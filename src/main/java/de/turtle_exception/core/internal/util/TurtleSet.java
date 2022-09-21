@@ -1,6 +1,6 @@
-package de.turtle_exception.core.util;
+package de.turtle_exception.core.internal.util;
 
-import de.turtle_exception.core.entities.Turtle;
+import de.turtle_exception.core.api.entities.Turtle;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
