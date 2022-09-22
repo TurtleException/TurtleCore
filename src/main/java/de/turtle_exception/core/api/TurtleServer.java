@@ -1,5 +1,7 @@
 package de.turtle_exception.core.api;
 
-public interface TurtleServer {
+import de.turtle_exception.core.api.entities.attribute.IUserContainer;
+
+public interface TurtleServer extends IUserContainer {
 
 }
