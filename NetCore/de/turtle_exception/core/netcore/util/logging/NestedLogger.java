@@ -1,4 +1,4 @@
-package de.turtle_exception.core.netcore.util;
+package de.turtle_exception.core.netcore.util.logging;
 
 import org.jetbrains.annotations.NotNull;
 

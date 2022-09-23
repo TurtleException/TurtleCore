@@ -1,8 +1,8 @@
 package de.turtle_exception.core.client.internal.entities;
 
-import de.turtle_exception.core.api.entities.Group;
-import de.turtle_exception.core.api.entities.User;
-import de.turtle_exception.core.client.internal.util.JsonUtil;
+import de.turtle_exception.core.client.api.entities.Group;
+import de.turtle_exception.core.client.api.entities.User;
+import de.turtle_exception.core.netcore.util.JsonUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;

@@ -1,18 +1,7 @@
-package de.turtle_exception.core.client.internal.net.server;
+package de.turtle_exception.core.server.net;
 
 import com.google.common.collect.Sets;
-import de.turtle_exception.core.api.TurtleServer;
-import de.turtle_exception.core.client.internal.TurtleServerImpl;
-import de.turtle_exception.core.client.internal.net.ActionImpl;
-import de.turtle_exception.core.client.internal.net.ActionParser;
-import de.turtle_exception.core.client.internal.net.NetworkAdapter;
-import de.turtle_exception.core.client.internal.net.Route;
-import de.turtle_exception.core.client.internal.net.action.AnswerableAction;
-import de.turtle_exception.core.client.internal.net.action.RemoteActionImpl;
-import de.turtle_exception.core.client.internal.net.action.VoidAction;
-import de.turtle_exception.core.client.internal.util.AsyncLoopThread;
-import de.turtle_exception.core.client.internal.util.NestedLogger;
-import de.turtle_exception.core.internal.net.*;
+import de.turtle_exception.core.server.TurtleServer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

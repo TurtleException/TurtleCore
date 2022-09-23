@@ -1,4 +1,4 @@
-package de.turtle_exception.core.client.internal.net.server;
+package de.turtle_exception.core.server.net;
 
 import de.turtle_exception.core.client.internal.util.AsyncLoopThread;
 import org.jetbrains.annotations.NotNull;
