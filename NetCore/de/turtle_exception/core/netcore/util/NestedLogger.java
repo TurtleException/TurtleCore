@@ -1,4 +1,4 @@
-package de.turtle_exception.core.client.internal.util;
+package de.turtle_exception.core.netcore.util;
 
 import org.jetbrains.annotations.NotNull;
 

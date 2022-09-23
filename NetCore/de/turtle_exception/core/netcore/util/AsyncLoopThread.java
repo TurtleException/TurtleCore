@@ -1,15 +1,10 @@
-package de.turtle_exception.core.client.internal.util;
-
-import de.turtle_exception.core.client.internal.net.client.InternalClient;
-import de.turtle_exception.core.client.internal.net.server.InternalServer;
+package de.turtle_exception.core.netcore.util;
 
 import java.util.function.BooleanSupplier;
 
 /**
  * A simple Thread that continuously repeats executing a {@link Runnable} until it is interrupted by a provided
  * {@link BooleanSupplier} or via {@link Thread#interrupt()}.
- * @see InternalServer
- * @see InternalClient
  */
 public class AsyncLoopThread extends Thread {
     private final BooleanSupplier condition;

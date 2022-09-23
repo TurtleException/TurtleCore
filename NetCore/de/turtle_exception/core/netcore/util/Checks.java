@@ -1,9 +1,9 @@
-package de.turtle_exception.core.client.internal.util;
+package de.turtle_exception.core.netcore.util;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class Check {
+public class Checks {
     public static boolean nonNulls(Object obj, Object... other) {
         if (obj == null) return false;
         for (Object o : other)
