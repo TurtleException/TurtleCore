@@ -20,30 +20,32 @@ public class RequestExecutor {
         return executor.isTerminated();
     }
 
-    public <T> CompletableFuture<T> register(ActionImpl<T> request) {
-        final long timeout = System.currentTimeMillis() + request.getTimeout();
+    /**
+     * Submits a {@link NetworkTask} to the underlying {@link Executor} and handles timeouts and returns a
+     * {@link CompletableFuture} of type {@code R} as described in {@link NetworkTask#handleResponse(String)}.e
+     * @param task An implementation of NetworkTask that should be executed.
+     * @return Result of the execution.
+     * @param <R> Type of the result provided by {@link NetworkTask#handleResponse(String)}
+     */
+    public <R> @NotNull CompletableFuture<R> submit(@NotNull NetworkTask<R> task) throws CompletionException {
+        final long timeout = System.currentTimeMillis() + task.getTimeout();
 
         return CompletableFuture.supplyAsync(() -> {
-            if (request instanceof AnswerableAction<T> aAction) {
-                // await response
-                while (System.currentTimeMillis() < timeout) {
-                    // this will return null until aAction#handle(RemoteActionImpl) has been called
-                    RemoteActionImpl response = aAction.getResponse();
-                    if (response != null)
-                        return aAction.handleResponse(response);
-                }
-                throw new CompletionException(new TimeoutException());
+            // await response
+            while (System.currentTimeMillis() <  timeout) {
+                String response = callbacks.get(task.getCallbackCode());
+                if (response != null)
+                    return task.handleResponse(response);
             }
-
-            throw new IllegalArgumentException("Action of type " + request.getClass().getSimpleName() + " is not supported.");
+            throw new CompletionException(new TimeoutException());
         }, executor);
     }
 
     /* - - - */
 
-    private final ConcurrentHashMap<Integer, RemoteActionImpl> callbacks = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Integer, String> callbacks = new ConcurrentHashMap<>();
 
-    public void alertCallback(int callbackCode, @NotNull RemoteActionImpl action) {
-        callbacks.put(callbackCode, action);
+    public void respond(int callbackCode, @NotNull String msg) {
+        callbacks.put(callbackCode, msg);
     }
 }

@@ -20,7 +20,7 @@ public abstract class NetworkAdapter {
     protected RequestExecutor outboundExecutor;
     protected RequestExecutor  inboundExecutor;
 
-    protected AsyncLoopThread inputReader;
+    protected AsyncLoopThread receiver;
 
     protected NetworkAdapter(NestedLogger logger) {
         this.logger = logger;
@@ -39,9 +39,9 @@ public abstract class NetworkAdapter {
         this.inboundExecutor  = new RequestExecutor((r, executor) -> logger.log(Level.WARNING,  "Inbound RequestExecutor rejected task: " + r.toString()));
     }
 
-    protected final void stopInputReader() {
-        this.inputReader.interrupt();
-        this.inputReader = null;
+    protected final void stopReceiver() {
+        this.receiver.interrupt();
+        this.receiver = null;
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
@@ -55,9 +55,9 @@ public abstract class NetworkAdapter {
 
     /* - - - */
 
-    public abstract <T> @NotNull CompletableFuture<T> submitOutbound(@NotNull ActionImpl<T> action) throws RejectedExecutionException, TimeoutException;
+    public abstract <T> @NotNull CompletableFuture<T> submitOutbound(@NotNull NetworkTask<T> action) throws RejectedExecutionException, TimeoutException;
 
-    public abstract void submitInbound(@NotNull RemoteActionImpl action);
+    public abstract <T> void submitInbound(@NotNull NetworkTask<T> action);
 
     public abstract boolean isStopped();
 }

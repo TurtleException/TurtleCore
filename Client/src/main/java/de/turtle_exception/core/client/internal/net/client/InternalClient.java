@@ -65,7 +65,7 @@ public class InternalClient extends NetworkAdapter {
         this.out = new PrintWriter(socket.getOutputStream(), true);
         this.in  = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
-        this.inputReader = new AsyncLoopThread(() -> status != ConnectionStatus.DISCONNECTED, () -> {
+        this.receiver = new AsyncLoopThread(() -> status != ConnectionStatus.DISCONNECTED, () -> {
             try {
                 receive(in.readLine());
             } catch (IOException e) {
@@ -81,7 +81,7 @@ public class InternalClient extends NetworkAdapter {
         // notify server
         new VoidAction(this.client, Route.Login.QUIT).queue();
 
-        this.stopInputReader();
+        this.stopReceiver();
         this.awaitExecutorShutdown();
 
         // close socket
@@ -105,7 +105,7 @@ public class InternalClient extends NetworkAdapter {
     }
 
     /**
-     * Called by the {@link InternalClient#inputReader} when the server sent a message.
+     * Called by the {@link InternalClient#receiver} when the server sent a message.
      * <p>This method decrypts the message and translates it into a {@link RemoteActionImpl} before passing it on to
      * {@link InternalClient#submitInbound(RemoteActionImpl)}.
      * @param msg The raw message from the server.
@@ -135,12 +135,12 @@ public class InternalClient extends NetworkAdapter {
 
         this.send(new Message(callbackCode, content));
 
-        return this.outboundExecutor.register(action);
+        return this.outboundExecutor.submit(action);
     }
 
     @Override
     public void submitInbound(@NotNull RemoteActionImpl action) {
-        this.inboundExecutor.register(action);
+        this.inboundExecutor.submit(action);
     }
 
     @Override

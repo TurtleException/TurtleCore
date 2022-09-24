@@ -1,11 +1,12 @@
 package de.turtle_exception.core.client.api.net;
 
+import de.turtle_exception.core.netcore.net.NetworkTask;
 import org.jetbrains.annotations.Range;
 
 import java.util.concurrent.*;
 import java.util.function.Consumer;
 
-public interface Action<T> {
+public interface Action<T> extends NetworkTask<T> {
     CompletableFuture<T> complete() throws CompletionException;
 
     /**
