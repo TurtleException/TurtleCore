@@ -1,12 +1,9 @@
 package de.turtle_exception.core.client.internal.net;
 
-import de.turtle_exception.core.api.net.Action;
+import de.turtle_exception.core.client.api.net.Action;
 import de.turtle_exception.core.client.internal.TurtleClientImpl;
-import de.turtle_exception.core.client.internal.TurtleCore;
-import de.turtle_exception.core.client.internal.TurtleServerImpl;
-import de.turtle_exception.core.client.internal.net.server.VirtualClient;
+import de.turtle_exception.core.netcore.net.Route;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
 
 import java.util.concurrent.CompletableFuture;
@@ -16,11 +13,8 @@ import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 
 public abstract class ActionImpl<T> implements Action<T> {
-    private final TurtleCore core;
+    private final TurtleClientImpl client;
     private final Route route;
-
-    // only for server actions
-    private final @Nullable VirtualClient target;
 
     private int priority = 0;
 
@@ -29,22 +23,15 @@ public abstract class ActionImpl<T> implements Action<T> {
     private Consumer<T> onSuccess;
     private Consumer<Throwable> onFailure;
 
-    public ActionImpl(@NotNull TurtleClientImpl core, @NotNull Route route) {
-        this.core = core;
+    public ActionImpl(@NotNull TurtleClientImpl client, @NotNull Route route) {
+        this.client = client;
         this.route = route;
-        this.target = null;
-    }
-
-    public ActionImpl(@NotNull TurtleServerImpl core, @NotNull Route route, @NotNull VirtualClient target) {
-        this.core = core;
-        this.route = route;
-        this.target = target;
     }
 
     @Override
     public CompletableFuture<T> complete() throws RejectedExecutionException, CompletionException {
         try {
-            return core.getNetworkAdapter().submitOutbound(this);
+            return client.getNetworkAdapter().submitOutbound(this);
         } catch (TimeoutException e) {
             throw new CompletionException(e);
         }
@@ -89,20 +76,15 @@ public abstract class ActionImpl<T> implements Action<T> {
 
     // TODO: call this method
     @NotNull Consumer<? super T> getOnSuccess() {
-        return onSuccess != null ? onSuccess : core.getDefaultOnSuccess();
+        return onSuccess != null ? onSuccess : client.getDefaultOnSuccess();
     }
 
     // TODO: call this method
     @NotNull Consumer<? super Throwable> getOnFailure() {
-        return onFailure != null ? onFailure : core.getDefaultOnSuccess();
+        return onFailure != null ? onFailure : client.getDefaultOnSuccess();
     }
 
     public @NotNull Route getRoute() {
         return route;
-    }
-
-    // only for server actions
-    public @Nullable VirtualClient getTarget() {
-        return target;
     }
 }

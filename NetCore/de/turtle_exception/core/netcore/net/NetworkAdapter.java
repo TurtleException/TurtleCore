@@ -1,8 +1,7 @@
-package de.turtle_exception.core.client.internal.net;
+package de.turtle_exception.core.netcore.net;
 
-import de.turtle_exception.core.client.internal.util.NestedLogger;
-import de.turtle_exception.core.client.internal.net.action.RemoteActionImpl;
-import de.turtle_exception.core.client.internal.util.AsyncLoopThread;
+import de.turtle_exception.core.netcore.util.AsyncLoopThread;
+import de.turtle_exception.core.netcore.util.logging.NestedLogger;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;

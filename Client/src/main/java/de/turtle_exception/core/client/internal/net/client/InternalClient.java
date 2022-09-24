@@ -1,17 +1,17 @@
 package de.turtle_exception.core.client.internal.net.client;
 
-import de.turtle_exception.core.api.TurtleClient;
+import de.turtle_exception.core.client.api.TurtleClient;
 import de.turtle_exception.core.client.internal.TurtleClientImpl;
+import de.turtle_exception.core.client.internal.net.ActionImpl;
 import de.turtle_exception.core.client.internal.net.ActionParser;
-import de.turtle_exception.core.client.internal.net.NetworkAdapter;
-import de.turtle_exception.core.client.internal.net.Route;
 import de.turtle_exception.core.client.internal.net.action.AnswerableAction;
 import de.turtle_exception.core.client.internal.net.action.RemoteActionImpl;
 import de.turtle_exception.core.client.internal.net.action.VoidAction;
-import de.turtle_exception.core.client.internal.net.server.VirtualClient;
-import de.turtle_exception.core.client.internal.util.AsyncLoopThread;
-import de.turtle_exception.core.client.internal.util.NestedLogger;
-import de.turtle_exception.core.client.internal.net.ActionImpl;
+import de.turtle_exception.core.netcore.net.ConnectionStatus;
+import de.turtle_exception.core.netcore.net.NetworkAdapter;
+import de.turtle_exception.core.netcore.net.Route;
+import de.turtle_exception.core.netcore.util.AsyncLoopThread;
+import de.turtle_exception.core.netcore.util.logging.NestedLogger;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedReader;
@@ -40,7 +40,7 @@ public class InternalClient extends NetworkAdapter {
     private PrintWriter out;
     private BufferedReader in;
 
-    private VirtualClient.Status status;
+    private ConnectionStatus status;
 
     public InternalClient(TurtleClientImpl client, String host, int port, String login, String pass) {
         super(new NestedLogger("Client#" + port, client.getLogger()));
@@ -60,12 +60,12 @@ public class InternalClient extends NetworkAdapter {
 
         // create the underlying socket (the spicy part)
         this.socket = new Socket(host, port);
-        this.status = VirtualClient.Status.CONNECTED;
+        this.status = ConnectionStatus.CONNECTED;
 
         this.out = new PrintWriter(socket.getOutputStream(), true);
         this.in  = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
-        this.inputReader = new AsyncLoopThread(() -> status != VirtualClient.Status.DISCONNECTED, () -> {
+        this.inputReader = new AsyncLoopThread(() -> status != ConnectionStatus.DISCONNECTED, () -> {
             try {
                 receive(in.readLine());
             } catch (IOException e) {
@@ -85,7 +85,7 @@ public class InternalClient extends NetworkAdapter {
         this.awaitExecutorShutdown();
 
         // close socket
-        this.status = VirtualClient.Status.DISCONNECTED;
+        this.status = ConnectionStatus.DISCONNECTED;
         this.in.close();
         this.out.close();
         this.socket.close();

@@ -1,9 +1,7 @@
 package de.turtle_exception.core.client.internal.net.action;
 
 import de.turtle_exception.core.client.internal.TurtleClientImpl;
-import de.turtle_exception.core.client.internal.TurtleServerImpl;
-import de.turtle_exception.core.client.internal.net.Route;
-import de.turtle_exception.core.client.internal.net.server.VirtualClient;
+import de.turtle_exception.core.netcore.net.Route;
 import de.turtle_exception.core.client.internal.net.ActionImpl;
 import org.jetbrains.annotations.NotNull;
 
@@ -15,11 +13,6 @@ public class RemoteActionImpl extends ActionImpl<Void> {
 
     public RemoteActionImpl(@NotNull TurtleClientImpl core, @NotNull Route route, @NotNull String content) {
         super(core, route);
-        this.content = content;
-    }
-
-    public RemoteActionImpl(@NotNull TurtleServerImpl core, @NotNull Route route, @NotNull String content, @NotNull VirtualClient target) {
-        super(core, route, target);
         this.content = content;
     }
 
