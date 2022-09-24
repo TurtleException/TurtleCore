@@ -1,7 +1,7 @@
 package de.turtle_exception.core.client.internal.entities;
 
-import de.turtle_exception.core.api.entities.Group;
-import de.turtle_exception.core.api.net.Action;
+import de.turtle_exception.core.client.api.entities.Group;
+import de.turtle_exception.core.client.api.net.Action;
 import org.jetbrains.annotations.NotNull;
 
 public class GroupImpl implements Group {
