@@ -1,5 +1,6 @@
 package de.turtle_exception.core.netcore.net;
 
+import de.turtle_exception.core.netcore.net.message.Message;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.*;
@@ -27,7 +28,7 @@ public class RequestExecutor {
      * @return Result of the execution.
      * @param <R> Type of the result provided by {@link NetworkTask#handleResponse(String)}
      */
-    public <R> @NotNull CompletableFuture<R> submit(@NotNull NetworkTask<R> task) throws CompletionException {
+    public @NotNull CompletableFuture<Message> submit(@NotNull Message task) throws CompletionException {
         final long timeout = System.currentTimeMillis() + task.getTimeout();
 
         return CompletableFuture.supplyAsync(() -> {

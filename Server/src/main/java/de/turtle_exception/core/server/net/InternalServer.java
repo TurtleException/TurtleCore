@@ -1,6 +1,8 @@
 package de.turtle_exception.core.server.net;
 
 import com.google.common.collect.Sets;
+import de.turtle_exception.core.netcore.net.route.Route;
+import de.turtle_exception.core.netcore.net.route.Routes;
 import de.turtle_exception.core.netcore.util.AsyncLoopThread;
 import de.turtle_exception.core.netcore.util.logging.NestedLogger;
 import de.turtle_exception.core.server.TurtleServer;
@@ -66,21 +68,7 @@ public class InternalServer {
      * @throws IOException if an I/O error occurs when closing the socket.
      */
     public void stop() throws IOException {
-        // close client connections
-        for (VirtualClient client : clients) {
-            clients.remove(client);
-
-            // notify client
-            new VoidAction(this.server, Route.Login.QUIT, client)
-                    .onSuccess(v -> {
-                        // close connection
-                        try {
-                            client.closeSocket();
-                        } catch (IOException e) {
-                            logger.log(Level.WARNING, "Encountered an exception when attempting to close connection to client \"" + client.getIdentifier() + "\".", e);
-                        }})
-                    .queue();
-        }
+        // notify clients
 
         this.receiver.interrupt();
         this.receiver = null;

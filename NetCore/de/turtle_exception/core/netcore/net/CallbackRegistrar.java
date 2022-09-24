@@ -1,6 +1,6 @@
 package de.turtle_exception.core.netcore.net;
 
-import de.turtle_exception.core.client.internal.net.action.AnswerableAction;
+import de.turtle_exception.core.netcore.net.message.Message;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -14,14 +14,14 @@ public class CallbackRegistrar {
     // TODO: isn't there a more elegant solution?
     private final AtomicInteger pointer = new AtomicInteger(1);
 
-    private final ConcurrentHashMap<Integer, AnswerableAction<?>> index = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Integer, Message> index = new ConcurrentHashMap<>();
 
     /**
      * Registers a foreign callbackCode.
      */
-    public boolean register(int i, AnswerableAction<?> action) {
-        pointer.set(Math.max(pointer.get(), i) + 1);
-        return index.put(i, action) != action;
+    public boolean register(Message msg) {
+        pointer.set(Math.max(pointer.get(), msg.callbackCode()) + 1);
+        return index.put(msg.callbackCode(), msg) != msg;
     }
 
     /**
@@ -29,7 +29,7 @@ public class CallbackRegistrar {
      * <p>Technically this method is not 100% thread-safe because the pointer could be changed between adding it to the
      * underlying set and returning the value but let's not think about that now and deal with the exceptions later :)
      */
-    public int register(AnswerableAction<?> action) throws TimeoutException {
+    public int newCode() throws TimeoutException {
         int timeout = 10000;
 
         while (index.containsKey(pointer.get())) {
@@ -44,7 +44,6 @@ public class CallbackRegistrar {
                 throw new TimeoutException("Too many tries! Could not register a new callbackCode.");
         }
 
-        index.put(pointer.get(), action);
         return pointer.get();
     }
 
@@ -60,7 +59,7 @@ public class CallbackRegistrar {
         return index.containsKey(i);
     }
 
-    public @Nullable AnswerableAction<?> getAction(int i) {
+    public @Nullable Message getMessage(int i) {
         return index.get(i);
     }
 }
