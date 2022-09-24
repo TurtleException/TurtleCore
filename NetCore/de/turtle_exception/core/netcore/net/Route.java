@@ -1,4 +1,4 @@
-package de.turtle_exception.core.client.internal.net;
+package de.turtle_exception.core.netcore.net;
 
 import de.turtle_exception.core.client.internal.TurtleClientImpl;
 import de.turtle_exception.core.client.internal.TurtleCore;

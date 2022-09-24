@@ -1,6 +1,7 @@
 package de.turtle_exception.core.client.internal.net;
 
 import de.turtle_exception.core.client.internal.TurtleCore;
+import de.turtle_exception.core.netcore.net.Route;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

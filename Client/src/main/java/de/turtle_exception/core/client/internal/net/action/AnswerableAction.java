@@ -1,10 +1,8 @@
 package de.turtle_exception.core.client.internal.net.action;
 
-import de.turtle_exception.core.api.net.Action;
+import de.turtle_exception.core.client.api.net.Action;
 import de.turtle_exception.core.client.internal.TurtleClientImpl;
-import de.turtle_exception.core.client.internal.TurtleServerImpl;
-import de.turtle_exception.core.client.internal.net.Route;
-import de.turtle_exception.core.client.internal.net.server.VirtualClient;
+import de.turtle_exception.core.netcore.net.Route;
 import de.turtle_exception.core.client.internal.net.ActionImpl;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -23,11 +21,6 @@ public class AnswerableAction<T> extends ActionImpl<T> {
 
     public AnswerableAction(@NotNull TurtleClientImpl core, @NotNull Route route, Function<RemoteActionImpl, T> handler) {
         super(core, route);
-        this.handler = handler;
-    }
-
-    public AnswerableAction(@NotNull TurtleServerImpl core, @NotNull Route route, @NotNull VirtualClient target, Function<RemoteActionImpl, T> handler) {
-        super(core, route, target);
         this.handler = handler;
     }
 

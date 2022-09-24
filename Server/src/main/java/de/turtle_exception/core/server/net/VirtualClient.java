@@ -1,6 +1,7 @@
 package de.turtle_exception.core.server.net;
 
-import de.turtle_exception.core.client.internal.util.AsyncLoopThread;
+import de.turtle_exception.core.netcore.net.ConnectionStatus;
+import de.turtle_exception.core.netcore.util.AsyncLoopThread;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedReader;
@@ -23,10 +24,7 @@ public class VirtualClient {
     private String pass;
 
     // TODO: use this
-    public enum Status {
-        CONNECTED, LOGIN, LOGGED_IN, DISCONNECTED;
-    }
-    private Status status = Status.CONNECTED;
+    private ConnectionStatus status = ConnectionStatus.CONNECTED;
 
     VirtualClient(InternalServer internalServer, Socket socket) throws IOException {
         this.internalServer = internalServer;
@@ -35,7 +33,7 @@ public class VirtualClient {
         this.out = new PrintWriter(socket.getOutputStream(), true);
         this.in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
-        this.inputReader = new AsyncLoopThread(() -> status != Status.DISCONNECTED, () -> {
+        this.inputReader = new AsyncLoopThread(() -> status != ConnectionStatus.DISCONNECTED, () -> {
             try {
                 receive(in.readLine());
             } catch (IOException e) {
@@ -71,7 +69,7 @@ public class VirtualClient {
         this.socket.close();
     }
 
-    public @NotNull Status getStatus() {
+    public @NotNull ConnectionStatus getStatus() {
         return status;
     }
 
