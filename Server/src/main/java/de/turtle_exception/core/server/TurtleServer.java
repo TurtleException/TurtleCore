@@ -63,4 +63,8 @@ public class TurtleServer {
 
         logger.log(Level.ALL, "OK bye.");
     }
+
+    public Logger getLogger() {
+        return logger;
+    }
 }
