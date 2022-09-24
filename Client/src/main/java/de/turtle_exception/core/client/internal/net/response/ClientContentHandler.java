@@ -6,9 +6,9 @@ import de.turtle_exception.core.netcore.net.Route;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ClientContentHandler implements ResponseHandler<TurtleClientImpl> {
+public class ClientContentHandler implements ResponseHandler {
     @Override
-    public void handle(@NotNull Route route, @NotNull TurtleClientImpl core, @NotNull String connectionIdentifier, @Nullable String content) {
+    public void handle(@NotNull Route route, @NotNull TurtleClientImpl client, @Nullable String content) {
         // TODO
     }
 }
