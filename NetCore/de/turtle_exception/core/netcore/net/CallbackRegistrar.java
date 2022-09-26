@@ -20,8 +20,8 @@ public class CallbackRegistrar {
      * Registers a foreign callbackCode.
      */
     public boolean register(Message msg) {
-        pointer.set(Math.max(pointer.get(), msg.callbackCode()) + 1);
-        return index.put(msg.callbackCode(), msg) != msg;
+        pointer.set(Math.max(pointer.get(), msg.getCallbackCode()) + 1);
+        return index.put(msg.getCallbackCode(), msg) != msg;
     }
 
     /**

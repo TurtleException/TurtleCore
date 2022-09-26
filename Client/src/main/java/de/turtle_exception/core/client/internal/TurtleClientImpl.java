@@ -6,10 +6,11 @@ import de.turtle_exception.core.client.api.entities.User;
 import de.turtle_exception.core.client.api.net.Action;
 import de.turtle_exception.core.client.internal.entities.EntityBuilder;
 import de.turtle_exception.core.client.internal.net.DefaultRequestConsumerHolder;
+import de.turtle_exception.core.netcore.TurtleCore;
 import de.turtle_exception.core.netcore.net.NetworkAdapter;
-import de.turtle_exception.core.netcore.net.Route;
 import de.turtle_exception.core.client.internal.net.action.ContentAction;
 import de.turtle_exception.core.client.internal.util.TurtleSet;
+import de.turtle_exception.core.netcore.net.route.Routes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -17,7 +18,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 
-public class TurtleClientImpl implements TurtleClient, DefaultRequestConsumerHolder {
+public class TurtleClientImpl extends TurtleCore implements TurtleClient, DefaultRequestConsumerHolder {
     /** The root logger of this core */
     private final Logger logger;
 
@@ -92,21 +93,21 @@ public class TurtleClientImpl implements TurtleClient, DefaultRequestConsumerHol
 
     @Override
     public @NotNull Action<User> retrieveUser(long id) {
-        return new ContentAction<>(this, Route.Content.User.GET, EntityBuilder::buildUser);
+        return new ContentAction<>(this, Routes.Content.User.GET, EntityBuilder::buildUser);
     }
 
     @Override
     public @NotNull Action<List<User>> retrieveUsers() {
-        return new ContentAction<>(this, Route.Content.User.GET_ALL, EntityBuilder::buildUsers);
+        return new ContentAction<>(this, Routes.Content.User.GET_ALL, EntityBuilder::buildUsers);
     }
 
     @Override
     public @NotNull Action<Group> retrieveGroup(long id) {
-        return new ContentAction<>(this, Route.Content.Group.GET, EntityBuilder::buildGroup);
+        return new ContentAction<>(this, Routes.Content.Group.GET, EntityBuilder::buildGroup);
     }
 
     @Override
     public @NotNull Action<List<Group>> retrieveGroups() {
-        return new ContentAction<>(this, Route.Content.Group.GET_ALL, EntityBuilder::buildGroups);
+        return new ContentAction<>(this, Routes.Content.Group.GET_ALL, EntityBuilder::buildGroups);
     }
 }

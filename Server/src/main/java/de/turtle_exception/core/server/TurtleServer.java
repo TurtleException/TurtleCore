@@ -1,5 +1,6 @@
 package de.turtle_exception.core.server;
 
+import de.turtle_exception.core.netcore.TurtleCore;
 import de.turtle_exception.core.netcore.util.logging.SimpleFormatter;
 import de.turtle_exception.core.server.util.LogUtil;
 import de.turtle_exception.core.server.util.Status;
@@ -9,7 +10,7 @@ import java.net.URISyntaxException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class TurtleServer {
+public class TurtleServer extends TurtleCore {
     private final Status status = new Status();
 
     /** The root logger of this server */

@@ -10,6 +10,7 @@ import de.turtle_exception.core.client.internal.net.action.VoidAction;
 import de.turtle_exception.core.netcore.net.ConnectionStatus;
 import de.turtle_exception.core.netcore.net.NetworkAdapter;
 import de.turtle_exception.core.netcore.net.Route;
+import de.turtle_exception.core.netcore.net.route.Routes;
 import de.turtle_exception.core.netcore.util.AsyncLoopThread;
 import de.turtle_exception.core.netcore.util.logging.NestedLogger;
 import org.jetbrains.annotations.NotNull;
@@ -54,10 +55,7 @@ public class InternalClient extends NetworkAdapter {
         this.pass = pass;
     }
 
-    @Override
     public void start() throws IOException {
-        this.prepareExecutors();
-
         // create the underlying socket (the spicy part)
         this.socket = new Socket(host, port);
         this.status = ConnectionStatus.CONNECTED;
@@ -79,7 +77,7 @@ public class InternalClient extends NetworkAdapter {
     @Override
     public void stop() throws IOException {
         // notify server
-        new VoidAction(this.client, Route.Login.QUIT).queue();
+        new VoidAction(this.client, Routes.Login.QUIT).queue();
 
         this.stopReceiver();
         this.awaitExecutorShutdown();

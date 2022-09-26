@@ -1,5 +1,6 @@
 package de.turtle_exception.core.netcore.net.message;
 
+import de.turtle_exception.core.netcore.TurtleCore;
 import de.turtle_exception.core.netcore.net.route.ContentType;
 import de.turtle_exception.core.netcore.net.route.Route;
 import de.turtle_exception.core.netcore.net.route.Routes;
@@ -28,7 +29,7 @@ public class MessageParser {
         );
     }
 
-    public static @NotNull Message parse(@NotNull String msg) throws IllegalArgumentException {
+    public static @NotNull Message parse(@NotNull TurtleCore core, @NotNull String msg) throws IllegalArgumentException {
         String[] parts = msg.split("#");
 
         if (parts.length != MESSAGE_TOKENS)
@@ -65,9 +66,8 @@ public class MessageParser {
         if (contentType == null)
             throw new IllegalArgumentException("Unknown ContentType: " + cTypStr);
 
-        return new Message(callbackCode, route, content, (self, response) -> {
-            // TODO: get this from some registry that client / server have to use to determine behaviour for certain routes
-        });
+        // TODO: include timeout in string message (?)
+        return new Message(core, callbackCode, route, content, core.getRouteManager().getRouteFinalizer(route));
     }
 
     /* - - - */

@@ -28,15 +28,15 @@ public class RequestExecutor {
      * @return Result of the execution.
      * @param <R> Type of the result provided by {@link NetworkTask#handleResponse(String)}
      */
-    public @NotNull CompletableFuture<Message> submit(@NotNull Message task) throws CompletionException {
+    public @NotNull CompletableFuture<Void> submit(@NotNull Message task) throws CompletionException {
         final long timeout = System.currentTimeMillis() + task.getTimeout();
 
         return CompletableFuture.supplyAsync(() -> {
             // await response
             while (System.currentTimeMillis() <  timeout) {
-                String response = callbacks.get(task.getCallbackCode());
+                Message response = callbacks.get(task.getCallbackCode());
                 if (response != null)
-                    return task.handleResponse(response);
+                    task.handleResponse(response);
             }
             throw new CompletionException(new TimeoutException());
         }, executor);
@@ -44,9 +44,9 @@ public class RequestExecutor {
 
     /* - - - */
 
-    private final ConcurrentHashMap<Integer, String> callbacks = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Integer, Message> callbacks = new ConcurrentHashMap<>();
 
-    public void respond(int callbackCode, @NotNull String msg) {
+    public void respond(int callbackCode, @NotNull Message msg) {
         callbacks.put(callbackCode, msg);
     }
 }
