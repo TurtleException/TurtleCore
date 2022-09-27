@@ -1,16 +1,12 @@
 package de.turtle_exception.core.client.internal;
 
+import de.turtle_exception.core.client.api.Action;
 import de.turtle_exception.core.client.api.TurtleClient;
 import de.turtle_exception.core.client.api.entities.Group;
 import de.turtle_exception.core.client.api.entities.User;
-import de.turtle_exception.core.client.api.net.Action;
-import de.turtle_exception.core.client.internal.entities.EntityBuilder;
-import de.turtle_exception.core.client.internal.net.DefaultRequestConsumerHolder;
+import de.turtle_exception.core.client.internal.util.TurtleSet;
 import de.turtle_exception.core.netcore.TurtleCore;
 import de.turtle_exception.core.netcore.net.NetworkAdapter;
-import de.turtle_exception.core.client.internal.net.action.ContentAction;
-import de.turtle_exception.core.client.internal.util.TurtleSet;
-import de.turtle_exception.core.netcore.net.route.Routes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -18,7 +14,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 
-public class TurtleClientImpl extends TurtleCore implements TurtleClient, DefaultRequestConsumerHolder {
+public class TurtleClientImpl extends TurtleCore implements TurtleClient {
     /** The root logger of this core */
     private final Logger logger;
 
@@ -28,8 +24,8 @@ public class TurtleClientImpl extends TurtleCore implements TurtleClient, Defaul
     /** The internal server / client */
     protected NetworkAdapter networkAdapter;
 
-    private Consumer<Object>            defaultOnSuccess = o -> { };
-    private Consumer<? super Throwable> defaultOnFailure = t -> {
+    private @NotNull Consumer<Object>            defaultOnSuccess = o -> { };
+    private @NotNull Consumer<? super Throwable> defaultOnFailure = t -> {
         // TODO
     };
 
@@ -69,45 +65,45 @@ public class TurtleClientImpl extends TurtleCore implements TurtleClient, Defaul
         return userCache.get(id);
     }
 
+    /* - - - */
+
     @Override
-    public @NotNull Consumer<Object> getDefaultOnSuccess() {
+    public @NotNull Consumer<Object> getDefaultActionSuccess() {
         return this.defaultOnSuccess;
     }
 
     @Override
-    public void setDefaultOnSuccess(@NotNull Consumer<Object> c) {
-        this.defaultOnSuccess = c;
-    }
-
-    @Override
-    public @NotNull Consumer<? super Throwable> getDefaultOnFailure() {
+    public @NotNull Consumer<? super Throwable> getDefaultActionFailure() {
         return this.defaultOnFailure;
     }
 
     @Override
-    public void setDefaultOnFailure(@NotNull Consumer<? super Throwable> c) {
-        this.defaultOnFailure = c;
+    public void setDefaultActionSuccess(@NotNull Consumer<Object> consumer) {
+        this.defaultOnSuccess = consumer;
     }
 
-    /* - - - */
+    @Override
+    public void setDefaultActionFailure(@NotNull Consumer<? super Throwable> consumer) {
+        this.defaultOnFailure = consumer;
+    }
 
     @Override
     public @NotNull Action<User> retrieveUser(long id) {
-        return new ContentAction<>(this, Routes.Content.User.GET, EntityBuilder::buildUser);
+        // TODO
     }
 
     @Override
     public @NotNull Action<List<User>> retrieveUsers() {
-        return new ContentAction<>(this, Routes.Content.User.GET_ALL, EntityBuilder::buildUsers);
+        // TODO
     }
 
     @Override
     public @NotNull Action<Group> retrieveGroup(long id) {
-        return new ContentAction<>(this, Routes.Content.Group.GET, EntityBuilder::buildGroup);
+        // TODO
     }
 
     @Override
     public @NotNull Action<List<Group>> retrieveGroups() {
-        return new ContentAction<>(this, Routes.Content.Group.GET_ALL, EntityBuilder::buildGroups);
+        // TODO
     }
 }

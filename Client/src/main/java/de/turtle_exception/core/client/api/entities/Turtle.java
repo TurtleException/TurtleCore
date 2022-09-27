@@ -1,5 +1,8 @@
 package de.turtle_exception.core.client.api.entities;
 
+import de.turtle_exception.core.client.api.TurtleClient;
+import org.jetbrains.annotations.NotNull;
+
 /**
  * A turtle entity is an entity that can be uniquely identified by its turtle id.
  * @see Turtle#getId()
@@ -10,4 +13,7 @@ public interface Turtle {
      * @return Long representation of the id.
      */
     long getId();
+
+    // TODO: docs
+    @NotNull TurtleClient getClient();
 }
