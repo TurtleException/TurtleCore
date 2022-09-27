@@ -1,6 +1,6 @@
 package de.turtle_exception.core.client.internal;
 
-import de.turtle_exception.core.client.api.Action;
+import de.turtle_exception.core.client.api.requests.Action;
 import de.turtle_exception.core.client.api.TurtleClient;
 import de.turtle_exception.core.client.api.entities.Group;
 import de.turtle_exception.core.client.api.entities.User;

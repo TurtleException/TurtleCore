@@ -1,5 +1,6 @@
-package de.turtle_exception.core.client.api;
+package de.turtle_exception.core.client.api.requests;
 
+import de.turtle_exception.core.client.api.TurtleClient;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
