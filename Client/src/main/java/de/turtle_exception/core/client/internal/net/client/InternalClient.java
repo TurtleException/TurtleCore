@@ -2,14 +2,8 @@ package de.turtle_exception.core.client.internal.net.client;
 
 import de.turtle_exception.core.client.api.TurtleClient;
 import de.turtle_exception.core.client.internal.TurtleClientImpl;
-import de.turtle_exception.core.client.internal.net.ActionImpl;
-import de.turtle_exception.core.client.internal.net.ActionParser;
-import de.turtle_exception.core.client.internal.net.action.AnswerableAction;
-import de.turtle_exception.core.client.internal.net.action.RemoteActionImpl;
-import de.turtle_exception.core.client.internal.net.action.VoidAction;
 import de.turtle_exception.core.netcore.net.ConnectionStatus;
 import de.turtle_exception.core.netcore.net.NetworkAdapter;
-import de.turtle_exception.core.netcore.net.Route;
 import de.turtle_exception.core.netcore.net.route.Routes;
 import de.turtle_exception.core.netcore.util.AsyncLoopThread;
 import de.turtle_exception.core.netcore.util.logging.NestedLogger;
@@ -21,9 +15,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 
 /** The actual client part of the {@link TurtleClient}. */
@@ -66,7 +57,7 @@ public class InternalClient extends NetworkAdapter {
 
         this.receiver = new AsyncLoopThread(() -> status != ConnectionStatus.DISCONNECTED, () -> {
             try {
-                receive(in.readLine());
+                this.handleInbound(in.readLine());
             } catch (IOException e) {
                 client.getLogger().log(Level.WARNING, "Could not read input from client " + socket.getInetAddress(), e);
             }
@@ -90,60 +81,8 @@ public class InternalClient extends NetworkAdapter {
         this.socket.close();
     }
 
-    /* - - - */
-
-    /**
-     * Called by {@link InternalClient#submitOutbound(ActionImpl)} when a message should be sent to a server.
-     * <p>This method translates the {@link Message} into a String and encrypts it before passing it on to the
-     * {@link InternalClient#out Socket OutputStream}.
-     */
-    void send(@NotNull Message msg) {
-        String str = Message.parseToServer(msg);
-        // TODO: encrypt
-        out.write(str);
-    }
-
-    /**
-     * Called by the {@link InternalClient#receiver} when the server sent a message.
-     * <p>This method decrypts the message and translates it into a {@link RemoteActionImpl} before passing it on to
-     * {@link InternalClient#submitInbound(RemoteActionImpl)}.
-     * @param msg The raw message from the server.
-     */
-    void receive(@NotNull String msg) {
-        String str = msg; // TODO: decrypt
-        Message message = Message.parseFromServer(msg);
-
-        // attempt to find the initial request this message is a response to
-        AnswerableAction<?> respondingTo = (message.callbackCode() > 0) ? callbackRegistrar.getAction(message.callbackCode()) : null;
-
-        // parse the message into an action, so it can be processed
-        RemoteActionImpl action = ActionParser.parseAction(client, message.content(), respondingTo);
-
-        this.submitInbound(action);
-    }
-
-    /* - - - */
-
     @Override
-    public @NotNull <T> CompletableFuture<T> submitOutbound(@NotNull ActionImpl<T> action) throws RejectedExecutionException, TimeoutException {
-        if (this.isStopped())
-            throw new RejectedExecutionException("The internal client has been stopped!");
-
-        String content   = action.getRoute().getMessage();
-        int callbackCode = (action instanceof AnswerableAction<T> aAction) ? callbackRegistrar.register(aAction) : 0;
-
-        this.send(new Message(callbackCode, content));
-
-        return this.executor.submit(action);
-    }
-
-    @Override
-    public void submitInbound(@NotNull RemoteActionImpl action) {
-        this.inboundExecutor.submit(action);
-    }
-
-    @Override
-    public boolean isStopped() {
-        return socket.isClosed();
+    protected void send(@NotNull String msg) {
+        this.out.write(msg);
     }
 }
