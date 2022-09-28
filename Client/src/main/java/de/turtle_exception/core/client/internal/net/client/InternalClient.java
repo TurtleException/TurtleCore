@@ -134,7 +134,7 @@ public class InternalClient extends NetworkAdapter {
 
         this.send(new Message(callbackCode, content));
 
-        return this.outboundExecutor.submit(action);
+        return this.executor.submit(action);
     }
 
     @Override

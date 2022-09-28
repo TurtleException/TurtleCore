@@ -1,37 +1,31 @@
 package de.turtle_exception.core.netcore.net;
 
 import de.turtle_exception.core.netcore.TurtleCore;
-import de.turtle_exception.core.netcore.net.message.Message;
+import de.turtle_exception.core.netcore.net.message.InboundMessage;
 import de.turtle_exception.core.netcore.net.message.MessageParser;
+import de.turtle_exception.core.netcore.net.message.OutboundMessage;
 import de.turtle_exception.core.netcore.util.AsyncLoopThread;
 import de.turtle_exception.core.netcore.util.logging.NestedLogger;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.*;
 import java.util.logging.Level;
 
 public abstract class NetworkAdapter {
-    private final TurtleCore core;
+    private   final TurtleCore core;
     protected final NestedLogger logger;
 
-    protected RequestExecutor inboundExecutor;
-    protected RequestExecutor outboundExecutor;
-
     protected final CallbackRegistrar callbackRegistrar;
-
+    protected ScheduledThreadPoolExecutor executor;
     protected AsyncLoopThread receiver;
-
     protected ConnectionStatus status;
 
     protected NetworkAdapter(TurtleCore core, NestedLogger logger) {
         this.core = core;
         this.logger = logger;
 
-        this.inboundExecutor  = new RequestExecutor((r, executor) -> { logger.log(Level.WARNING,  "An inbound message was rejected by the executor: " + r); });
-        this.outboundExecutor = new RequestExecutor((r, executor) -> { logger.log(Level.WARNING, "An outbound message was rejected by the executor: " + r); });
-
+        this.executor = new ScheduledThreadPoolExecutor(4, (r, executor) -> logger.log(Level.WARNING, "An outbound message was rejected by the executor: " + r));
         this.callbackRegistrar = new CallbackRegistrar();
     }
 
@@ -41,7 +35,7 @@ public abstract class NetworkAdapter {
 
     /* - - - */
 
-    protected final void handleOutbound(@NotNull Message msg) {
+    protected final void handleOutbound(@NotNull OutboundMessage msg) {
         String message = MessageParser.parse(msg);
         // TODO: encrypt
         this.send(message);
@@ -52,8 +46,8 @@ public abstract class NetworkAdapter {
     protected final void handleInbound(@NotNull String msg) {
         // TODO: decrypt
         try {
-            Message message = MessageParser.parse(core, msg);
-            this.submitInbound(message);
+            InboundMessage message = MessageParser.parse(core, msg);
+            this.submit(message);
         } catch (IllegalArgumentException e) {
             logger.log(Level.WARNING, "Could not parse inbound message: " + msg, e);
         } catch (RejectedExecutionException e) {
@@ -63,7 +57,7 @@ public abstract class NetworkAdapter {
 
     /* - - - */
 
-    public final @NotNull CompletableFuture<Void> submitOutbound(@NotNull Message message) throws RejectedExecutionException {
+    public final @NotNull CompletableFuture<OutboundMessage> submit(@NotNull OutboundMessage message) throws RejectedExecutionException {
         if (this.getStatus() != ConnectionStatus.LOGGED_IN)
             throw new RejectedExecutionException("The NetworkAdapter has been stopped!");
 
@@ -75,17 +69,29 @@ public abstract class NetworkAdapter {
         // do send
         this.handleOutbound(message);
 
-        return this.outboundExecutor.submit(message);
+        // await response until deadline
+        return CompletableFuture.supplyAsync(() -> {
+            while (System.currentTimeMillis() <= message.getDeadline()) {
+                if (message.cancelled)
+                    throw new CancellationException();
+                if (message.done)
+                    return message;
+            }
+            throw new CompletionException(new TimeoutException());
+        }, executor);
     }
 
-    public final void submitInbound(@NotNull Message message) throws RejectedExecutionException {
+    public final void submit(@NotNull InboundMessage message) throws RejectedExecutionException {
         if (this.getStatus() != ConnectionStatus.LOGGED_IN)
             throw new RejectedExecutionException("The NetworkAdapter has been stopped!");
 
-        // TODO: alert initial message if the inbound message is a response
+        OutboundMessage initialMsg = callbackRegistrar.getOutboundMessage(message.getCallbackCode());
+        callbackRegistrar.register(message);
 
-        this.outboundExecutor.respond(message.getCallbackCode(), message);
-        this.inboundExecutor.submit(message);
+        if (initialMsg != null)
+            initialMsg.handleResponse(message);
+
+        // in case the inbound message is still relevant it is still registered to the callbackRegistrar
     }
 
     /* - - - */
@@ -99,14 +105,13 @@ public abstract class NetworkAdapter {
     /** A helper method for {@link NetworkAdapter#stop()} */
     @SuppressWarnings("StatementWithEmptyBody")
     protected final void awaitExecutorShutdown() {
-        this.inboundExecutor.shutdown();
-        this.outboundExecutor.shutdown();
+        this.executor.shutdown();
 
-        while (!this.inboundExecutor.isTerminated()) { }
-        while (!this.outboundExecutor.isTerminated()) { }
+        // TODO: use #awaitTermination() instead?
 
-        this.inboundExecutor = null;
-        this.outboundExecutor = null;
+        while (!this.executor.isTerminated()) { }
+
+        this.executor = null;
     }
 
     public @NotNull ConnectionStatus getStatus() {

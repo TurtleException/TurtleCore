@@ -5,31 +5,24 @@ import de.turtle_exception.core.netcore.net.route.Route;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.function.BiConsumer;
+public abstract class Message {
+    protected final @NotNull TurtleCore core;
 
-public class Message {
-    private final @NotNull TurtleCore core;
+    protected final int callbackCode;
+    protected final @NotNull Route route;
+    protected final @NotNull String content;
 
-    private final int callbackCode;
-    private final @NotNull Route route;
-    private final @NotNull String content;
-    private final @NotNull BiConsumer<Message, Message> finalizer;
+    protected final long deadline;
 
-    private final long timeout;
+    public boolean done      = false;
+    public boolean cancelled = false;
 
-    public Message(@NotNull TurtleCore core, int callbackCode, @NotNull Route route, @Nullable String content, long timeout, @Nullable BiConsumer<Message, Message> finalizer) {
-        this.core = core;
+    public Message(@NotNull TurtleCore core, int callbackCode, @NotNull Route route, @Nullable String content, long deadline) {
+        this.core         = core;
         this.callbackCode = callbackCode;
-        this.route = route;
-        this.content = content != null ? content : "";
-        this.finalizer = finalizer != null ? finalizer : (self, response) -> { };
-        this.timeout = timeout;
-    }
-
-    public void handleResponse(Message response) throws IllegalArgumentException {
-        if (!this.route.isTerminating() && response != null)
-            this.finalizer.accept(this, response);
-        throw new IllegalArgumentException("This route is " + (this.route.isTerminating() ? "" : "not ") + "terminating.");
+        this.route        = route;
+        this.content      = content != null ? content : "";
+        this.deadline     = deadline;
     }
 
     public @NotNull TurtleCore getCore() {
@@ -53,7 +46,7 @@ public class Message {
         return content;
     }
 
-    public long getTimeout() {
-        return timeout;
+    public long getDeadline() {
+        return deadline;
     }
 }

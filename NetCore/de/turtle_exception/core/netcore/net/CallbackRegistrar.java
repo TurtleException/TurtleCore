@@ -1,6 +1,8 @@
 package de.turtle_exception.core.netcore.net;
 
+import de.turtle_exception.core.netcore.net.message.InboundMessage;
 import de.turtle_exception.core.netcore.net.message.Message;
+import de.turtle_exception.core.netcore.net.message.OutboundMessage;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -59,7 +61,19 @@ public class CallbackRegistrar {
         return index.containsKey(i);
     }
 
-    public @Nullable Message getMessage(int i) {
-        return index.get(i);
+    public @Nullable InboundMessage getInboundMessage(int i) {
+        try {
+            return (InboundMessage) index.get(i);
+        } catch (ClassCastException e) {
+            return null;
+        }
+    }
+
+    public @Nullable OutboundMessage getOutboundMessage(int i) {
+        try {
+            return (OutboundMessage) index.get(i);
+        } catch (ClassCastException e) {
+            return null;
+        }
     }
 }

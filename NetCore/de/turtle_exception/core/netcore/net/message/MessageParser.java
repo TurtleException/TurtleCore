@@ -20,7 +20,7 @@ public class MessageParser {
 
     /* - - - */
 
-    public static @NotNull String parse(@NotNull Message msg) {
+    public static @NotNull String parse(@NotNull OutboundMessage msg) {
         return String.join(DELIMITER,
                 parseIntToString(msg.getCallbackCode()),
                 escapeDelimiter(msg.getCommand()),
@@ -29,7 +29,7 @@ public class MessageParser {
         );
     }
 
-    public static @NotNull Message parse(@NotNull TurtleCore core, @NotNull String msg) throws IllegalArgumentException {
+    public static @NotNull InboundMessage parse(@NotNull TurtleCore core, @NotNull String msg) throws IllegalArgumentException {
         String[] parts = msg.split("#");
 
         if (parts.length != MESSAGE_TOKENS)
@@ -67,7 +67,7 @@ public class MessageParser {
             throw new IllegalArgumentException("Unknown ContentType: " + cTypStr);
 
         // TODO: include timeout in string message (?)
-        return new Message(core, callbackCode, route, content, core.getRouteManager().getRouteFinalizer(route));
+        return new InboundMessage(core, callbackCode, route, content, core.getRouteManager().getRouteFinalizer(route));
     }
 
     /* - - - */
