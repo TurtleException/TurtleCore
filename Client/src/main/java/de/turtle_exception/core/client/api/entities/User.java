@@ -1,6 +1,6 @@
 package de.turtle_exception.core.client.api.entities;
 
-import de.turtle_exception.core.client.api.net.Action;
+import de.turtle_exception.core.client.api.requests.Action;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;

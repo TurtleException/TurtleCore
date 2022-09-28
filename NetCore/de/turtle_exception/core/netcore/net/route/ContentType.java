@@ -3,14 +3,11 @@ package de.turtle_exception.core.netcore.net.route;
 import org.jetbrains.annotations.NotNull;
 
 // TODO: docs
-// TODO: replace USERNAME, VERSION and TURTLE_ID with PLAINTEXT ?
-// TODO: can't this implicetely be passed vie the Route?
+// TODO: can't this implicetely be passed via the Route?
 public enum ContentType {
     NONE("null"),
 
-    USERNAME("username"),
-    VERSION("version"),
-    TURTLE_ID("id"),
+    PLAINTEXT("plaintext"),
 
     USER("user"),
     USERS("users"),

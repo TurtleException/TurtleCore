@@ -13,7 +13,7 @@ public class Route {
     private String  content      = null;
 
     Route(@Nullable String command, boolean terminating, @NotNull ContentType contentType) {
-        this.command = command;
+        this.command = command != null ? command : "";
         this.terminating = terminating;
         this.contentType = contentType;
     }

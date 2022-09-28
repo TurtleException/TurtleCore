@@ -18,6 +18,9 @@ public class ActionImpl<T> implements Action<T> {
     private final Route route;
     private final BiFunction<Message, Request<T>, T> handler;
 
+    private Consumer<? super T>         onSuccess = null;
+    private Consumer<? super Throwable> onFailure = null;
+
     private boolean priority = false;
     private long deadline = 0;
 
@@ -53,10 +56,24 @@ public class ActionImpl<T> implements Action<T> {
         return this;
     }
 
+    public ActionImpl<T> onSuccess(Consumer<? super T> consumer) {
+        this.onSuccess = consumer;
+        return this;
+    }
+
+    public ActionImpl<T> onFailure(Consumer<? super Throwable> consumer) {
+        this.onFailure = consumer;
+        return this;
+    }
+
     public void handleResponse(Message response, Request<T> request) {
-        if (handler == null)
+        if (handler == null) {
+            onSuccess.accept(null);
             request.onSuccess(null);
-        else
-            request.onSuccess(handler.apply(response, request));
+        } else {
+            T obj = handler.apply(response, request);
+            onSuccess.accept(obj);
+            request.onSuccess(obj);
+        }
     }
 }

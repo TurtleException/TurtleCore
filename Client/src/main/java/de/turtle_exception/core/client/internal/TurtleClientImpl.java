@@ -4,9 +4,11 @@ import de.turtle_exception.core.client.api.requests.Action;
 import de.turtle_exception.core.client.api.TurtleClient;
 import de.turtle_exception.core.client.api.entities.Group;
 import de.turtle_exception.core.client.api.entities.User;
+import de.turtle_exception.core.client.internal.entities.EntityBuilder;
 import de.turtle_exception.core.client.internal.net.NetClient;
 import de.turtle_exception.core.client.internal.util.TurtleSet;
 import de.turtle_exception.core.netcore.TurtleCore;
+import de.turtle_exception.core.netcore.net.route.Routes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
@@ -31,6 +33,7 @@ public class TurtleClientImpl extends TurtleCore implements TurtleClient {
     };
 
     private final TurtleSet<User> userCache = new TurtleSet<>();
+    private final TurtleSet<Group> groupCache = new TurtleSet<>();
 
     protected TurtleClientImpl(@Nullable String name, @NotNull String host, @Range(from = 0, to = 65535) int port, @NotNull String login, @NotNull String pass) {
         this.name = name;
@@ -92,21 +95,41 @@ public class TurtleClientImpl extends TurtleCore implements TurtleClient {
 
     @Override
     public @NotNull Action<User> retrieveUser(long id) {
-        // TODO
+        return new ActionImpl<User>(this, Routes.Content.User.GET.setContent(String.valueOf(id)), (message, userRequest) -> {
+            return EntityBuilder.buildUser(message.getRoute().content());
+        }).onSuccess(user -> {
+            userCache.removeIf(oldUser -> oldUser.getId() == id);
+            userCache.add(user);
+        });
     }
 
     @Override
     public @NotNull Action<List<User>> retrieveUsers() {
-        // TODO
+        return new ActionImpl<List<User>>(this, Routes.Content.User.GET_ALL, (message, userRequest) -> {
+            return EntityBuilder.buildUsers(message.getRoute().content());
+        }).onSuccess(l -> {
+            userCache.clear();
+            userCache.addAll(l);
+        });
     }
 
     @Override
     public @NotNull Action<Group> retrieveGroup(long id) {
-        // TODO
+        return new ActionImpl<Group>(this, Routes.Content.Group.GET.setContent(String.valueOf(id)), (message, userRequest) -> {
+            return EntityBuilder.buildGroup(message.getRoute().content());
+        }).onSuccess(group -> {
+            groupCache.removeIf(oldGroup -> oldGroup.getId() == id);
+            groupCache.add(group);
+        });
     }
 
     @Override
     public @NotNull Action<List<Group>> retrieveGroups() {
-        // TODO
+        return new ActionImpl<List<Group>>(this, Routes.Content.Group.GET_ALL, (message, userRequest) -> {
+            return EntityBuilder.buildGroups(message.getRoute().content());
+        }).onSuccess(l -> {
+            groupCache.clear();
+            groupCache.addAll(l);
+        });
     }
 }
