@@ -7,9 +7,9 @@ import de.turtle_exception.core.client.api.entities.User;
 import de.turtle_exception.core.client.internal.net.client.InternalClient;
 import de.turtle_exception.core.client.internal.util.TurtleSet;
 import de.turtle_exception.core.netcore.TurtleCore;
-import de.turtle_exception.core.netcore.net.NetworkAdapter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Range;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -32,11 +32,11 @@ public class TurtleClientImpl extends TurtleCore implements TurtleClient {
 
     private final TurtleSet<User> userCache = new TurtleSet<>();
 
-    protected TurtleClientImpl(@Nullable String name) {
+    protected TurtleClientImpl(@Nullable String name, @NotNull String host, @Range(from = 0, to = 65535) int port, @NotNull String login, @NotNull String pass) {
         this.name = name;
         this.logger = Logger.getLogger(name != null ? "CLIENT#" + name : "CLIENT");
 
-        // TODO: init netClient
+        this.netClient = new InternalClient(this, host, port, login, pass);
     }
 
     /**

@@ -14,6 +14,7 @@ import de.turtle_exception.core.netcore.net.route.Routes;
 import de.turtle_exception.core.netcore.util.AsyncLoopThread;
 import de.turtle_exception.core.netcore.util.logging.NestedLogger;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Range;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -43,8 +44,8 @@ public class InternalClient extends NetworkAdapter {
 
     private ConnectionStatus status;
 
-    public InternalClient(TurtleClientImpl client, String host, int port, String login, String pass) {
-        super(new NestedLogger("Client#" + port, client.getLogger()));
+    public InternalClient(TurtleClientImpl client, String host, @Range(from = 0, to = 65535) int port, String login, String pass) {
+        super(client, new NestedLogger("Client#" + port, client.getLogger()));
 
         this.client = client;
 
