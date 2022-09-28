@@ -6,8 +6,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class InboundMessage extends Message {
-    public InboundMessage(@NotNull TurtleCore core, int callbackCode, @NotNull Route route, @Nullable String content, long timeout) {
-        super(core, callbackCode, route, content, timeout);
+    public InboundMessage(@NotNull TurtleCore core, int callbackCode, @NotNull Route route, @Nullable String content, long deadline) {
+        super(core, callbackCode, route, content, deadline);
     }
 
     public void handleResponse(@NotNull OutboundMessage response) {

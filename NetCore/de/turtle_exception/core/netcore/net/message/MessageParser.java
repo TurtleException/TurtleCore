@@ -66,8 +66,7 @@ public class MessageParser {
         if (contentType == null)
             throw new IllegalArgumentException("Unknown ContentType: " + cTypStr);
 
-        // TODO: include timeout in string message (?)
-        return new InboundMessage(core, callbackCode, route, content, core.getRouteManager().getRouteFinalizer(route));
+        return new InboundMessage(core, callbackCode, route, content, System.currentTimeMillis() + core.getDefaultTimeoutInbound());
     }
 
     /* - - - */

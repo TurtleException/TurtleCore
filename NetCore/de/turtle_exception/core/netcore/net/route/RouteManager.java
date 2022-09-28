@@ -12,7 +12,7 @@ public class RouteManager {
     private final ConcurrentHashMap<Route, BiConsumer<Message, Message>> registry = new ConcurrentHashMap<>();
 
     /** The default finalizer that will be used if no specific finalizer is registered for a route. */
-    private @NotNull BiConsumer<Message, Message> defaultFinalizer = (message, message2) -> { };
+    private final @NotNull BiConsumer<Message, Message> defaultFinalizer = (message, message2) -> { };
 
     public void setRouteFinalizer(@NotNull Route route, @Nullable BiConsumer<Message, Message> finalizer) {
         if (finalizer != null)
