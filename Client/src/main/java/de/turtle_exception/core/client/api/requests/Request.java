@@ -89,6 +89,14 @@ public class Request<T> {
         return this.cancelled;
     }
 
+    public Route getRoute() {
+        return route;
+    }
+
+    public long getDeadline() {
+        return deadline;
+    }
+
     /* - - - */
 
     public void handleResponse(@NotNull Message response) {

@@ -23,7 +23,7 @@ public class TurtleClientImpl extends TurtleCore implements TurtleClient {
     private final @Nullable String name;
 
     /** The internal network part of the client */
-    protected NetClient netClient;
+    private final NetClient netClient;
 
     private @NotNull Consumer<Object>            defaultOnSuccess = o -> { };
     private @NotNull Consumer<? super Throwable> defaultOnFailure = t -> {

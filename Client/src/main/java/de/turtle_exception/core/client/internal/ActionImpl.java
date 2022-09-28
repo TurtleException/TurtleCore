@@ -1,7 +1,8 @@
 package de.turtle_exception.core.client.internal;
 
-import de.turtle_exception.core.client.api.requests.Action;
 import de.turtle_exception.core.client.api.TurtleClient;
+import de.turtle_exception.core.client.api.requests.Action;
+import de.turtle_exception.core.client.api.requests.ActionFuture;
 import de.turtle_exception.core.client.api.requests.Request;
 import de.turtle_exception.core.netcore.net.message.Message;
 import de.turtle_exception.core.netcore.net.route.Route;
@@ -39,12 +40,12 @@ public class ActionImpl<T> implements Action<T> {
 
     @Override
     public void queue(@Nullable Consumer<? super T> success, @Nullable Consumer<? super Throwable> failure) {
-        // TODO
+        client.getNetClient().request(new Request<>(client, this, success, failure, route, deadline, priority));
     }
 
     @Override
     public @NotNull CompletableFuture<T> submit() {
-        // TODO
+        return new ActionFuture<>(this, deadline, priority, route);
     }
 
     public @NotNull ActionImpl<T> setPriority() {

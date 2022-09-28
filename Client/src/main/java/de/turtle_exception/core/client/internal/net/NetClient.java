@@ -1,9 +1,12 @@
 package de.turtle_exception.core.client.internal.net;
 
 import de.turtle_exception.core.client.api.TurtleClient;
+import de.turtle_exception.core.client.api.requests.Request;
+import de.turtle_exception.core.client.internal.ActionImpl;
 import de.turtle_exception.core.client.internal.TurtleClientImpl;
 import de.turtle_exception.core.netcore.net.ConnectionStatus;
 import de.turtle_exception.core.netcore.net.NetworkAdapter;
+import de.turtle_exception.core.netcore.net.message.OutboundMessage;
 import de.turtle_exception.core.netcore.net.route.Routes;
 import de.turtle_exception.core.netcore.util.AsyncLoopThread;
 import de.turtle_exception.core.netcore.util.logging.NestedLogger;
@@ -69,7 +72,7 @@ public class NetClient extends NetworkAdapter {
     @Override
     public void stop() throws IOException {
         // notify server
-        new VoidAction(this.client, Routes.Login.QUIT).queue();
+        new ActionImpl<Void>(client, Routes.Login.QUIT, null).queue();
 
         this.stopReceiver();
         this.awaitExecutorShutdown();
@@ -84,5 +87,15 @@ public class NetClient extends NetworkAdapter {
     @Override
     protected void send(@NotNull String msg) {
         this.out.write(msg);
+    }
+
+    /* - - - */
+
+    public <T> void request(@NotNull Request<T> request) {
+        try {
+            this.submit(new OutboundMessage(client, request.getRoute().setCallbackCode(callbackRegistrar.newCode()).build(), request.getDeadline()));
+        } catch (Throwable t) {
+            request.onFailure(t);
+        }
     }
 }

@@ -22,10 +22,10 @@ public class MessageParser {
 
     public static @NotNull String parse(@NotNull OutboundMessage msg) {
         return String.join(DELIMITER,
-                parseIntToString(msg.getCallbackCode()),
-                escapeDelimiter(msg.getCommand()),
-                escapeDelimiter(msg.getRoute().getContentType().getName()),
-                escapeDelimiter(msg.getCommand())
+                parseIntToString(msg.getRoute().callbackCode()),
+                escapeDelimiter(msg.getRoute().command()),
+                escapeDelimiter(msg.getRoute().contentType().getName()),
+                escapeDelimiter(msg.getRoute().content())
         );
     }
 
@@ -66,7 +66,9 @@ public class MessageParser {
         if (contentType == null)
             throw new IllegalArgumentException("Unknown ContentType: " + cTypStr);
 
-        return new InboundMessage(core, callbackCode, route, content, System.currentTimeMillis() + core.getDefaultTimeoutInbound());
+        route.setContent(content).setCallbackCode(callbackCode);
+
+        return new InboundMessage(core, route.build(), System.currentTimeMillis() + core.getDefaultTimeoutInbound());
     }
 
     /* - - - */
