@@ -5,6 +5,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
 
+/** A simple Formatter that utilizes ISO-8601 compliant datetime and UTC time. */
 public class SimpleFormatter extends Formatter {
     @Override
     public String format(LogRecord record) {
