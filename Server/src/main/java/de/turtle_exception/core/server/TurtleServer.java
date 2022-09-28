@@ -34,6 +34,7 @@ public class TurtleServer extends TurtleCore {
         this.logger.addHandler(LogUtil.getFileHandler(new SimpleFormatter()));
     }
 
+    @SuppressWarnings("StatementWithEmptyBody")
     public void run() throws Exception {
         status.set(Status.INIT);
 

@@ -93,6 +93,7 @@ public class TurtleClientImpl extends TurtleCore implements TurtleClient {
         this.defaultOnFailure = consumer;
     }
 
+    @SuppressWarnings("CodeBlock2Expr")
     @Override
     public @NotNull Action<User> retrieveUser(long id) {
         return new ActionImpl<User>(this, Routes.Content.User.GET.setContent(String.valueOf(id)), (message, userRequest) -> {
@@ -103,6 +104,7 @@ public class TurtleClientImpl extends TurtleCore implements TurtleClient {
         });
     }
 
+    @SuppressWarnings("CodeBlock2Expr")
     @Override
     public @NotNull Action<List<User>> retrieveUsers() {
         return new ActionImpl<List<User>>(this, Routes.Content.User.GET_ALL, (message, userRequest) -> {
@@ -113,6 +115,7 @@ public class TurtleClientImpl extends TurtleCore implements TurtleClient {
         });
     }
 
+    @SuppressWarnings("CodeBlock2Expr")
     @Override
     public @NotNull Action<Group> retrieveGroup(long id) {
         return new ActionImpl<Group>(this, Routes.Content.Group.GET.setContent(String.valueOf(id)), (message, userRequest) -> {
@@ -123,6 +126,7 @@ public class TurtleClientImpl extends TurtleCore implements TurtleClient {
         });
     }
 
+    @SuppressWarnings("CodeBlock2Expr")
     @Override
     public @NotNull Action<List<Group>> retrieveGroups() {
         return new ActionImpl<List<Group>>(this, Routes.Content.Group.GET_ALL, (message, userRequest) -> {

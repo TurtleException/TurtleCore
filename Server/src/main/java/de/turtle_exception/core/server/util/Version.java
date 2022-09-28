@@ -15,7 +15,7 @@ public record Version(int[] versions, @Nullable String EXTRA) {
         }
     }
 
-    private static Version doParse(String raw) throws Exception {
+    private static Version doParse(String raw) throws ArrayIndexOutOfBoundsException, NumberFormatException {
         String[] parts = raw.split("-");
         String[] versions = parts[0].split("\\.");
         String extra = parts.length > 1 ? parts[1] : null;

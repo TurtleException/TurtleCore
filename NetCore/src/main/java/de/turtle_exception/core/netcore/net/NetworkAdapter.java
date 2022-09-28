@@ -61,8 +61,8 @@ public abstract class NetworkAdapter {
         if (this.getStatus() != ConnectionStatus.LOGGED_IN)
             throw new RejectedExecutionException("The NetworkAdapter has been stopped!");
 
-        if (message.getRoute().isTerminating())
-            callbackRegistrar.unregister(message.getCallbackCode());
+        if (message.getRoute().terminating())
+            callbackRegistrar.unregister(message.getRoute().callbackCode());
         else
             callbackRegistrar.register(message);
 
@@ -85,7 +85,7 @@ public abstract class NetworkAdapter {
         if (this.getStatus() != ConnectionStatus.LOGGED_IN)
             throw new RejectedExecutionException("The NetworkAdapter has been stopped!");
 
-        OutboundMessage initialMsg = callbackRegistrar.getOutboundMessage(message.getCallbackCode());
+        OutboundMessage initialMsg = callbackRegistrar.getOutboundMessage(message.getRoute().callbackCode());
         callbackRegistrar.register(message);
 
         if (initialMsg != null)

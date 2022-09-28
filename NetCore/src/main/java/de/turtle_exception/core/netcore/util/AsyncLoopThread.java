@@ -1,5 +1,7 @@
 package de.turtle_exception.core.netcore.util;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.function.BooleanSupplier;
 
 /**
@@ -10,7 +12,7 @@ public class AsyncLoopThread extends Thread {
     private final BooleanSupplier condition;
     private final Runnable task;
 
-    public AsyncLoopThread(BooleanSupplier condition, Runnable task) {
+    public AsyncLoopThread(@NotNull BooleanSupplier condition, @NotNull Runnable task) {
         this.condition = condition;
         this.task = task;
         this.setDaemon(true);
@@ -19,8 +21,8 @@ public class AsyncLoopThread extends Thread {
 
     @Override
     public void run() {
-        while (condition.getAsBoolean() && !this.isInterrupted()) {
-            task.run();
+        while (this.condition.getAsBoolean() && !this.isInterrupted()) {
+            this.task.run();
         }
     }
 }

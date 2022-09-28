@@ -3,7 +3,7 @@ package de.turtle_exception.core.netcore.net.route;
 import org.jetbrains.annotations.NotNull;
 
 // TODO: docs
-// TODO: can't this implicetely be passed via the Route?
+// TODO: can't this implicitly be passed via the Route?
 public enum ContentType {
     NONE("null"),
 
