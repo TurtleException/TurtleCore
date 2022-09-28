@@ -4,7 +4,7 @@ import de.turtle_exception.core.client.api.requests.Action;
 import de.turtle_exception.core.client.api.TurtleClient;
 import de.turtle_exception.core.client.api.entities.Group;
 import de.turtle_exception.core.client.api.entities.User;
-import de.turtle_exception.core.client.internal.net.client.InternalClient;
+import de.turtle_exception.core.client.internal.net.NetClient;
 import de.turtle_exception.core.client.internal.util.TurtleSet;
 import de.turtle_exception.core.netcore.TurtleCore;
 import org.jetbrains.annotations.NotNull;
@@ -23,7 +23,7 @@ public class TurtleClientImpl extends TurtleCore implements TurtleClient {
     private final @Nullable String name;
 
     /** The internal network part of the client */
-    protected InternalClient netClient;
+    protected NetClient netClient;
 
     private @NotNull Consumer<Object>            defaultOnSuccess = o -> { };
     private @NotNull Consumer<? super Throwable> defaultOnFailure = t -> {
@@ -36,7 +36,7 @@ public class TurtleClientImpl extends TurtleCore implements TurtleClient {
         this.name = name;
         this.logger = Logger.getLogger(name != null ? "CLIENT#" + name : "CLIENT");
 
-        this.netClient = new InternalClient(this, host, port, login, pass);
+        this.netClient = new NetClient(this, host, port, login, pass);
     }
 
     /**
@@ -55,7 +55,7 @@ public class TurtleClientImpl extends TurtleCore implements TurtleClient {
         return name;
     }
 
-    public InternalClient getNetClient() {
+    public NetClient getNetClient() {
         return netClient;
     }
 

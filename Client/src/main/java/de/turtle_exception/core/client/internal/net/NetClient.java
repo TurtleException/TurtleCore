@@ -1,4 +1,4 @@
-package de.turtle_exception.core.client.internal.net.client;
+package de.turtle_exception.core.client.internal.net;
 
 import de.turtle_exception.core.client.api.TurtleClient;
 import de.turtle_exception.core.client.internal.TurtleClientImpl;
@@ -18,7 +18,7 @@ import java.net.Socket;
 import java.util.logging.Level;
 
 /** The actual client part of the {@link TurtleClient}. */
-public class InternalClient extends NetworkAdapter {
+public class NetClient extends NetworkAdapter {
     private final TurtleClientImpl client;
 
     private final String host;
@@ -35,7 +35,7 @@ public class InternalClient extends NetworkAdapter {
 
     private ConnectionStatus status;
 
-    public InternalClient(TurtleClientImpl client, String host, @Range(from = 0, to = 65535) int port, String login, String pass) {
+    public NetClient(TurtleClientImpl client, String host, @Range(from = 0, to = 65535) int port, String login, String pass) {
         super(client, new NestedLogger("Client#" + port, client.getLogger()));
 
         this.client = client;
