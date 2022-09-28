@@ -4,6 +4,7 @@ import de.turtle_exception.core.client.api.requests.Action;
 import de.turtle_exception.core.client.api.TurtleClient;
 import de.turtle_exception.core.client.api.entities.Group;
 import de.turtle_exception.core.client.api.entities.User;
+import de.turtle_exception.core.client.internal.net.client.InternalClient;
 import de.turtle_exception.core.client.internal.util.TurtleSet;
 import de.turtle_exception.core.netcore.TurtleCore;
 import de.turtle_exception.core.netcore.net.NetworkAdapter;
@@ -21,8 +22,8 @@ public class TurtleClientImpl extends TurtleCore implements TurtleClient {
     /** Name of this instance. Naming is not required, but it may be helpful when using multiple instances. */
     private final @Nullable String name;
 
-    /** The internal server / client */
-    protected NetworkAdapter networkAdapter;
+    /** The internal network part of the client */
+    protected InternalClient netClient;
 
     private @NotNull Consumer<Object>            defaultOnSuccess = o -> { };
     private @NotNull Consumer<? super Throwable> defaultOnFailure = t -> {
@@ -34,6 +35,8 @@ public class TurtleClientImpl extends TurtleCore implements TurtleClient {
     protected TurtleClientImpl(@Nullable String name) {
         this.name = name;
         this.logger = Logger.getLogger(name != null ? "CLIENT#" + name : "CLIENT");
+
+        // TODO: init netClient
     }
 
     /**
@@ -52,8 +55,8 @@ public class TurtleClientImpl extends TurtleCore implements TurtleClient {
         return name;
     }
 
-    public NetworkAdapter getNetworkAdapter() {
-        return networkAdapter;
+    public InternalClient getNetClient() {
+        return netClient;
     }
 
     public @NotNull TurtleSet<User> getUserCache() {
