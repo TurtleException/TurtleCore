@@ -1,12 +1,11 @@
 package de.turtle_exception.core.client.internal;
 
-import de.turtle_exception.core.client.api.EventManager;
+import de.turtle_exception.core.client.api.event.EventManager;
 import de.turtle_exception.core.client.api.TurtleClient;
 import de.turtle_exception.core.client.api.entities.Group;
 import de.turtle_exception.core.client.api.entities.User;
 import de.turtle_exception.core.client.api.requests.Action;
 import de.turtle_exception.core.client.internal.entities.EntityBuilder;
-import de.turtle_exception.core.client.internal.event.EventManagerImpl;
 import de.turtle_exception.core.client.internal.net.NetClient;
 import de.turtle_exception.core.client.internal.util.TurtleSet;
 import de.turtle_exception.core.netcore.TurtleCore;
@@ -48,7 +47,7 @@ public class TurtleClientImpl extends TurtleCore implements TurtleClient {
         this.name = name;
         this.logger = Logger.getLogger(name != null ? "CLIENT#" + name : "CLIENT");
 
-        this.eventManager = new EventManagerImpl();
+        this.eventManager = new EventManager();
 
         this.callbackExecutor = new ScheduledThreadPoolExecutor(4, (r, executor) -> logger.log(Level.WARNING, "A callback task was rejected by the executor: ", r));
         this.netClient = new NetClient(this, host, port, login, pass);

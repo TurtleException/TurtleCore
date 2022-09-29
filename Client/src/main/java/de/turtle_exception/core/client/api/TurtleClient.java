@@ -3,6 +3,7 @@ package de.turtle_exception.core.client.api;
 import de.turtle_exception.core.client.api.entities.Group;
 import de.turtle_exception.core.client.api.entities.User;
 import de.turtle_exception.core.client.api.entities.attribute.IUserContainer;
+import de.turtle_exception.core.client.api.event.EventManager;
 import de.turtle_exception.core.client.api.requests.Action;
 import org.jetbrains.annotations.NotNull;
 
