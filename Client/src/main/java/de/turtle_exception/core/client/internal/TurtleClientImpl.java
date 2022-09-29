@@ -1,10 +1,12 @@
 package de.turtle_exception.core.client.internal;
 
+import de.turtle_exception.core.client.api.EventManager;
 import de.turtle_exception.core.client.api.TurtleClient;
 import de.turtle_exception.core.client.api.entities.Group;
 import de.turtle_exception.core.client.api.entities.User;
 import de.turtle_exception.core.client.api.requests.Action;
 import de.turtle_exception.core.client.internal.entities.EntityBuilder;
+import de.turtle_exception.core.client.internal.event.EventManagerImpl;
 import de.turtle_exception.core.client.internal.net.NetClient;
 import de.turtle_exception.core.client.internal.util.TurtleSet;
 import de.turtle_exception.core.netcore.TurtleCore;
@@ -27,6 +29,8 @@ public class TurtleClientImpl extends TurtleCore implements TurtleClient {
     /** Name of this instance. Naming is not required, but it may be helpful when using multiple instances. */
     private final @Nullable String name;
 
+    private final EventManager eventManager;
+
     /** The internal network part of the client */
     private final NetClient netClient;
 
@@ -43,6 +47,8 @@ public class TurtleClientImpl extends TurtleCore implements TurtleClient {
     public TurtleClientImpl(@Nullable String name, @NotNull String host, @Range(from = 0, to = 65535) int port, @NotNull String login, @NotNull String pass) {
         this.name = name;
         this.logger = Logger.getLogger(name != null ? "CLIENT#" + name : "CLIENT");
+
+        this.eventManager = new EventManagerImpl();
 
         this.callbackExecutor = new ScheduledThreadPoolExecutor(4, (r, executor) -> logger.log(Level.WARNING, "A callback task was rejected by the executor: ", r));
         this.netClient = new NetClient(this, host, port, login, pass);
@@ -65,6 +71,11 @@ public class TurtleClientImpl extends TurtleCore implements TurtleClient {
      */
     public @NotNull Logger getLogger() {
         return logger;
+    }
+
+    @Override
+    public @NotNull EventManager getEventManager() {
+        return this.eventManager;
     }
 
     /**

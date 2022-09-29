@@ -15,6 +15,8 @@ public interface TurtleClient extends IUserContainer {
     @NotNull
     Logger getLogger();
 
+    @NotNull EventManager getEventManager();
+
     @NotNull Consumer<Object> getDefaultActionSuccess();
 
     @NotNull Consumer<? super Throwable> getDefaultActionFailure();
@@ -22,6 +24,8 @@ public interface TurtleClient extends IUserContainer {
     void setDefaultActionSuccess(@NotNull Consumer<Object> consumer);
 
     void setDefaultActionFailure(@NotNull Consumer<? super Throwable> consumer);
+
+    /* - - - */
 
     @NotNull Action<User> retrieveUser(long id);
 
