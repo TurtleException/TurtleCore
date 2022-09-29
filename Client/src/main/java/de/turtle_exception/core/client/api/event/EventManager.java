@@ -2,7 +2,6 @@ package de.turtle_exception.core.client.api.event;
 
 import com.google.common.collect.Sets;
 import de.turtle_exception.core.client.api.Listener;
-import de.turtle_exception.core.client.api.event.events.Event;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;

@@ -1,4 +1,4 @@
-package de.turtle_exception.core.client.api.event.events;
+package de.turtle_exception.core.client.api.event;
 
 import de.turtle_exception.core.client.api.TurtleClient;
 import org.jetbrains.annotations.NotNull;
