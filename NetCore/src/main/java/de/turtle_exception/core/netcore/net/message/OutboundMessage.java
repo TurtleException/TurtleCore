@@ -4,12 +4,18 @@ import de.turtle_exception.core.netcore.TurtleCore;
 import de.turtle_exception.core.netcore.net.route.CompiledRoute;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.function.Consumer;
+
 public class OutboundMessage extends Message {
-    public OutboundMessage(@NotNull TurtleCore core, @NotNull CompiledRoute route, long deadline) {
+    private final Consumer<InboundMessage> handler;
+
+    public OutboundMessage(@NotNull TurtleCore core, @NotNull CompiledRoute route, long deadline, @NotNull Consumer<InboundMessage> handler) {
         super(core, route, deadline);
+        this.handler = handler;
     }
 
     public void handleResponse(@NotNull InboundMessage response) {
-        // TODO: ?
+        this.done = true;
+        this.handler.accept(response);
     }
 }

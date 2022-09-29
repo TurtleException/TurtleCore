@@ -13,6 +13,12 @@ public class Routes {
         public static final Route QUIT    = new Route("QUIT"   , true, ContentType.NONE);
     }
 
+    // implementation note: all commands should start with "ERROR "
+    // TODO: implement a single ERROR Route with ContentType ERROR
+    public static class Error {
+        public static final Route NOT_SUPPORTED = new Route("ERROR NOT_SUPPORTED", true, ContentType.NONE);
+    }
+
     public static class Content {
         public static class User {
             public static final Route GET_ALL = new Route("USER GET ALL", false, ContentType.NONE);
@@ -20,27 +26,23 @@ public class Routes {
             public static final Route DEL     = new Route("USER DEL"    , false, ContentType.PLAINTEXT);
             public static final Route SET     = new Route("USER SET"    , true , ContentType.USER);
             public static final Route UPDATE  = new Route("USER UPDATE" , true , ContentType.USER);
+            public static final Route UPDATES = new Route("USER UPDATES" , true , ContentType.USERS);
 
             public static final Route MODIFY_NAME = new Route("USER MOD NAME", true, ContentType.PLAINTEXT);
 
             public static final Route GROUP_JOIN  = new Route("USER GROUP JOIN" , true, ContentType.PLAINTEXT);
             public static final Route GROUP_LEAVE = new Route("USER GROUP LEAVE", true, ContentType.PLAINTEXT);
-
-            public static final Route RAW  = new Route(null, true, ContentType.USER);
-            public static final Route RAWS = new Route(null, true, ContentType.USERS);
         }
 
         public static class Group {
             public static final Route GET_ALL = new Route("GROUP GET ALL", false, ContentType.NONE);
             public static final Route GET     = new Route("GROUP GET"    , false, ContentType.PLAINTEXT);
             public static final Route DEL     = new Route("GROUP DEL"    , false, ContentType.PLAINTEXT);
-            public static final Route SET     = new Route("GROUP SET"     , true , ContentType.GROUP);
+            public static final Route SET     = new Route("GROUP SET"    , true , ContentType.GROUP);
             public static final Route UPDATE  = new Route("GROUP UPDATE" , true , ContentType.GROUP);
+            public static final Route UPDATES = new Route("GROUP UPDATES" , true , ContentType.GROUPS);
 
             public static final Route MODIFY_NAME = new Route("GROUP MOD NAME", true, ContentType.PLAINTEXT);
-
-            public static final Route RAW  = new Route(null, true, ContentType.GROUP);
-            public static final Route RAWS = new Route(null, true, ContentType.GROUPS);
         }
     }
 

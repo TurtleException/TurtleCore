@@ -12,8 +12,8 @@ public class Route {
     private Integer callbackCode = null;
     private String  content      = null;
 
-    Route(@Nullable String command, boolean terminating, @NotNull ContentType contentType) {
-        this.command = command != null ? command : "";
+    Route(@NotNull String command, boolean terminating, @NotNull ContentType contentType) {
+        this.command = command;
         this.terminating = terminating;
         this.contentType = contentType;
     }
@@ -42,7 +42,7 @@ public class Route {
         return callbackCode;
     }
 
-    public @Nullable String getCommand() {
+    public @NotNull String getCommand() {
         return command;
     }
 

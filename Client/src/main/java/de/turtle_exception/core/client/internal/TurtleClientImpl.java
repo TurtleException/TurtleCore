@@ -1,9 +1,9 @@
 package de.turtle_exception.core.client.internal;
 
-import de.turtle_exception.core.client.api.requests.Action;
 import de.turtle_exception.core.client.api.TurtleClient;
 import de.turtle_exception.core.client.api.entities.Group;
 import de.turtle_exception.core.client.api.entities.User;
+import de.turtle_exception.core.client.api.requests.Action;
 import de.turtle_exception.core.client.internal.entities.EntityBuilder;
 import de.turtle_exception.core.client.internal.net.NetClient;
 import de.turtle_exception.core.client.internal.util.TurtleSet;
@@ -13,8 +13,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.function.Consumer;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class TurtleClientImpl extends TurtleCore implements TurtleClient {
@@ -26,6 +29,8 @@ public class TurtleClientImpl extends TurtleCore implements TurtleClient {
 
     /** The internal network part of the client */
     private final NetClient netClient;
+
+    private final ScheduledThreadPoolExecutor callbackExecutor;
 
     private @NotNull Consumer<Object>            defaultOnSuccess = o -> { };
     private @NotNull Consumer<? super Throwable> defaultOnFailure = t -> {
@@ -39,7 +44,19 @@ public class TurtleClientImpl extends TurtleCore implements TurtleClient {
         this.name = name;
         this.logger = Logger.getLogger(name != null ? "CLIENT#" + name : "CLIENT");
 
+        this.callbackExecutor = new ScheduledThreadPoolExecutor(4, (r, executor) -> logger.log(Level.WARNING, "A callback task was rejected by the executor: ", r));
         this.netClient = new NetClient(this, host, port, login, pass);
+
+        this.routeManager.setLog(logger::log);
+
+        this.routeManager.setRouteFinalizer(Routes.Login.QUIT, inboundMessage -> {
+            logger.log(Level.WARNING, "Received QUIT command!");
+            try {
+                netClient.quit();
+            } catch (IOException e) {
+                logger.log(Level.WARNING, "Could not close socket properly.", e);
+            }
+        });
     }
 
     /**
@@ -92,6 +109,12 @@ public class TurtleClientImpl extends TurtleCore implements TurtleClient {
     public void setDefaultActionFailure(@NotNull Consumer<? super Throwable> consumer) {
         this.defaultOnFailure = consumer;
     }
+
+    public ScheduledThreadPoolExecutor getCallbackExecutor() {
+        return callbackExecutor;
+    }
+
+    /* - - - */
 
     @SuppressWarnings("CodeBlock2Expr")
     @Override

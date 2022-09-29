@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
+import java.util.logging.Level;
 
 // TODO: docs
 public class Request<T> {
@@ -40,17 +41,30 @@ public class Request<T> {
     public void onSuccess(T successObj) {
         if (done) return;
         done = true;
-        // TODO
+
+        this.client.getCallbackExecutor().execute(() -> {
+            try {
+                onSuccess.accept(successObj);
+            } catch (Throwable t) {
+                client.getLogger().log(Level.WARNING, "Unexpected error when processing success object.", t);
+            }
+        });
     }
 
-    public void onFailure(Message response) {
-        // TODO
-    }
+    // TODO: onFailure(Error)
+    // see Routes.Error
 
     public void onFailure(Throwable t) {
         if (done) return;
         done = true;
-        // TODO
+
+        this.client.getCallbackExecutor().execute(() -> {
+            try {
+                onFailure.accept(t);
+            } catch (Throwable th) {
+                client.getLogger().log(Level.WARNING, "Unexpected error when processing failure.", th);
+            }
+        });
     }
 
     public void onCancelled() {

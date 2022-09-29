@@ -57,7 +57,7 @@ public abstract class NetworkAdapter {
 
     /* - - - */
 
-    public final @NotNull CompletableFuture<OutboundMessage> submit(@NotNull OutboundMessage message) throws RejectedExecutionException {
+    public final void submit(@NotNull OutboundMessage message) throws RejectedExecutionException {
         if (this.getStatus() != ConnectionStatus.LOGGED_IN)
             throw new RejectedExecutionException("The NetworkAdapter has been stopped!");
 
@@ -70,12 +70,14 @@ public abstract class NetworkAdapter {
         this.handleOutbound(message);
 
         // await response until deadline
-        return CompletableFuture.supplyAsync(() -> {
+        CompletableFuture.runAsync(() -> {
             while (System.currentTimeMillis() <= message.getDeadline()) {
                 if (message.cancelled)
                     throw new CancellationException();
-                if (message.done)
-                    return message;
+                if (message.done) {
+                    callbackRegistrar.unregister(message.getRoute().callbackCode());
+                    return;
+                }
             }
             throw new CompletionException(new TimeoutException());
         }, executor);
@@ -86,12 +88,16 @@ public abstract class NetworkAdapter {
             throw new RejectedExecutionException("The NetworkAdapter has been stopped!");
 
         OutboundMessage initialMsg = callbackRegistrar.getOutboundMessage(message.getRoute().callbackCode());
-        callbackRegistrar.register(message);
 
+        // this will also unregister the callback code
         if (initialMsg != null)
             initialMsg.handleResponse(message);
 
-        // in case the inbound message is still relevant it is still registered to the callbackRegistrar
+        // overwrite the current message for the callback code
+        if (!message.getRoute().terminating())
+            callbackRegistrar.register(message);
+
+        core.getRouteManager().getRouteFinalizer(message.getRoute().command()).accept(message);
     }
 
     /* - - - */

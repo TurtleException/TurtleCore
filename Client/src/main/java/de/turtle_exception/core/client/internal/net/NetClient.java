@@ -74,6 +74,10 @@ public class NetClient extends NetworkAdapter {
         // notify server
         new ActionImpl<Void>(client, Routes.Login.QUIT, null).queue();
 
+        this.quit();
+    }
+
+    public void quit() throws IOException {
         this.stopReceiver();
         this.awaitExecutorShutdown();
 
@@ -93,7 +97,7 @@ public class NetClient extends NetworkAdapter {
 
     public <T> void request(@NotNull Request<T> request) {
         try {
-            this.submit(new OutboundMessage(client, request.getRoute().setCallbackCode(callbackRegistrar.newCode()).build(), request.getDeadline()));
+            this.submit(new OutboundMessage(client, request.getRoute().setCallbackCode(callbackRegistrar.newCode()).build(), request.getDeadline(), request::handleResponse));
         } catch (Throwable t) {
             request.onFailure(t);
         }
