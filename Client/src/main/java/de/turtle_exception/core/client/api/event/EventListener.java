@@ -4,7 +4,10 @@ import de.turtle_exception.core.client.api.event.group.GroupUpdateNameEvent;
 import de.turtle_exception.core.client.api.event.user.UserGroupJoinEvent;
 import de.turtle_exception.core.client.api.event.user.UserGroupLeaveEvent;
 import de.turtle_exception.core.client.api.event.user.UserUpdateNameEvent;
+import de.turtle_exception.core.netcore.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
+
+import java.lang.reflect.Method;
 
 public abstract class EventListener {
     public void onGenericEvent(@NotNull Event event) { }
@@ -16,4 +19,22 @@ public abstract class EventListener {
     public void onUserUpdateName(@NotNull UserUpdateNameEvent event) { }
     public void onUserGroupJoin(@NotNull UserGroupJoinEvent event) { }
     public void onUserGroupLeave(@NotNull UserGroupLeaveEvent event) { }
+
+    /* - - - */
+
+    public final <T extends Event> void onEvent(@NotNull T event) {
+        this.onGenericEvent(event);
+
+        final String methodName = "on" + StringUtil.cutEnd(event.getClass().getSimpleName(), "Event".length());
+
+        for (Method method : this.getClass().getDeclaredMethods()) {
+            if (method.getName().equals(methodName)) {
+                try {
+                    method.invoke(event);
+                } catch (Throwable t) {
+                    throw new RuntimeException(t);
+                }
+            }
+        }
+    }
 }
