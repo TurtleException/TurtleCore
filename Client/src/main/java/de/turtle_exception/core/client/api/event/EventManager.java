@@ -10,7 +10,7 @@ public class EventManager {
 
     public void handleEvent(@NotNull Event event) {
         for (EventListener listener : listeners) {
-            listener.onEvent(event);
+            listener.onGenericEvent(event);
         }
     }
 

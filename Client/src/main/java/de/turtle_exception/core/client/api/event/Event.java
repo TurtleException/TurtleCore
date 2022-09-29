@@ -10,7 +10,7 @@ public class Event {
         this.client = client;
     }
 
-    public TurtleClient getClient() {
+    public @NotNull TurtleClient getClient() {
         return client;
     }
 }
