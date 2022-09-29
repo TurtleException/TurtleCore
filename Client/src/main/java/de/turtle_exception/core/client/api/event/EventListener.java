@@ -8,6 +8,7 @@ import de.turtle_exception.core.netcore.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Method;
+import java.util.logging.Level;
 
 public abstract class EventListener {
     public void onGenericEvent(@NotNull Event event) { }
@@ -30,9 +31,9 @@ public abstract class EventListener {
         for (Method method : this.getClass().getDeclaredMethods()) {
             if (method.getName().equals(methodName)) {
                 try {
-                    method.invoke(event);
+                    method.invoke(this, event);
                 } catch (Throwable t) {
-                    throw new RuntimeException(t);
+                    event.getClient().getLogger().log(Level.WARNING, "An EventListener threw an unexpected exception.", t);
                 }
             }
         }
