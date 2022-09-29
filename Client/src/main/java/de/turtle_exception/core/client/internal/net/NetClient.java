@@ -36,8 +36,6 @@ public class NetClient extends NetworkAdapter {
     private PrintWriter out;
     private BufferedReader in;
 
-    private ConnectionStatus status;
-
     public NetClient(TurtleClientImpl client, String host, @Range(from = 0, to = 65535) int port, String login, String pass) {
         super(client, new NestedLogger("Client#" + port, client.getLogger()));
 
