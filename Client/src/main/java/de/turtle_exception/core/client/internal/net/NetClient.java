@@ -27,25 +27,17 @@ public class NetClient extends NetworkAdapter {
     private final String host;
     private final int port;
 
-    /** The username to log in with */
-    private final String login;
-    /** The password used for en-/decryption */
-    private final String pass;
-
     private Socket socket;
     private PrintWriter out;
     private BufferedReader in;
 
-    public NetClient(TurtleClientImpl client, String host, @Range(from = 0, to = 65535) int port, String login, String pass) {
-        super(client, new NestedLogger("Client#" + port, client.getLogger()));
+    public NetClient(TurtleClientImpl client, String host, @Range(from = 0, to = 65535) int port, @NotNull String login, @NotNull String pass) {
+        super(client, new NestedLogger("Client#" + port, client.getLogger()), login, pass);
 
         this.client = client;
 
         this.host = host;
         this.port = port;
-
-        this.login = login;
-        this.pass = pass;
     }
 
     public void start() throws IOException {

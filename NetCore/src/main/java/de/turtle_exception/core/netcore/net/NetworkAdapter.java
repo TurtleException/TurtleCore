@@ -1,6 +1,7 @@
 package de.turtle_exception.core.netcore.net;
 
 import de.turtle_exception.core.netcore.TurtleCore;
+import de.turtle_exception.core.netcore.crypto.Encryption;
 import de.turtle_exception.core.netcore.net.message.InboundMessage;
 import de.turtle_exception.core.netcore.net.message.MessageParser;
 import de.turtle_exception.core.netcore.net.message.OutboundMessage;
@@ -8,7 +9,14 @@ import de.turtle_exception.core.netcore.util.AsyncLoopThread;
 import de.turtle_exception.core.netcore.util.logging.NestedLogger;
 import org.jetbrains.annotations.NotNull;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import java.io.IOException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.concurrent.*;
 import java.util.logging.Level;
 
@@ -21,12 +29,20 @@ public abstract class NetworkAdapter {
     protected AsyncLoopThread receiver;
     protected ConnectionStatus status;
 
-    protected NetworkAdapter(TurtleCore core, NestedLogger logger) {
+    /** The username to log in with */
+    protected final String login;
+    /** The password used for en-/decryption */
+    protected final String pass;
+
+    protected NetworkAdapter(TurtleCore core, NestedLogger logger, @NotNull String login, @NotNull String pass) {
         this.core = core;
         this.logger = logger;
 
         this.executor = new ScheduledThreadPoolExecutor(4, (r, executor) -> logger.log(Level.WARNING, "An outbound message was rejected by the executor: " + r));
         this.callbackRegistrar = new CallbackRegistrar();
+
+        this.login = login;
+        this.pass  = pass;
     }
 
     /* - - - */
@@ -36,22 +52,41 @@ public abstract class NetworkAdapter {
     /* - - - */
 
     protected final void handleOutbound(@NotNull OutboundMessage msg) {
-        String message = MessageParser.parse(msg);
-        // TODO: encrypt
-        this.send(message);
+        String message = "";
+        try {
+            message = MessageParser.parse(msg);
+            message = Encryption.encrypt(message, pass);
+            this.send(message);
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException | InvalidAlgorithmParameterException |
+                 NoSuchPaddingException | IllegalBlockSizeException | BadPaddingException | InvalidKeyException e) {
+            logger.log(Level.WARNING, "Could not encrypt outbound message: " + message, e);
+        } catch (Throwable t) {
+            logger.log(Level.WARNING, "Could not handle outbound message: " + message, t);
+        }
     }
 
     protected abstract void send(@NotNull String msg);
 
     protected final void handleInbound(@NotNull String msg) {
-        // TODO: decrypt
+        String decryptedMessage = "";
         try {
-            InboundMessage message = MessageParser.parse(core, this, msg);
+            decryptedMessage = Encryption.decrypt(msg, pass);
+        } catch (InvalidAlgorithmParameterException | NoSuchPaddingException | IllegalBlockSizeException |
+                 NoSuchAlgorithmException | InvalidKeySpecException | BadPaddingException | InvalidKeyException e) {
+            logger.log(Level.WARNING, "Could not decrypt inbound message.", e);
+        } catch (Throwable t) {
+            logger.log(Level.WARNING, "Could not handle inbound message.", t);
+        }
+
+        try {
+            InboundMessage message = MessageParser.parse(core, decryptedMessage);
             this.submit(message);
         } catch (IllegalArgumentException e) {
-            logger.log(Level.WARNING, "Could not parse inbound message: " + msg, e);
+            logger.log(Level.WARNING, "Could not parse inbound message: " + decryptedMessage, e);
         } catch (RejectedExecutionException e) {
-            logger.log(Level.WARNING, "Could not submit inbound message: " + msg, e);
+            logger.log(Level.WARNING, "Could not submit inbound message: " + decryptedMessage, e);
+        } catch (Throwable t) {
+            logger.log(Level.WARNING, "Could not handle inbound message: " + decryptedMessage, t);
         }
     }
 
