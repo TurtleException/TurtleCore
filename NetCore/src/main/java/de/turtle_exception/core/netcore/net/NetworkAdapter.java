@@ -60,6 +60,8 @@ public abstract class NetworkAdapter {
         } catch (NoSuchAlgorithmException | InvalidKeySpecException | InvalidAlgorithmParameterException |
                  NoSuchPaddingException | IllegalBlockSizeException | BadPaddingException | InvalidKeyException e) {
             logger.log(Level.WARNING, "Could not encrypt outbound message: " + message, e);
+        } catch (Throwable t) {
+            logger.log(Level.WARNING, "Could not handle outbound message: " + message, t);
         }
     }
 
@@ -72,6 +74,8 @@ public abstract class NetworkAdapter {
         } catch (InvalidAlgorithmParameterException | NoSuchPaddingException | IllegalBlockSizeException |
                  NoSuchAlgorithmException | InvalidKeySpecException | BadPaddingException | InvalidKeyException e) {
             logger.log(Level.WARNING, "Could not decrypt inbound message.", e);
+        } catch (Throwable t) {
+            logger.log(Level.WARNING, "Could not handle inbound message.", t);
         }
 
         try {
@@ -81,6 +85,8 @@ public abstract class NetworkAdapter {
             logger.log(Level.WARNING, "Could not parse inbound message: " + decryptedMessage, e);
         } catch (RejectedExecutionException e) {
             logger.log(Level.WARNING, "Could not submit inbound message: " + decryptedMessage, e);
+        } catch (Throwable t) {
+            logger.log(Level.WARNING, "Could not handle inbound message: " + decryptedMessage, t);
         }
     }
 
