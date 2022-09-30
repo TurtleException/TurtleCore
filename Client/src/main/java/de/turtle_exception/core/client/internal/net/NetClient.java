@@ -80,7 +80,7 @@ public class NetClient extends NetworkAdapter {
 
     @Override
     protected void send(@NotNull String msg) {
-        this.out.write(msg);
+        this.out.println(msg);
     }
 
     /* - - - */

@@ -1,7 +1,9 @@
 package de.turtle_exception.core.server.net;
 
 import de.turtle_exception.core.netcore.net.ConnectionStatus;
+import de.turtle_exception.core.netcore.net.NetworkAdapter;
 import de.turtle_exception.core.netcore.util.AsyncLoopThread;
+import de.turtle_exception.core.netcore.util.logging.NestedLogger;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedReader;
@@ -12,48 +14,38 @@ import java.net.Socket;
 import java.util.logging.Level;
 
 /** A virtual client on the server-side of the application. Used as a communication interface. */
-public class VirtualClient {
+public class VirtualClient extends NetworkAdapter {
     private final InternalServer internalServer;
     private final Socket socket;
     private final PrintWriter out;
     private final BufferedReader in;
 
-    private final AsyncLoopThread inputReader;
-
-    private String login;
-    private String pass;
-
-    // TODO: use this
-    private ConnectionStatus status = ConnectionStatus.CONNECTED;
-
-    VirtualClient(InternalServer internalServer, Socket socket) throws IOException {
+    VirtualClient(InternalServer internalServer, Socket socket, @NotNull String login, @NotNull String pass) throws IOException {
+        super(internalServer.getServer(), new NestedLogger("Client#" + login, internalServer.getLogger()), login, pass);
         this.internalServer = internalServer;
         this.socket = socket;
 
         this.out = new PrintWriter(socket.getOutputStream(), true);
         this.in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
-        this.inputReader = new AsyncLoopThread(() -> status != ConnectionStatus.DISCONNECTED, () -> {
+        this.receiver = new AsyncLoopThread(() -> status != ConnectionStatus.DISCONNECTED, () -> {
             try {
-                receive(in.readLine());
+                this.handleInbound(in.readLine());
             } catch (IOException e) {
-                internalServer.logger.log(Level.WARNING, "Could not read input from client " + socket.getInetAddress(), e);
+                logger.log(Level.WARNING, "Could not read input from client.", e);
             }
         });
     }
 
     /* - - - */
-
-    void send(@NotNull Message msg) {
-        String str = Message.parseToClient(msg);
-        // TODO: encrypt
-        out.write(str);
+    @Override
+    public void stop() throws IOException {
+        // TODO
     }
 
-    private void receive(@NotNull String msg) {
-        String str = msg; // TODO: decrypt
-        Message message = Message.parseFromClient(this, msg);
-        internalServer.receive(message);
+    @Override
+    protected void send(@NotNull String msg) {
+        this.out.println(msg);
     }
 
     /* - - - */
@@ -63,7 +55,7 @@ public class VirtualClient {
     }
 
     void closeSocket() throws IOException {
-        status = Status.DISCONNECTED;
+        status = ConnectionStatus.DISCONNECTED;
         this.in.close();
         this.out.close();
         this.socket.close();
@@ -75,9 +67,5 @@ public class VirtualClient {
 
     InternalServer getInternalServer() {
         return internalServer;
-    }
-
-    Socket getSocket() {
-        return socket;
     }
 }
