@@ -1,6 +1,7 @@
 package de.turtle_exception.core.netcore.net.message;
 
 import de.turtle_exception.core.netcore.TurtleCore;
+import de.turtle_exception.core.netcore.net.NetworkAdapter;
 import de.turtle_exception.core.netcore.net.route.ContentType;
 import de.turtle_exception.core.netcore.net.route.Route;
 import de.turtle_exception.core.netcore.net.route.Routes;
@@ -29,7 +30,7 @@ public class MessageParser {
         );
     }
 
-    public static @NotNull InboundMessage parse(@NotNull TurtleCore core, @NotNull String msg) throws IllegalArgumentException {
+    public static @NotNull InboundMessage parse(@NotNull TurtleCore core, @NotNull NetworkAdapter adapter, @NotNull String msg) throws IllegalArgumentException {
         String[] parts = msg.split("#");
 
         if (parts.length != MESSAGE_TOKENS)
@@ -68,7 +69,7 @@ public class MessageParser {
 
         route.setContent(content).setCallbackCode(callbackCode);
 
-        return new InboundMessage(core, route.build(), System.currentTimeMillis() + core.getDefaultTimeoutInbound());
+        return new InboundMessage(core, adapter, route.build(), System.currentTimeMillis() + core.getDefaultTimeoutInbound());
     }
 
     /* - - - */

@@ -46,7 +46,7 @@ public abstract class NetworkAdapter {
     protected final void handleInbound(@NotNull String msg) {
         // TODO: decrypt
         try {
-            InboundMessage message = MessageParser.parse(core, msg);
+            InboundMessage message = MessageParser.parse(core, this, msg);
             this.submit(message);
         } catch (IllegalArgumentException e) {
             logger.log(Level.WARNING, "Could not parse inbound message: " + msg, e);
