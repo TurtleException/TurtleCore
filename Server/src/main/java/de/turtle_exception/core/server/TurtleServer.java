@@ -39,15 +39,15 @@ public class TurtleServer extends TurtleCore {
         this.logger.addHandler(LogUtil.getFileHandler(new SimpleFormatter()));
 
         this.config.load(new FileReader(new File(DIR, "server.properties")));
-
-        this.routeManager.setLog(logger::log);
-
-        this.routeManager.setRouteFinalizer(Routes.OK, inboundMessage -> { });
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
     public void run() throws Exception {
         status.set(Status.INIT);
+
+        this.logger.log(Level.INFO, "Registering route finalizers...");
+        this.routeManager.setLog(logger::log);
+        this.routeManager.setRouteFinalizer(Routes.OK, inboundMessage -> { });
 
         /* RUNNING */
 
