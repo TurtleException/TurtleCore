@@ -6,7 +6,9 @@ import de.turtle_exception.core.server.util.LogUtil;
 import de.turtle_exception.core.server.util.Status;
 
 import java.io.File;
+import java.io.FileReader;
 import java.net.URISyntaxException;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -29,9 +31,13 @@ public class TurtleServer extends TurtleCore {
         DIR = f;
     }
 
+    private final Properties config = new Properties();
+
     public TurtleServer() throws Exception {
         this.logger = Logger.getLogger("SERVER");
         this.logger.addHandler(LogUtil.getFileHandler(new SimpleFormatter()));
+
+        this.config.load(new FileReader(new File(DIR, "server.properties")));
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
