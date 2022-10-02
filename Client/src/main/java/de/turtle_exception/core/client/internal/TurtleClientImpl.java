@@ -13,6 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
 
+import javax.security.auth.login.LoginException;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -40,7 +41,7 @@ public class TurtleClientImpl extends TurtleCore implements TurtleClient {
     private final TurtleSet<User> userCache = new TurtleSet<>();
     private final TurtleSet<Group> groupCache = new TurtleSet<>();
 
-    public TurtleClientImpl(@Nullable String name, @NotNull String host, @Range(from = 0, to = 65535) int port, @NotNull String login, @NotNull String pass) {
+    public TurtleClientImpl(@Nullable String name, @NotNull String host, @Range(from = 0, to = 65535) int port, @NotNull String login, @NotNull String pass) throws IOException, LoginException {
         this.name = name;
         this.logger = Logger.getLogger(name != null ? "CLIENT#" + name : "CLIENT");
 
@@ -57,6 +58,8 @@ public class TurtleClientImpl extends TurtleCore implements TurtleClient {
                 logger.log(Level.WARNING, "Could not close socket properly.", e);
             }
         });
+
+        this.netClient.start();
     }
 
     /**
@@ -73,6 +76,10 @@ public class TurtleClientImpl extends TurtleCore implements TurtleClient {
      */
     public @Nullable String getName() {
         return name;
+    }
+
+    public @NotNull String getVersion() {
+        // TODO
     }
 
     public NetClient getNetClient() {

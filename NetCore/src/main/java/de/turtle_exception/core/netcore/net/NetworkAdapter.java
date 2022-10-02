@@ -21,6 +21,8 @@ import java.util.concurrent.*;
 import java.util.logging.Level;
 
 public abstract class NetworkAdapter {
+    public static final String LOGGED_IN = "LOGGED IN";
+
     private   final TurtleCore core;
     protected final NestedLogger logger;
 

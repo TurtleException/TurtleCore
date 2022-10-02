@@ -13,11 +13,13 @@ import de.turtle_exception.core.netcore.util.logging.NestedLogger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Range;
 
+import javax.security.auth.login.LoginException;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.concurrent.*;
 import java.util.logging.Level;
 
 /** The actual client part of the {@link TurtleClient}. */
@@ -40,13 +42,16 @@ public class NetClient extends NetworkAdapter {
         this.port = port;
     }
 
-    public void start() throws IOException {
+    public void start() throws IOException, LoginException {
         // create the underlying socket (the spicy part)
         this.socket = new Socket(host, port);
         this.status = ConnectionStatus.CONNECTED;
 
         this.out = new PrintWriter(socket.getOutputStream(), true);
         this.in  = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
+        this.status = ConnectionStatus.LOGIN;
+        new LoginHandler(out, in, client.getVersion(), login).await(10, TimeUnit.SECONDS);
 
         this.receiver = new AsyncLoopThread(() -> status != ConnectionStatus.DISCONNECTED, () -> {
             try {
@@ -56,7 +61,7 @@ public class NetClient extends NetworkAdapter {
             }
         });
 
-        // TODO: login
+        this.status = ConnectionStatus.LOGGED_IN;
     }
 
     @Override
