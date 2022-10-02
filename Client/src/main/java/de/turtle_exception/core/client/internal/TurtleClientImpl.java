@@ -9,6 +9,7 @@ import de.turtle_exception.core.client.internal.net.NetClient;
 import de.turtle_exception.core.client.internal.util.TurtleSet;
 import de.turtle_exception.core.netcore.TurtleCore;
 import de.turtle_exception.core.netcore.net.route.Routes;
+import de.turtle_exception.core.netcore.util.version.Version;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
@@ -22,6 +23,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class TurtleClientImpl extends TurtleCore implements TurtleClient {
+    private final Version version;
+
     /** The root logger of this core */
     private final Logger logger;
 
@@ -42,6 +45,10 @@ public class TurtleClientImpl extends TurtleCore implements TurtleClient {
     private final TurtleSet<Group> groupCache = new TurtleSet<>();
 
     public TurtleClientImpl(@Nullable String name, @NotNull String host, @Range(from = 0, to = 65535) int port, @NotNull String login, @NotNull String pass) throws IOException, LoginException {
+        this.version = Version.retrieveFromResources(TurtleClient.class);
+        if (this.version == null)
+            throw new IOException("Illegal version");
+
         this.name = name;
         this.logger = Logger.getLogger(name != null ? "CLIENT#" + name : "CLIENT");
 
@@ -78,8 +85,8 @@ public class TurtleClientImpl extends TurtleCore implements TurtleClient {
         return name;
     }
 
-    public @NotNull String getVersion() {
-        // TODO
+    public @NotNull Version getVersion() {
+        return this.version;
     }
 
     public NetClient getNetClient() {

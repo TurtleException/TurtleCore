@@ -1,4 +1,4 @@
-package de.turtle_exception.core.server.util;
+package de.turtle_exception.core.netcore.util.version;
 
 public class IllegalVersionException extends RuntimeException {
     IllegalVersionException(String raw, Throwable cause) {

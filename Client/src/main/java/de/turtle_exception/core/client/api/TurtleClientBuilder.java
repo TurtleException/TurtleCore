@@ -5,6 +5,8 @@ import de.turtle_exception.core.netcore.util.Checks;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.security.auth.login.LoginException;
+import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -24,7 +26,7 @@ public class TurtleClientBuilder {
 
     public TurtleClientBuilder() { }
 
-    public @NotNull TurtleClient build() throws IllegalArgumentException {
+    public @NotNull TurtleClient build() throws IllegalArgumentException, IOException, LoginException {
         try {
             Checks.nonNull(host , "Host" );
             Checks.nonNull(port , "Port" );

@@ -1,6 +1,6 @@
-package de.turtle_exception.core.server.util;
+package de.turtle_exception.core.netcore.util;
 
-public class MiscUtil {
+public class StringUtil {
     public static String join(String delimiter, int[] arr) {
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < arr.length; i++) {
