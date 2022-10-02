@@ -5,18 +5,13 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 
 public class Routes {
-    public static final Route OK = new Route("OK", true, ContentType.NONE);
+    public static final Route OK    = new Route("OK"   , true, ContentType.NONE);
+    public static final Route ERROR = new Route("ERROR", true, ContentType.ERROR);
 
     public static class Login {
         public static final Route LOGIN   = new Route("LOGIN"  , false, ContentType.PLAINTEXT);
         public static final Route VERSION = new Route("VERSION", false, ContentType.PLAINTEXT);
         public static final Route QUIT    = new Route("QUIT"   , true, ContentType.NONE);
-    }
-
-    // implementation note: all commands should start with "ERROR "
-    // TODO: implement a single ERROR Route with ContentType ERROR
-    public static class Error {
-        public static final Route NOT_SUPPORTED = new Route("ERROR NOT_SUPPORTED", true, ContentType.NONE);
     }
 
     public static class Content {
@@ -26,7 +21,7 @@ public class Routes {
             public static final Route DEL     = new Route("USER DEL"    , false, ContentType.PLAINTEXT);
             public static final Route SET     = new Route("USER SET"    , true , ContentType.USER);
             public static final Route UPDATE  = new Route("USER UPDATE" , true , ContentType.USER);
-            public static final Route UPDATES = new Route("USER UPDATES" , true , ContentType.USERS);
+            public static final Route UPDATES = new Route("USER UPDATES", true , ContentType.USERS);
 
             public static final Route MODIFY_NAME = new Route("USER MOD NAME", true, ContentType.PLAINTEXT);
 
@@ -40,7 +35,7 @@ public class Routes {
             public static final Route DEL     = new Route("GROUP DEL"    , false, ContentType.PLAINTEXT);
             public static final Route SET     = new Route("GROUP SET"    , true , ContentType.GROUP);
             public static final Route UPDATE  = new Route("GROUP UPDATE" , true , ContentType.GROUP);
-            public static final Route UPDATES = new Route("GROUP UPDATES" , true , ContentType.GROUPS);
+            public static final Route UPDATES = new Route("GROUP UPDATES", true , ContentType.GROUPS);
 
             public static final Route MODIFY_NAME = new Route("GROUP MOD NAME", true, ContentType.PLAINTEXT);
         }
