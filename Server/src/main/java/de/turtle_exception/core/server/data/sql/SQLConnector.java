@@ -10,10 +10,6 @@ import java.sql.SQLException;
 import java.text.MessageFormat;
 
 class SQLConnector {
-    private final String host;
-    private final int port;
-
-    private final String database;
     private final String login;
     private final String pass;
 
@@ -24,9 +20,6 @@ class SQLConnector {
     private Connection connection;
 
     public SQLConnector(String host, int port, String database, String login, String pass) throws SQLException {
-        this.host = host;
-        this.port = port;
-        this.database = database;
         this.login = login;
         this.pass = pass;
 
