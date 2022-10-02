@@ -1,5 +1,6 @@
-package de.turtle_exception.core.server.util;
+package de.turtle_exception.core.netcore.util.version;
 
+import de.turtle_exception.core.netcore.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -34,10 +35,10 @@ public record Version(int[] versions, @Nullable String EXTRA) {
      * the main class.
      * @return Version stored in resources.
      */
-    public static Version retrieveFromResources() {
+    public static Version retrieveFromResources(@NotNull Class<?> clazz) {
         try {
             Properties properties = new Properties();
-            properties.load(Version.class.getClassLoader().getResourceAsStream("version.properties"));
+            properties.load(clazz.getClassLoader().getResourceAsStream("version.properties"));
             return parse(properties.getProperty("version"));
         } catch (NullPointerException | IOException | IllegalVersionException e) {
             System.out.println("Unable to retrieve version from resources.");
@@ -74,6 +75,6 @@ public record Version(int[] versions, @Nullable String EXTRA) {
      */
     @Override
     public @NotNull String toString() {
-        return MiscUtil.join(".", versions) + ((EXTRA != null) ? ("-" + EXTRA) : "");
+        return StringUtil.join(".", versions) + ((EXTRA != null) ? ("-" + EXTRA) : "");
     }
 }

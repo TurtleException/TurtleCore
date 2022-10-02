@@ -15,13 +15,16 @@ public class RouteManager {
     /** This map links all finalizers to their route. */
     private final ConcurrentHashMap<String, Consumer<InboundMessage>> registry = new ConcurrentHashMap<>();
 
-    private Consumer<LogRecord> log;
+    private Consumer<LogRecord> log = logRecord -> { };
 
     /** The default finalizer that will be used if no specific finalizer is registered for a route. */
     private final @NotNull Consumer<InboundMessage> defaultFinalizer = message -> {
         message.respond(new OutboundMessage(
                 message.getCore(),
-                Routes.Error.NOT_SUPPORTED.setCallbackCode(message.getRoute().callbackCode()).build(),
+                Routes.ERROR
+                        .setCallbackCode(message.getRoute().callbackCode())
+                        .setContent(Errors.NOT_SUPPORTED)
+                        .build(),
                 System.currentTimeMillis() + message.getCore().getDefaultTimeoutOutbound(),
                 inboundMessage -> { }
         ));

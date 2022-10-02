@@ -19,4 +19,10 @@ public class Checks {
     public static <T> @NotNull T nullOr(@Nullable T o1, @NotNull T o2) {
         return o1 != null ? o1 : o2;
     }
+
+    public static boolean equalsNeither(@NotNull Object obj, @NotNull Object... other) {
+        for (Object o : other)
+            if (obj.equals(o)) return false;
+        return true;
+    }
 }

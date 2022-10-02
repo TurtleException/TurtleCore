@@ -1,7 +1,7 @@
 package de.turtle_exception.core.server;
 
-import de.turtle_exception.core.server.util.IllegalVersionException;
-import de.turtle_exception.core.server.util.Version;
+import de.turtle_exception.core.netcore.util.version.IllegalVersionException;
+import de.turtle_exception.core.netcore.util.version.Version;
 
 /**
  * Technical main class used to initialize {@link TurtleServer} and to prevent accidentally initializing multiple
@@ -14,7 +14,7 @@ public class Main {
     }
 
     public static TurtleServer singleton;
-    public static final Version VERSION = Version.retrieveFromResources();
+    public static final Version VERSION = Version.retrieveFromResources(Main.class);
 
     /**
      * Called by the JVM when starting this program.

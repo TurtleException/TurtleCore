@@ -7,6 +7,8 @@ import org.jetbrains.annotations.NotNull;
 public enum ContentType {
     NONE("null"),
 
+    ERROR("error"),
+
     PLAINTEXT("plaintext"),
 
     USER("user"),

@@ -1,6 +1,7 @@
 package de.turtle_exception.core.server.net;
 
 import com.google.common.collect.Sets;
+import de.turtle_exception.core.netcore.net.route.Routes;
 import de.turtle_exception.core.netcore.util.AsyncLoopThread;
 import de.turtle_exception.core.netcore.util.logging.NestedLogger;
 import de.turtle_exception.core.server.TurtleServer;
@@ -10,10 +11,8 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 
 /** The actual server part of the {@link TurtleServer}. */
@@ -26,9 +25,12 @@ public class InternalServer {
     private boolean online = false;
 
     private ServerSocket socket;
-    private Set<VirtualClient> clients;
+    Set<VirtualClient> clients;
 
     protected AsyncLoopThread receiver;
+
+    // note: this should only be used by #registerLogin()
+    private final HashSet<String> registeredLogins = new HashSet<>();
 
     public InternalServer(TurtleServer server, int port) {
         this.server = server;
@@ -52,7 +54,7 @@ public class InternalServer {
         this.receiver = new AsyncLoopThread(() -> online, () -> {
             try {
                 Socket client = socket.accept();
-                clients.add(new VirtualClient(InternalServer.this, client));
+                new LoginHandler(this, client);
             } catch (IOException e) {
                 logger.log(Level.WARNING, "Could not establish requested connection.", e);
             }
@@ -72,6 +74,16 @@ public class InternalServer {
         // close socket
         this.online = false;
         this.socket.close();
+    }
+
+    /* - - - */
+
+    @Nullable String getPass(@NotNull String login) {
+        // TODO (DataService required)
+    }
+
+    synchronized boolean registerLogin(@NotNull String login) {
+        return this.registeredLogins.add(login);
     }
 
     /* - - - */

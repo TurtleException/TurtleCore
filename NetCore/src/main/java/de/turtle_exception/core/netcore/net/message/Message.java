@@ -2,6 +2,7 @@ package de.turtle_exception.core.netcore.net.message;
 
 import de.turtle_exception.core.netcore.TurtleCore;
 import de.turtle_exception.core.netcore.net.route.CompiledRoute;
+import de.turtle_exception.core.netcore.net.route.ContentType;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class Message {
@@ -29,6 +30,10 @@ public abstract class Message {
 
     public @NotNull CompiledRoute getRoute() {
         return route;
+    }
+
+    public boolean isError() {
+        return route.contentType().equals(ContentType.ERROR);
     }
 
     public long getDeadline() {
