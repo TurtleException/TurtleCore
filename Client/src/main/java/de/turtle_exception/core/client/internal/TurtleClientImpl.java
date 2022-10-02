@@ -57,7 +57,7 @@ public class TurtleClientImpl extends TurtleCore implements TurtleClient {
 
         this.routeManager.setLog(logger::log);
 
-        this.routeManager.setRouteFinalizer(Routes.Login.QUIT, inboundMessage -> {
+        this.routeManager.setRouteFinalizer(Routes.QUIT, inboundMessage -> {
             logger.log(Level.WARNING, "Received QUIT command!");
             try {
                 netClient.quit();

@@ -43,7 +43,6 @@ public class TurtleServer extends TurtleCore {
         this.routeManager.setLog(logger::log);
 
         this.routeManager.setRouteFinalizer(Routes.OK, inboundMessage -> { });
-        this.routeManager.setRouteFinalizer(Routes.Login.LOGIN, inboundMessage -> { });
     }
 
     @SuppressWarnings("StatementWithEmptyBody")

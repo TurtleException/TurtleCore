@@ -7,12 +7,7 @@ import java.util.ArrayList;
 public class Routes {
     public static final Route OK    = new Route("OK"   , true, ContentType.NONE);
     public static final Route ERROR = new Route("ERROR", true, ContentType.ERROR);
-
-    public static class Login {
-        public static final Route LOGIN   = new Route("LOGIN"  , false, ContentType.PLAINTEXT);
-        public static final Route VERSION = new Route("VERSION", false, ContentType.PLAINTEXT);
-        public static final Route QUIT    = new Route("QUIT"   , true, ContentType.NONE);
-    }
+    public static final Route QUIT    = new Route("QUIT"   , true, ContentType.NONE);
 
     public static class Content {
         public static class User {
