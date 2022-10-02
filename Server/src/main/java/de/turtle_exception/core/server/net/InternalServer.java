@@ -11,6 +11,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
 
@@ -27,6 +28,9 @@ public class InternalServer {
     Set<VirtualClient> clients;
 
     protected AsyncLoopThread receiver;
+
+    // note: this should only be used by #registerLogin()
+    private final HashSet<String> registeredLogins = new HashSet<>();
 
     public InternalServer(TurtleServer server, int port) {
         this.server = server;
@@ -79,7 +83,7 @@ public class InternalServer {
     }
 
     synchronized boolean registerLogin(@NotNull String login) {
-        // TODO
+        return this.registeredLogins.add(login);
     }
 
     /* - - - */
