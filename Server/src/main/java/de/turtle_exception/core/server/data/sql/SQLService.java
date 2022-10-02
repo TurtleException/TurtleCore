@@ -30,6 +30,20 @@ public class SQLService implements DataService {
     /* - - - */
 
     @Override
+    public @NotNull String getPass(@NotNull String login) throws DataAccessException {
+        ResultSet resultSet = this.sqlConnector.executeQuery(Statements.GET_PASS, login);
+
+        try {
+            if (!resultSet.next())
+                throw new DataAccessException("Could not parse pass from empty ResultSet.");
+
+            return resultSet.getString("pass");
+        } catch (SQLException e) {
+            throw new DataAccessException(e);
+        }
+    }
+
+    @Override
     public @NotNull List<Long> getGroupIds() throws DataAccessException {
         ResultSet resultSet = this.sqlConnector.executeQuery(Statements.GET_GROUP_IDS);
 
@@ -52,6 +66,9 @@ public class SQLService implements DataService {
         JsonObject json = new JsonObject();
 
         try {
+            if (!resultSet.next())
+                throw new DataAccessException("Could not parse group from empty ResultSet.");
+
             json.addProperty("id"  , resultSet.getString("id"));
             json.addProperty("name", resultSet.getString("name"));
         } catch (SQLException e) {
@@ -104,6 +121,9 @@ public class SQLService implements DataService {
         JsonObject json = new JsonObject();
 
         try {
+            if (!resultUser.next())
+                throw new DataAccessException("Could not parse user from empty ResultSet.");
+
             json.addProperty("id"  , resultUser.getString("id"));
             json.addProperty("name", resultUser.getString("name"));
 

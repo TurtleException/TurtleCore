@@ -1,10 +1,10 @@
 package de.turtle_exception.core.server.net;
 
 import com.google.common.collect.Sets;
-import de.turtle_exception.core.netcore.net.route.Routes;
 import de.turtle_exception.core.netcore.util.AsyncLoopThread;
 import de.turtle_exception.core.netcore.util.logging.NestedLogger;
 import de.turtle_exception.core.server.TurtleServer;
+import de.turtle_exception.core.server.data.DataAccessException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -79,7 +79,11 @@ public class InternalServer {
     /* - - - */
 
     @Nullable String getPass(@NotNull String login) {
-        // TODO (DataService required)
+        try {
+            return server.getDataService().getPass(login);
+        } catch (DataAccessException e) {
+            return null;
+        }
     }
 
     synchronized boolean registerLogin(@NotNull String login) {

@@ -4,11 +4,15 @@ class Statements {
     private Statements() { }
 
     // CREATE TABLE
+    public static final String CT_CREDENTIALS    = "CREATE TABLE IF NOT EXISTS `credentials` (`login` VARCHAR(256) NOT NULL , `pass` VARCHAR(256) NOT NULL , PRIMARY KEY (`login`));";
     public static final String CT_GROUPS         = "CREATE TABLE IF NOT EXISTS `groups` (`id` BIGINT NOT NULL , `name` TINYTEXT NOT NULL , PRIMARY KEY (`id`));";
     public static final String CT_USERS          = "CREATE TABLE IF NOT EXISTS `users` (`id` BIGINT NOT NULL , `name` TINYTEXT NOT NULL , PRIMARY KEY (`id`));";
     public static final String CT_USER_GROUPS    = "CREATE TABLE IF NOT EXISTS `user_groups` (`user` BIGINT NOT NULL , `group` BIGINT NOT NULL , PRIMARY KEY (`user`, `group`));";
     public static final String CT_USER_DISCORD   = "CREATE TABLE IF NOT EXISTS `user_discord` (`user` BIGINT NOT NULL , `discord` BIGINT NOT NULL , PRIMARY KEY (`user`, `discord`));";
     public static final String CT_USER_MINECRAFT = "CREATE TABLE IF NOT EXISTS `user_minecraft` (`user` BIGINT NOT NULL , `minecraft` VARCHAR(36) NOT NULL , PRIMARY KEY (`user`, `minecraft`));";
+
+    // CREDENTIALS
+    public static final String GET_PASS = "SELECT `pass` FROM `credentials` WHERE `name` = '{0}';";
 
     // GROUPS
     public static final String GET_GROUP     = "SELECT * FROM `groups` WHERE `id` = '{0}';";

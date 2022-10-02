@@ -3,6 +3,8 @@ package de.turtle_exception.core.server;
 import de.turtle_exception.core.netcore.TurtleCore;
 import de.turtle_exception.core.netcore.net.route.Routes;
 import de.turtle_exception.core.netcore.util.logging.SimpleFormatter;
+import de.turtle_exception.core.server.data.DataService;
+import de.turtle_exception.core.server.data.sql.SQLService;
 import de.turtle_exception.core.server.util.LogUtil;
 import de.turtle_exception.core.server.util.Status;
 
@@ -34,11 +36,23 @@ public class TurtleServer extends TurtleCore {
 
     private final Properties config = new Properties();
 
+    private final DataService dataService;
+
     public TurtleServer() throws Exception {
         this.logger = Logger.getLogger("SERVER");
         this.logger.addHandler(LogUtil.getFileHandler(new SimpleFormatter()));
 
         this.config.load(new FileReader(new File(DIR, "server.properties")));
+
+        // TODO: check config to determine which implementation should be used
+        this.dataService = new SQLService(
+                config.getProperty("sql.host"),
+                // TODO: handle exception (?)
+                Integer.parseInt(config.getProperty("sql.port")),
+                config.getProperty("sql.database"),
+                config.getProperty("sql.login"),
+                config.getProperty("sql.pass")
+        );
 
         this.routeManager.setLog(logger::log);
 
@@ -78,7 +92,13 @@ public class TurtleServer extends TurtleCore {
         logger.log(Level.ALL, "OK bye.");
     }
 
+    /* - - - */
+
     public Logger getLogger() {
         return logger;
+    }
+
+    public DataService getDataService() {
+        return dataService;
     }
 }

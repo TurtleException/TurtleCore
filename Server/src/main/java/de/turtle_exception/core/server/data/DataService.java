@@ -7,6 +7,9 @@ import java.util.List;
 import java.util.UUID;
 
 public interface DataService {
+    // TODO: docs
+    @NotNull String getPass(@NotNull String login) throws DataAccessException;
+
     /**
      * Provides a List containing the ids of all groups.
      * @return List of group ids
