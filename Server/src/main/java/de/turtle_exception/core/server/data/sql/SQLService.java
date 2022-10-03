@@ -18,6 +18,7 @@ public class SQLService implements DataService {
     public SQLService(@NotNull String host, int port, @NotNull String database, @NotNull String login, @NotNull String pass) throws SQLException {
         this.sqlConnector = new SQLConnector(host, port, database, login, pass);
 
+        this.sqlConnector.executeSilentRaw(Statements.CT_CREDENTIALS);
         this.sqlConnector.executeSilentRaw(Statements.CT_GROUPS);
         this.sqlConnector.executeSilentRaw(Statements.CT_USERS);
         this.sqlConnector.executeSilentRaw(Statements.CT_USER_GROUPS);
