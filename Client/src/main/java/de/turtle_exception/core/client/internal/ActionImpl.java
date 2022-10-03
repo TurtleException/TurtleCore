@@ -15,8 +15,8 @@ import java.util.function.Consumer;
 
 public class ActionImpl<T> implements Action<T> {
     private final @NotNull TurtleClientImpl client;
-    private final Route route;
-    private final BiFunction<Message, Request<T>, T> handler;
+    protected Route route;
+    protected BiFunction<Message, Request<T>, T> handler;
 
     private Consumer<? super T>         onSuccess = null;
     private Consumer<? super Throwable> onFailure = null;

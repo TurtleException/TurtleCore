@@ -13,9 +13,16 @@ public enum ContentType {
 
     USER("user"),
     USERS("users"),
+    /** A user id with an info field (separated by a space) */
+    USER_INFO("userinfo"),
+
+    USER_DISCORD("discord"),
+    USER_MINECRAFT("minecraft"),
 
     GROUP("group"),
-    GROUPS("groups")
+    GROUPS("groups"),
+    /** A group id with an info field (separated by a space) */
+    GROUP_INFO("groupinfo")
     ;
 
     private final String name;

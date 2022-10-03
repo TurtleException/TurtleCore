@@ -17,6 +17,8 @@ public class RouteManager {
 
     private Consumer<LogRecord> log = logRecord -> { };
 
+    private final Consumer<InboundMessage> emptyFinalizer = inboundMessage -> { };
+
     /** The default finalizer that will be used if no specific finalizer is registered for a route. */
     private final @NotNull Consumer<InboundMessage> defaultFinalizer = message -> {
         message.respond(new OutboundMessage(
@@ -45,6 +47,11 @@ public class RouteManager {
 
     public @NotNull Consumer<InboundMessage> getRouteFinalizer(@NotNull String command) {
         return registry.getOrDefault(command, defaultFinalizer);
+    }
+
+    public void setEmptyFinalizer(@NotNull Route... routes) {
+        for (Route route : routes)
+            this.setRouteFinalizer(route, emptyFinalizer);
     }
 
     public void setLog(@Nullable Consumer<LogRecord> log) {

@@ -3,6 +3,7 @@ package de.turtle_exception.core.server;
 import de.turtle_exception.core.netcore.TurtleCore;
 import de.turtle_exception.core.netcore.net.route.Routes;
 import de.turtle_exception.core.netcore.util.logging.SimpleFormatter;
+import de.turtle_exception.core.server.net.InternalServer;
 import de.turtle_exception.core.server.util.LogUtil;
 import de.turtle_exception.core.server.util.Status;
 
@@ -34,6 +35,8 @@ public class TurtleServer extends TurtleCore {
 
     private final Properties config = new Properties();
 
+    private InternalServer internalServer;
+
     public TurtleServer() throws Exception {
         this.logger = Logger.getLogger("SERVER");
         this.logger.addHandler(LogUtil.getFileHandler(new SimpleFormatter()));
@@ -47,7 +50,64 @@ public class TurtleServer extends TurtleCore {
 
         this.logger.log(Level.INFO, "Registering route finalizers...");
         this.routeManager.setLog(logger::log);
-        this.routeManager.setRouteFinalizer(Routes.OK, inboundMessage -> { });
+        this.routeManager.setRouteFinalizer(Routes.ERROR, inboundMessage -> {
+            // this is for debug purposes (relevant errors should be reported in processing)
+            logger.log(Level.FINE, "Received error: " + inboundMessage.getRoute().content());
+        });
+        this.routeManager.setRouteFinalizer(Routes.QUIT, inboundMessage -> {
+            // TODO: missing some sort of #getVirtualClient() in InboundMessage
+        });
+        /* --- NOT HANDLED BY FINALIZERS */
+        this.routeManager.setEmptyFinalizer(
+                Routes.OK
+        );
+        /* --- CONTENT / USER */
+        this.routeManager.setRouteFinalizer(Routes.Content.User.GET_ALL, inboundMessage -> {
+            // TODO
+        });
+        this.routeManager.setRouteFinalizer(Routes.Content.User.GET, inboundMessage -> {
+            // TODO
+        });
+        this.routeManager.setRouteFinalizer(Routes.Content.User.DEL, inboundMessage -> {
+            // TODO
+        });
+        this.routeManager.setRouteFinalizer(Routes.Content.User.MOD_NAME, inboundMessage -> {
+            // TODO
+        });
+        this.routeManager.setRouteFinalizer(Routes.Content.User.MOD_NAME, inboundMessage -> {
+            // TODO
+        });
+        this.routeManager.setRouteFinalizer(Routes.Content.User.GROUP_JOIN, inboundMessage -> {
+            // TODO
+        });
+        this.routeManager.setRouteFinalizer(Routes.Content.User.GROUP_LEAVE, inboundMessage -> {
+            // TODO
+        });
+        this.routeManager.setRouteFinalizer(Routes.Content.User.DISCORD_GET, inboundMessage -> {
+            // TODO
+        });
+        this.routeManager.setRouteFinalizer(Routes.Content.User.DISCORD_SET, inboundMessage -> {
+            // TODO
+        });
+        this.routeManager.setRouteFinalizer(Routes.Content.User.MINECRAFT_GET, inboundMessage -> {
+            // TODO
+        });
+        this.routeManager.setRouteFinalizer(Routes.Content.User.MINECRAFT_SET, inboundMessage -> {
+            // TODO
+        });
+        /* --- CONTENT / GROUP */
+        this.routeManager.setRouteFinalizer(Routes.Content.Group.GET_ALL, inboundMessage -> {
+            // TODO
+        });
+        this.routeManager.setRouteFinalizer(Routes.Content.Group.GET, inboundMessage -> {
+            // TODO
+        });
+        this.routeManager.setRouteFinalizer(Routes.Content.Group.DEL, inboundMessage -> {
+            // TODO
+        });
+        this.routeManager.setRouteFinalizer(Routes.Content.Group.MOD_NAME, inboundMessage -> {
+            // TODO
+        });
 
         /* RUNNING */
 

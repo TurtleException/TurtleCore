@@ -1,10 +1,12 @@
 package de.turtle_exception.core.client.internal;
 
+import com.google.gson.*;
 import de.turtle_exception.core.client.api.TurtleClient;
 import de.turtle_exception.core.client.api.entities.Group;
 import de.turtle_exception.core.client.api.entities.User;
 import de.turtle_exception.core.client.api.requests.Action;
 import de.turtle_exception.core.client.internal.entities.EntityBuilder;
+import de.turtle_exception.core.client.internal.entities.UserImpl;
 import de.turtle_exception.core.client.internal.net.NetClient;
 import de.turtle_exception.core.client.internal.util.TurtleSet;
 import de.turtle_exception.core.netcore.TurtleCore;
@@ -16,7 +18,9 @@ import org.jetbrains.annotations.Range;
 
 import javax.security.auth.login.LoginException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.function.Consumer;
 import java.util.logging.Level;
@@ -64,6 +68,85 @@ public class TurtleClientImpl extends TurtleCore implements TurtleClient {
             } catch (IOException e) {
                 logger.log(Level.WARNING, "Could not close socket properly.", e);
             }
+        });
+        this.routeManager.setRouteFinalizer(Routes.ERROR, inboundMessage -> {
+            // this is for debug purposes (relevant errors should be reported in processing)
+            logger.log(Level.FINE, "Received error: " + inboundMessage.getRoute().content());
+        });
+
+        /* --- NOT HANDLED BY FINALIZERS */
+        this.routeManager.setEmptyFinalizer(
+                Routes.OK,
+                Routes.Content.User.GET_ALL_R,
+                Routes.Content.User.GET_R,
+                Routes.Content.User.DISCORD_GET_R,
+                Routes.Content.User.MINECRAFT_GET_R,
+                Routes.Content.Group.GET_ALL_R,
+                Routes.Content.Group.GET_R
+        );
+
+        /* --- CONTENT / USER */
+        this.routeManager.setRouteFinalizer(Routes.Content.User.DELETED, inboundMessage -> {
+            userCache.removeStringId(inboundMessage.getRoute().content());
+        });
+        this.routeManager.setRouteFinalizer(Routes.Content.User.UPDATE, inboundMessage -> {
+            userCache.add(EntityBuilder.buildUser(inboundMessage.getRoute().content()));
+        });
+        this.routeManager.setRouteFinalizer(Routes.Content.User.UPDATES, inboundMessage -> {
+            userCache.addAll(EntityBuilder.buildUsers(inboundMessage.getRoute().content()));
+        });
+        this.routeManager.setRouteFinalizer(Routes.Content.User.DISCORD_UPDATE, inboundMessage -> {
+            try {
+                JsonObject json = new Gson().fromJson(inboundMessage.getRoute().content(), JsonObject.class);
+
+                long id = json.get("user").getAsLong();
+                UserImpl  user    = (UserImpl) userCache.get(id);
+                JsonArray discord = json.getAsJsonArray("discord");
+
+                if (user == null)
+                    throw new NullPointerException();
+
+                ArrayList<Long> list = new ArrayList<>();
+                for (JsonElement jsonElement : discord)
+                    list.add(jsonElement.getAsLong());
+                user.setDiscordIdSet(list);
+            } catch (JsonSyntaxException e) {
+                logger.log(Level.WARNING, "Malformed JSON on Route DISCORD_UPDATE", e);
+            } catch (ClassCastException | NullPointerException e) {
+                logger.log(Level.WARNING, "Could not finalize DISCORD_UPDATE", e);
+            }
+        });
+        this.routeManager.setRouteFinalizer(Routes.Content.User.MINECRAFT_UPDATE, inboundMessage -> {
+            try {
+                JsonObject json = new Gson().fromJson(inboundMessage.getRoute().content(), JsonObject.class);
+
+                long id = json.get("user").getAsLong();
+                UserImpl  user      = (UserImpl) userCache.get(id);
+                JsonArray minecraft = json.getAsJsonArray("minecraft");
+
+                if (user == null)
+                    throw new NullPointerException();
+
+                ArrayList<UUID> list = new ArrayList<>();
+                for (JsonElement jsonElement : minecraft)
+                    list.add(UUID.fromString(jsonElement.getAsString()));
+                user.setMinecraftIdSet(list);
+            } catch (JsonSyntaxException e) {
+                logger.log(Level.WARNING, "Malformed JSON on Route MINECRAFT_UPDATE", e);
+            } catch (IllegalArgumentException | ClassCastException | NullPointerException e) {
+                logger.log(Level.WARNING, "Could not finalize MINECRAFT_UPDATE", e);
+            }
+        });
+
+        /* --- CONTENT / GROUP */
+        this.routeManager.setRouteFinalizer(Routes.Content.Group.DELETED, inboundMessage -> {
+            groupCache.removeStringId(inboundMessage.getRoute().content());
+        });
+        this.routeManager.setRouteFinalizer(Routes.Content.Group.UPDATE, inboundMessage -> {
+            groupCache.add(EntityBuilder.buildGroup(inboundMessage.getRoute().content()));
+        });
+        this.routeManager.setRouteFinalizer(Routes.Content.Group.UPDATES, inboundMessage -> {
+            groupCache.addAll(EntityBuilder.buildGroups(inboundMessage.getRoute().content()));
         });
 
         this.netClient.start();
