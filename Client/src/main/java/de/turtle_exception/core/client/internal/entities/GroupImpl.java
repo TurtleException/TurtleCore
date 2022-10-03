@@ -4,7 +4,7 @@ import de.turtle_exception.core.client.api.TurtleClient;
 import de.turtle_exception.core.client.api.entities.Group;
 import de.turtle_exception.core.client.api.requests.Action;
 import de.turtle_exception.core.client.internal.ActionImpl;
-import de.turtle_exception.core.netcore.net.route.Routes;
+import de.turtle_exception.core.core.net.route.Routes;
 import org.jetbrains.annotations.NotNull;
 
 public class GroupImpl implements Group {

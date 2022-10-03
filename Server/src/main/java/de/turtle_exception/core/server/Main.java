@@ -1,7 +1,7 @@
 package de.turtle_exception.core.server;
 
-import de.turtle_exception.core.netcore.util.version.IllegalVersionException;
-import de.turtle_exception.core.netcore.util.version.Version;
+import de.turtle_exception.core.core.util.version.IllegalVersionException;
+import de.turtle_exception.core.core.util.version.Version;
 
 /**
  * Technical main class used to initialize {@link TurtleServer} and to prevent accidentally initializing multiple

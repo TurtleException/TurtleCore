@@ -2,7 +2,7 @@ package de.turtle_exception.core.client.api.requests;
 
 import de.turtle_exception.core.client.internal.ActionImpl;
 import de.turtle_exception.core.client.internal.TurtleClientImpl;
-import de.turtle_exception.core.netcore.net.route.Route;
+import de.turtle_exception.core.core.net.route.Route;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.CompletableFuture;
