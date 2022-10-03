@@ -231,32 +231,43 @@ public class FilesystemService implements DataService {
     }
 
     @Override
-    public void userJoinGroup(long userId, long groupId) throws DataAccessException {
+    public @NotNull JsonArray getUserGroups(long user) throws DataAccessException {
+        JsonObject json;
         synchronized (userLock) {
-            JsonObject json   = getUserJson(userId);
-            JsonArray  groups = json.getAsJsonArray("groups");
+            json = this.getUserJson(user);
+        }
+        JsonArray group = json.getAsJsonArray("groups");
 
-            groups.add(groupId);
+        return group != null ? group : new JsonArray();
+    }
 
-            json.add("groups", groups);
-            this.setUserJson(json);
+    @Override
+    public void addUserGroup(long user, long group) throws DataAccessException {
+        synchronized (userLock) {
+            JsonArray json = getUserGroups(user);
+            json.add(group);
+            this.setUserGroups(user, json);
         }
     }
 
     @Override
-    public void userLeaveGroup(long userId, long groupId) throws DataAccessException {
+    public void delUserGroup(long user, long group) throws DataAccessException {
         synchronized (userLock) {
-            JsonObject json = getUserJson(userId);
-            JsonArray oldGroups = json.getAsJsonArray("groups");
-            JsonArray newGroups = new JsonArray();
+            JsonArray oldJson = getUserGroups(user);
+            JsonArray newJson = new JsonArray();
 
-            for (JsonElement oldGroup : oldGroups)
-                if (oldGroup.getAsLong() != groupId)
-                    newGroups.add(oldGroup);
+            for (JsonElement entry : oldJson)
+                if (entry.getAsLong() != group)
+                    newJson.add(entry);
 
-            json.add("groups", newGroups);
-            this.setUserJson(json);
+            this.setUserGroups(user, newJson);
         }
+    }
+
+    private void setUserGroups(long user, @NotNull JsonArray groups) throws DataAccessException {
+        JsonObject json = this.getUserJson(user);
+        json.add("groups", groups);
+        this.setUserJson(json);
     }
 
     @Override

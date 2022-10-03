@@ -27,9 +27,9 @@ class Statements {
     public static final String DEL_USER     = "DELETE FROM `users` WHERE `id` = {0};";
 
     // USERS & GROUPS
-    public static final String GET_USER_GROUP_IDS = "SELECT `group` FROM `user_groups` WHERE `user` = '{0}';";
-    public static final String USER_GROUP_JOIN    = "INSERT INTO `user_groups`(`user`, `group`) VALUES ('{0}', '{1}');";
-    public static final String USER_GROUP_LEAVE   = "DELETE FROM `user_groups` WHERE `user` = '{0}' AND `group` = '{1}';";
+    public static final String GET_USER_GROUPS = "SELECT `group` FROM `user_groups` WHERE `user` = '{0}';";
+    public static final String ADD_USER_GROUP  = "INSERT INTO `user_groups`(`user`, `group`) VALUES ('{0}', '{1}');";
+    public static final String DEL_USER_GROUP  = "DELETE FROM `user_groups` WHERE `user` = '{0}' AND `group` = '{1}';";
 
     // USERS & DISCORD
     public static final String GET_USER_DISCORD = "SELECT `discord` FROM `user_discord` WHERE `user` = '{0}';";

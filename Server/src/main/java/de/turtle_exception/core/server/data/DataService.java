@@ -88,9 +88,11 @@ public interface DataService {
      */
     void deleteUser(long id) throws DataAccessException;
 
-    void userJoinGroup(long userId, long groupId) throws DataAccessException;
+    @NotNull JsonArray getUserGroups(long user) throws DataAccessException;
 
-    void userLeaveGroup(long userId, long groupId) throws DataAccessException;
+    void addUserGroup(long userId, long groupId) throws DataAccessException;
+
+    void delUserGroup(long userId, long groupId) throws DataAccessException;
 
     @NotNull JsonArray getUserDiscord(long user) throws DataAccessException;
 

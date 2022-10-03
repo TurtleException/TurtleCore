@@ -138,13 +138,29 @@ public class SQLService implements DataService {
     }
 
     @Override
-    public void userJoinGroup(long user, long group) throws DataAccessException {
-        this.sqlConnector.executeSilent(Statements.USER_GROUP_JOIN, user, group);
+    public @NotNull JsonArray getUserGroups(long user) throws DataAccessException {
+        ResultSet resultSet = this.sqlConnector.executeQuery(Statements.GET_USER_GROUPS, user);
+
+        try {
+            JsonArray groups = new JsonArray();
+
+            while (resultSet.next())
+                groups.add(resultSet.getLong("groups"));
+
+            return groups;
+        } catch (SQLException e) {
+            throw new DataAccessException(e);
+        }
     }
 
     @Override
-    public void userLeaveGroup(long user, long group) throws DataAccessException {
-        this.sqlConnector.executeSilent(Statements.USER_GROUP_LEAVE, user, group);
+    public void addUserGroup(long user, long group) throws DataAccessException {
+        this.sqlConnector.executeSilent(Statements.ADD_USER_GROUP, user, group);
+    }
+
+    @Override
+    public void delUserGroup(long user, long group) throws DataAccessException {
+        this.sqlConnector.executeSilent(Statements.DEL_USER_GROUP, user, group);
     }
 
     @Override
