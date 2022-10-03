@@ -1,5 +1,7 @@
 package de.turtle_exception.core.server.data;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -18,8 +20,8 @@ public interface DataService {
     @NotNull List<Long> getGroupIds() throws DataAccessException;
 
     // TODO: docs
-    default @NotNull List<String> getGroups() throws DataAccessException {
-        ArrayList<String> list = new ArrayList<>();
+    default @NotNull List<JsonObject> getGroups() throws DataAccessException {
+        ArrayList<JsonObject> list = new ArrayList<>();
 
         for (Long group : this.getGroupIds())
             list.add(this.getGroup(group));
@@ -32,14 +34,14 @@ public interface DataService {
      * @return JSON representation of the group.
      * @throws DataAccessException if the request fails.
      */
-    @NotNull String getGroup(long id) throws DataAccessException;
+    @NotNull JsonObject getGroup(long id) throws DataAccessException;
 
     /**
      * Takes in a JSON object representing a group and feeds it into the underlying database, overwriting any existing
      * data of that group.
      * @param group JSON representation of the group.
      */
-    void setGroup(@NotNull String group) throws DataAccessException;
+    void setGroup(@NotNull JsonObject group) throws DataAccessException;
 
     /**
      * Deletes all data of the group specified by the id.
@@ -56,8 +58,8 @@ public interface DataService {
     @NotNull List<Long> getUserIds() throws DataAccessException;
 
     // TODO: docs
-    default @NotNull List<String> getUsers() throws DataAccessException {
-        ArrayList<String> list = new ArrayList<>();
+    default @NotNull List<JsonObject> getUsers() throws DataAccessException {
+        ArrayList<JsonObject> list = new ArrayList<>();
 
         for (Long user : this.getUserIds())
             list.add(this.getGroup(user));
@@ -70,14 +72,14 @@ public interface DataService {
      * @return JSON representation of the user.
      * @throws DataAccessException if the request fails.
      */
-    @NotNull String getUser(long id) throws DataAccessException;
+    @NotNull JsonObject getUser(long id) throws DataAccessException;
 
     /**
      * Takes in a JSON object representing a user and feeds it into the underlying database, overwriting any existing
      * data of that user.
      * @param user JSON representation of the user.
      */
-    void setUser(@NotNull String user) throws DataAccessException;
+    void setUser(@NotNull JsonObject user) throws DataAccessException;
 
     /**
      * Deletes all data of the user specified by the id.
@@ -90,13 +92,13 @@ public interface DataService {
 
     void userLeaveGroup(long userId, long groupId) throws DataAccessException;
 
-    @NotNull List<Long> getUserDiscord(long user) throws DataAccessException;
-
-    @NotNull List<UUID> getUserMinecraft(long user) throws DataAccessException;
+    @NotNull JsonArray getUserDiscord(long user) throws DataAccessException;
 
     void addUserDiscord(long user, long discord) throws DataAccessException;
 
     void delUserDiscord(long user, long discord) throws DataAccessException;
+
+    @NotNull JsonArray getUserMinecraft(long user) throws DataAccessException;
 
     void addUserMinecraft(long user, @NotNull UUID minecraft) throws DataAccessException;
 

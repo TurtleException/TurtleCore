@@ -1,6 +1,5 @@
 package de.turtle_exception.core.server.data.sql;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import de.turtle_exception.core.server.data.DataAccessException;
@@ -9,7 +8,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -60,7 +58,7 @@ public class SQLService implements DataService {
     }
 
     @Override
-    public @NotNull String getGroup(long id) throws DataAccessException {
+    public @NotNull JsonObject getGroup(long id) throws DataAccessException {
         ResultSet resultSet =  this.sqlConnector.executeQuery(Statements.GET_GROUP);
 
         JsonObject json = new JsonObject();
@@ -75,24 +73,20 @@ public class SQLService implements DataService {
             throw new DataAccessException(e);
         }
 
-        return json.toString();
+        return json;
     }
 
     @Override
-    public void setGroup(@NotNull String group) throws DataAccessException {
-        JsonObject json = new Gson().fromJson(group, JsonObject.class);
-        
-        String sql = MessageFormat.format(Statements.SET_GROUP,
-                json.get("id").getAsString(),
-                json.get("name").getAsString()
+    public void setGroup(@NotNull JsonObject group) throws DataAccessException {
+        this.sqlConnector.executeSilent(Statements.SET_GROUP,
+                group.get("id").getAsString(),
+                group.get("name").getAsString()
         );
-
-        this.sqlConnector.executeSilent(sql);
     }
 
     @Override
     public void deleteGroup(long id) throws DataAccessException {
-        this.sqlConnector.executeSilent(MessageFormat.format(Statements.DEL_GROUP, id));
+        this.sqlConnector.executeSilent(Statements.DEL_GROUP, id);
     }
 
     @Override
@@ -112,11 +106,8 @@ public class SQLService implements DataService {
     }
 
     @Override
-    public @NotNull String getUser(long id) throws DataAccessException {
-        ResultSet resultUser          = this.sqlConnector.executeQuery(Statements.GET_USER          , id);
-        ResultSet resultUserGroups    = this.sqlConnector.executeQuery(Statements.GET_USER_GROUP_IDS, id);
-        ResultSet resultUserDiscord   = this.sqlConnector.executeQuery(Statements.GET_USER_DISCORD  , id);
-        ResultSet resultUserMinecraft = this.sqlConnector.executeQuery(Statements.GET_USER_MINECRAFT, id);
+    public @NotNull JsonObject getUser(long id) throws DataAccessException {
+        ResultSet resultUser = this.sqlConnector.executeQuery(Statements.GET_USER, id);
 
         JsonObject json = new JsonObject();
 
@@ -126,43 +117,24 @@ public class SQLService implements DataService {
 
             json.addProperty("id"  , resultUser.getString("id"));
             json.addProperty("name", resultUser.getString("name"));
-
-            JsonArray groups = new JsonArray();
-            while (resultUserGroups.next())
-                groups.add(resultUserGroups.getString("group"));
-            json.add("groups", groups);
-
-            JsonArray discord = new JsonArray();
-            while (resultUserDiscord.next())
-                discord.add(resultUserDiscord.getString("discord"));
-            json.add("discord", discord);
-
-            JsonArray minecraft = new JsonArray();
-            while (resultUserMinecraft.next())
-                minecraft.add(resultUserMinecraft.getString("minecraft"));
-            json.add("minecraft", minecraft);
         } catch (SQLException e) {
             throw new DataAccessException(e);
         }
 
-        return json.toString();
+        return json;
     }
 
-    // TODO: should this handle groups, discord & minecraft?
     @Override
-    public void setUser(@NotNull String user) throws DataAccessException {
-        JsonObject newUser = new Gson().fromJson(user, JsonObject.class);
-
+    public void setUser(@NotNull JsonObject user) throws DataAccessException {
         this.sqlConnector.executeSilent(Statements.SET_USER,
-                newUser.get("id").getAsLong(),
-                newUser.get("name").getAsString()
+                user.get("id").getAsLong(),
+                user.get("name").getAsString()
         );
     }
 
     @Override
     public void deleteUser(long id) throws DataAccessException {
-        this.sqlConnector.executeSilent(MessageFormat.format(Statements.DEL_USER, id));
-
+        this.sqlConnector.executeSilent(Statements.DEL_USER, id);
     }
 
     @Override
@@ -176,33 +148,17 @@ public class SQLService implements DataService {
     }
 
     @Override
-    public @NotNull List<Long> getUserDiscord(long user) throws DataAccessException {
+    public @NotNull JsonArray getUserDiscord(long user) throws DataAccessException {
         ResultSet resultSet = this.sqlConnector.executeQuery(Statements.GET_USER_DISCORD, user);
 
         try {
-            List<Long> discord = new ArrayList<>();
+            JsonArray discord = new JsonArray();
 
             while (resultSet.next())
                 discord.add(resultSet.getLong("discord"));
 
-            return List.copyOf(discord);
+            return discord;
         } catch (SQLException e) {
-            throw new DataAccessException(e);
-        }
-    }
-
-    @Override
-    public @NotNull List<UUID> getUserMinecraft(long user) throws DataAccessException {
-        ResultSet resultSet = this.sqlConnector.executeQuery(Statements.GET_USER_MINECRAFT, user);
-
-        try {
-            List<UUID> minecraft = new ArrayList<>();
-
-            while (resultSet.next())
-                minecraft.add(UUID.fromString(resultSet.getString("minecraft")));
-
-            return List.copyOf(minecraft);
-        } catch (SQLException | IllegalArgumentException e) {
             throw new DataAccessException(e);
         }
     }
@@ -215,6 +171,22 @@ public class SQLService implements DataService {
     @Override
     public void delUserDiscord(long user, long discord) throws DataAccessException {
         this.sqlConnector.executeSilent(Statements.DEL_USER_DISCORD, user, discord);
+    }
+
+    @Override
+    public @NotNull JsonArray getUserMinecraft(long user) throws DataAccessException {
+        ResultSet resultSet = this.sqlConnector.executeQuery(Statements.GET_USER_MINECRAFT, user);
+
+        try {
+            JsonArray minecraft = new JsonArray();
+
+            while (resultSet.next())
+                minecraft.add(resultSet.getString("minecraft"));
+
+            return minecraft;
+        } catch (SQLException | IllegalArgumentException e) {
+            throw new DataAccessException(e);
+        }
     }
 
     @Override

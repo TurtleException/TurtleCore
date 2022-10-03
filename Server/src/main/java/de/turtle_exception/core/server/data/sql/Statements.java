@@ -32,12 +32,12 @@ class Statements {
     public static final String USER_GROUP_LEAVE   = "DELETE FROM `user_groups` WHERE `user` = '{0}' AND `group` = '{1}';";
 
     // USERS & DISCORD
-    public static final String GET_USER_DISCORD     = "SELECT `discord` FROM `user_discord` WHERE `user` = '{0}';";
-    public static final String ADD_USER_DISCORD     = "INSERT INTO `user_discord`(`user`, `discord`) VALUES ('{0}','{1}');";
-    public static final String DEL_USER_DISCORD     = "DELETE FROM `user_discord` WHERE `user` = '{0}' AND `discord` = '{1}';";
+    public static final String GET_USER_DISCORD = "SELECT `discord` FROM `user_discord` WHERE `user` = '{0}';";
+    public static final String ADD_USER_DISCORD = "INSERT INTO `user_discord`(`user`, `discord`) VALUES ('{0}','{1}');";
+    public static final String DEL_USER_DISCORD = "DELETE FROM `user_discord` WHERE `user` = '{0}' AND `discord` = '{1}';";
 
     // USERS & MINECRAFT
-    public static final String GET_USER_MINECRAFT     = "SELECT `minecraft` FROM `user_minecraft` WHERE `user` = '{0}';";
-    public static final String ADD_USER_MINECRAFT     = "INSERT INTO `user_minecraft`(`user`, `minecraft`) VALUES ('{0}','{1}');";
-    public static final String DEL_USER_MINECRAFT     = "DELETE FROM `user_minecraft` WHERE `user` = '{0}' AND `minecraft` = '{1}';";
+    public static final String GET_USER_MINECRAFT = "SELECT `minecraft` FROM `user_minecraft` WHERE `user` = '{0}';";
+    public static final String ADD_USER_MINECRAFT = "INSERT INTO `user_minecraft`(`user`, `minecraft`) VALUES ('{0}','{1}');";
+    public static final String DEL_USER_MINECRAFT = "DELETE FROM `user_minecraft` WHERE `user` = '{0}' AND `minecraft` = '{1}';";
 }
