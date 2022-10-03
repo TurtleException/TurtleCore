@@ -110,7 +110,11 @@ public class FilesystemService implements DataService {
     public @NotNull String getPass(@NotNull String login) throws DataAccessException {
         synchronized (lock) {
             JsonObject json = this.getCredentialsJson();
-            return json.get(login).getAsString();
+            String pass = json.get(login).getAsString();
+            if (pass != null)
+                return pass;
+            else
+                throw new DataAccessException("Invalid login");
         }
     }
 
