@@ -1,8 +1,8 @@
 package de.turtle_exception.core.server;
 
-import de.turtle_exception.core.netcore.TurtleCore;
-import de.turtle_exception.core.netcore.net.route.Routes;
-import de.turtle_exception.core.netcore.util.logging.SimpleFormatter;
+import de.turtle_exception.core.core.TurtleCore;
+import de.turtle_exception.core.core.net.route.Routes;
+import de.turtle_exception.core.core.util.logging.SimpleFormatter;
 import de.turtle_exception.core.server.data.DataService;
 import de.turtle_exception.core.server.data.DataServiceProvider;
 import de.turtle_exception.core.server.net.InternalServer;

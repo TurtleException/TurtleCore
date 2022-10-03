@@ -1,9 +1,9 @@
 package de.turtle_exception.core.server.net;
 
-import de.turtle_exception.core.netcore.net.ConnectionStatus;
-import de.turtle_exception.core.netcore.net.NetworkAdapter;
-import de.turtle_exception.core.netcore.util.AsyncLoopThread;
-import de.turtle_exception.core.netcore.util.logging.NestedLogger;
+import de.turtle_exception.core.core.net.ConnectionStatus;
+import de.turtle_exception.core.core.net.NetworkAdapter;
+import de.turtle_exception.core.core.util.AsyncLoopThread;
+import de.turtle_exception.core.core.util.logging.NestedLogger;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedReader;

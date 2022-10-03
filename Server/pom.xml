@@ -41,7 +41,7 @@
     <dependencies>
         <dependency>
             <groupId>de.turtle_exception.core</groupId>
-            <artifactId>NetCore</artifactId>
+            <artifactId>Core</artifactId>
             <version>1.0.0-alpha.1</version>
         </dependency>
         <dependency>

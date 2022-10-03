@@ -1,8 +1,8 @@
 package de.turtle_exception.core.server.net;
 
 import com.google.common.collect.Sets;
-import de.turtle_exception.core.netcore.util.AsyncLoopThread;
-import de.turtle_exception.core.netcore.util.logging.NestedLogger;
+import de.turtle_exception.core.core.util.AsyncLoopThread;
+import de.turtle_exception.core.core.util.logging.NestedLogger;
 import de.turtle_exception.core.server.TurtleServer;
 import de.turtle_exception.core.server.data.DataAccessException;
 import org.jetbrains.annotations.NotNull;

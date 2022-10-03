@@ -1,7 +1,7 @@
 package de.turtle_exception.core.client.api;
 
 import de.turtle_exception.core.client.internal.TurtleClientImpl;
-import de.turtle_exception.core.netcore.util.Checks;
+import de.turtle_exception.core.core.util.Checks;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

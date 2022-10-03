@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>de.turtle_exception.core</groupId>
-    <artifactId>Client</artifactId>
+    <artifactId>Core</artifactId>
     <version>1.0.0-alpha.1</version>
 
     <!--
@@ -26,24 +26,9 @@
                 </configuration>
             </plugin>
         </plugins>
-        <resources>
-            <resource>
-                <!-- Write version into resource file -->
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-                <includes>
-                    <include>version.properties</include>
-                </includes>
-            </resource>
-        </resources>
     </build>
 
     <dependencies>
-        <dependency>
-            <groupId>de.turtle_exception.core</groupId>
-            <artifactId>Core</artifactId>
-            <version>1.0.0-alpha.1</version>
-        </dependency>
         <dependency>
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>

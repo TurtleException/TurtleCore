@@ -4,12 +4,12 @@ import de.turtle_exception.core.client.api.TurtleClient;
 import de.turtle_exception.core.client.api.requests.Request;
 import de.turtle_exception.core.client.internal.ActionImpl;
 import de.turtle_exception.core.client.internal.TurtleClientImpl;
-import de.turtle_exception.core.netcore.net.ConnectionStatus;
-import de.turtle_exception.core.netcore.net.NetworkAdapter;
-import de.turtle_exception.core.netcore.net.message.OutboundMessage;
-import de.turtle_exception.core.netcore.net.route.Routes;
-import de.turtle_exception.core.netcore.util.AsyncLoopThread;
-import de.turtle_exception.core.netcore.util.logging.NestedLogger;
+import de.turtle_exception.core.core.net.ConnectionStatus;
+import de.turtle_exception.core.core.net.NetworkAdapter;
+import de.turtle_exception.core.core.net.message.OutboundMessage;
+import de.turtle_exception.core.core.net.route.Routes;
+import de.turtle_exception.core.core.util.AsyncLoopThread;
+import de.turtle_exception.core.core.util.logging.NestedLogger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Range;
 

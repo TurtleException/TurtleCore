@@ -4,8 +4,8 @@ import de.turtle_exception.core.client.api.TurtleClient;
 import de.turtle_exception.core.client.api.requests.Action;
 import de.turtle_exception.core.client.api.requests.ActionFuture;
 import de.turtle_exception.core.client.api.requests.Request;
-import de.turtle_exception.core.netcore.net.message.Message;
-import de.turtle_exception.core.netcore.net.route.Route;
+import de.turtle_exception.core.core.net.message.Message;
+import de.turtle_exception.core.core.net.route.Route;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
