@@ -12,12 +12,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * An implementation of {@link DataService} that uses a MySQL-server as database. All data is written to tables with
+ * relational info (e.g. a user being a member of a group) being stored according to SQL-conventions.
+ * <p> See all {@code CREATE TABLE} statements in {@link Statements} for more info.
+ */
 public class SQLService implements DataService {
     private final SQLConnector sqlConnector;
 
     public SQLService(@NotNull String host, int port, @NotNull String database, @NotNull String login, @NotNull String pass) throws SQLException {
         this.sqlConnector = new SQLConnector(host, port, database, login, pass);
 
+        // create tables (if they don't already exist)
         this.sqlConnector.executeSilentRaw(Statements.CT_CREDENTIALS);
         this.sqlConnector.executeSilentRaw(Statements.CT_GROUPS);
         this.sqlConnector.executeSilentRaw(Statements.CT_USERS);

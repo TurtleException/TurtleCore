@@ -11,14 +11,23 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * An implementation of {@link DataService} that uses the local filesystem as database. All data is written into
+ * {@code .json}-files and stored according to their primary identifier.
+ */
 public class FilesystemService implements DataService {
+    /** The root directory of the filesystem database. */
     private final File dir;
 
+    // These locks are used to prevent reading old data while it is being rewritten by another Thread
     private final Object metaLock  = new Object();
     private final Object groupLock = new Object();
     private final Object userLock  = new Object();
 
+    // file containing credential data
     private final File fileCredentials;
+
+    // directories
     private final File dirGroups;
     private final File dirUsers;
 
