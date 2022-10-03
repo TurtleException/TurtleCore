@@ -4,7 +4,7 @@ import de.turtle_exception.core.netcore.TurtleCore;
 import de.turtle_exception.core.netcore.net.route.Routes;
 import de.turtle_exception.core.netcore.util.logging.SimpleFormatter;
 import de.turtle_exception.core.server.data.DataService;
-import de.turtle_exception.core.server.data.sql.SQLService;
+import de.turtle_exception.core.server.data.DataServiceProvider;
 import de.turtle_exception.core.server.util.LogUtil;
 import de.turtle_exception.core.server.util.Status;
 
@@ -44,15 +44,7 @@ public class TurtleServer extends TurtleCore {
 
         this.config.load(new FileReader(new File(DIR, "server.properties")));
 
-        // TODO: check config to determine which implementation should be used
-        this.dataService = new SQLService(
-                config.getProperty("sql.host"),
-                // TODO: handle exception (?)
-                Integer.parseInt(config.getProperty("sql.port")),
-                config.getProperty("sql.database"),
-                config.getProperty("sql.login"),
-                config.getProperty("sql.pass")
-        );
+        this.dataService = new DataServiceProvider(this).get();
 
         this.routeManager.setLog(logger::log);
 
@@ -96,6 +88,10 @@ public class TurtleServer extends TurtleCore {
 
     public Logger getLogger() {
         return logger;
+    }
+
+    public Properties getConfig() {
+        return config;
     }
 
     public DataService getDataService() {
