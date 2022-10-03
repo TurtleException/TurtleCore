@@ -3,6 +3,8 @@ package de.turtle_exception.core.server;
 import de.turtle_exception.core.core.TurtleCore;
 import de.turtle_exception.core.core.net.route.Routes;
 import de.turtle_exception.core.core.util.logging.SimpleFormatter;
+import de.turtle_exception.core.server.data.DataService;
+import de.turtle_exception.core.server.data.DataServiceProvider;
 import de.turtle_exception.core.server.net.InternalServer;
 import de.turtle_exception.core.server.util.LogUtil;
 import de.turtle_exception.core.server.util.Status;
@@ -37,11 +39,15 @@ public class TurtleServer extends TurtleCore {
 
     private InternalServer internalServer;
 
+    private final DataService dataService;
+
     public TurtleServer() throws Exception {
         this.logger = Logger.getLogger("SERVER");
         this.logger.addHandler(LogUtil.getFileHandler(new SimpleFormatter()));
 
         this.config.load(new FileReader(new File(DIR, "server.properties")));
+
+        this.dataService = new DataServiceProvider(this).get();
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
@@ -137,7 +143,17 @@ public class TurtleServer extends TurtleCore {
         logger.log(Level.ALL, "OK bye.");
     }
 
+    /* - - - */
+
     public Logger getLogger() {
         return logger;
+    }
+
+    public Properties getConfig() {
+        return config;
+    }
+
+    public DataService getDataService() {
+        return dataService;
     }
 }
