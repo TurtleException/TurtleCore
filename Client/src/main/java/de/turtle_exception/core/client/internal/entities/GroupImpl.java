@@ -36,7 +36,7 @@ public class GroupImpl implements Group {
 
     @Override
     public @NotNull Action<Void> modifyName(@NotNull String name) {
-        return new ActionImpl<>(client, Routes.Content.Group.MODIFY_NAME.setContent(name), null);
+        return new ActionImpl<>(client, Routes.Content.Group.MOD_NAME.setContent(name), null);
     }
 
     public void setName(@NotNull String name) {

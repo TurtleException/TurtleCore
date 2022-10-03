@@ -66,6 +66,14 @@ public class TurtleSet<T extends Turtle> implements Set<T> {
         return content.remove(o) != null;
     }
 
+    public boolean removeStringId(@NotNull String id) {
+        try {
+            return this.remove(Long.parseLong(id));
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
     @Override
     public boolean containsAll(@NotNull Collection<?> c) {
         return content.values().containsAll(c);
