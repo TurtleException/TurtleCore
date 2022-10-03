@@ -4,7 +4,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -25,17 +24,17 @@ public interface DataService {
     @NotNull List<Long> getGroupIds() throws DataAccessException;
 
     /**
-     * Provides a List containing all groups.
-     * @return List of all groups.
+     * Provides a {@link JsonArray} containing all groups.
+     * @return Array of all groups.
      * @throws DataAccessException if the request fails.
      */
-    default @NotNull List<JsonObject> getGroups() throws DataAccessException {
-        ArrayList<JsonObject> list = new ArrayList<>();
+    default @NotNull JsonArray getGroups() throws DataAccessException {
+        JsonArray arr = new JsonArray();
 
         for (Long group : this.getGroupIds())
-            list.add(this.getGroup(group));
+            arr.add(this.getGroup(group));
 
-        return List.copyOf(list);
+        return arr;
     }
 
     /**
@@ -70,17 +69,17 @@ public interface DataService {
     @NotNull List<Long> getUserIds() throws DataAccessException;
 
     /**
-     * Provides a List containing all users.
-     * @return List of all users.
+     * Provides a {@link JsonArray} containing all users.
+     * @return Array of all users.
      * @throws DataAccessException if the request fails.
      */
-    default @NotNull List<JsonObject> getUsers() throws DataAccessException {
-        ArrayList<JsonObject> list = new ArrayList<>();
+    default @NotNull JsonArray getUsers() throws DataAccessException {
+        JsonArray arr = new JsonArray();
 
         for (Long user : this.getUserIds())
-            list.add(this.getGroup(user));
+            arr.add(this.getGroup(user));
 
-        return List.copyOf(list);
+        return arr;
     }
 
     /**
