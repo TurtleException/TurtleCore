@@ -13,4 +13,19 @@ public record CompiledRoute(
     public boolean isRoute(@NotNull Route route) {
         return this.route.getRoute().equals(route.getRoute());
     }
+
+    public static CompiledRoute of(@NotNull String routeRaw, @NotNull String routeCompiled, @NotNull Method method, @Nullable String content) throws IllegalArgumentException {
+        Route route = null;
+        for (Route checkRoute : Routes.getRoutes()) {
+            if (!checkRoute.getMethod().equals(method))  continue;
+            if (!checkRoute.getRoute().equals(routeRaw)) continue;
+
+            route = checkRoute;
+            break;
+        }
+        if (route == null)
+            throw new IllegalArgumentException("Unknown route: " + routeRaw);
+
+        return route.compileReplacing(content, routeCompiled);
+    }
 }

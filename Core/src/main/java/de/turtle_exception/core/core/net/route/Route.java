@@ -46,6 +46,10 @@ public class Route {
         return new CompiledRoute(this, method, builder.toString(), content);
     }
 
+    CompiledRoute compileReplacing(String content, String route) {
+        return new CompiledRoute(this, method, route, content);
+    }
+
     /* - - - */
 
     public @NotNull Method getMethod() {
