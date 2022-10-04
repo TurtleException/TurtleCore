@@ -16,8 +16,9 @@ public enum ContentType {
     /** A user id with an info field (separated by a space) */
     USER_INFO("userinfo"),
 
-    USER_DISCORD("discord"),
-    USER_MINECRAFT("minecraft"),
+    USER_GROUPS("user_groups"),
+    USER_DISCORD("user_discord"),
+    USER_MINECRAFT("user_minecraft"),
 
     GROUP("group"),
     GROUPS("groups"),

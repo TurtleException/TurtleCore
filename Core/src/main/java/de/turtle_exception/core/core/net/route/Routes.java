@@ -30,10 +30,13 @@ public class Routes {
             /** Requests to modify the name of a user */
             public static final Route MOD_NAME = new Route("USER MOD NAME", false, ContentType.USER_INFO);
 
-            /** Requests to add a user to a group */
-            public static final Route GROUP_JOIN  = new Route("USER GROUP JOIN" , false, ContentType.USER_INFO);
-            /** Requests to remove a user from a group */
-            public static final Route GROUP_LEAVE = new Route("USER GROUP LEAVE", false, ContentType.USER_INFO);
+            /** Requests the list of group ids associated with a user. */
+            public static final Route GROUPS_GET    = new Route("USER GROUP GET"   , false, ContentType.PLAINTEXT);
+            public static final Route GROUPS_GET_R  = new Route("USER GROUP GET R" , true , ContentType.USER_GROUPS);
+            /** Requests to overwrite the list of group ids associated with a user. */
+            public static final Route GROUPS_SET    = new Route("USER GROUP SET"   , false, ContentType.USER_GROUPS);
+            /** Informs the client that the list of group ids associated with a user has been updated. */
+            public static final Route GROUPS_UPDATE = new Route("USER GROUP UPDATE", true , ContentType.USER_GROUPS);
 
             /** Requests the list of discord ids associated with a user. */
             public static final Route DISCORD_GET    = new Route("USER DISCORD GET"   , false, ContentType.PLAINTEXT);
