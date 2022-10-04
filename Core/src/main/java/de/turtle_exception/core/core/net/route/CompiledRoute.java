@@ -1,12 +1,11 @@
 package de.turtle_exception.core.core.net.route;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 // TODO: docs
 public record CompiledRoute(
-        int callbackCode,
-        @NotNull String command,
-        @NotNull ContentType contentType,
-        @NotNull String content,
-        boolean terminating
+        @NotNull Method method,
+        @NotNull String route,
+        @Nullable String content
 ) { }

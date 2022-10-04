@@ -16,6 +16,23 @@ public class StringUtil {
         return builder.toString();
     }
 
+    // note: this will not work with overlapping results
+    public static int count(final @NotNull String str, final @NotNull String match) {
+        int count = 0;
+        int last  = 0;
+
+        while (last != -1) {
+            last = str.indexOf(match, last);
+
+            if (last != -1) {
+                count++;
+                last += match.length();
+            }
+        }
+
+        return count;
+    }
+
     public static @Nullable String getToken(@NotNull String str, @NotNull String regex, int index) {
         String[] arr = str.split(regex);
         if (arr.length < index)
