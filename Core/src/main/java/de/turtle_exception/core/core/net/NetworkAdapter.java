@@ -3,8 +3,12 @@ package de.turtle_exception.core.core.net;
 import de.turtle_exception.core.core.TurtleCore;
 import de.turtle_exception.core.core.crypto.Encryption;
 import de.turtle_exception.core.core.net.message.InboundMessage;
+import de.turtle_exception.core.core.net.message.Message;
 import de.turtle_exception.core.core.net.message.MessageParser;
 import de.turtle_exception.core.core.net.message.OutboundMessage;
+import de.turtle_exception.core.core.net.route.Route;
+import de.turtle_exception.core.core.net.route.RouteErrors;
+import de.turtle_exception.core.core.net.route.Routes;
 import de.turtle_exception.core.core.util.AsyncLoopThread;
 import de.turtle_exception.core.core.util.logging.NestedLogger;
 import org.jetbrains.annotations.NotNull;
@@ -17,6 +21,7 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
+import java.util.Random;
 import java.util.concurrent.*;
 import java.util.logging.Level;
 
@@ -26,7 +31,8 @@ public abstract class NetworkAdapter {
     private   final TurtleCore core;
     protected final NestedLogger logger;
 
-    protected final CallbackRegistrar callbackRegistrar;
+    protected final ConcurrentHashMap<Long, Message> conversations = new ConcurrentHashMap<>();
+
     protected ScheduledThreadPoolExecutor executor;
     protected AsyncLoopThread receiver;
     protected ConnectionStatus status;
@@ -41,7 +47,6 @@ public abstract class NetworkAdapter {
         this.logger = logger;
 
         this.executor = new ScheduledThreadPoolExecutor(4, (r, executor) -> logger.log(Level.WARNING, "An outbound message was rejected by the executor: " + r));
-        this.callbackRegistrar = new CallbackRegistrar();
 
         this.login = login;
         this.pass  = pass;
@@ -50,6 +55,8 @@ public abstract class NetworkAdapter {
     /* - - - */
 
     public abstract void stop() throws IOException;
+
+    protected abstract void quit() throws IOException;
 
     /* - - - */
 
@@ -98,10 +105,10 @@ public abstract class NetworkAdapter {
         if (this.getStatus() != ConnectionStatus.LOGGED_IN)
             throw new RejectedExecutionException("The NetworkAdapter has been stopped!");
 
-        if (message.getRoute().terminating())
-            callbackRegistrar.unregister(message.getRoute().callbackCode());
+        if (message.isTerminating())
+            conversations.remove(message.getConversation());
         else
-            callbackRegistrar.register(message);
+            conversations.put(message.getConversation(), message);
 
         // do send
         this.handleOutbound(message);
@@ -111,10 +118,8 @@ public abstract class NetworkAdapter {
             while (System.currentTimeMillis() <= message.getDeadline()) {
                 if (message.cancelled)
                     throw new CancellationException();
-                if (message.done) {
-                    callbackRegistrar.unregister(message.getRoute().callbackCode());
+                if (message.done)
                     return;
-                }
             }
             throw new CompletionException(new TimeoutException());
         }, executor);
@@ -124,17 +129,59 @@ public abstract class NetworkAdapter {
         if (this.getStatus() != ConnectionStatus.LOGGED_IN)
             throw new RejectedExecutionException("The NetworkAdapter has been stopped!");
 
-        OutboundMessage initialMsg = callbackRegistrar.getOutboundMessage(message.getRoute().callbackCode());
-
-        // this will also unregister the callback code
-        if (initialMsg != null)
+        if (conversations.get(message.getConversation()) instanceof OutboundMessage initialMsg) {
             initialMsg.handleResponse(message);
+            conversations.remove(message.getConversation(), initialMsg);
+        } else {
+            if (!this.handleIncomingRequest(message))
+                message.respond(RouteErrors.NOT_SUPPORTED.compile(), core.getDefaultTimeoutOutbound(), in -> { });
+        }
 
         // overwrite the current message for the callback code
-        if (!message.getRoute().terminating())
-            callbackRegistrar.register(message);
+        if (!message.isTerminating())
+            conversations.put(message.getConversation(), message);
 
-        core.getRouteManager().getRouteFinalizer(message.getRoute().command()).accept(message);
+        // TODO: completely remove finalizers
+    }
+
+    /* - - - */
+
+    // TODO: replace this with something less weird (also implement reserving codes)
+    public long newConversation() {
+        Long code = null;
+        Random random = new Random();
+        while (code == null) {
+            code = random.nextLong();
+
+            if (conversations.containsKey(code))
+                code = null;
+        }
+        return code;
+    }
+
+    /* - - - */
+
+    // TODO: handle inbound request
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
+    protected boolean handleIncomingRequest(@NotNull InboundMessage msg) {
+        Route route = msg.getRoute().route();
+
+        if (route.equals(Routes.OK)) return true;
+        if (route.equals(Routes.QUIT)) {
+            logger.log(Level.INFO, "Received QUIT message.");
+            try {
+                this.quit();
+            } catch (IOException e) {
+                logger.log(Level.WARNING, "Could not close socket properly.", e);
+            }
+            return true;
+        }
+        if (route.equals(Routes.ERROR)) {
+            logger.log(Level.WARNING, "Dangling ERROR: " + msg.getRoute().content());
+            return true;
+        }
+
+        return false;
     }
 
     /* - - - */

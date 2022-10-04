@@ -6,7 +6,9 @@ import de.turtle_exception.core.client.internal.ActionImpl;
 import de.turtle_exception.core.client.internal.TurtleClientImpl;
 import de.turtle_exception.core.core.net.ConnectionStatus;
 import de.turtle_exception.core.core.net.NetworkAdapter;
+import de.turtle_exception.core.core.net.message.InboundMessage;
 import de.turtle_exception.core.core.net.message.OutboundMessage;
+import de.turtle_exception.core.core.net.route.Route;
 import de.turtle_exception.core.core.net.route.Routes;
 import de.turtle_exception.core.core.util.AsyncLoopThread;
 import de.turtle_exception.core.core.util.logging.NestedLogger;
@@ -19,7 +21,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.concurrent.*;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
 /** The actual client part of the {@link TurtleClient}. */
@@ -72,7 +74,8 @@ public class NetClient extends NetworkAdapter {
         this.quit();
     }
 
-    public void quit() throws IOException {
+    @Override
+    protected void quit() throws IOException {
         this.stopReceiver();
         this.awaitExecutorShutdown();
 
@@ -88,11 +91,22 @@ public class NetClient extends NetworkAdapter {
         this.out.println(msg);
     }
 
+    @Override
+    protected boolean handleIncomingRequest(@NotNull InboundMessage msg) {
+        // let the superclass handle common routes
+        if (super.handleIncomingRequest(msg)) return true;
+
+        Route route = msg.getRoute().route();
+        // TODO: other incoming requests
+
+        return false;
+    }
+
     /* - - - */
 
     public <T> void request(@NotNull Request<T> request) {
         try {
-            this.submit(new OutboundMessage(client, request.getRoute().setCallbackCode(callbackRegistrar.newCode()).build(), request.getDeadline(), request::handleResponse));
+            this.submit(new OutboundMessage(client, newConversation(), request.getRoute(), request.getDeadline(), request::handleResponse));
         } catch (Throwable t) {
             request.onFailure(t);
         }

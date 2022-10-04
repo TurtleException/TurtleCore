@@ -9,4 +9,8 @@ public record CompiledRoute(
         @NotNull Method method,
         @NotNull String routeStr,
         @Nullable String content
-) { }
+) {
+    public boolean isRoute(@NotNull Route route) {
+        return this.route.getRoute().equals(route.getRoute());
+    }
+}

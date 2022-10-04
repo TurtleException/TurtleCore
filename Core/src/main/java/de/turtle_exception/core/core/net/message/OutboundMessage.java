@@ -9,8 +9,8 @@ import java.util.function.Consumer;
 public class OutboundMessage extends Message {
     private final Consumer<InboundMessage> handler;
 
-    public OutboundMessage(@NotNull TurtleCore core, @NotNull CompiledRoute route, long deadline, @NotNull Consumer<InboundMessage> handler) {
-        super(core, route, deadline);
+    public OutboundMessage(@NotNull TurtleCore core, long conversation, @NotNull CompiledRoute route, long deadline, @NotNull Consumer<InboundMessage> handler) {
+        super(core, conversation, route, deadline);
         this.handler = handler;
     }
 

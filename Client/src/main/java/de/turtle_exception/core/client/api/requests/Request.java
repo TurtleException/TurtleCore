@@ -3,7 +3,7 @@ package de.turtle_exception.core.client.api.requests;
 import de.turtle_exception.core.client.internal.ActionImpl;
 import de.turtle_exception.core.client.internal.TurtleClientImpl;
 import de.turtle_exception.core.core.net.message.Message;
-import de.turtle_exception.core.core.net.route.Route;
+import de.turtle_exception.core.core.net.route.CompiledRoute;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.CancellationException;
@@ -17,14 +17,14 @@ public class Request<T> {
     private final ActionImpl<T> action;
     private final Consumer<? super T>         onSuccess;
     private final Consumer<? super Throwable> onFailure;
-    private final Route route;
+    private final CompiledRoute route;
     private final long    deadline;
     private final boolean priority;
 
     private boolean done      = false;
     private boolean cancelled = false;
 
-    public Request(TurtleClientImpl client, ActionImpl<T> action, Consumer<? super T> onSuccess, Consumer<? super Throwable> onFailure, Route route, long deadline, boolean priority) {
+    public Request(TurtleClientImpl client, ActionImpl<T> action, Consumer<? super T> onSuccess, Consumer<? super Throwable> onFailure, CompiledRoute route, long deadline, boolean priority) {
         this.client = client;
         this.action = action;
         this.onSuccess = onSuccess;
@@ -103,7 +103,7 @@ public class Request<T> {
         return this.cancelled;
     }
 
-    public Route getRoute() {
+    public CompiledRoute getRoute() {
         return route;
     }
 
