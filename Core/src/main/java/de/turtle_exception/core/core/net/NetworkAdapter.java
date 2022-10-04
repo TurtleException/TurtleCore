@@ -140,8 +140,6 @@ public abstract class NetworkAdapter {
         // overwrite the current message for the callback code
         if (!message.isTerminating())
             conversations.put(message.getConversation(), message);
-
-        // TODO: completely remove finalizers
     }
 
     /* - - - */
