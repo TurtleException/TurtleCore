@@ -12,39 +12,34 @@ public enum Method {
      * Contains information regarding the connection and / or communication between client and server. As example for
      * this would be the request to close the connection.
      * <p><b>Direction: </b> Client <-> Server
-     * <p><b>Terminating: </b> No
      */
-    META("META"),
+    META("META", false),
 
     /**
      * Requests to delete the data specified by a provided identifier.
      * <p><b>Direction: </b> Client -> Server
-     * <p><b>Terminating: </b> No
      */
-    DELETE("DELETE"),
+    DELETE("DELETE", false),
 
     /**
      * Requests data specified by a provided identifier. A GET request should never modify data.
      * <p><b>Direction: </b> Client -> Server
-     * <p><b>Terminating: </b> No
      */
-    GET("GET"),
+    GET("GET", false),
 
     // TODO: need this?
     /**
      * Essentially a GET request but without actually sending data. This can be used to check whether data is available.
      * <p><b>Direction: </b> Client -> Server
-     * <p><b>Terminating: </b> No
      */
-    HEAD("HEAD"),
+    HEAD("HEAD", false),
 
     /**
      * Requests to write data. This can either mean that existing data should be updated or the provided data should
      * simply be saved as new.
      * <p><b>Direction: </b> Client -> Server
-     * <p><b>Terminating: </b> No
      */
-    PUT("PUT"),
+    PUT("PUT", false),
 
     /**
      * Essentially a PUT request but only with partial data. While PUT requests are required to send entire objects and
@@ -53,40 +48,42 @@ public enum Method {
      * <p> While a server could technically send these types of requests to a client this method is strictly reserved
      * for client-to-server communication to ensure cache validity on the client-side.
      * <p><b>Direction: </b> Client -> Server
-     * <p><b>Terminating: </b> No
      */
-    PATCH("PATCH"),
+    PATCH("PATCH", false),
 
     /**
      * Provides the user with data that should be updated in the client cache.
      * <p><b>Direction: </b> Client <- Server
-     * <p><b>Terminating: </b> Yes
      */
-    UPDATE("UPDATE"),
+    UPDATE("UPDATE", true),
 
     /**
      * Acknowledged a request as successful and optionally provides the requested data in the form of route parameters.
      * <p><b>Direction: </b> Client <-> Server
-     * <p><b>Terminating: </b> Yes
      */
-    RESPOND("RESPOND"),
+    RESPOND("RESPOND", true),
 
     /**
      *Acknowledged a request as unsuccessful and provides a reason in the form of route parameters.
      * <p><b>Direction: </b> Client <-> Server
-     * <p><b>Terminating: </b> Yes
      */
-    ERROR("ERROR"),
+    ERROR("ERROR", true),
 
     ;
 
     private final @NotNull String name;
+    private final boolean terminating;
 
-    Method(@NotNull String name) {
+    Method(@NotNull String name, boolean terminating) {
         this.name = name;
+        this.terminating = terminating;
     }
 
     public @NotNull String getName() {
         return name;
+    }
+
+    public boolean isTerminating() {
+        return terminating;
     }
 }
