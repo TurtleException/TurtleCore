@@ -43,7 +43,7 @@ public class Route {
             builder.replace(beginIndex, endIndex + 1, args[i]);
         }
 
-        return new CompiledRoute(method, builder.toString(), content);
+        return new CompiledRoute(this, method, builder.toString(), content);
     }
 
     /* - - - */

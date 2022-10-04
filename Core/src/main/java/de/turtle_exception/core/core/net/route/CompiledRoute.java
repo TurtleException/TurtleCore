@@ -5,7 +5,8 @@ import org.jetbrains.annotations.Nullable;
 
 // TODO: docs
 public record CompiledRoute(
+        @NotNull Route route,
         @NotNull Method method,
-        @NotNull String route,
+        @NotNull String routeStr,
         @Nullable String content
 ) { }
