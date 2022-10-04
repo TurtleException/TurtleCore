@@ -67,11 +67,13 @@ public class Routes {
         }
 
         public static class Group {
-            /** Requests all raw group objects (without relational data) */
+            /** Requests all raw group objects (without relational data). */
             public static final Route GET_ALL   = new Route("GROUP GET ALL"  , false, ContentType.NONE);
+            /** Response to {@link Routes.Content.Group#GET_ALL}. */
             public static final Route GET_ALL_R = new Route("GROUP GET ALL R", true , ContentType.GROUPS);
-            /** Requests the raw group object (without relational data) */
+            /** Requests the raw group object (without relational data). */
             public static final Route GET       = new Route("GROUP GET"      , false, ContentType.PLAINTEXT);
+            /** Response to {@link Routes.Content.Group#GET}. */
             public static final Route GET_R     = new Route("GROUP GET R"    , true , ContentType.GROUP);
             /** Requests the permanent deletion of a group. */
             public static final Route DEL       = new Route("GROUP DEL"      , false, ContentType.PLAINTEXT);
@@ -80,7 +82,7 @@ public class Routes {
             public static final Route DELETED = new Route("GROUP DELETED", true , ContentType.PLAINTEXT);
             /** Informs the client that a group has been updated. */
             public static final Route UPDATE  = new Route("GROUP UPDATE" , true , ContentType.GROUP);
-            /** Informs the client that multiple groups have been updated (response to GET_ALL) */
+            /** Informs the client that multiple groups have been updated (response to GET_ALL). */
             public static final Route UPDATES = new Route("GROUP UPDATES", true , ContentType.GROUPS);
 
             /** Requests to modify the name of a group */
