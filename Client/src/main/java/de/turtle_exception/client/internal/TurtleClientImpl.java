@@ -58,6 +58,10 @@ public class TurtleClientImpl extends TurtleCore implements TurtleClient {
         this.netClient = new NetClient(this, host, port, login, pass);
 
         this.netClient.start();
+
+        // initial requests
+        this.retrieveUsers().await();
+        this.retrieveGroups().await();
     }
 
     /**
