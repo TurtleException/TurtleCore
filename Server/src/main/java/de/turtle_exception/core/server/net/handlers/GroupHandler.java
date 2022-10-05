@@ -22,10 +22,10 @@ public class GroupHandler extends ResourceHandler {
 
         if (route.isRoute(Routes.Group.GET)) {
             long id = Long.parseLong(route.args()[0]);
-            msg.respond(Routes.RESPONSE.compile(getDataService().getGroup(id).toString()));
+            msg.respond(Routes.RESPONSE.compile(getDataService().getGroup(id)));
             return;
         } else if (route.isRoute(Routes.Group.GET_ALL)) {
-            msg.respond(Routes.RESPONSE.compile(getDataService().getGroups().toString()));
+            msg.respond(Routes.RESPONSE.compile(getDataService().getGroups()));
             return;
         } else if (route.isRoute(Routes.Group.DEL)) {
             long id = Long.parseLong(route.args()[0]);

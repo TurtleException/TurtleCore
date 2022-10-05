@@ -39,7 +39,7 @@ public class GroupImpl implements Group {
     public @NotNull Action<Void> modifyName(@NotNull String name) {
         JsonObject json = new JsonObject();
         json.addProperty("name", name);
-        return new ActionImpl<>(client, Routes.Group.MODIFY.compile(json.toString(), this.id), null);
+        return new ActionImpl<>(client, Routes.Group.MODIFY.compile(json, this.id), null);
     }
 
     public void setName(@NotNull String name) {

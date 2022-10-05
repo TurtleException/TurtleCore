@@ -1,5 +1,6 @@
 package de.turtle_exception.core.core.net.route;
 
+import com.google.gson.JsonElement;
 import de.turtle_exception.core.core.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 
@@ -22,7 +23,7 @@ public class Route {
 
     /* - - - */
 
-    public CompiledRoute compile(String content, @NotNull Object... args) throws IllegalArgumentException {
+    public CompiledRoute compile(JsonElement content, @NotNull Object... args) throws IllegalArgumentException {
         if (args.length != paramCount)
             throw new IllegalArgumentException("Incorrect amount of arguments (" + args.length + ") for " + paramCount + " parameters.");
 
@@ -39,7 +40,7 @@ public class Route {
         return new CompiledRoute(this, method, stringArgs, content);
     }
 
-    CompiledRoute compileReplacing(String content, String[] args) {
+    CompiledRoute compileReplacing(JsonElement content, String[] args) {
         return new CompiledRoute(this, method, args, content);
     }
 

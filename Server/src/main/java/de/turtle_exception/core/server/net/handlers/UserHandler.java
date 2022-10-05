@@ -23,10 +23,10 @@ public class UserHandler extends ResourceHandler {
 
         if (route.isRoute(Routes.User.GET)) {
             long id = Long.parseLong(route.args()[0]);
-            msg.respond(Routes.RESPONSE.compile(getDataService().getUser(id).toString()));
+            msg.respond(Routes.RESPONSE.compile(getDataService().getUser(id)));
             return;
         } else if (route.isRoute(Routes.User.GET_ALL)) {
-            msg.respond(Routes.RESPONSE.compile(getDataService().getUsers().toString()));
+            msg.respond(Routes.RESPONSE.compile(getDataService().getUsers()));
             return;
         } else if (route.isRoute(Routes.User.DEL)) {
             long id = Long.parseLong(route.args()[0]);

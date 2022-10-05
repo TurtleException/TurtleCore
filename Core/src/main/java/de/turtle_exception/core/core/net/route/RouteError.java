@@ -38,7 +38,7 @@ public class RouteError {
         if (throwable != null)
             json.add("throwable", parseThrowable(throwable));
 
-        return Routes.ERROR.compile(json.toString());
+        return Routes.ERROR.compile(json);
     }
 
     private static @NotNull JsonObject parseThrowable(@NotNull Throwable throwable) {

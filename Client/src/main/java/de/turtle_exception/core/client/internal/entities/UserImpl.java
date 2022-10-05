@@ -57,7 +57,7 @@ public class UserImpl implements User {
     public @NotNull Action<Void> modifyName(@NotNull String name) {
         JsonObject json = new JsonObject();
         json.addProperty("name", name);
-        return new ActionImpl<>(client, Routes.User.MODIFY.compile(name, this.id), null);
+        return new ActionImpl<>(client, Routes.User.MODIFY.compile(json, this.id), null);
     }
 
     @Override

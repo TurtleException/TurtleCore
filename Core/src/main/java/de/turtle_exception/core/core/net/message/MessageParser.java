@@ -2,6 +2,7 @@ package de.turtle_exception.core.core.net.message;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import de.turtle_exception.core.core.TurtleCore;
 import de.turtle_exception.core.core.net.NetworkAdapter;
@@ -25,7 +26,7 @@ public class MessageParser {
         json.addProperty("code", msg.getConversation());
         json.addProperty("method", msg.getRoute().method().getName());
         json.add("route", route);
-        json.addProperty("content", msg.getRoute().content());
+        json.add("content", msg.getRoute().content());
 
         return json.toString();
     }
@@ -38,9 +39,9 @@ public class MessageParser {
             String     routeRaw  = routeJson.get("route").getAsString();
             JsonArray  routeArgs = routeJson.getAsJsonArray("arguments");
 
-            long conversation = json.get("code").getAsLong();
-            String  methodStr = json.get("method").getAsString();
-            String contentStr = json.get("content").getAsString();
+            long   conversation = json.get("code").getAsLong();
+            String    methodStr = json.get("method").getAsString();
+            JsonElement content = json.get("content");
 
             String[] args = new String[0];
             if (routeArgs != null) {
@@ -60,7 +61,7 @@ public class MessageParser {
             Checks.nonNull(routeRaw , "Raw Route"     );
             Checks.nonNull(method   , "Method"        );
 
-            CompiledRoute route = CompiledRoute.of(routeRaw, args, method, contentStr);
+            CompiledRoute route = CompiledRoute.of(routeRaw, args, method, content);
             long deadline = System.currentTimeMillis() + core.getDefaultTimeoutInbound();
 
             return new InboundMessage(core, adapter, conversation, route, deadline);
