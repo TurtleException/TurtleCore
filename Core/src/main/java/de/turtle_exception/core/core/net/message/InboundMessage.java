@@ -20,6 +20,10 @@ public class InboundMessage extends Message {
         this.networkAdapter.submit(message);
     }
 
+    public void respond(@NotNull CompiledRoute route) {
+        this.respond(route, core.getDefaultTimeoutOutbound(), in -> { });
+    }
+
     public void respond(@NotNull CompiledRoute route, @Range(from = 0, to = Long.MAX_VALUE) long timeout, @NotNull Consumer<InboundMessage> handler) {
         this.respond(new OutboundMessage(this.core, this.conversation, route, System.currentTimeMillis() + timeout, handler));
     }
