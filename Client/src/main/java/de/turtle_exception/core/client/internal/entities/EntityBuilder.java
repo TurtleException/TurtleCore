@@ -2,6 +2,7 @@ package de.turtle_exception.core.client.internal.entities;
 
 import de.turtle_exception.core.client.api.entities.Group;
 import de.turtle_exception.core.client.api.entities.User;
+import de.turtle_exception.core.core.util.Checks;
 import de.turtle_exception.core.core.util.JsonUtil;
 import org.jetbrains.annotations.NotNull;
 
@@ -17,13 +18,17 @@ public class EntityBuilder {
      * @throws IllegalArgumentException if the JSON String does not represent a valid User or is not a properly
      *                                  formatted JSON object.
      */
-    public static @NotNull User buildUser(@NotNull String json) throws NullPointerException, IllegalArgumentException {
+    public static @NotNull User buildUser(String json) throws NullPointerException, IllegalArgumentException {
+        Checks.nonNull(json, "JSON");
+
         Map<String, String> data = JsonUtil.jsonToMap(json);
 
         // TODO
     }
 
-    public static @NotNull List<User> buildUsers(@NotNull String json) throws NullPointerException, IllegalArgumentException {
+    public static @NotNull List<User> buildUsers(String json) throws NullPointerException, IllegalArgumentException {
+        Checks.nonNull(json, "JSON");
+
         List<String> data  = JsonUtil.jsonToList(json);
         List<User>   users = new ArrayList<>();
 
@@ -40,13 +45,17 @@ public class EntityBuilder {
      * @throws IllegalArgumentException if the JSON String does not represent a valid Group or is not a properly
      *                                  formatted JSON object.
      */
-    public static @NotNull Group buildGroup(@NotNull String json) throws NullPointerException, IllegalArgumentException {
+    public static @NotNull Group buildGroup(String json) throws NullPointerException, IllegalArgumentException {
+        Checks.nonNull(json, "JSON");
+
         Map<String, String> data = JsonUtil.jsonToMap(json);
 
         // TODO
     }
 
-    public static @NotNull List<Group> buildGroups(@NotNull String json) throws NullPointerException, IllegalArgumentException {
+    public static @NotNull List<Group> buildGroups(String json) throws NullPointerException, IllegalArgumentException {
+        Checks.nonNull(json, "JSON");
+
         List<String> data   = JsonUtil.jsonToList(json);
         List<Group>  groups = new ArrayList<>();
 
