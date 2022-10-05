@@ -2,8 +2,11 @@ package de.turtle_exception.core.server.net;
 
 import de.turtle_exception.core.core.net.ConnectionStatus;
 import de.turtle_exception.core.core.net.NetworkAdapter;
+import de.turtle_exception.core.core.net.route.Routes;
 import de.turtle_exception.core.core.util.AsyncLoopThread;
 import de.turtle_exception.core.core.util.logging.NestedLogger;
+import de.turtle_exception.core.server.net.handlers.GroupHandler;
+import de.turtle_exception.core.server.net.handlers.UserHandler;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedReader;
@@ -28,6 +31,30 @@ public class VirtualClient extends NetworkAdapter {
         this.out = new PrintWriter(socket.getOutputStream(), true);
         this.in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
+
+        /* --- GROUP */
+        GroupHandler groupHandler = new GroupHandler(this);
+        this.registerHandler(Routes.Group.GET,     groupHandler);
+        this.registerHandler(Routes.Group.GET_ALL, groupHandler);
+        this.registerHandler(Routes.Group.DEL,     groupHandler);
+        this.registerHandler(Routes.Group.CREATE,  groupHandler);
+        this.registerHandler(Routes.Group.MODIFY,  groupHandler);
+        this.registerHandler(Routes.Group.ADD_USER, groupHandler);
+        this.registerHandler(Routes.Group.DEL_USER, groupHandler);
+
+        /* --- USER */
+        UserHandler userHandler = new UserHandler(this);
+        this.registerHandler(Routes.User.GET,     userHandler);
+        this.registerHandler(Routes.User.GET_ALL, userHandler);
+        this.registerHandler(Routes.User.DEL,     userHandler);
+        this.registerHandler(Routes.User.CREATE,  userHandler);
+        this.registerHandler(Routes.User.MODIFY,  userHandler);
+        this.registerHandler(Routes.User.ADD_DISCORD, userHandler);
+        this.registerHandler(Routes.User.DEL_DISCORD, userHandler);
+        this.registerHandler(Routes.User.ADD_MINECRAFT, userHandler);
+        this.registerHandler(Routes.User.DEL_MINECRAFT, userHandler);
+
+
         this.receiver = new AsyncLoopThread(() -> status != ConnectionStatus.DISCONNECTED, () -> {
             try {
                 this.handleInbound(in.readLine());
@@ -40,6 +67,13 @@ public class VirtualClient extends NetworkAdapter {
     /* - - - */
     @Override
     public void stop() throws IOException {
+        // TODO
+
+        this.quit();
+    }
+
+    @Override
+    protected void quit() throws IOException {
         // TODO
     }
 
@@ -65,7 +99,7 @@ public class VirtualClient extends NetworkAdapter {
         return status;
     }
 
-    InternalServer getInternalServer() {
+    public InternalServer getInternalServer() {
         return internalServer;
     }
 }

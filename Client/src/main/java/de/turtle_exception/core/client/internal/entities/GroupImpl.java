@@ -1,5 +1,6 @@
 package de.turtle_exception.core.client.internal.entities;
 
+import com.google.gson.JsonObject;
 import de.turtle_exception.core.client.api.TurtleClient;
 import de.turtle_exception.core.client.api.entities.Group;
 import de.turtle_exception.core.client.api.requests.Action;
@@ -36,7 +37,9 @@ public class GroupImpl implements Group {
 
     @Override
     public @NotNull Action<Void> modifyName(@NotNull String name) {
-        return new ActionImpl<>(client, Routes.Content.Group.MOD_NAME.setContent(name), null);
+        JsonObject json = new JsonObject();
+        json.addProperty("name", name);
+        return new ActionImpl<>(client, Routes.Group.MODIFY.compile(json, this.id), null);
     }
 
     public void setName(@NotNull String name) {

@@ -1,60 +1,64 @@
 package de.turtle_exception.core.core.net.route;
 
-import de.turtle_exception.core.core.util.Checks;
+import com.google.gson.JsonElement;
+import de.turtle_exception.core.core.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-// TODO: docs
+/**
+ * A Route is an instruction on where and how to execute a network request.
+ * Routes can be re-used across connections and instances.
+ * @see Routes
+ */
 public class Route {
-    private final String command;
-    private final boolean terminating;
-    private final ContentType contentType;
-    private Integer callbackCode = null;
-    private String  content      = null;
+    private final @NotNull Method method;
+    private final @NotNull String route;
+    private final boolean hasContent;
+    private final int paramCount;
 
-    Route(@NotNull String command, boolean terminating, @NotNull ContentType contentType) {
-        this.command = command;
-        this.terminating = terminating;
-        this.contentType = contentType;
-    }
+    Route(@NotNull Method method, @NotNull String route, boolean hasContent) throws IllegalArgumentException {
+        this.method  = method;
+        this.route = route;
+        this.hasContent = hasContent;
 
-    public @NotNull CompiledRoute build() throws IllegalArgumentException {
-        Checks.nonNull(callbackCode, "CallbackCode");
-
-        return new CompiledRoute(callbackCode, command, contentType, content, terminating);
+        this.paramCount = StringUtil.count(route, "{");
+        if (paramCount != StringUtil.count(route, "}"))
+            throw new IllegalArgumentException("Missing braces on a argument for route: " + method.getName() + " " + route);
     }
 
     /* - - - */
 
-    public Route setCallbackCode(Integer callbackCode) {
-        this.callbackCode = callbackCode;
-        return this;
+    public CompiledRoute compile(JsonElement content, @NotNull Object... args) throws IllegalArgumentException {
+        if (args.length != paramCount)
+            throw new IllegalArgumentException("Incorrect amount of arguments (" + args.length + ") for " + paramCount + " parameters.");
+
+        if (content == null && hasContent)
+            throw new IllegalArgumentException("Expected non-null content.");
+        if (content != null && !hasContent)
+            throw new IllegalArgumentException("Unexpected non-null content. This route does not support content.");
+
+        String[] stringArgs = new String[args.length];
+        for (int i = 0; i < args.length; i++) {
+            stringArgs[i] = String.valueOf(args[i]);
+        }
+
+        return new CompiledRoute(this, method, stringArgs, content);
     }
 
-    public Route setContent(String content) {
-        this.content = content;
-        return this;
+    CompiledRoute compileReplacing(JsonElement content, String[] args) {
+        return new CompiledRoute(this, method, args, content);
     }
 
     /* - - - */
 
-    public @Nullable Integer getCallbackCode() {
-        return callbackCode;
+    public @NotNull Method getMethod() {
+        return method;
     }
 
-    public @NotNull String getCommand() {
-        return command;
+    public @NotNull String getRoute() {
+        return route;
     }
 
-    public @NotNull ContentType getContentType() {
-        return contentType;
-    }
-
-    public @Nullable String getContent() {
-        return content;
-    }
-
-    public boolean isTerminating() {
-        return terminating;
+    public int getParamCount() {
+        return paramCount;
     }
 }

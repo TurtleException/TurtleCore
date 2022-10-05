@@ -10,6 +10,7 @@ import java.nio.file.NotDirectoryException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Function;
 
 /**
  * An implementation of {@link DataService} that uses the local filesystem as database. All data is written into
@@ -65,6 +66,14 @@ public class FilesystemService implements DataService {
         }
     }
 
+    private JsonObject getGroupJson(long group) throws DataAccessException {
+        try {
+            return this.getFile(new File(dirGroups, group + ".json"));
+        } catch (FileNotFoundException e) {
+            throw new DataAccessException(e);
+        }
+    }
+
     private JsonObject getUserJson(long user) throws DataAccessException {
         try {
             return this.getFile(new File(dirUsers, user + ".json"));
@@ -86,6 +95,14 @@ public class FilesystemService implements DataService {
     private void setCredentialsJson(@NotNull JsonObject credentials) throws DataAccessException {
         try {
             this.setFile(credentials, fileCredentials);
+        } catch (IOException e) {
+            throw new DataAccessException(e);
+        }
+    }
+
+    private void setGroupJson(@NotNull JsonObject group) throws DataAccessException {
+        try {
+            this.setFile(group, new File(dirGroups, group.get("id").getAsString()));
         } catch (IOException e) {
             throw new DataAccessException(e);
         }
@@ -168,6 +185,15 @@ public class FilesystemService implements DataService {
     }
 
     @Override
+    public void modifyGroup(long group, @NotNull Function<JsonObject, JsonObject> function) throws DataAccessException {
+        synchronized (groupLock) {
+            JsonObject json = this.getGroupJson(group);
+            json = function.apply(json);
+            this.setGroupJson(json);
+        }
+    }
+
+    @Override
     public @NotNull List<Long> getUserIds() {
         File[] userFiles;
         synchronized (userLock) {
@@ -236,6 +262,15 @@ public class FilesystemService implements DataService {
         synchronized (userLock) {
             File file = new File(dirUsers, id + ".json");
             file.delete();
+        }
+    }
+
+    @Override
+    public void modifyUser(long user, @NotNull Function<JsonObject, JsonObject> function) throws DataAccessException {
+        synchronized (userLock) {
+            JsonObject json = this.getUserJson(user);
+            json = function.apply(json);
+            this.setUserJson(json);
         }
     }
 

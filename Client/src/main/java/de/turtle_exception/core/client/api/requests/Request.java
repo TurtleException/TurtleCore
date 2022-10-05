@@ -2,8 +2,9 @@ package de.turtle_exception.core.client.api.requests;
 
 import de.turtle_exception.core.client.internal.ActionImpl;
 import de.turtle_exception.core.client.internal.TurtleClientImpl;
-import de.turtle_exception.core.core.net.message.Message;
-import de.turtle_exception.core.core.net.route.Route;
+import de.turtle_exception.core.core.net.message.InboundMessage;
+import de.turtle_exception.core.core.net.route.CompiledRoute;
+import de.turtle_exception.core.core.net.route.RouteError;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.CancellationException;
@@ -15,16 +16,19 @@ import java.util.logging.Level;
 public class Request<T> {
     private final TurtleClientImpl client;
     private final ActionImpl<T> action;
+
+    // these are the consumers provided by Action#queue()
     private final Consumer<? super T>         onSuccess;
     private final Consumer<? super Throwable> onFailure;
-    private final Route route;
+
+    private final CompiledRoute route;
     private final long    deadline;
     private final boolean priority;
 
     private boolean done      = false;
     private boolean cancelled = false;
 
-    public Request(TurtleClientImpl client, ActionImpl<T> action, Consumer<? super T> onSuccess, Consumer<? super Throwable> onFailure, Route route, long deadline, boolean priority) {
+    public Request(TurtleClientImpl client, ActionImpl<T> action, Consumer<? super T> onSuccess, Consumer<? super Throwable> onFailure, CompiledRoute route, long deadline, boolean priority) {
         this.client = client;
         this.action = action;
         this.onSuccess = onSuccess;
@@ -51,8 +55,9 @@ public class Request<T> {
         });
     }
 
-    // TODO: onFailure(Error)
-    // see Routes.Error
+    public void onFailure(RouteError error) {
+        this.onFailure(new RouteErrorException(error));
+    }
 
     public void onFailure(Throwable t) {
         if (done) return;
@@ -103,7 +108,7 @@ public class Request<T> {
         return this.cancelled;
     }
 
-    public Route getRoute() {
+    public CompiledRoute getRoute() {
         return route;
     }
 
@@ -113,7 +118,7 @@ public class Request<T> {
 
     /* - - - */
 
-    public void handleResponse(@NotNull Message response) {
+    public void handleResponse(@NotNull InboundMessage response) {
         action.handleResponse(response, this);
         // TODO: event system
         //client.handleEvent(new NetRequestEvent(this, response));

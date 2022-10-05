@@ -1,9 +1,13 @@
 package de.turtle_exception.core.client.internal.net;
 
+import com.google.gson.JsonObject;
 import de.turtle_exception.core.client.api.TurtleClient;
+import de.turtle_exception.core.client.api.entities.Group;
+import de.turtle_exception.core.client.api.entities.User;
 import de.turtle_exception.core.client.api.requests.Request;
 import de.turtle_exception.core.client.internal.ActionImpl;
 import de.turtle_exception.core.client.internal.TurtleClientImpl;
+import de.turtle_exception.core.client.internal.entities.EntityBuilder;
 import de.turtle_exception.core.core.net.ConnectionStatus;
 import de.turtle_exception.core.core.net.NetworkAdapter;
 import de.turtle_exception.core.core.net.message.OutboundMessage;
@@ -19,7 +23,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.concurrent.*;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
 /** The actual client part of the {@link TurtleClient}. */
@@ -40,6 +44,27 @@ public class NetClient extends NetworkAdapter {
 
         this.host = host;
         this.port = port;
+
+        this.registerHandler(Routes.Group.UPDATE, (netAdapter, msg) -> {
+            Group group = EntityBuilder.buildGroup((JsonObject) msg.getRoute().content());
+            client.getGroupCache().add(group);
+            // TODO: event
+        });
+        this.registerHandler(Routes.Group.REMOVE, (netAdapter, msg) -> {
+            String id = msg.getRoute().args()[0];
+            client.getGroupCache().removeStringId(id);
+            // TODO: event
+        });
+        this.registerHandler(Routes.User.UPDATE, (netAdapter, msg) -> {
+            User user = EntityBuilder.buildUser((JsonObject) msg.getRoute().content());
+            client.getUserCache().add(user);
+            // TODO: event
+        });
+        this.registerHandler(Routes.User.REMOVE, (netAdapter, msg) -> {
+            String id = msg.getRoute().args()[0];
+            client.getUserCache().removeStringId(id);
+            // TODO: event
+        });
     }
 
     public void start() throws IOException, LoginException {
@@ -67,12 +92,13 @@ public class NetClient extends NetworkAdapter {
     @Override
     public void stop() throws IOException {
         // notify server
-        new ActionImpl<Void>(client, Routes.QUIT, null).queue();
+        new ActionImpl<Void>(client, Routes.QUIT.compile(null), null).queue();
 
         this.quit();
     }
 
-    public void quit() throws IOException {
+    @Override
+    protected void quit() throws IOException {
         this.stopReceiver();
         this.awaitExecutorShutdown();
 
@@ -92,7 +118,7 @@ public class NetClient extends NetworkAdapter {
 
     public <T> void request(@NotNull Request<T> request) {
         try {
-            this.submit(new OutboundMessage(client, request.getRoute().setCallbackCode(callbackRegistrar.newCode()).build(), request.getDeadline(), request::handleResponse));
+            this.submit(new OutboundMessage(client, newConversation(), request.getRoute(), request.getDeadline(), request::handleResponse));
         } catch (Throwable t) {
             request.onFailure(t);
         }

@@ -2,7 +2,7 @@ package de.turtle_exception.core.client.api.requests;
 
 import de.turtle_exception.core.client.internal.ActionImpl;
 import de.turtle_exception.core.client.internal.TurtleClientImpl;
-import de.turtle_exception.core.core.net.route.Route;
+import de.turtle_exception.core.core.net.route.CompiledRoute;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.CompletableFuture;
@@ -10,7 +10,7 @@ import java.util.concurrent.CompletableFuture;
 public class ActionFuture<T> extends CompletableFuture<T> {
     private final Request<T> request;
 
-    public ActionFuture(final ActionImpl<T> action, final long deadline, final boolean priority, final @NotNull Route route) {
+    public ActionFuture(final ActionImpl<T> action, final long deadline, final boolean priority, final @NotNull CompiledRoute route) {
         this.request = new Request<>(((TurtleClientImpl) action.getClient()), action, this::complete, this::completeExceptionally, route, deadline, priority);
 
         ((TurtleClientImpl) action.getClient()).getNetClient().request(this.request);

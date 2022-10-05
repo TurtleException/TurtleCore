@@ -1,93 +1,79 @@
 package de.turtle_exception.core.core.net.route;
 
+import de.turtle_exception.core.core.net.message.InboundMessage;
+import de.turtle_exception.core.core.net.message.OutboundMessage;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 
+/**
+ * A collection of prepared {@link Route} objects that can be used as templates when creating {@link OutboundMessage}
+ * objects or as an anchor to provide information in {@link InboundMessage} objects.
+ */
 public class Routes {
-    public static final Route OK    = new Route("OK"   , true, ContentType.NONE);
-    public static final Route ERROR = new Route("ERROR", true, ContentType.ERROR);
-    public static final Route QUIT  = new Route("QUIT" , true, ContentType.NONE);
+    /** Acknowledges a request as successful. <p><b>Direction: </b> Client <-> Server */
+    public static final Route OK    = new Route(Method.RESPOND, "ok"   , false);
+    /** Informs that a request failed and provides information on why. <p><b>Direction: </b> Client <-> Server */
+    public static final Route ERROR = new Route(Method.ERROR  , "error", true );
+    /** Informs that the connection will now be closed. <p><b>Direction: </b> Client <-> Server */
+    public static final Route QUIT  = new Route(Method.META   , "quit" , false);
 
-    public static class Content {
-        public static class User {
-            /** Requests all raw user objects (without relational data). */
-            public static final Route GET_ALL   = new Route("USER GET ALL"  , false, ContentType.NONE);
-            /** Response to {@link Routes.Content.User#GET_ALL}. */
-            public static final Route GET_ALL_R = new Route("USER GET ALL R", true , ContentType.USERS);
-            /** Requests the raw user object (without relational data). */
-            public static final Route GET       = new Route("USER GET"      , false, ContentType.PLAINTEXT);
-            /** Response to {@link Routes.Content.User#GET}. */
-            public static final Route GET_R     = new Route("USER GET R"    , true , ContentType.USER);
-            /** Requests the permanent deletion of a user. */
-            public static final Route DEL       = new Route("USER DEL"      , false, ContentType.PLAINTEXT);
+    /**
+     * An empty route that can be used to respond to a request.
+     * <p><b>Direction: </b> Client <-> Server
+     */
+    public static final Route RESPONSE = new Route(Method.RESPOND, "", true);
 
-            /** Informs the client that a user has been deleted and its cache should be updated. */
-            public static final Route DELETED = new Route("USER DELETED", true , ContentType.PLAINTEXT);
-            /** Informs the client that a user has been updated. */
-            public static final Route UPDATE  = new Route("USER UPDATE" , true , ContentType.USER);
-            /** Informs the client that multiple users have been updated (response to GET_ALL). */
-            public static final Route UPDATES = new Route("USER UPDATES", true , ContentType.USERS);
+    public static class Group {
+        /** Requests a single group. <p><b>Direction: </b> Client -> Server */
+        public static final Route GET     = new Route(Method.GET   , "groups/{group.id}", false);
+        /** Requests all a available groups. <p><b>Direction: </b> Client -> Server */
+        public static final Route GET_ALL = new Route(Method.GET   , "groups"           , false);
+        /** Completely deletes a group. <p><b>Direction: </b> Client -> Server */
+        public static final Route DEL     = new Route(Method.DELETE, "groups/{group.id}", false);
+        /** Creates a new group. <p><b>Direction: </b> Client -> Server */
+        public static final Route CREATE  = new Route(Method.PUT   , "groups"           , true );
+        /** Partially modifies a group. <p><b>Direction: </b> Client -> Server */
+        public static final Route MODIFY  = new Route(Method.PATCH , "groups/{group.id}", true );
 
-            /** Requests to modify the name of a user. */
-            public static final Route MOD_NAME = new Route("USER MOD NAME", false, ContentType.USER_INFO);
+        /** Provides a group that has been updated. <p><b>Direction: </b> Client <- Server */
+        public static final Route UPDATE = new Route(Method.UPDATE, "groups/{group.id}", true );
+        /** Notifies that the specified group has been deleted. <p><b>Direction: </b> Client <- Server */
+        public static final Route REMOVE = new Route(Method.REMOVE, "groups/{group.id}", false);
 
-            /** Requests the list of group ids associated with a user. */
-            public static final Route GROUPS_GET    = new Route("USER GROUP GET"   , false, ContentType.PLAINTEXT);
-            /** Response to {@link Routes.Content.User#GROUPS_GET}. */
-            public static final Route GROUPS_GET_R  = new Route("USER GROUP GET R" , true , ContentType.USER_GROUPS);
-            /** Requests to add a user to a group (group id will be saved with the user). */
-            public static final Route GROUPS_ADD    = new Route("USER GROUP ADD"   , false, ContentType.USER_GROUPS);
-            /** Requests to remove a user from a group. */
-            public static final Route GROUPS_DEL    = new Route("USER GROUP DEL"   , false, ContentType.USER_GROUPS);
-            /** Informs the client that the list of group ids associated with a user has been updated. */
-            public static final Route GROUPS_UPDATE = new Route("USER GROUP UPDATE", true , ContentType.USER_GROUPS);
+        /** Adds a user to a group. <p><b>Direction: </b> Client -> Server */
+        public static final Route ADD_USER = new Route(Method.PUT   , "groups/{group}/members/{user}", false);
+        /** Removes a user from a group. <p><b>Direction: </b> Client -> Server */
+        public static final Route DEL_USER = new Route(Method.DELETE, "groups/{group}/members/{user}", false);
+    }
 
-            /** Requests the list of discord ids associated with a user. */
-            public static final Route DISCORD_GET    = new Route("USER DISCORD GET"   , false, ContentType.PLAINTEXT);
-            /** Response to {@link Routes.Content.User#DISCORD_GET}. */
-            public static final Route DISCORD_GET_R  = new Route("USER DISCORD GET R" , true , ContentType.USER_DISCORD);
-            /** Requests to add a discord id to a user. */
-            public static final Route DISCORD_ADD    = new Route("USER DISCORD ADD"   , false, ContentType.USER_DISCORD);
-            /** Requests to remove a discord id from a user. */
-            public static final Route DISCORD_DEL    = new Route("USER DISCORD DEL"   , false, ContentType.USER_DISCORD);
-            /** Informs the client that the list of discord ids associated with a user has been updated. */
-            public static final Route DISCORD_UPDATE = new Route("USER DISCORD UPDATE", true , ContentType.USER_DISCORD);
+    public static class User {
+        /** Requests a single user. <p><b>Direction: </b> Client -> Server */
+        public static final Route GET     = new Route(Method.GET   , "users/{user.id}", false);
+        /** Requests all a available users. <p><b>Direction: </b> Client -> Server */
+        public static final Route GET_ALL = new Route(Method.GET   , "users"          , false);
+        /** Completely deletes a user. <p><b>Direction: </b> Client -> Server */
+        public static final Route DEL     = new Route(Method.DELETE, "users/{user.id}", false);
+        /** Creates a new user. <p><b>Direction: </b> Client -> Server */
+        public static final Route CREATE  = new Route(Method.PUT   , "users"          , true );
+        /** Partially modifies a user. <p><b>Direction: </b> Client -> Server */
+        public static final Route MODIFY  = new Route(Method.PATCH , "users/{user.id}", true );
 
-            /** Requests the list of minecraft ids associated with a user. */
-            public static final Route MINECRAFT_GET    = new Route("USER MINECRAFT GET"   , false, ContentType.PLAINTEXT);
-            /** Response to {@link Routes.Content.User#MINECRAFT_GET}. */
-            public static final Route MINECRAFT_GET_R  = new Route("USER MINECRAFT GET R" , true , ContentType.USER_MINECRAFT);
-            /** Requests to add a minecraft id to a user. */
-            public static final Route MINECRAFT_ADD    = new Route("USER MINECRAFT ADD"   , false, ContentType.USER_MINECRAFT);
-            /** Requests to remove a minecraft id from a user. */
-            public static final Route MINECRAFT_DEL    = new Route("USER MINECRAFT DEL"   , false, ContentType.USER_MINECRAFT);
-            /** Informs the client that the list of minecraft ids associated with a user has been updated. */
-            public static final Route MINECRAFT_UPDATE = new Route("USER MINECRAFT UPDATE", true , ContentType.USER_MINECRAFT);
-        }
+        /** Provides a user that has been updated. <p><b>Direction: </b> Client <- Server */
+        public static final Route UPDATE = new Route(Method.UPDATE, "users/{user.id}", true );
+        /** Notifies that the specified user has been deleted. <p><b>Direction: </b> Client <- Server */
+        public static final Route REMOVE = new Route(Method.REMOVE, "users/{user.id}", false);
 
-        public static class Group {
-            /** Requests all raw group objects (without relational data). */
-            public static final Route GET_ALL   = new Route("GROUP GET ALL"  , false, ContentType.NONE);
-            /** Response to {@link Routes.Content.Group#GET_ALL}. */
-            public static final Route GET_ALL_R = new Route("GROUP GET ALL R", true , ContentType.GROUPS);
-            /** Requests the raw group object (without relational data). */
-            public static final Route GET       = new Route("GROUP GET"      , false, ContentType.PLAINTEXT);
-            /** Response to {@link Routes.Content.Group#GET}. */
-            public static final Route GET_R     = new Route("GROUP GET R"    , true , ContentType.GROUP);
-            /** Requests the permanent deletion of a group. */
-            public static final Route DEL       = new Route("GROUP DEL"      , false, ContentType.PLAINTEXT);
+        /** Adds a Discord account to a user. <p><b>Direction: </b> Client -> Server */
+        public static final Route ADD_DISCORD = new Route(Method.PUT   , "users/{user.id}/discord/{discord.id}", false);
+        /** Removes a Discord account from a user. <p><b>Direction: </b> Client -> Server */
+        public static final Route DEL_DISCORD = new Route(Method.DELETE, "users/{user.id}/discord/{discord.id}", false);
 
-            /** Informs the client that a group has been deleted and its cache should be updated. */
-            public static final Route DELETED = new Route("GROUP DELETED", true , ContentType.PLAINTEXT);
-            /** Informs the client that a group has been updated. */
-            public static final Route UPDATE  = new Route("GROUP UPDATE" , true , ContentType.GROUP);
-            /** Informs the client that multiple groups have been updated (response to GET_ALL). */
-            public static final Route UPDATES = new Route("GROUP UPDATES", true , ContentType.GROUPS);
-
-            /** Requests to modify the name of a group */
-            public static final Route MOD_NAME = new Route("GROUP MOD NAME", false, ContentType.GROUP_INFO);
-        }
+        /** Adds a Minecraft account to a user. <p><b>Direction: </b> Client -> Server */
+        public static final Route ADD_MINECRAFT = new Route(Method.PUT   , "users/{user.id}/minecraft/{minecraft.id}", false);
+        /** Removes a Minecraft account from a user. <p><b>Direction: </b> Client -> Server */
+        public static final Route DEL_MINECRAFT = new Route(Method.DELETE, "users/{user.id}/minecraft/{minecraft.id}", false);
     }
 
     /* --- */
@@ -109,6 +95,7 @@ public class Routes {
         ROUTES = routes.toArray(new Route[0]);
     }
 
+    /** Provides all template {@link Route} objects form this class. */
     public static Route[] getRoutes() {
         return ROUTES;
     }

@@ -1,80 +1,72 @@
 package de.turtle_exception.core.core.net.message;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import de.turtle_exception.core.core.TurtleCore;
 import de.turtle_exception.core.core.net.NetworkAdapter;
-import de.turtle_exception.core.core.net.route.ContentType;
-import de.turtle_exception.core.core.net.route.Route;
-import de.turtle_exception.core.core.net.route.Routes;
+import de.turtle_exception.core.core.net.route.CompiledRoute;
+import de.turtle_exception.core.core.net.route.Method;
+import de.turtle_exception.core.core.util.Checks;
 import org.jetbrains.annotations.NotNull;
 
 public class MessageParser {
-    public static final String DELIMITER = "#";
-    public static final int MESSAGE_TOKENS = 4;
-
-    public static String escapeDelimiter(String str) {
-        return str.replaceAll(DELIMITER, "\\\\" + DELIMITER);
-    }
-
-    public static String unescapeDelimiter(String str) {
-        return str.replaceAll("\\\\" + DELIMITER, DELIMITER);
-    }
-
-    /* - - - */
-
     public static @NotNull String parse(@NotNull OutboundMessage msg) {
-        return String.join(DELIMITER,
-                parseIntToString(msg.getRoute().callbackCode()),
-                escapeDelimiter(msg.getRoute().command()),
-                escapeDelimiter(msg.getRoute().contentType().getName()),
-                escapeDelimiter(msg.getRoute().content())
-        );
+        JsonObject json = new JsonObject();
+
+        JsonObject route = new JsonObject();
+        route.addProperty("route", msg.getRoute().route().getRoute());
+
+        JsonArray routeArgs = new JsonArray();
+        for (String arg : msg.getRoute().args())
+            routeArgs.add(arg);
+        route.add("arguments", routeArgs);
+
+        json.addProperty("code", msg.getConversation());
+        json.addProperty("method", msg.getRoute().method().getName());
+        json.add("route", route);
+        json.add("content", msg.getRoute().content());
+
+        return json.toString();
     }
 
     public static @NotNull InboundMessage parse(@NotNull TurtleCore core, @NotNull NetworkAdapter adapter, @NotNull String msg) throws IllegalArgumentException {
-        String[] parts = msg.split("#");
-
-        if (parts.length != MESSAGE_TOKENS)
-            throw new IllegalArgumentException("Unexpected amount of tokens (" + parts.length + " instead of " + MESSAGE_TOKENS + ") in message: " + msg);
-
-        int callbackCode;
-        Route route = null;
-        ContentType contentType = null;
-        String command = unescapeDelimiter(parts[1]);
-        String cTypStr = unescapeDelimiter(parts[2]);
-        String content = unescapeDelimiter(parts[3]);
-
         try {
-            callbackCode = Integer.parseUnsignedInt(parts[0]);
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Could not parse callbackCode.", e);
-        }
+            JsonObject json = new Gson().fromJson(msg, JsonObject.class);
 
-        for (Route route1 : Routes.getRoutes()) {
-            if (command.equals(route1.getCommand())) {
-                route = route1;
-                break;
+            JsonObject routeJson = json.getAsJsonObject("route");
+            String     routeRaw  = routeJson.get("route").getAsString();
+            JsonArray  routeArgs = routeJson.getAsJsonArray("arguments");
+
+            long   conversation = json.get("code").getAsLong();
+            String    methodStr = json.get("method").getAsString();
+            JsonElement content = json.get("content");
+
+            String[] args = new String[0];
+            if (routeArgs != null) {
+                args = new String[routeArgs.size()];
+                for (int i = 0; i < routeArgs.size(); i++)
+                    args[i] = routeArgs.get(i).getAsString();
             }
-        }
-        if (route == null)
-            throw new IllegalArgumentException("Unknown command: " + command);
 
-        for (ContentType value : ContentType.values()) {
-            if (value.getName().equals(cTypStr)) {
-                contentType = value;
-                break;
+            Method method = null;
+            for (Method value : Method.values()) {
+                if (value.getName().equals(methodStr)) {
+                    method = value;
+                    break;
+                }
             }
+
+            Checks.nonNull(routeRaw , "Raw Route"     );
+            Checks.nonNull(method   , "Method"        );
+
+            CompiledRoute route = CompiledRoute.of(routeRaw, args, method, content);
+            long deadline = System.currentTimeMillis() + core.getDefaultTimeoutInbound();
+
+            return new InboundMessage(core, adapter, conversation, route, deadline);
+        } catch (Exception e) {
+            throw new IllegalArgumentException(e);
         }
-        if (contentType == null)
-            throw new IllegalArgumentException("Unknown ContentType: " + cTypStr);
-
-        route.setContent(content).setCallbackCode(callbackCode);
-
-        return new InboundMessage(core, adapter, route.build(), System.currentTimeMillis() + core.getDefaultTimeoutInbound());
-    }
-
-    /* - - - */
-
-    private static String parseIntToString(int i) {
-        return String.format("%32s", Integer.toBinaryString(i)).replace(' ', '0');
     }
 }

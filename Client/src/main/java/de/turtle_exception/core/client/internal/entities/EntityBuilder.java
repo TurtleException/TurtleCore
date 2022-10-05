@@ -1,7 +1,11 @@
 package de.turtle_exception.core.client.internal.entities;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import de.turtle_exception.core.client.api.entities.Group;
 import de.turtle_exception.core.client.api.entities.User;
+import de.turtle_exception.core.core.util.Checks;
 import de.turtle_exception.core.core.util.JsonUtil;
 import org.jetbrains.annotations.NotNull;
 
@@ -17,20 +21,24 @@ public class EntityBuilder {
      * @throws IllegalArgumentException if the JSON String does not represent a valid User or is not a properly
      *                                  formatted JSON object.
      */
-    public static @NotNull User buildUser(@NotNull String json) throws NullPointerException, IllegalArgumentException {
-        Map<String, String> data = JsonUtil.jsonToMap(json);
+    public static @NotNull User buildUser(JsonObject json) throws NullPointerException, IllegalArgumentException {
+        Checks.nonNull(json, "JSON");
 
         // TODO
     }
 
-    public static @NotNull List<User> buildUsers(@NotNull String json) throws NullPointerException, IllegalArgumentException {
-        List<String> data  = JsonUtil.jsonToList(json);
-        List<User>   users = new ArrayList<>();
+    public static @NotNull List<User> buildUsers(JsonArray json) throws NullPointerException, IllegalArgumentException {
+        Checks.nonNull(json, "JSON");
 
-        for (String userJson : data)
-            users.add(buildUser(userJson));
+        List<User> users = new ArrayList<>();
 
-        return users;
+        for (JsonElement jsonElement : json) {
+            // ignore all elements that are not a JsonObject
+            if (!(jsonElement instanceof JsonObject obj)) continue;
+            users.add(buildUser(obj));
+        }
+
+        return List.copyOf(users);
     }
 
     /**
@@ -40,19 +48,23 @@ public class EntityBuilder {
      * @throws IllegalArgumentException if the JSON String does not represent a valid Group or is not a properly
      *                                  formatted JSON object.
      */
-    public static @NotNull Group buildGroup(@NotNull String json) throws NullPointerException, IllegalArgumentException {
-        Map<String, String> data = JsonUtil.jsonToMap(json);
+    public static @NotNull Group buildGroup(JsonObject json) throws NullPointerException, IllegalArgumentException {
+        Checks.nonNull(json, "JSON");
 
         // TODO
     }
 
-    public static @NotNull List<Group> buildGroups(@NotNull String json) throws NullPointerException, IllegalArgumentException {
-        List<String> data   = JsonUtil.jsonToList(json);
-        List<Group>  groups = new ArrayList<>();
+    public static @NotNull List<Group> buildGroups(JsonArray json) throws NullPointerException, IllegalArgumentException {
+        Checks.nonNull(json, "JSON");
 
-        for (String groupJson : data)
-            groups.add(buildGroup(groupJson));
+        List<Group> groups = new ArrayList<>();
 
-        return groups;
+        for (JsonElement jsonElement : json) {
+            // ignore all elements that are not a JsonObject
+            if (!(jsonElement instanceof JsonObject obj)) continue;
+            groups.add(buildGroup(obj));
+        }
+
+        return List.copyOf(groups);
     }
 }

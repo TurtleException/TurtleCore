@@ -6,6 +6,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Function;
 
 public interface DataService {
     /**
@@ -61,6 +62,8 @@ public interface DataService {
      */
     void deleteGroup(long id) throws DataAccessException;
 
+    void modifyGroup(long group, @NotNull Function<JsonObject, JsonObject> function) throws DataAccessException;
+
     /**
      * Provides a List containing the ids of all users.
      * @return List of user ids.
@@ -105,6 +108,8 @@ public interface DataService {
      * @implNote This method should generally also delete all relational data (i.e. membership in a group).
      */
     void deleteUser(long id) throws DataAccessException;
+
+    void modifyUser(long user, @NotNull Function<JsonObject, JsonObject> function) throws DataAccessException;
 
     /**
      * Provides a List containing the ids of all groups the given user is a member of.
