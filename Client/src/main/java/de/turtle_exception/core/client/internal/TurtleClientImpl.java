@@ -1,5 +1,7 @@
 package de.turtle_exception.core.client.internal;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import de.turtle_exception.core.client.api.TurtleClient;
 import de.turtle_exception.core.client.api.entities.Group;
 import de.turtle_exception.core.client.api.entities.User;
@@ -127,7 +129,7 @@ public class TurtleClientImpl extends TurtleCore implements TurtleClient {
     @Override
     public @NotNull Action<User> retrieveUser(long id) {
         return new ActionImpl<User>(this, Routes.User.GET.compile(null, String.valueOf(id)), (message, userRequest) -> {
-            return EntityBuilder.buildUser(message.getRoute().content());
+            return EntityBuilder.buildUser((JsonObject) message.getRoute().content());
         }).onSuccess(user -> {
             userCache.removeIf(oldUser -> oldUser.getId() == id);
             userCache.add(user);
@@ -138,7 +140,7 @@ public class TurtleClientImpl extends TurtleCore implements TurtleClient {
     @Override
     public @NotNull Action<List<User>> retrieveUsers() {
         return new ActionImpl<List<User>>(this, Routes.User.GET_ALL.compile(null), (message, userRequest) -> {
-            return EntityBuilder.buildUsers(message.getRoute().content());
+            return EntityBuilder.buildUsers((JsonArray) message.getRoute().content());
         }).onSuccess(l -> {
             userCache.clear();
             userCache.addAll(l);
@@ -149,7 +151,7 @@ public class TurtleClientImpl extends TurtleCore implements TurtleClient {
     @Override
     public @NotNull Action<Group> retrieveGroup(long id) {
         return new ActionImpl<Group>(this, Routes.Group.GET.compile(null, String.valueOf(id)), (message, userRequest) -> {
-            return EntityBuilder.buildGroup(message.getRoute().content());
+            return EntityBuilder.buildGroup((JsonObject) message.getRoute().content());
         }).onSuccess(group -> {
             groupCache.removeIf(oldGroup -> oldGroup.getId() == id);
             groupCache.add(group);
@@ -160,7 +162,7 @@ public class TurtleClientImpl extends TurtleCore implements TurtleClient {
     @Override
     public @NotNull Action<List<Group>> retrieveGroups() {
         return new ActionImpl<List<Group>>(this, Routes.Group.GET_ALL.compile(null), (message, userRequest) -> {
-            return EntityBuilder.buildGroups(message.getRoute().content());
+            return EntityBuilder.buildGroups((JsonArray) message.getRoute().content());
         }).onSuccess(l -> {
             groupCache.clear();
             groupCache.addAll(l);
