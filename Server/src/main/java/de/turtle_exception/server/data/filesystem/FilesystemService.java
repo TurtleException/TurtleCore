@@ -17,9 +17,6 @@ import java.util.UUID;
  * {@code .json}-files and stored according to their primary identifier.
  */
 public class FilesystemService implements DataService {
-    /** The root directory of the filesystem database. */
-    private final File dir;
-
     // These locks are used to prevent reading old data while it is being rewritten by another Thread
     private final Object metaLock  = new Object();
     private final Object groupLock = new Object();
@@ -39,8 +36,6 @@ public class FilesystemService implements DataService {
 
         if (!dir.exists())
             dir.mkdirs();
-
-        this.dir = dir;
 
         this.fileCredentials = new File(dir, "credentials.json");
         this.dirGroups       = new File(dir, "groups");
@@ -89,14 +84,6 @@ public class FilesystemService implements DataService {
 
         try (FileWriter writer = new FileWriter(file, false)) {
             writer.write(gson.toJson(json));
-        }
-    }
-
-    private void setCredentialsJson(@NotNull JsonObject credentials) throws DataAccessException {
-        try {
-            this.setFile(credentials, fileCredentials);
-        } catch (IOException e) {
-            throw new DataAccessException(e);
         }
     }
 
