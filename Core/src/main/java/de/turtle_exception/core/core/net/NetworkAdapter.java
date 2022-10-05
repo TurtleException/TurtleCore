@@ -194,7 +194,7 @@ public abstract class NetworkAdapter {
                 handler.handle(this, msg);
                 return false;
             } catch (Exception e) {
-                msg.respond(RouteErrors.UNKNOWN.with(e).compile(), System.currentTimeMillis() + core.getDefaultTimeoutOutbound(), in -> { });
+                msg.respond(RouteErrors.BAD_REQUEST.with(e).compile(), System.currentTimeMillis() + core.getDefaultTimeoutOutbound(), in -> { });
                 return true;
             }
         } else {
