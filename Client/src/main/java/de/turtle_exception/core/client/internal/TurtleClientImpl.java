@@ -176,6 +176,10 @@ public class TurtleClientImpl extends TurtleCore implements TurtleClient {
         return netClient;
     }
 
+    public @NotNull TurtleSet<Group> getGroupCache() {
+        return groupCache;
+    }
+
     public @NotNull TurtleSet<User> getUserCache() {
         return userCache;
     }
