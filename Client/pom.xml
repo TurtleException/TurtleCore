@@ -26,12 +26,22 @@
                 </configuration>
             </plugin>
         </plugins>
+        <resources>
+            <resource>
+                <!-- Write version into resource file -->
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>version.properties</include>
+                </includes>
+            </resource>
+        </resources>
     </build>
 
     <dependencies>
         <dependency>
             <groupId>de.turtle_exception.core</groupId>
-            <artifactId>NetCore</artifactId>
+            <artifactId>Core</artifactId>
             <version>1.0.0-alpha.1</version>
         </dependency>
         <dependency>
@@ -48,6 +58,12 @@
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
             <version>2.9.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>net.dv8tion</groupId>
+            <artifactId>JDA</artifactId>
+            <version>5.0.0-alpha.20</version>
         </dependency>
     </dependencies>
 </project>
