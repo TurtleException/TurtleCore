@@ -65,6 +65,30 @@ public interface DataService {
     void modifyGroup(long group, @NotNull Function<JsonObject, JsonObject> function) throws DataAccessException;
 
     /**
+     * Provides a List containing the ids of all users that are members of the given group.
+     * @param group id of the group.
+     * @return List of user ids.
+     * @throws DataAccessException if the request fails.
+     */
+    @NotNull JsonArray getGroupMembers(long group) throws DataAccessException;
+
+    /**
+     * Adds a user id to the list of users that are part of the provided group.
+     * @param group id of the group.
+     * @param user id of the user.
+     * @throws DataAccessException if the request fails.
+     */
+    void addGroupMember(long group, long user) throws DataAccessException;
+
+    /**
+     * Removes a user id from the list of users that are part of the provided group.
+     * @param group id of the group.
+     * @param user id of the user.
+     * @throws DataAccessException if the request fails.
+     */
+    void delGroupMember(long group, long user) throws DataAccessException;
+
+    /**
      * Provides a List containing the ids of all users.
      * @return List of user ids.
      * @throws DataAccessException if the request fails.
@@ -110,30 +134,6 @@ public interface DataService {
     void deleteUser(long id) throws DataAccessException;
 
     void modifyUser(long user, @NotNull Function<JsonObject, JsonObject> function) throws DataAccessException;
-
-    /**
-     * Provides a List containing the ids of all groups the given user is a member of.
-     * @param user id of the user.
-     * @return List of group ids.
-     * @throws DataAccessException if the request fails.
-     */
-    @NotNull JsonArray getUserGroups(long user) throws DataAccessException;
-
-    /**
-     * Adds a group id to the list of groups that this user is a member of.
-     * @param user id of the user.
-     * @param group id of the group.
-     * @throws DataAccessException if the request fails.
-     */
-    void addUserGroup(long user, long group) throws DataAccessException;
-
-    /**
-     * Removes a group id from the list of groups that this user is a member of.
-     * @param user id of the user.
-     * @param group id of the group.
-     * @throws DataAccessException if the request fails.
-     */
-    void delUserGroup(long user, long group) throws DataAccessException;
 
     /**
      * Provides a List containing the ids of all Discord accounts associated with this user.

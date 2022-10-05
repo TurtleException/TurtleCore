@@ -45,12 +45,12 @@ public class GroupHandler extends ResourceHandler {
             long groupId = Long.parseLong(route.args()[0]);
             long  userId = Long.parseLong(route.args()[1]);
 
-            getDataService().addUserGroup(userId, groupId);
+            getDataService().addGroupMember(userId, groupId);
         } else if (route.isRoute(Routes.Group.DEL_USER)) {
             long groupId = Long.parseLong(route.args()[0]);
             long  userId = Long.parseLong(route.args()[1]);
 
-            getDataService().delUserGroup(userId, groupId);
+            getDataService().delGroupMember(userId, groupId);
         } else {
             throw new UnsupportedOperationException();
         }

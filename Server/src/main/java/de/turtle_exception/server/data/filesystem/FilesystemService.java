@@ -134,7 +134,7 @@ public class FilesystemService implements DataService {
     public @NotNull List<Long> getGroupIds() {
         File[] groupFiles;
         synchronized (groupLock) {
-            groupFiles  = dirGroups.listFiles();
+            groupFiles = dirGroups.listFiles();
         }
 
         if (groupFiles == null) return List.of();
@@ -166,7 +166,18 @@ public class FilesystemService implements DataService {
 
     @Override
     public void setGroup(@NotNull JsonObject group) throws DataAccessException {
+        long id;
+        try {
+            id = group.get("id").getAsLong();
+            group.get("name").getAsString();
+        } catch (Exception e) {
+            throw new DataAccessException("Malformed parameters for group object");
+        }
+
         synchronized (groupLock) {
+            // simpler to use this (all members will also be deleted)
+            this.deleteGroup(id);
+
             try {
                 this.setFile(group, new File(dirGroups, group.get("id").getAsString()));
             } catch (IOException e) {
@@ -191,6 +202,42 @@ public class FilesystemService implements DataService {
             json = function.apply(json);
             this.setGroupJson(json);
         }
+    }
+
+    @Override
+    public @NotNull JsonArray getGroupMembers(long group) throws DataAccessException {
+        try {
+            return this.getGroup(group).getAsJsonArray("members");
+        } catch (Exception e) {
+            throw new DataAccessException(e);
+        }
+    }
+
+    @Override
+    public void addGroupMember(long group, long user) throws DataAccessException {
+        this.modifyGroup(group, json -> {
+            JsonArray members = json.getAsJsonArray("members");
+            members.add(user);
+            json.add("members", members);
+            return json;
+        });
+    }
+
+    @Override
+    public void delGroupMember(long group, long user) throws DataAccessException {
+        this.modifyGroup(group, json -> {
+            JsonArray members = json.getAsJsonArray("members");
+
+            for (int i = 0; i < members.size(); i++) {
+                if (members.get(i).getAsLong() == user) {
+                    members.remove(i);
+                    break;
+                }
+            }
+
+            json.add("members", members);
+            return json;
+        });
     }
 
     @Override
@@ -224,35 +271,41 @@ public class FilesystemService implements DataService {
             if (json == null)
                 throw new DataAccessException("Unknown user");
 
-            json.remove("groups");
-            json.remove("discord");
-            json.remove("minecraft");
-
             return json;
         }
     }
 
     @Override
     public void setUser(@NotNull JsonObject user) throws DataAccessException {
-        final long id = user.get("id").getAsLong();
+        long id;
+        String name;
+        try {
+            id = user.get("id").getAsLong();
+            name = user.get("name").getAsString();
+        } catch (Exception e) {
+            throw new DataAccessException("Malformed parameters for group object");
+        }
+
+        JsonObject json = new JsonObject();
+
+        try {
+            json.addProperty("id", id);
+            json.addProperty("name", name);
+
+            JsonElement discord = user.get("discord");
+            json.add("discord", (discord instanceof JsonArray) ? discord : new JsonArray());
+
+            JsonElement minecraft = user.get("minecraft");
+            json.add("minecraft", (minecraft instanceof JsonArray) ? minecraft : new JsonArray());
+        } catch (Exception e) {
+            throw new DataAccessException(e);
+        }
 
         synchronized (userLock) {
-            JsonObject json = this.getUserJson(id);
+            // simpler to use this (all members will also be deleted)
+            this.deleteUser(id);
 
-            if (json == null) {
-                // new user
-                json = user.deepCopy();
-
-                json.add("groups", new JsonArray());
-                json.add("discord", new JsonArray());
-                json.add("minecraft", new JsonArray());
-            } else {
-                // overwrite values
-                for (String key : user.keySet())
-                    json.add(key, user.get(key));
-            }
-
-            this.setUserJson(json);
+            this.setUserJson(user);
         }
     }
 
@@ -260,6 +313,8 @@ public class FilesystemService implements DataService {
     @Override
     public void deleteUser(long id) {
         synchronized (userLock) {
+            // TODO: delete members
+
             File file = new File(dirUsers, id + ".json");
             file.delete();
         }
@@ -275,46 +330,6 @@ public class FilesystemService implements DataService {
     }
 
     @Override
-    public @NotNull JsonArray getUserGroups(long user) throws DataAccessException {
-        JsonObject json;
-        synchronized (userLock) {
-            json = this.getUserJson(user);
-        }
-        JsonArray group = json.getAsJsonArray("groups");
-
-        return group != null ? group : new JsonArray();
-    }
-
-    @Override
-    public void addUserGroup(long user, long group) throws DataAccessException {
-        synchronized (userLock) {
-            JsonArray json = getUserGroups(user);
-            json.add(group);
-            this.setUserGroups(user, json);
-        }
-    }
-
-    @Override
-    public void delUserGroup(long user, long group) throws DataAccessException {
-        synchronized (userLock) {
-            JsonArray oldJson = getUserGroups(user);
-            JsonArray newJson = new JsonArray();
-
-            for (JsonElement entry : oldJson)
-                if (entry.getAsLong() != group)
-                    newJson.add(entry);
-
-            this.setUserGroups(user, newJson);
-        }
-    }
-
-    private void setUserGroups(long user, @NotNull JsonArray groups) throws DataAccessException {
-        JsonObject json = this.getUserJson(user);
-        json.add("groups", groups);
-        this.setUserJson(json);
-    }
-
-    @Override
     public @NotNull JsonArray getUserDiscord(long user) throws DataAccessException {
         JsonObject json;
         synchronized (userLock) {
@@ -327,31 +342,29 @@ public class FilesystemService implements DataService {
 
     @Override
     public void addUserDiscord(long user, long discord) throws DataAccessException {
-        synchronized (userLock) {
-            JsonArray json = getUserDiscord(user);
-            json.add(discord);
-            this.setUserDiscord(user, json);
-        }
+        this.modifyUser(user, json -> {
+            JsonArray arr = json.getAsJsonArray("discord");
+            arr.add(discord);
+            json.add("discord", arr);
+            return json;
+        });
     }
 
     @Override
     public void delUserDiscord(long user, long discord) throws DataAccessException {
-        synchronized (userLock) {
-            JsonArray oldJson = getUserDiscord(user);
-            JsonArray newJson = new JsonArray();
+        this.modifyUser(user, json -> {
+            JsonArray arr = json.getAsJsonArray("discord");
 
-            for (JsonElement entry : oldJson)
-                if (entry.getAsLong() != discord)
-                    newJson.add(entry);
+            for (int i = 0; i < arr.size(); i++) {
+                if (arr.get(i).getAsLong() == discord) {
+                    arr.remove(i);
+                    break;
+                }
+            }
 
-            this.setUserDiscord(user, newJson);
-        }
-    }
-
-    private void setUserDiscord(long user, @NotNull JsonArray discord) throws DataAccessException {
-        JsonObject json = this.getUserJson(user);
-        json.add("discord", discord);
-        this.setUserJson(json);
+            json.add("discord", arr);
+            return json;
+        });
     }
 
     @Override
@@ -367,32 +380,28 @@ public class FilesystemService implements DataService {
 
     @Override
     public void addUserMinecraft(long user, @NotNull UUID minecraft) throws DataAccessException {
-        synchronized (userLock) {
-            JsonArray json = getUserMinecraft(user);
-            json.add(minecraft.toString());
-            this.setUserMinecraft(user, json);
-        }
+        this.modifyUser(user, json -> {
+            JsonArray arr = json.getAsJsonArray("minecraft");
+            arr.add(minecraft.toString());
+            json.add("minecraft", arr);
+            return json;
+        });
     }
 
     @Override
     public void delUserMinecraft(long user, @NotNull UUID minecraft) throws DataAccessException {
-        synchronized (userLock) {
-            JsonArray oldJson = getUserMinecraft(user);
-            JsonArray newJson = new JsonArray();
+        this.modifyUser(user, json -> {
+            JsonArray arr = json.getAsJsonArray("minecraft");
 
-            String mStr = minecraft.toString();
+            for (int i = 0; i < arr.size(); i++) {
+                if (UUID.fromString(arr.get(i).getAsString()) == minecraft) {
+                    arr.remove(i);
+                    break;
+                }
+            }
 
-            for (JsonElement entry : oldJson)
-                if (!entry.getAsString().equals(mStr))
-                    newJson.add(entry);
-
-            this.setUserMinecraft(user, newJson);
-        }
-    }
-
-    private void setUserMinecraft(long user, @NotNull JsonArray minecraft) throws DataAccessException {
-        JsonObject json = this.getUserJson(user);
-        json.add("minecraft", minecraft);
-        this.setUserJson(json);
+            json.add("minecraft", arr);
+            return json;
+        });
     }
 }
