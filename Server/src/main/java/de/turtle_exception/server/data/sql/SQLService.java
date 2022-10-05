@@ -42,9 +42,7 @@ public class SQLService implements DataService {
 
     @Override
     public @NotNull String getPass(@NotNull String login) throws DataAccessException {
-        ResultSet resultSet = this.sqlConnector.executeQuery(Statements.GET_PASS, login);
-
-        try {
+        try (ResultSet resultSet = this.sqlConnector.executeQuery(Statements.GET_PASS, login)) {
             if (!resultSet.next())
                 throw new DataAccessException("Could not parse pass from empty ResultSet.");
 
@@ -56,9 +54,7 @@ public class SQLService implements DataService {
 
     @Override
     public @NotNull List<Long> getGroupIds() throws DataAccessException {
-        ResultSet resultSet = this.sqlConnector.executeQuery(Statements.GET_GROUP_IDS);
-
-        try {
+        try (ResultSet resultSet = this.sqlConnector.executeQuery(Statements.GET_GROUP_IDS)) {
             ArrayList<Long> list = new ArrayList<>();
 
             while (resultSet.next())
@@ -72,22 +68,20 @@ public class SQLService implements DataService {
 
     @Override
     public @NotNull JsonObject getGroup(long id) throws DataAccessException {
-        ResultSet resultSet = this.sqlConnector.executeQuery(Statements.GET_GROUP);
+        try (ResultSet resultSet = this.sqlConnector.executeQuery(Statements.GET_GROUP)) {
+            JsonObject json = new JsonObject();
 
-        JsonObject json = new JsonObject();
-
-        try {
             if (!resultSet.next())
                 throw new DataAccessException("Could not parse group from empty ResultSet.");
 
             json.addProperty("id"  , resultSet.getString("id"));
             json.addProperty("name", resultSet.getString("name"));
             json.add("members", this.getGroupMembers(id));
+
+            return json;
         } catch (Exception e) {
             throw new DataAccessException(e);
         }
-
-        return json;
     }
 
     @Override
@@ -144,9 +138,7 @@ public class SQLService implements DataService {
 
     @Override
     public @NotNull JsonArray getGroupMembers(long group) throws DataAccessException {
-        ResultSet resultSet = this.sqlConnector.executeQuery(Statements.GET_MEMBERS, group);
-
-        try {
+        try (ResultSet resultSet = this.sqlConnector.executeQuery(Statements.GET_MEMBERS, group)) {
             JsonArray groups = new JsonArray();
 
             while (resultSet.next())
@@ -170,9 +162,7 @@ public class SQLService implements DataService {
 
     @Override
     public @NotNull List<Long> getUserIds() throws DataAccessException {
-        ResultSet resultSet = this.sqlConnector.executeQuery(Statements.GET_USER_IDS);
-
-        try {
+        try (ResultSet resultSet = this.sqlConnector.executeQuery(Statements.GET_USER_IDS)) {
             ArrayList<Long> list = new ArrayList<>();
 
             while (resultSet.next())
@@ -186,11 +176,9 @@ public class SQLService implements DataService {
 
     @Override
     public @NotNull JsonObject getUser(long id) throws DataAccessException {
-        ResultSet resultUser = this.sqlConnector.executeQuery(Statements.GET_USER, id);
+        try (ResultSet resultUser = this.sqlConnector.executeQuery(Statements.GET_USER, id)) {
+            JsonObject json = new JsonObject();
 
-        JsonObject json = new JsonObject();
-
-        try {
             if (!resultUser.next())
                 throw new DataAccessException("Could not parse user from empty ResultSet.");
 
@@ -198,11 +186,12 @@ public class SQLService implements DataService {
             json.addProperty("name", resultUser.getString("name"));
             json.add("discord"  , this.getUserDiscord(id));
             json.add("minecraft", this.getUserMinecraft(id));
+
+            return json;
         } catch (Exception e) {
             throw new DataAccessException(e);
         }
 
-        return json;
     }
 
     @Override
@@ -270,9 +259,7 @@ public class SQLService implements DataService {
 
     @Override
     public @NotNull JsonArray getUserDiscord(long user) throws DataAccessException {
-        ResultSet resultSet = this.sqlConnector.executeQuery(Statements.GET_USER_DISCORD, user);
-
-        try {
+        try (ResultSet resultSet = this.sqlConnector.executeQuery(Statements.GET_USER_DISCORD, user)) {
             JsonArray discord = new JsonArray();
 
             while (resultSet.next())
@@ -296,9 +283,7 @@ public class SQLService implements DataService {
 
     @Override
     public @NotNull JsonArray getUserMinecraft(long user) throws DataAccessException {
-        ResultSet resultSet = this.sqlConnector.executeQuery(Statements.GET_USER_MINECRAFT, user);
-
-        try {
+        try (ResultSet resultSet = this.sqlConnector.executeQuery(Statements.GET_USER_MINECRAFT, user)) {
             JsonArray minecraft = new JsonArray();
 
             while (resultSet.next())
