@@ -4,7 +4,13 @@ import com.google.gson.JsonElement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-// TODO: docs
+/**
+ * A final version of {@link Route} with arguments and content.
+ * @param route The underlying {@link Route}.
+ * @param method The request method.
+ * @param args The arguments for the route parameters. This array should always have the same length as {@link Route#getParamCount()}.
+ * @param content The content this route should be sent with.
+ */
 public record CompiledRoute(
         @NotNull Route route,
         @NotNull Method method,

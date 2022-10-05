@@ -4,7 +4,11 @@ import com.google.gson.JsonElement;
 import de.turtle_exception.core.core.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 
-// TODO: docs
+/**
+ * A Route is an instruction on where and how to execute a network request.
+ * Routes can be re-used across connections and instances.
+ * @see Routes
+ */
 public class Route {
     private final @NotNull Method method;
     private final @NotNull String route;
