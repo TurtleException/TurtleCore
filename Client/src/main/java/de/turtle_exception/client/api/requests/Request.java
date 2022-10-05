@@ -13,6 +13,7 @@ import java.util.function.Consumer;
 import java.util.logging.Level;
 
 // TODO: docs
+@SuppressWarnings("unused")
 public class Request<T> {
     private final TurtleClientImpl client;
     private final ActionImpl<T> action;

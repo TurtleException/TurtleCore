@@ -15,6 +15,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * <p>A TurtleClientBuilder can be re-used to instantiate multiple instances of a {@link TurtleClient}. This might be
  * useful to connect to the server with multiple users to clearly distinct between different features of an application.
  */
+@SuppressWarnings("unused")
 public class TurtleClientBuilder {
     private static final AtomicInteger increment = new AtomicInteger(0);
 

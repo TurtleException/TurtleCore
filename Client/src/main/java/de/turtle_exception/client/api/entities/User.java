@@ -6,6 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.UUID;
 
+@SuppressWarnings("unused")
 public interface User extends Turtle {
     @NotNull String getName();
 

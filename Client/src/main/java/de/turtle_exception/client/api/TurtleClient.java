@@ -11,6 +11,7 @@ import java.util.function.Consumer;
 import java.util.logging.Logger;
 
 // TODO: docs
+@SuppressWarnings("unused")
 public interface TurtleClient extends IUserContainer {
     @NotNull
     Logger getLogger();
