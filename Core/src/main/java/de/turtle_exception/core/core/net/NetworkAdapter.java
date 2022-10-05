@@ -74,7 +74,7 @@ public abstract class NetworkAdapter {
         this.pass  = pass;
 
         this.registerHandler(Routes.OK      , (netAdapter, msg) -> {
-            logger.log(Level.INFO, "Dangling OK");
+            throw new UnexpectedRouteException("Dangling OK");
         });
         this.registerHandler(Routes.QUIT    , (netAdapter, msg) -> {
             logger.log(Level.INFO, "Received QUIT message.");
@@ -85,10 +85,10 @@ public abstract class NetworkAdapter {
             }
         });
         this.registerHandler(Routes.ERROR   , (netAdapter, msg) -> {
-            logger.log(Level.WARNING, "Dangling ERROR: " + msg.getRoute().content());
+            throw new UnexpectedRouteException("Dangling ERROR: " + msg.getRoute().content());
         });
         this.registerHandler(Routes.RESPONSE, (netAdapter, msg) -> {
-            logger.log(Level.INFO, "Dangling RESPONSE: " + msg.getRoute().content());
+            throw new UnexpectedRouteException("Dangling RESPONSE: " + msg.getRoute().content());
         });
     }
 
@@ -275,6 +275,9 @@ public abstract class NetworkAdapter {
             try {
                 handler.handle(this, msg);
                 return false;
+            } catch (UnexpectedRouteException e) {
+                this.logger.log(Level.WARNING, e.getMessage());
+                return true;
             } catch (Exception e) {
                 msg.respond(RouteErrors.BAD_REQUEST.with(e).compile(), System.currentTimeMillis() + core.getDefaultTimeoutOutbound(), in -> { });
                 return true;
