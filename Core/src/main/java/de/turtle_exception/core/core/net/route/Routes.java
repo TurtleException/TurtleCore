@@ -20,6 +20,7 @@ public class Routes {
         public static final Route MODIFY  = new Route(Method.PATCH , "groups/{group.id}", true );
 
         public static final Route UPDATE = new Route(Method.UPDATE, "groups/{group.id}", true );
+        public static final Route REMOVE = new Route(Method.REMOVE, "groups/{group.id}", false);
 
         public static final Route ADD_USER = new Route(Method.PUT   , "groups/{group}/members/{user}", false);
         public static final Route DEL_USER = new Route(Method.DELETE, "groups/{group}/members/{user}", false);
@@ -33,6 +34,7 @@ public class Routes {
         public static final Route MODIFY  = new Route(Method.PATCH , "users/{user.id}", true );
 
         public static final Route UPDATE = new Route(Method.UPDATE, "users/{user.id}", true );
+        public static final Route REMOVE = new Route(Method.REMOVE, "users/{user.id}", false);
 
         public static final Route ADD_DISCORD = new Route(Method.PUT   , "users/{user.id}/discord/{discord.id}", false);
         public static final Route DEL_DISCORD = new Route(Method.DELETE, "users/{user.id}/discord/{discord.id}", false);

@@ -58,13 +58,19 @@ public enum Method {
     UPDATE("UPDATE", true),
 
     /**
+     * Informs the client that a resource has been completely deleted and the client should update its cache.
+     * <p><b>Direction: </b> Client <- Server
+     */
+    REMOVE("REMOVE", true),
+
+    /**
      * Acknowledged a request as successful and optionally provides the requested data in the form of route parameters.
      * <p><b>Direction: </b> Client <-> Server
      */
     RESPOND("RESPOND", true),
 
     /**
-     *Acknowledged a request as unsuccessful and provides a reason in the form of route parameters.
+     * Acknowledged a request as unsuccessful and provides a reason in the form of route parameters.
      * <p><b>Direction: </b> Client <-> Server
      */
     ERROR("ERROR", true),
