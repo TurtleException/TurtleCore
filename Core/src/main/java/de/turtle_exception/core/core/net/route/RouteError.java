@@ -1,22 +1,26 @@
 package de.turtle_exception.core.core.net.route;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class RouteError {
-    private final String    message;
-    private final String    description;
-    private final Throwable throwable;
+    private final String     message;
+    private final String     description;
+    private final Throwable  throwable;
+    private final JsonObject jsonThrowable;
 
-    RouteError(@Nullable String message, @Nullable String description, @Nullable Throwable throwable) throws IllegalArgumentException {
-        this.message = message;
-        this.description = description;
-        this.throwable = throwable;
+    RouteError(@NotNull String message, @Nullable String description, @Nullable Throwable throwable) {
+        this(message, description, throwable, null);
+    }
 
-        if (message == null && throwable == null)
-            throw new IllegalArgumentException("Either message or throwable must be non-null!");
+    private RouteError(@NotNull String message, @Nullable String description, @Nullable Throwable throwable, @Nullable JsonObject throwableJson) {
+        this.message       = message;
+        this.description   = description;
+        this.throwable     = throwable;
+        this.jsonThrowable = throwableJson;
     }
 
     /* - - - */
@@ -26,13 +30,45 @@ public class RouteError {
         return new RouteError(message, description, throwable);
     }
 
+    private RouteError with(@NotNull JsonObject throwableJson) {
+        return new RouteError(message, description, throwable, throwableJson);
+    }
+
+    /* - - - */
+
+    public static RouteError of(JsonElement json) throws IllegalArgumentException {
+        if (json == null)
+            throw new IllegalArgumentException("Empty JSON");
+        if (!json.isJsonObject())
+            throw new IllegalArgumentException("Illegal type of JsonElement: " + json.getClass().getSimpleName());
+
+        JsonObject content   = json.getAsJsonObject();
+        String message       = content.get("message").getAsString();
+        JsonObject throwable = content.getAsJsonObject("throwable");
+
+        if (message == null)
+            throw new IllegalArgumentException("Illegal message: null");
+
+        RouteError error = null;
+        for (RouteError checkError : RouteErrors.getErrors()) {
+            if (!checkError.getMessage().equals(message)) continue;
+
+            error = checkError;
+            break;
+        }
+
+        if (error == null)
+            throw new IllegalArgumentException("Unknown error: " + message);
+
+        return error.with(throwable);
+    }
+
     /* - - - */
 
     public CompiledRoute compile() {
         JsonObject json = new JsonObject();
 
-        if (message != null)
-            json.addProperty("message", message);
+        json.addProperty("message", message);
         if (description != null)
             json.addProperty("description", description);
         if (throwable != null)
@@ -58,5 +94,23 @@ public class RouteError {
             json.add("cause", parseThrowable(cause));
 
         return json;
+    }
+
+    /* - - - */
+
+    public String getMessage() {
+        return message;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public Throwable getThrowable() {
+        return throwable;
+    }
+
+    public JsonObject getJsonThrowable() {
+        return jsonThrowable;
     }
 }
