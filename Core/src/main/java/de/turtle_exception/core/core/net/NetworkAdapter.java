@@ -26,16 +26,36 @@ import java.util.Random;
 import java.util.concurrent.*;
 import java.util.logging.Level;
 
+/**
+ * A NetworkAdapter is responsible for establishing and managing a connection and functions as an interface between two
+ * remote parts of the application. Implementations of this class should handle encryption, {@link Route} parsing and
+ * conversation caching.
+ */
 public abstract class NetworkAdapter {
+    /** The last message that should be sent unencrypted to signal that from now on all traffic will be encrypted. */
     public static final String LOGGED_IN = "LOGGED IN";
 
     private   final TurtleCore core;
     protected final NestedLogger logger;
 
+    /**
+     * Conversations are basic associations between inbound and outbound messages that provide information on how or
+     * where a message should be processed. Every message contains a conversation code that is randomly generated for
+     * every new request (on the requesting side) and will be the same for every response or error associated with the
+     * initial message.
+     * @see NetworkAdapter#newConversation()
+     * @see MessageParser
+     */
     protected final ConcurrentHashMap<Long, Message> conversations = new ConcurrentHashMap<>();
+    /**
+     * Designated handlers for every non-responding route this {@link NetworkAdapter} supports.
+     * @see RouteHandler
+     */
     protected final ConcurrentHashMap<Route, RouteHandler> handlers = new ConcurrentHashMap<>();
 
+    /** A simple executor to await responses to outbound messages. */
     protected ScheduledThreadPoolExecutor executor;
+    /** Constantly receives data from the remote connection and passes it on to {@link NetworkAdapter#handleInbound(String)} */
     protected AsyncLoopThread receiver;
     protected ConnectionStatus status;
 
@@ -74,12 +94,29 @@ public abstract class NetworkAdapter {
 
     /* - - - */
 
+    /**
+     * Closes the remote connection and stops the NetworkAdapter.
+     * @throws IOException if any IO problems occur while attempting to stop.
+     * @implNote This method should generally only notify the remote application and then call {@link NetworkAdapter#quit()}
+     */
     public abstract void stop() throws IOException;
 
+    /**
+     * Closes the remote connection and stops the NetworkAdapter without notifying the remote application.
+     * @throws IOException if any IO problems occur while attempting to quit.
+     * @see NetworkAdapter#stop()
+     */
     protected abstract void quit() throws IOException;
 
     /* - - - */
 
+    /**
+     * Takes in an {@link OutboundMessage} object, parses it to an encrypted String and passes it on to
+     * {@link NetworkAdapter#send(String)} to be sent to the remote connection. If either of these operations fail it
+     * will be reported to the {@link NetworkAdapter#logger} and the message will be ignored.
+     * <p> This method does not handle conversations!
+     * @see NetworkAdapter#submit(InboundMessage)
+     */
     protected final void handleOutbound(@NotNull OutboundMessage msg) {
         String message = "";
         try {
@@ -94,8 +131,19 @@ public abstract class NetworkAdapter {
         }
     }
 
+    /**
+     * Sends a provided String to the remote connection without processing it any further.
+     * <p> This method does not handle encryption!
+     * @see NetworkAdapter#handleOutbound(OutboundMessage)
+     */
     protected abstract void send(@NotNull String msg);
 
+    /**
+     * Takes in an encrypted message that was received by the {@link NetworkAdapter#receiver} and attempts to decrypt it
+     * and parse it to an {@link InboundMessage} object. If either of these operations fail it will be reported to the
+     * {@link NetworkAdapter#logger} and the message will be ignored.
+     * @param msg Encrypted message from remote connection.
+     */
     protected final void handleInbound(@NotNull String msg) {
         String decryptedMessage = "";
         try {
@@ -121,6 +169,12 @@ public abstract class NetworkAdapter {
 
     /* - - - */
 
+    /**
+     * Submits a message to be sent to the remote connection.
+     * @throws RejectedExecutionException if the {@link NetworkAdapter#executor} rejects the task to asynchronously
+     *                                    await cancellation or timeout. This does not mean that the message has not
+     *                                    been sent!
+     */
     public final void submit(@NotNull OutboundMessage message) throws RejectedExecutionException {
         if (this.getStatus() != ConnectionStatus.LOGGED_IN)
             throw new RejectedExecutionException("The NetworkAdapter has been stopped!");
@@ -145,7 +199,11 @@ public abstract class NetworkAdapter {
         }, executor);
     }
 
-    public final void submit(@NotNull InboundMessage message) throws RejectedExecutionException {
+    /**
+     * Submits a message to be handled by the NetworkAdapter.
+     * @throws RejectedExecutionException if the NetworkAdapter has been stopped.
+     */
+    protected final void submit(@NotNull InboundMessage message) throws RejectedExecutionException {
         if (this.getStatus() != ConnectionStatus.LOGGED_IN)
             throw new RejectedExecutionException("The NetworkAdapter has been stopped!");
 
@@ -153,10 +211,7 @@ public abstract class NetworkAdapter {
             initialMsg.handleResponse(message);
             conversations.remove(message.getConversation(), initialMsg);
         } else {
-            if (this.handleIncomingRequest(message)) {
-                conversations.remove(message.getConversation());
-                return;
-            }
+            if (this.handleIncomingRequest(message)) return;
         }
 
         // overwrite the current message for the callback code
@@ -166,10 +221,26 @@ public abstract class NetworkAdapter {
 
     /* - - - */
 
-    // TODO: replace this with something less weird (also implement reserving codes)
+    /**
+     * Requests a new conversation code. This will generate a random {@code long} value that is not yet in use.
+     * <p> This method has two technical weak points that can be ignored because of their extreme improbability of occurring:
+     * <ul>
+     *     <li> When calling this method on multiple Threads on the same time it would be possible to get the same result
+     *     on two or more calls. Due to the delay of registering the messages to the {@link NetworkAdapter#conversations}
+     *     map (which happens outside of this method) it would therefore be possible for 2 unrelated messages to have the
+     *     same conversation code.
+     *     <li> Because this method loops until a new conversation code has been found (that is not already registered to
+     *     conversation map) it would be possible for this method to loop infinitely by either generating the same random
+     *     value over and over or by every possible code already being taken.
+     * </ul>
+     * However, for either of these scenarios to occur the exact same long value would have to be generated twice within
+     * milliseconds or {@value Long#MAX_VALUE} conversations would have to be registered, which would also be impossible
+     * because the {@link NetworkAdapter#conversations} has a maximum capacity of {@code 2^16}.
+     */
     public long newConversation() {
         Long code = null;
         Random random = new Random();
+        // this should generally only run once but you never know
         while (code == null) {
             code = random.nextLong();
 
@@ -181,10 +252,21 @@ public abstract class NetworkAdapter {
 
     /* - - - */
 
+    /**
+     * Registers a new {@link RouteHandler} for a specific {@link Route}.
+     * @param route The route.
+     * @param handler The handler.
+     */
     public void registerHandler(@NotNull Route route, @NotNull RouteHandler handler) {
         handlers.put(route, handler);
     }
 
+    /**
+     * This method is called by {@link NetworkAdapter#submit(InboundMessage)} when the inbound message is not a response
+     * to an outbound message and therefore should be treated as an incoming request.
+     * @return {@code true} if the incoming message should <b>not</b> be registered to the conversation map because it
+     *         has been handled exceptionally.
+     */
     protected final boolean handleIncomingRequest(@NotNull InboundMessage msg) {
         Route route = msg.getRoute().route();
 
@@ -223,6 +305,7 @@ public abstract class NetworkAdapter {
         this.executor = null;
     }
 
+    /** Provides the current status of this NetworkAdapter. */
     public @NotNull ConnectionStatus getStatus() {
         return status;
     }
