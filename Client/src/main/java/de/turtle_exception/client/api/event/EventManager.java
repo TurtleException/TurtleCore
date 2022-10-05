@@ -1,4 +1,4 @@
-package de.turtle_exception.core.client.api.event;
+package de.turtle_exception.client.api.event;
 
 import com.google.common.collect.Sets;
 import org.jetbrains.annotations.NotNull;

@@ -1,8 +1,8 @@
-package de.turtle_exception.core.client.api.event.group;
+package de.turtle_exception.client.api.event.group;
 
-import de.turtle_exception.core.client.api.TurtleClient;
-import de.turtle_exception.core.client.api.entities.Group;
-import de.turtle_exception.core.client.api.event.Event;
+import de.turtle_exception.client.api.TurtleClient;
+import de.turtle_exception.client.api.entities.Group;
+import de.turtle_exception.client.api.event.Event;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class GroupEvent extends Event {

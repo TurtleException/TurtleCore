@@ -1,7 +1,7 @@
-package de.turtle_exception.core.client.api.event.group;
+package de.turtle_exception.client.api.event.group;
 
-import de.turtle_exception.core.client.api.TurtleClient;
-import de.turtle_exception.core.client.api.entities.Group;
+import de.turtle_exception.client.api.TurtleClient;
+import de.turtle_exception.client.api.entities.Group;
 import org.jetbrains.annotations.NotNull;
 
 public class GroupUpdateNameEvent extends GroupEvent {

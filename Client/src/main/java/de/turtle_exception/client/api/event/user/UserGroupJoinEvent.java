@@ -1,8 +1,8 @@
-package de.turtle_exception.core.client.api.event.user;
+package de.turtle_exception.client.api.event.user;
 
-import de.turtle_exception.core.client.api.TurtleClient;
-import de.turtle_exception.core.client.api.entities.Group;
-import de.turtle_exception.core.client.api.entities.User;
+import de.turtle_exception.client.api.TurtleClient;
+import de.turtle_exception.client.api.entities.Group;
+import de.turtle_exception.client.api.entities.User;
 import org.jetbrains.annotations.NotNull;
 
 public class UserGroupJoinEvent extends UserEvent {

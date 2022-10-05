@@ -1,9 +1,9 @@
-package de.turtle_exception.core.client.api.event;
+package de.turtle_exception.client.api.event;
 
-import de.turtle_exception.core.client.api.event.group.GroupUpdateNameEvent;
-import de.turtle_exception.core.client.api.event.user.UserGroupJoinEvent;
-import de.turtle_exception.core.client.api.event.user.UserGroupLeaveEvent;
-import de.turtle_exception.core.client.api.event.user.UserUpdateNameEvent;
+import de.turtle_exception.client.api.event.group.GroupUpdateNameEvent;
+import de.turtle_exception.client.api.event.user.UserGroupJoinEvent;
+import de.turtle_exception.client.api.event.user.UserGroupLeaveEvent;
+import de.turtle_exception.client.api.event.user.UserUpdateNameEvent;
 import de.turtle_exception.core.netcore.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 
