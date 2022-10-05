@@ -37,23 +37,21 @@ public class TurtleServer extends TurtleCore {
     private final Properties config = new Properties();
 
     private InternalServer internalServer;
-
-    private final DataService dataService;
+    private DataService    dataService;
 
     public TurtleServer() throws Exception {
         this.logger = Logger.getLogger("SERVER");
         this.logger.addHandler(LogUtil.getFileHandler(new SimpleFormatter()));
 
         this.config.load(new FileReader(new File(DIR, "server.properties")));
-
-        this.dataService = new DataServiceProvider(this).get();
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
     public void run() throws Exception {
         status.set(Status.INIT);
 
-        // TODO
+        logger.log(Level.INFO, "Initializing DataService...");
+        this.dataService = new DataServiceProvider(this).get();
 
         /* RUNNING */
 
