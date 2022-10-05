@@ -6,9 +6,7 @@ import de.turtle_exception.core.client.internal.ActionImpl;
 import de.turtle_exception.core.client.internal.TurtleClientImpl;
 import de.turtle_exception.core.core.net.ConnectionStatus;
 import de.turtle_exception.core.core.net.NetworkAdapter;
-import de.turtle_exception.core.core.net.message.InboundMessage;
 import de.turtle_exception.core.core.net.message.OutboundMessage;
-import de.turtle_exception.core.core.net.route.Route;
 import de.turtle_exception.core.core.net.route.Routes;
 import de.turtle_exception.core.core.util.AsyncLoopThread;
 import de.turtle_exception.core.core.util.logging.NestedLogger;
@@ -89,17 +87,6 @@ public class NetClient extends NetworkAdapter {
     @Override
     protected void send(@NotNull String msg) {
         this.out.println(msg);
-    }
-
-    @Override
-    protected boolean handleIncomingRequest(@NotNull InboundMessage msg) {
-        // let the superclass handle common routes
-        if (super.handleIncomingRequest(msg)) return true;
-
-        Route route = msg.getRoute().route();
-        // TODO: other incoming requests
-
-        return false;
     }
 
     /* - - - */

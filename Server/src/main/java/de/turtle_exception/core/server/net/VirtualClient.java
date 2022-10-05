@@ -2,8 +2,6 @@ package de.turtle_exception.core.server.net;
 
 import de.turtle_exception.core.core.net.ConnectionStatus;
 import de.turtle_exception.core.core.net.NetworkAdapter;
-import de.turtle_exception.core.core.net.message.InboundMessage;
-import de.turtle_exception.core.core.net.route.Route;
 import de.turtle_exception.core.core.util.AsyncLoopThread;
 import de.turtle_exception.core.core.util.logging.NestedLogger;
 import org.jetbrains.annotations.NotNull;
@@ -55,19 +53,6 @@ public class VirtualClient extends NetworkAdapter {
     @Override
     protected void send(@NotNull String msg) {
         this.out.println(msg);
-    }
-
-    /* - - - */
-
-    @Override
-    protected boolean handleIncomingRequest(@NotNull InboundMessage msg) {
-        // let the superclass handle common routes
-        if (super.handleIncomingRequest(msg)) return true;
-
-        Route route = msg.getRoute().route();
-        // TODO: other incoming requests
-
-        return false;
     }
 
     /* - - - */

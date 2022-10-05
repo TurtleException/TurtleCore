@@ -9,6 +9,7 @@ import de.turtle_exception.core.core.net.message.OutboundMessage;
 import de.turtle_exception.core.core.net.route.Route;
 import de.turtle_exception.core.core.net.route.RouteErrors;
 import de.turtle_exception.core.core.net.route.Routes;
+import de.turtle_exception.core.core.net.route.RouteHandler;
 import de.turtle_exception.core.core.util.AsyncLoopThread;
 import de.turtle_exception.core.core.util.logging.NestedLogger;
 import org.jetbrains.annotations.NotNull;
@@ -32,6 +33,7 @@ public abstract class NetworkAdapter {
     protected final NestedLogger logger;
 
     protected final ConcurrentHashMap<Long, Message> conversations = new ConcurrentHashMap<>();
+    protected final ConcurrentHashMap<Route, RouteHandler> handlers = new ConcurrentHashMap<>();
 
     protected ScheduledThreadPoolExecutor executor;
     protected AsyncLoopThread receiver;
@@ -50,6 +52,24 @@ public abstract class NetworkAdapter {
 
         this.login = login;
         this.pass  = pass;
+
+        this.registerHandler(Routes.OK      , (netAdapter, msg) -> {
+            logger.log(Level.INFO, "Dangling OK");
+        });
+        this.registerHandler(Routes.QUIT    , (netAdapter, msg) -> {
+            logger.log(Level.INFO, "Received QUIT message.");
+            try {
+                this.quit();
+            } catch (IOException e) {
+                logger.log(Level.WARNING, "Could not close socket properly.", e);
+            }
+        });
+        this.registerHandler(Routes.ERROR   , (netAdapter, msg) -> {
+            logger.log(Level.WARNING, "Dangling ERROR: " + msg.getRoute().content());
+        });
+        this.registerHandler(Routes.RESPONSE, (netAdapter, msg) -> {
+            logger.log(Level.INFO, "Dangling RESPONSE: " + msg.getRoute().content());
+        });
     }
 
     /* - - - */
@@ -133,8 +153,10 @@ public abstract class NetworkAdapter {
             initialMsg.handleResponse(message);
             conversations.remove(message.getConversation(), initialMsg);
         } else {
-            if (!this.handleIncomingRequest(message))
-                message.respond(RouteErrors.NOT_SUPPORTED.compile(), core.getDefaultTimeoutOutbound(), in -> { });
+            if (this.handleIncomingRequest(message)) {
+                conversations.remove(message.getConversation());
+                return;
+            }
         }
 
         // overwrite the current message for the callback code
@@ -159,27 +181,26 @@ public abstract class NetworkAdapter {
 
     /* - - - */
 
-    // TODO: handle inbound request
-    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-    protected boolean handleIncomingRequest(@NotNull InboundMessage msg) {
+    public void registerHandler(@NotNull Route route, @NotNull RouteHandler handler) {
+        handlers.put(route, handler);
+    }
+
+    protected final boolean handleIncomingRequest(@NotNull InboundMessage msg) {
         Route route = msg.getRoute().route();
 
-        if (route.equals(Routes.OK)) return true;
-        if (route.equals(Routes.QUIT)) {
-            logger.log(Level.INFO, "Received QUIT message.");
+        RouteHandler handler = handlers.get(route);
+        if (handler != null) {
             try {
-                this.quit();
-            } catch (IOException e) {
-                logger.log(Level.WARNING, "Could not close socket properly.", e);
+                handler.handle(this, msg);
+                return false;
+            } catch (Exception e) {
+                msg.respond(RouteErrors.UNKNOWN.with(e).compile(), System.currentTimeMillis() + core.getDefaultTimeoutOutbound(), in -> { });
+                return true;
             }
+        } else {
+            msg.respond(RouteErrors.NOT_SUPPORTED.compile(), core.getDefaultTimeoutOutbound(), in -> { });
             return true;
         }
-        if (route.equals(Routes.ERROR)) {
-            logger.log(Level.WARNING, "Dangling ERROR: " + msg.getRoute().content());
-            return true;
-        }
-
-        return false;
     }
 
     /* - - - */
