@@ -216,7 +216,7 @@ public class TurtleClientImpl extends TurtleCore implements TurtleClient {
     @SuppressWarnings("CodeBlock2Expr")
     @Override
     public @NotNull Action<User> retrieveUser(long id) {
-        return new ActionImpl<User>(this, Routes.Content.User.GET.setContent(String.valueOf(id)), (message, userRequest) -> {
+        return new ActionImpl<User>(this, Routes.User.GET.compile(null, String.valueOf(id)), (message, userRequest) -> {
             return EntityBuilder.buildUser(message.getRoute().content());
         }).onSuccess(user -> {
             userCache.removeIf(oldUser -> oldUser.getId() == id);
@@ -227,7 +227,7 @@ public class TurtleClientImpl extends TurtleCore implements TurtleClient {
     @SuppressWarnings("CodeBlock2Expr")
     @Override
     public @NotNull Action<List<User>> retrieveUsers() {
-        return new ActionImpl<List<User>>(this, Routes.Content.User.GET_ALL, (message, userRequest) -> {
+        return new ActionImpl<List<User>>(this, Routes.User.GET_ALL.compile(null), (message, userRequest) -> {
             return EntityBuilder.buildUsers(message.getRoute().content());
         }).onSuccess(l -> {
             userCache.clear();
@@ -238,7 +238,7 @@ public class TurtleClientImpl extends TurtleCore implements TurtleClient {
     @SuppressWarnings("CodeBlock2Expr")
     @Override
     public @NotNull Action<Group> retrieveGroup(long id) {
-        return new ActionImpl<Group>(this, Routes.Content.Group.GET.setContent(String.valueOf(id)), (message, userRequest) -> {
+        return new ActionImpl<Group>(this, Routes.Group.GET.compile(null, String.valueOf(id)), (message, userRequest) -> {
             return EntityBuilder.buildGroup(message.getRoute().content());
         }).onSuccess(group -> {
             groupCache.removeIf(oldGroup -> oldGroup.getId() == id);
@@ -249,7 +249,7 @@ public class TurtleClientImpl extends TurtleCore implements TurtleClient {
     @SuppressWarnings("CodeBlock2Expr")
     @Override
     public @NotNull Action<List<Group>> retrieveGroups() {
-        return new ActionImpl<List<Group>>(this, Routes.Content.Group.GET_ALL, (message, userRequest) -> {
+        return new ActionImpl<List<Group>>(this, Routes.Group.GET_ALL.compile(null), (message, userRequest) -> {
             return EntityBuilder.buildGroups(message.getRoute().content());
         }).onSuccess(l -> {
             groupCache.clear();

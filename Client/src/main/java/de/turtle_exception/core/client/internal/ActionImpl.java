@@ -5,7 +5,7 @@ import de.turtle_exception.core.client.api.requests.Action;
 import de.turtle_exception.core.client.api.requests.ActionFuture;
 import de.turtle_exception.core.client.api.requests.Request;
 import de.turtle_exception.core.core.net.message.Message;
-import de.turtle_exception.core.core.net.route.Route;
+import de.turtle_exception.core.core.net.route.CompiledRoute;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -15,7 +15,7 @@ import java.util.function.Consumer;
 
 public class ActionImpl<T> implements Action<T> {
     private final @NotNull TurtleClientImpl client;
-    protected Route route;
+    protected CompiledRoute route;
     protected BiFunction<Message, Request<T>, T> handler;
 
     private Consumer<? super T>         onSuccess = null;
@@ -24,7 +24,7 @@ public class ActionImpl<T> implements Action<T> {
     private boolean priority = false;
     private long deadline = 0;
 
-    public ActionImpl(@NotNull TurtleClient client, Route route, BiFunction<Message, Request<T>, T> handler) {
+    public ActionImpl(@NotNull TurtleClient client, CompiledRoute route, BiFunction<Message, Request<T>, T> handler) {
         this.client = (TurtleClientImpl) client;
         this.route = route;
         this.handler = handler;

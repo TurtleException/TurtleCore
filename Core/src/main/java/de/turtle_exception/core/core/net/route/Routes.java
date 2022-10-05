@@ -13,10 +13,11 @@ public class Routes {
     public static final Route RESPONSE = new Route(Method.RESPOND, "", true);
 
     public static class Group {
-        public static final Route GET    = new Route(Method.GET   , "groups/{group.id}", false);
-        public static final Route DEL    = new Route(Method.DELETE, "groups/{group.id}", false);
-        public static final Route CREATE = new Route(Method.PUT   , "groups"           , true );
-        public static final Route MODIFY = new Route(Method.PATCH , "groups/{group.id}", true );
+        public static final Route GET     = new Route(Method.GET   , "groups/{group.id}", false);
+        public static final Route GET_ALL = new Route(Method.GET   , "groups"           , false);
+        public static final Route DEL     = new Route(Method.DELETE, "groups/{group.id}", false);
+        public static final Route CREATE  = new Route(Method.PUT   , "groups"           , true );
+        public static final Route MODIFY  = new Route(Method.PATCH , "groups/{group.id}", true );
 
         public static final Route UPDATE = new Route(Method.UPDATE, "groups/{group.id}", true );
 
@@ -25,10 +26,11 @@ public class Routes {
     }
 
     public static class User {
-        public static final Route GET    = new Route(Method.GET   , "users/{user.id}", false);
-        public static final Route DEL    = new Route(Method.DELETE, "users/{user.id}", false);
-        public static final Route CREATE = new Route(Method.PUT   , "users"          , true );
-        public static final Route MODIFY = new Route(Method.PATCH , "users/{user.id}", true );
+        public static final Route GET     = new Route(Method.GET   , "users/{user.id}", false);
+        public static final Route GET_ALL = new Route(Method.GET   , "users"          , false);
+        public static final Route DEL     = new Route(Method.DELETE, "users/{user.id}", false);
+        public static final Route CREATE  = new Route(Method.PUT   , "users"          , true );
+        public static final Route MODIFY  = new Route(Method.PATCH , "users/{user.id}", true );
 
         public static final Route UPDATE = new Route(Method.UPDATE, "users/{user.id}", true );
 

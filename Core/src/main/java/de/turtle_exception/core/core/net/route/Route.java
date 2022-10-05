@@ -22,7 +22,7 @@ public class Route {
 
     /* - - - */
 
-    public CompiledRoute compile(String content, @NotNull String... args) throws IllegalArgumentException {
+    public CompiledRoute compile(String content, @NotNull Object... args) throws IllegalArgumentException {
         if (args.length != paramCount)
             throw new IllegalArgumentException("Incorrect amount of arguments (" + args.length + ") for " + paramCount + " parameters.");
 
@@ -40,7 +40,7 @@ public class Route {
             if (beginIndex <= endIndex)
                 throw new IllegalArgumentException("Unexpected order of parameter braces");
 
-            builder.replace(beginIndex, endIndex + 1, args[i]);
+            builder.replace(beginIndex, endIndex + 1, String.valueOf(args[i]));
         }
 
         return new CompiledRoute(this, method, builder.toString(), content);

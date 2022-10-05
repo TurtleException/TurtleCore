@@ -1,7 +1,7 @@
 package de.turtle_exception.core.client.internal.entities;
 
 import com.google.common.collect.Sets;
-import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import de.turtle_exception.core.client.api.TurtleClient;
 import de.turtle_exception.core.client.api.entities.Group;
 import de.turtle_exception.core.client.api.entities.User;
@@ -55,7 +55,9 @@ public class UserImpl implements User {
 
     @Override
     public @NotNull Action<Void> modifyName(@NotNull String name) {
-        return new ActionImpl<>(client, Routes.Content.User.MOD_NAME.setContent(getId() + " " + name), null);
+        JsonObject json = new JsonObject();
+        json.addProperty("name", name);
+        return new ActionImpl<>(client, Routes.User.MODIFY.compile(name, this.id), null);
     }
 
     @Override
@@ -71,12 +73,12 @@ public class UserImpl implements User {
 
     @Override
     public @NotNull Action<Void> joinGroup(long groupId) {
-        return new ActionImpl<>(client, Routes.Content.User.GROUP_JOIN.setContent(getId() + " " + groupId), null);
+        return new ActionImpl<>(client, Routes.Group.ADD_USER.compile(null, this.id, groupId), null);
     }
 
     @Override
     public @NotNull Action<Void> leaveGroup(long groupId) {
-        return new ActionImpl<>(client, Routes.Content.User.GROUP_LEAVE.setContent(getId() + " " + groupId), null);
+        return new ActionImpl<>(client, Routes.Group.DEL_USER.compile(null, this.id, groupId), null);
     }
 
     @Override
@@ -96,22 +98,12 @@ public class UserImpl implements User {
 
     @Override
     public @NotNull Action<Void> addDiscordId(long discordId) {
-        JsonArray json = new JsonArray();
-        for (Long aLong : discord)
-            json.add(aLong);
-        json.add(discordId);
-
-        return new ActionImpl<>(client, Routes.Content.User.DISCORD_SET.setContent(json.getAsString()), null);
+        return new ActionImpl<>(client, Routes.User.ADD_DISCORD.compile(null, this.id, discordId), null);
     }
 
     @Override
     public @NotNull Action<Void> removeDiscordId(long discordId) {
-        JsonArray json = new JsonArray();
-        for (Long aLong : discord)
-            if (!aLong.equals(discordId))
-                json.add(aLong);
-
-        return new ActionImpl<>(client, Routes.Content.User.DISCORD_SET.setContent(json.getAsString()), null);
+        return new ActionImpl<>(client, Routes.User.DEL_DISCORD.compile(null, this.id, discordId), null);
     }
 
     @Override
@@ -131,21 +123,11 @@ public class UserImpl implements User {
 
     @Override
     public @NotNull Action<Void> addMinecraftId(@NotNull UUID minecraftId) {
-        JsonArray json = new JsonArray();
-        for (UUID uuid : minecraft)
-            json.add(uuid.toString());
-        json.add(minecraftId.toString());
-
-        return new ActionImpl<>(client, Routes.Content.User.MINECRAFT_SET.setContent(json.getAsString()), null);
+        return new ActionImpl<>(client, Routes.User.ADD_MINECRAFT.compile(null, this.id, minecraftId), null);
     }
 
     @Override
     public @NotNull Action<Void> removeMinecraftId(@NotNull UUID minecraftId) {
-        JsonArray json = new JsonArray();
-        for (UUID uuid : minecraft)
-            if (!uuid.equals(minecraftId))
-                json.add(uuid.toString());
-
-        return new ActionImpl<>(client, Routes.Content.User.MINECRAFT_SET.setContent(json.getAsString()), null);
+        return new ActionImpl<>(client, Routes.User.DEL_MINECRAFT.compile(null, this.id, minecraftId), null);
     }
 }
