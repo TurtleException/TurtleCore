@@ -1,6 +1,6 @@
 package de.turtle_exception.server.data;
 
-import de.turtle_exception.core.netcore.util.Checks;
+import de.turtle_exception.core.util.Checks;
 import de.turtle_exception.server.TurtleServer;
 import de.turtle_exception.server.data.filesystem.FilesystemService;
 import de.turtle_exception.server.data.sql.SQLService;
