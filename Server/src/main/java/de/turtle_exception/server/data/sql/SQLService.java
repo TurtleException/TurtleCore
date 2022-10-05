@@ -3,6 +3,7 @@ package de.turtle_exception.server.data.sql;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import de.turtle_exception.core.util.ExceptionalFunction;
 import de.turtle_exception.server.data.DataAccessException;
 import de.turtle_exception.server.data.DataService;
 import org.jetbrains.annotations.NotNull;
@@ -12,7 +13,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.function.Function;
 
 /**
  * An implementation of {@link DataService} that uses a MySQL-server as database. All data is written to tables with
@@ -126,11 +126,15 @@ public class SQLService implements DataService {
     }
 
     @Override
-    public void modifyGroup(long group, @NotNull Function<JsonObject, JsonObject> function) throws DataAccessException {
+    public void modifyGroup(long group, @NotNull ExceptionalFunction<JsonObject, JsonObject> function) throws DataAccessException {
         // TODO: lock
 
         JsonObject json = this.getGroup(group);
-        json = function.apply(json);
+        try {
+            json = function.apply(json);
+        } catch (Exception e) {
+            throw new DataAccessException(e);
+        }
         this.setGroup(json);
     }
 
@@ -248,11 +252,15 @@ public class SQLService implements DataService {
     }
 
     @Override
-    public void modifyUser(long user, @NotNull Function<JsonObject, JsonObject> function) throws DataAccessException {
+    public void modifyUser(long user, @NotNull ExceptionalFunction<JsonObject, JsonObject> function) throws DataAccessException {
         // TODO: lock
 
         JsonObject json = this.getUser(user);
-        json = function.apply(json);
+        try {
+            json = function.apply(json);
+        } catch (Exception e) {
+            throw new DataAccessException(e);
+        }
         this.setUser(json);
     }
 

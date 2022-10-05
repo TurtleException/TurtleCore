@@ -1,6 +1,7 @@
 package de.turtle_exception.server.data.filesystem;
 
 import com.google.gson.*;
+import de.turtle_exception.core.util.ExceptionalFunction;
 import de.turtle_exception.server.data.DataAccessException;
 import de.turtle_exception.server.data.DataService;
 import org.jetbrains.annotations.NotNull;
@@ -10,7 +11,6 @@ import java.nio.file.NotDirectoryException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.function.Function;
 
 /**
  * An implementation of {@link DataService} that uses the local filesystem as database. All data is written into
@@ -196,10 +196,14 @@ public class FilesystemService implements DataService {
     }
 
     @Override
-    public void modifyGroup(long group, @NotNull Function<JsonObject, JsonObject> function) throws DataAccessException {
+    public void modifyGroup(long group, @NotNull ExceptionalFunction<JsonObject, JsonObject> function) throws DataAccessException {
         synchronized (groupLock) {
             JsonObject json = this.getGroupJson(group);
-            json = function.apply(json);
+            try {
+                json = function.apply(json);
+            } catch (Exception e) {
+                throw new DataAccessException(e);
+            }
             this.setGroupJson(json);
         }
     }
@@ -216,9 +220,7 @@ public class FilesystemService implements DataService {
     @Override
     public void addGroupMember(long group, long user) throws DataAccessException {
         this.modifyGroup(group, json -> {
-            JsonArray members = json.getAsJsonArray("members");
-            members.add(user);
-            json.add("members", members);
+            addElementToJsonArray(json, "members", new JsonPrimitive(user));
             return json;
         });
     }
@@ -226,16 +228,7 @@ public class FilesystemService implements DataService {
     @Override
     public void delGroupMember(long group, long user) throws DataAccessException {
         this.modifyGroup(group, json -> {
-            JsonArray members = json.getAsJsonArray("members");
-
-            for (int i = 0; i < members.size(); i++) {
-                if (members.get(i).getAsLong() == user) {
-                    members.remove(i);
-                    break;
-                }
-            }
-
-            json.add("members", members);
+            removeElementFromJsonArray(json, "members", String.valueOf(user));
             return json;
         });
     }
@@ -244,7 +237,7 @@ public class FilesystemService implements DataService {
     public @NotNull List<Long> getUserIds() {
         File[] userFiles;
         synchronized (userLock) {
-            userFiles  = dirUsers.listFiles();
+            userFiles = dirUsers.listFiles();
         }
 
         if (userFiles == null) return List.of();
@@ -321,10 +314,14 @@ public class FilesystemService implements DataService {
     }
 
     @Override
-    public void modifyUser(long user, @NotNull Function<JsonObject, JsonObject> function) throws DataAccessException {
+    public void modifyUser(long user, @NotNull ExceptionalFunction<JsonObject, JsonObject> function) throws DataAccessException {
         synchronized (userLock) {
             JsonObject json = this.getUserJson(user);
-            json = function.apply(json);
+            try {
+                json = function.apply(json);
+            } catch (Exception e) {
+                throw new DataAccessException(e);
+            }
             this.setUserJson(json);
         }
     }
@@ -343,9 +340,7 @@ public class FilesystemService implements DataService {
     @Override
     public void addUserDiscord(long user, long discord) throws DataAccessException {
         this.modifyUser(user, json -> {
-            JsonArray arr = json.getAsJsonArray("discord");
-            arr.add(discord);
-            json.add("discord", arr);
+            addElementToJsonArray(json, "discord", new JsonPrimitive(discord));
             return json;
         });
     }
@@ -353,16 +348,7 @@ public class FilesystemService implements DataService {
     @Override
     public void delUserDiscord(long user, long discord) throws DataAccessException {
         this.modifyUser(user, json -> {
-            JsonArray arr = json.getAsJsonArray("discord");
-
-            for (int i = 0; i < arr.size(); i++) {
-                if (arr.get(i).getAsLong() == discord) {
-                    arr.remove(i);
-                    break;
-                }
-            }
-
-            json.add("discord", arr);
+            removeElementFromJsonArray(json, "discord", String.valueOf(discord));
             return json;
         });
     }
@@ -373,7 +359,7 @@ public class FilesystemService implements DataService {
         synchronized (userLock) {
             json = this.getUserJson(user);
         }
-        JsonArray  minecraft = json.getAsJsonArray("minecraft");
+        JsonArray minecraft = json.getAsJsonArray("minecraft");
 
         return minecraft != null ? minecraft : new JsonArray();
     }
@@ -381,6 +367,8 @@ public class FilesystemService implements DataService {
     @Override
     public void addUserMinecraft(long user, @NotNull UUID minecraft) throws DataAccessException {
         this.modifyUser(user, json -> {
+            addElementToJsonArray(json, "minecraft", new JsonPrimitive(minecraft.toString()));
+
             JsonArray arr = json.getAsJsonArray("minecraft");
             arr.add(minecraft.toString());
             json.add("minecraft", arr);
@@ -391,17 +379,39 @@ public class FilesystemService implements DataService {
     @Override
     public void delUserMinecraft(long user, @NotNull UUID minecraft) throws DataAccessException {
         this.modifyUser(user, json -> {
-            JsonArray arr = json.getAsJsonArray("minecraft");
+            removeElementFromJsonArray(json, "minecraft", minecraft.toString());
+            return json;
+        });
+    }
 
-            for (int i = 0; i < arr.size(); i++) {
-                if (UUID.fromString(arr.get(i).getAsString()) == minecraft) {
+    /* - - - */
+
+    private static void removeElementFromJsonArray(@NotNull JsonObject json, @NotNull String keyToArray, @NotNull String element) throws DataAccessException {
+        modifyJsonArray(json, keyToArray, arr -> {
+            for (int i = 0; i < arr.size(); i++)
+                if (element.equals(arr.get(i).getAsString())) {
                     arr.remove(i);
                     break;
                 }
-            }
-
-            json.add("minecraft", arr);
-            return json;
+            return arr;
         });
+    }
+
+    private static void addElementToJsonArray(@NotNull JsonObject json, @NotNull String keyToArray, @NotNull JsonElement element) throws DataAccessException {
+        modifyJsonArray(json, keyToArray, arr -> {
+            arr.add(element);
+            return arr;
+        });
+    }
+
+    private static void modifyJsonArray(@NotNull JsonObject json, @NotNull String keyToArray, @NotNull ExceptionalFunction<JsonArray, JsonArray> function) throws DataAccessException {
+        try {
+            JsonElement element = json.get(keyToArray);
+            JsonArray   array   = element != null ? (JsonArray) element : new JsonArray();
+
+            json.add(keyToArray, function.apply(array));
+        } catch (Exception e) {
+            throw new DataAccessException(e);
+        }
     }
 }

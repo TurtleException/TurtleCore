@@ -2,11 +2,11 @@ package de.turtle_exception.server.data;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import de.turtle_exception.core.util.ExceptionalFunction;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.function.Function;
 
 public interface DataService {
     /**
@@ -62,7 +62,7 @@ public interface DataService {
      */
     void deleteGroup(long id) throws DataAccessException;
 
-    void modifyGroup(long group, @NotNull Function<JsonObject, JsonObject> function) throws DataAccessException;
+    void modifyGroup(long group, @NotNull ExceptionalFunction<JsonObject, JsonObject> function) throws DataAccessException;
 
     /**
      * Provides a List containing the ids of all users that are members of the given group.
@@ -133,7 +133,7 @@ public interface DataService {
      */
     void deleteUser(long id) throws DataAccessException;
 
-    void modifyUser(long user, @NotNull Function<JsonObject, JsonObject> function) throws DataAccessException;
+    void modifyUser(long user, @NotNull ExceptionalFunction<JsonObject, JsonObject> function) throws DataAccessException;
 
     /**
      * Provides a List containing the ids of all Discord accounts associated with this user.
