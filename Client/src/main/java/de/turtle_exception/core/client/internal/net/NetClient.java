@@ -1,5 +1,6 @@
 package de.turtle_exception.core.client.internal.net;
 
+import com.google.gson.JsonObject;
 import de.turtle_exception.core.client.api.TurtleClient;
 import de.turtle_exception.core.client.api.entities.Group;
 import de.turtle_exception.core.client.api.entities.User;
@@ -45,7 +46,7 @@ public class NetClient extends NetworkAdapter {
         this.port = port;
 
         this.registerHandler(Routes.Group.UPDATE, (netAdapter, msg) -> {
-            Group group = EntityBuilder.buildGroup(msg.getRoute().content());
+            Group group = EntityBuilder.buildGroup((JsonObject) msg.getRoute().content());
             client.getGroupCache().add(group);
             // TODO: event
         });
@@ -55,7 +56,7 @@ public class NetClient extends NetworkAdapter {
             // TODO: event
         });
         this.registerHandler(Routes.User.UPDATE, (netAdapter, msg) -> {
-            User user = EntityBuilder.buildUser(msg.getRoute().content());
+            User user = EntityBuilder.buildUser((JsonObject) msg.getRoute().content());
             client.getUserCache().add(user);
             // TODO: event
         });
