@@ -3,10 +3,12 @@ package de.turtle_exception.client.internal.entities;
 import com.google.gson.JsonObject;
 import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.api.entities.Group;
+import de.turtle_exception.client.api.entities.User;
 import de.turtle_exception.client.api.requests.Action;
 import de.turtle_exception.client.internal.ActionImpl;
 import de.turtle_exception.core.net.route.Routes;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class GroupImpl implements Group {
     private final @NotNull TurtleClient client;
@@ -44,5 +46,12 @@ public class GroupImpl implements Group {
 
     public void setName(@NotNull String name) {
         this.name = name;
+    }
+
+    /* - - - */
+
+    @Override
+    public @Nullable User getUserById(long id) {
+        // TODO
     }
 }

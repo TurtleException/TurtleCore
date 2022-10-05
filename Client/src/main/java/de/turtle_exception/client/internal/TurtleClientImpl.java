@@ -107,6 +107,11 @@ public class TurtleClientImpl extends TurtleCore implements TurtleClient {
     }
 
     @Override
+    public @Nullable Group getGroupById(long id) {
+        return groupCache.get(id);
+    }
+
+    @Override
     public @Nullable User getUserById(long id) {
         return userCache.get(id);
     }
