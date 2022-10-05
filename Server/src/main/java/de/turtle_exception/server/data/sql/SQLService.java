@@ -22,6 +22,10 @@ import java.util.UUID;
 public class SQLService implements DataService {
     private final SQLConnector sqlConnector;
 
+    // These locks are used to prevent reading old data while it is being rewritten by another Thread
+    private final Object groupLock = new Object();
+    private final Object userLock  = new Object();
+
     public SQLService(@NotNull String host, int port, @NotNull String database, @NotNull String login, @NotNull String pass) throws SQLException {
         this.sqlConnector = new SQLConnector(host, port, database, login, pass);
 
@@ -127,15 +131,15 @@ public class SQLService implements DataService {
 
     @Override
     public void modifyGroup(long group, @NotNull ExceptionalFunction<JsonObject, JsonObject> function) throws DataAccessException {
-        // TODO: lock
-
-        JsonObject json = this.getGroup(group);
-        try {
-            json = function.apply(json);
-        } catch (Exception e) {
-            throw new DataAccessException(e);
+        synchronized (groupLock) {
+            JsonObject json = this.getGroup(group);
+            try {
+                json = function.apply(json);
+            } catch (Exception e) {
+                throw new DataAccessException(e);
+            }
+            this.setGroup(json);
         }
-        this.setGroup(json);
     }
 
     @Override
@@ -253,15 +257,15 @@ public class SQLService implements DataService {
 
     @Override
     public void modifyUser(long user, @NotNull ExceptionalFunction<JsonObject, JsonObject> function) throws DataAccessException {
-        // TODO: lock
-
-        JsonObject json = this.getUser(user);
-        try {
-            json = function.apply(json);
-        } catch (Exception e) {
-            throw new DataAccessException(e);
+        synchronized (userLock) {
+            JsonObject json = this.getUser(user);
+            try {
+                json = function.apply(json);
+            } catch (Exception e) {
+                throw new DataAccessException(e);
+            }
+            this.setUser(json);
         }
-        this.setUser(json);
     }
 
     @Override
