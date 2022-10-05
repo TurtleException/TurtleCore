@@ -46,13 +46,13 @@ public class TurtleClientImpl extends TurtleCore implements TurtleClient {
     private final TurtleSet<User> userCache = new TurtleSet<>();
     private final TurtleSet<Group> groupCache = new TurtleSet<>();
 
-    public TurtleClientImpl(@Nullable String name, @NotNull String host, @Range(from = 0, to = 65535) int port, @NotNull String login, @NotNull String pass) throws IOException, LoginException {
+    public TurtleClientImpl(@Nullable String name, @NotNull Logger logger, @NotNull String host, @Range(from = 0, to = 65535) int port, @NotNull String login, @NotNull String pass) throws IOException, LoginException {
         this.version = Version.retrieveFromResources(TurtleClient.class);
         if (this.version == null)
             throw new IOException("Illegal version");
 
         this.name = name;
-        this.logger = Logger.getLogger(name != null ? "CLIENT#" + name : "CLIENT");
+        this.logger = logger;
 
         this.callbackExecutor = new ScheduledThreadPoolExecutor(4, (r, executor) -> logger.log(Level.WARNING, "A callback task was rejected by the executor: ", r));
         this.netClient = new NetClient(this, host, port, login, pass);

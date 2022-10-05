@@ -8,6 +8,7 @@ import org.jetbrains.annotations.Nullable;
 import javax.security.auth.login.LoginException;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Logger;
 
 /**
  * The TurtleClientBuilder is used to instantiate the {@link TurtleClient} interface, while avoiding an explicit
@@ -25,6 +26,8 @@ public class TurtleClientBuilder {
     private @Nullable String login;
     private @Nullable String pass;
 
+    private @Nullable Logger logger;
+
     public TurtleClientBuilder() { }
 
     public @NotNull TurtleClient build() throws IllegalArgumentException, IOException, LoginException {
@@ -37,7 +40,10 @@ public class TurtleClientBuilder {
             throw new IllegalArgumentException(e);
         }
 
-        return new TurtleClientImpl(String.valueOf(increment.getAndIncrement()), host, port, login, pass);
+        String name   = String.valueOf(increment.getAndIncrement());
+        Logger logger = this.logger != null ? this.logger : Logger.getLogger("CLIENT#" + name);
+
+        return new TurtleClientImpl(name, logger, host, port, login, pass);
     }
 
     /* - - - */
@@ -62,6 +68,11 @@ public class TurtleClientBuilder {
         return this;
     }
 
+    public TurtleClientBuilder setLogger(Logger logger) {
+        this.logger = logger;
+        return this;
+    }
+
     /* - - - */
 
     public @Nullable String getHost() {
@@ -78,5 +89,9 @@ public class TurtleClientBuilder {
 
     public @Nullable String getPass() {
         return pass;
+    }
+
+    public @Nullable Logger getLogger() {
+        return logger;
     }
 }
