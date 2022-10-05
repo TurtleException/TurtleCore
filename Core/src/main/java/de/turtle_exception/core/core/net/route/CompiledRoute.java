@@ -7,14 +7,14 @@ import org.jetbrains.annotations.Nullable;
 public record CompiledRoute(
         @NotNull Route route,
         @NotNull Method method,
-        @NotNull String routeStr,
+        @NotNull String[] args,
         @Nullable String content
 ) {
     public boolean isRoute(@NotNull Route route) {
         return this.route.getRoute().equals(route.getRoute());
     }
 
-    public static CompiledRoute of(@NotNull String routeRaw, @NotNull String routeCompiled, @NotNull Method method, @Nullable String content) throws IllegalArgumentException {
+    public static CompiledRoute of(@NotNull String routeRaw, @NotNull String[] args, @NotNull Method method, @Nullable String content) throws IllegalArgumentException {
         Route route = null;
         for (Route checkRoute : Routes.getRoutes()) {
             if (!checkRoute.getMethod().equals(method))  continue;
@@ -26,6 +26,6 @@ public record CompiledRoute(
         if (route == null)
             throw new IllegalArgumentException("Unknown route: " + routeRaw);
 
-        return route.compileReplacing(content, routeCompiled);
+        return route.compileReplacing(content, args);
     }
 }

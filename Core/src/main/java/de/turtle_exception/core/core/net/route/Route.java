@@ -31,23 +31,16 @@ public class Route {
         if (content != null && !hasContent)
             throw new IllegalArgumentException("Unexpected non-null content. This route does not support content.");
 
-        StringBuilder builder = new StringBuilder(this.route);
-
-        for (int i = 0; i < paramCount; i++) {
-            int beginIndex = builder.indexOf("{");
-            int   endIndex = builder.indexOf("}");
-
-            if (beginIndex <= endIndex)
-                throw new IllegalArgumentException("Unexpected order of parameter braces");
-
-            builder.replace(beginIndex, endIndex + 1, String.valueOf(args[i]));
+        String[] stringArgs = new String[args.length];
+        for (int i = 0; i < args.length; i++) {
+            stringArgs[i] = String.valueOf(args[i]);
         }
 
-        return new CompiledRoute(this, method, builder.toString(), content);
+        return new CompiledRoute(this, method, stringArgs, content);
     }
 
-    CompiledRoute compileReplacing(String content, String route) {
-        return new CompiledRoute(this, method, route, content);
+    CompiledRoute compileReplacing(String content, String[] args) {
+        return new CompiledRoute(this, method, args, content);
     }
 
     /* - - - */

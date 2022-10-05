@@ -1,6 +1,7 @@
 package de.turtle_exception.core.core.net.message;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import de.turtle_exception.core.core.TurtleCore;
 import de.turtle_exception.core.core.net.NetworkAdapter;
@@ -14,8 +15,12 @@ public class MessageParser {
         JsonObject json = new JsonObject();
 
         JsonObject route = new JsonObject();
-        route.addProperty("raw", msg.getRoute().route().getRoute());
-        route.addProperty("compiled", msg.getRoute().routeStr());
+        route.addProperty("route", msg.getRoute().route().getRoute());
+
+        JsonArray routeArgs = new JsonArray();
+        for (String arg : msg.getRoute().args())
+            routeArgs.add(arg);
+        route.add("arguments", routeArgs);
 
         json.addProperty("code", msg.getConversation());
         json.addProperty("method", msg.getRoute().method().getName());
@@ -29,13 +34,20 @@ public class MessageParser {
         try {
             JsonObject json = new Gson().fromJson(msg, JsonObject.class);
 
-            JsonObject routeJson     = json.getAsJsonObject("route");
-            String     routeRaw      = routeJson.get("raw").getAsString();
-            String     routeCompiled = routeJson.get("compiled").getAsString();
+            JsonObject routeJson = json.getAsJsonObject("route");
+            String     routeRaw  = routeJson.get("route").getAsString();
+            JsonArray  routeArgs = routeJson.getAsJsonArray("arguments");
 
             long conversation = json.get("code").getAsLong();
             String  methodStr = json.get("method").getAsString();
             String contentStr = json.get("content").getAsString();
+
+            String[] args = new String[0];
+            if (routeArgs != null) {
+                args = new String[routeArgs.size()];
+                for (int i = 0; i < routeArgs.size(); i++)
+                    args[i] = routeArgs.get(i).getAsString();
+            }
 
             Method method = null;
             for (Method value : Method.values()) {
@@ -45,11 +57,10 @@ public class MessageParser {
                 }
             }
 
-            Checks.nonNull(routeRaw     , "Raw Route"     );
-            Checks.nonNull(routeCompiled, "Compiled Route");
-            Checks.nonNull(method       , "Method"        );
+            Checks.nonNull(routeRaw , "Raw Route"     );
+            Checks.nonNull(method   , "Method"        );
 
-            CompiledRoute route = CompiledRoute.of(routeRaw, routeCompiled, method, contentStr);
+            CompiledRoute route = CompiledRoute.of(routeRaw, args, method, contentStr);
             long deadline = System.currentTimeMillis() + core.getDefaultTimeoutInbound();
 
             return new InboundMessage(core, adapter, conversation, route, deadline);
