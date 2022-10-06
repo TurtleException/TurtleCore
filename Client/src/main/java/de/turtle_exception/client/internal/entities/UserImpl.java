@@ -13,18 +13,21 @@ import java.util.List;
 import java.util.UUID;
 
 public class UserImpl implements User {
-    private final @NotNull TurtleClient client;
+    private final TurtleClient client;
     private final long id;
 
     private String name;
 
-    private ArrayList<Long> discord   = new ArrayList<>();
-    private ArrayList<UUID> minecraft = new ArrayList<>();
+    private final ArrayList<Long> discord;
+    private final ArrayList<UUID> minecraft;
 
-    UserImpl(@NotNull TurtleClient client, long id, String name) {
+    UserImpl(TurtleClient client, long id, String name, ArrayList<Long> discord, ArrayList<UUID> minecraft) {
         this.client = client;
         this.id = id;
         this.name = name;
+
+        this.discord   = discord;
+        this.minecraft = minecraft;
     }
 
     @Override
@@ -63,16 +66,6 @@ public class UserImpl implements User {
         return List.copyOf(discord);
     }
 
-    /** Provides the underlying (modifiable) set of Discord ids this user is associated with. */
-    public @NotNull ArrayList<Long> getDiscordIdSet() {
-        return discord;
-    }
-
-    /** Changes the underlying set of Discord ids this user is associated with. */
-    public void setDiscordIdSet(@NotNull List<Long> list) {
-        this.discord = new ArrayList<>(list);
-    }
-
     @Override
     public @NotNull Action<Void> addDiscordId(long discordId) {
         return new ActionImpl<>(client, Routes.User.ADD_DISCORD.compile(null, this.id, discordId), null);
@@ -88,16 +81,6 @@ public class UserImpl implements User {
     @Override
     public @NotNull List<UUID> getMinecraftIds() {
         return List.copyOf(minecraft);
-    }
-
-    /** Provides the underlying (modifiable) set of Minecraft ids this user is associated with. */
-    public @NotNull ArrayList<UUID> getMinecraftIdSet() {
-        return minecraft;
-    }
-
-    /** Changes the underlying set of Discord ids this user is associated with. */
-    public void setMinecraftIdSet(@NotNull List<UUID> list) {
-        this.minecraft = new ArrayList<>(list);
     }
 
     @Override

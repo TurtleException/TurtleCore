@@ -50,7 +50,7 @@ public class NetClient extends NetworkAdapter {
         this.port = port;
 
         this.registerHandler(Routes.Group.UPDATE, (netAdapter, msg) -> {
-            Group newGroup = EntityBuilder.buildGroup((JsonObject) msg.getRoute().content());
+            Group newGroup = EntityBuilder.buildGroup(client, (JsonObject) msg.getRoute().content());
             Group oldGroup = client.getGroupCache().put(newGroup);
             UpdateHelper.handleGroupUpdate(oldGroup, newGroup);
         });
@@ -60,7 +60,7 @@ public class NetClient extends NetworkAdapter {
             client.getEventManager().handleEvent(new GroupDeleteEvent(old));
         });
         this.registerHandler(Routes.User.UPDATE, (netAdapter, msg) -> {
-            User newUser = EntityBuilder.buildUser((JsonObject) msg.getRoute().content());
+            User newUser = EntityBuilder.buildUser(client, (JsonObject) msg.getRoute().content());
             User oldUser = client.getUserCache().put(newUser);
             UpdateHelper.handleUserUpdate(oldUser, newUser);
         });
