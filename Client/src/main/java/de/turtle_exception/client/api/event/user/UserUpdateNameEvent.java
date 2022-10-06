@@ -4,6 +4,7 @@ import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.api.entities.User;
 import org.jetbrains.annotations.NotNull;
 
+@SuppressWarnings("unused")
 public class UserUpdateNameEvent extends UserEvent {
     private final String oldName;
     private final String newName;

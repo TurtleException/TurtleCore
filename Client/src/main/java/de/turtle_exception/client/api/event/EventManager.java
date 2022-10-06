@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
 
+@SuppressWarnings("unused")
 public class EventManager {
     private final Set<EventListener> listeners = Sets.newConcurrentHashSet();
 

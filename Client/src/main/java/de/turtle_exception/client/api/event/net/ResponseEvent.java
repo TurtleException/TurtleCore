@@ -5,6 +5,7 @@ import de.turtle_exception.client.api.requests.Request;
 import de.turtle_exception.core.net.message.InboundMessage;
 import org.jetbrains.annotations.NotNull;
 
+@SuppressWarnings("unused")
 public class ResponseEvent extends Event {
     protected final Request<?> request;
     protected final InboundMessage msg;

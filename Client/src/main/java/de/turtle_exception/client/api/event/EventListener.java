@@ -10,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import java.lang.reflect.Method;
 import java.util.logging.Level;
 
+@SuppressWarnings("unused")
 public abstract class EventListener {
     public void onGenericEvent(@NotNull Event event) { }
 

@@ -6,6 +6,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
+@SuppressWarnings("unused")
 public class UserMinecraftAddEvent extends UserEvent {
     protected final UUID uuid;
 
