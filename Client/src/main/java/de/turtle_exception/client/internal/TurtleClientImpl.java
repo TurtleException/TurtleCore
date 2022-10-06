@@ -107,6 +107,16 @@ public class TurtleClientImpl extends TurtleCore implements TurtleClient {
     }
 
     @Override
+    public @NotNull List<Group> getGroups() {
+        return List.copyOf(groupCache);
+    }
+
+    @Override
+    public @NotNull List<User> getUsers() {
+        return List.copyOf(userCache);
+    }
+
+    @Override
     public @Nullable Group getGroupById(long id) {
         return groupCache.get(id);
     }

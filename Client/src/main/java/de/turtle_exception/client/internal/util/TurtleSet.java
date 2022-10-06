@@ -61,17 +61,21 @@ public class TurtleSet<T extends Turtle> implements Set<T> {
         return content.put(t.getId(), t) == null;
     }
 
+    public @Nullable T put(@NotNull T t) {
+        return content.put(t.getId(), t);
+    }
+
     @Override
     public boolean remove(Object o) {
         return content.remove(o) != null;
     }
 
-    public boolean removeStringId(@NotNull String id) {
-        try {
-            return this.remove(Long.parseLong(id));
-        } catch (NumberFormatException e) {
-            return false;
-        }
+    public T removeById(long id) {
+        return content.remove(id);
+    }
+
+    public T removeById(@NotNull String str) throws NumberFormatException {
+        return this.removeById(Long.parseLong(str));
     }
 
     @Override
