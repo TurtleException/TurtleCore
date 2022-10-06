@@ -1,6 +1,9 @@
 package de.turtle_exception.client.internal.net;
 
 import com.google.gson.JsonObject;
+import de.turtle_exception.client.api.event.group.GroupDeleteEvent;
+import de.turtle_exception.client.api.event.net.RequestEvent;
+import de.turtle_exception.client.api.event.user.UserDeleteEvent;
 import de.turtle_exception.client.api.requests.Request;
 import de.turtle_exception.client.internal.entities.EntityBuilder;
 import de.turtle_exception.client.api.TurtleClient;
@@ -8,6 +11,7 @@ import de.turtle_exception.client.api.entities.Group;
 import de.turtle_exception.client.api.entities.User;
 import de.turtle_exception.client.internal.ActionImpl;
 import de.turtle_exception.client.internal.TurtleClientImpl;
+import de.turtle_exception.client.internal.event.UpdateHelper;
 import de.turtle_exception.core.net.ConnectionStatus;
 import de.turtle_exception.core.net.NetworkAdapter;
 import de.turtle_exception.core.net.message.OutboundMessage;
@@ -46,24 +50,24 @@ public class NetClient extends NetworkAdapter {
         this.port = port;
 
         this.registerHandler(Routes.Group.UPDATE, (netAdapter, msg) -> {
-            Group group = EntityBuilder.buildGroup((JsonObject) msg.getRoute().content());
-            client.getGroupCache().add(group);
-            // TODO: event
+            Group newGroup = EntityBuilder.buildGroup((JsonObject) msg.getRoute().content());
+            Group oldGroup = client.getGroupCache().put(newGroup);
+            UpdateHelper.handleGroupUpdate(oldGroup, newGroup);
         });
         this.registerHandler(Routes.Group.REMOVE, (netAdapter, msg) -> {
             String id = msg.getRoute().args()[0];
-            client.getGroupCache().removeStringId(id);
-            // TODO: event
+            Group old = client.getGroupCache().removeById(id);
+            client.getEventManager().handleEvent(new GroupDeleteEvent(old));
         });
         this.registerHandler(Routes.User.UPDATE, (netAdapter, msg) -> {
-            User user = EntityBuilder.buildUser((JsonObject) msg.getRoute().content());
-            client.getUserCache().add(user);
-            // TODO: event
+            User newUser = EntityBuilder.buildUser((JsonObject) msg.getRoute().content());
+            User oldUser = client.getUserCache().put(newUser);
+            UpdateHelper.handleUserUpdate(oldUser, newUser);
         });
         this.registerHandler(Routes.User.REMOVE, (netAdapter, msg) -> {
             String id = msg.getRoute().args()[0];
-            client.getUserCache().removeStringId(id);
-            // TODO: event
+            User  old = client.getUserCache().removeById(id);
+            client.getEventManager().handleEvent(new UserDeleteEvent(old));
         });
     }
 
@@ -117,6 +121,7 @@ public class NetClient extends NetworkAdapter {
     /* - - - */
 
     public <T> void request(@NotNull Request<T> request) {
+        client.getEventManager().handleEvent(new RequestEvent(request));
         try {
             this.submit(new OutboundMessage(client, newConversation(), request.getRoute(), request.getDeadline(), request::handleResponse));
         } catch (Throwable t) {

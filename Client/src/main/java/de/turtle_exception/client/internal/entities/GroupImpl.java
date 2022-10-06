@@ -6,15 +6,20 @@ import de.turtle_exception.client.api.entities.Group;
 import de.turtle_exception.client.api.entities.User;
 import de.turtle_exception.client.api.requests.Action;
 import de.turtle_exception.client.internal.ActionImpl;
+import de.turtle_exception.client.internal.util.TurtleSet;
 import de.turtle_exception.core.net.route.Routes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public class GroupImpl implements Group {
     private final @NotNull TurtleClient client;
     private final long id;
 
     private String name;
+
+    private final TurtleSet<User> users = new TurtleSet<>();
 
     GroupImpl(@NotNull TurtleClient client, long id, String name) {
         this.client = client;
@@ -32,9 +37,15 @@ public class GroupImpl implements Group {
         return this.id;
     }
 
+    /* - NAME - */
+
     @Override
     public @NotNull String getName() {
         return this.name;
+    }
+
+    public void setName(@NotNull String name) {
+        this.name = name;
     }
 
     @Override
@@ -44,14 +55,29 @@ public class GroupImpl implements Group {
         return new ActionImpl<>(client, Routes.Group.MODIFY.compile(json, this.id), null);
     }
 
-    public void setName(@NotNull String name) {
-        this.name = name;
+    /* - MEMBERS - */
+
+    @Override
+    public @NotNull List<User> getUsers() {
+        return List.copyOf(users);
     }
 
-    /* - - - */
+    public @NotNull TurtleSet<User> getUserSet() {
+        return users;
+    }
 
     @Override
     public @Nullable User getUserById(long id) {
-        // TODO
+        return users.get(id);
+    }
+
+    @Override
+    public @NotNull Action<Void> addUser(long user) {
+        return new ActionImpl<>(client, Routes.Group.ADD_USER.compile(null, this.id, user), null);
+    }
+
+    @Override
+    public @NotNull Action<Void> removeUser(long user) {
+        return new ActionImpl<>(client, Routes.Group.DEL_USER.compile(null, this.id, user), null);
     }
 }

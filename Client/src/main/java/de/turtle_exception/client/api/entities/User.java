@@ -3,6 +3,7 @@ package de.turtle_exception.client.api.entities;
 import de.turtle_exception.client.api.requests.Action;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -12,25 +13,33 @@ public interface User extends Turtle {
 
     @NotNull Action<Void> modifyName(@NotNull String name);
 
-    @NotNull List<Group> getGroups();
+    /* - GROUPS - */
 
-    @NotNull Action<Void> joinGroup(long groupId);
+    default @NotNull List<Group> getGroups() {
+        ArrayList<Group> groups = new ArrayList<>();
+        for (Group group : getClient().getGroups())
+            if (group.getUserById(this.getId()) != null)
+                groups.add(group);
+        return List.copyOf(groups);
+    }
 
     default @NotNull Action<Void> joinGroup(@NotNull Group group) {
-        return this.joinGroup(group.getId());
+        return group.addUser(this);
     }
-
-    @NotNull Action<Void> leaveGroup(long groupId);
 
     default @NotNull Action<Void> leaveGroup(@NotNull Group group) {
-        return this.leaveGroup(group.getId());
+        return group.removeUser(this);
     }
+
+    /* - DISCORD - */
 
     @NotNull List<Long> getDiscordIds();
 
     @NotNull Action<Void> addDiscordId(long discordId);
 
     @NotNull Action<Void> removeDiscordId(long discordId);
+
+    /* - MINECRAFT - */
 
     @NotNull List<UUID> getMinecraftIds();
 

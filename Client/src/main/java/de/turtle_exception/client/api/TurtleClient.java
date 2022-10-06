@@ -4,6 +4,7 @@ import de.turtle_exception.client.api.entities.Group;
 import de.turtle_exception.client.api.entities.User;
 import de.turtle_exception.client.api.entities.attribute.IGroupContainer;
 import de.turtle_exception.client.api.entities.attribute.IUserContainer;
+import de.turtle_exception.client.api.event.EventManager;
 import de.turtle_exception.client.api.requests.Action;
 import org.jetbrains.annotations.NotNull;
 
@@ -16,6 +17,8 @@ import java.util.logging.Logger;
 public interface TurtleClient extends IUserContainer, IGroupContainer {
     @NotNull
     Logger getLogger();
+
+    @NotNull EventManager getEventManager();
 
     @NotNull Consumer<Object> getDefaultActionSuccess();
 

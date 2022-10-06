@@ -2,13 +2,14 @@ package de.turtle_exception.client.internal;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.api.entities.Group;
 import de.turtle_exception.client.api.entities.User;
+import de.turtle_exception.client.api.event.EventManager;
 import de.turtle_exception.client.api.requests.Action;
 import de.turtle_exception.client.internal.entities.EntityBuilder;
 import de.turtle_exception.client.internal.net.NetClient;
 import de.turtle_exception.client.internal.util.TurtleSet;
-import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.core.TurtleCore;
 import de.turtle_exception.core.net.route.Routes;
 import de.turtle_exception.core.util.version.Version;
@@ -33,6 +34,8 @@ public class TurtleClientImpl extends TurtleCore implements TurtleClient {
     /** Name of this instance. Naming is not required, but it may be helpful when using multiple instances. */
     private final @Nullable String name;
 
+    private final EventManager eventManager;
+
     /** The internal network part of the client */
     private final NetClient netClient;
 
@@ -54,6 +57,8 @@ public class TurtleClientImpl extends TurtleCore implements TurtleClient {
         this.name = name;
         this.logger = logger;
 
+        this.eventManager = new EventManager();
+
         this.callbackExecutor = new ScheduledThreadPoolExecutor(4, (r, executor) -> logger.log(Level.WARNING, "A callback task was rejected by the executor: ", r));
         this.netClient = new NetClient(this, host, port, login, pass);
 
@@ -70,6 +75,11 @@ public class TurtleClientImpl extends TurtleCore implements TurtleClient {
      */
     public @NotNull Logger getLogger() {
         return logger;
+    }
+
+    @Override
+    public @NotNull EventManager getEventManager() {
+        return this.eventManager;
     }
 
     /**
@@ -94,6 +104,16 @@ public class TurtleClientImpl extends TurtleCore implements TurtleClient {
 
     public @NotNull TurtleSet<User> getUserCache() {
         return userCache;
+    }
+
+    @Override
+    public @NotNull List<Group> getGroups() {
+        return List.copyOf(groupCache);
+    }
+
+    @Override
+    public @NotNull List<User> getUsers() {
+        return List.copyOf(userCache);
     }
 
     @Override

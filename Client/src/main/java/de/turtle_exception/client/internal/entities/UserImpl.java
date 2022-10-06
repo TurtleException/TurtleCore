@@ -1,9 +1,7 @@
 package de.turtle_exception.client.internal.entities;
 
-import com.google.common.collect.Sets;
 import com.google.gson.JsonObject;
 import de.turtle_exception.client.api.TurtleClient;
-import de.turtle_exception.client.api.entities.Group;
 import de.turtle_exception.client.api.entities.User;
 import de.turtle_exception.client.api.requests.Action;
 import de.turtle_exception.client.internal.ActionImpl;
@@ -12,7 +10,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 public class UserImpl implements User {
@@ -21,16 +18,13 @@ public class UserImpl implements User {
 
     private String name;
 
-    private final Set<Group> groups = Sets.newConcurrentHashSet();
     private ArrayList<Long> discord   = new ArrayList<>();
     private ArrayList<UUID> minecraft = new ArrayList<>();
 
-    UserImpl(@NotNull TurtleClient client, long id, String name, Set<Group> groups) {
+    UserImpl(@NotNull TurtleClient client, long id, String name) {
         this.client = client;
         this.id = id;
         this.name = name;
-
-        this.groups.addAll(groups);
     }
 
     @Override
@@ -42,6 +36,8 @@ public class UserImpl implements User {
     public long getId() {
         return this.id;
     }
+
+    /* - NAME - */
 
     @Override
     public @NotNull String getName() {
@@ -60,26 +56,7 @@ public class UserImpl implements User {
         return new ActionImpl<>(client, Routes.User.MODIFY.compile(json, this.id), null);
     }
 
-    @Override
-    public @NotNull List<Group> getGroups() {
-        return List.copyOf(groups);
-    }
-
-    // TODO: use this (route finalizer)
-    /** Provides the underlying (modifiable) set of {@link Group Groups} this user is a part of. */
-    public @NotNull Set<Group> getGroupSet() {
-        return this.groups;
-    }
-
-    @Override
-    public @NotNull Action<Void> joinGroup(long groupId) {
-        return new ActionImpl<>(client, Routes.Group.ADD_USER.compile(null, this.id, groupId), null);
-    }
-
-    @Override
-    public @NotNull Action<Void> leaveGroup(long groupId) {
-        return new ActionImpl<>(client, Routes.Group.DEL_USER.compile(null, this.id, groupId), null);
-    }
+    /* - DISCORD - */
 
     @Override
     public @NotNull List<Long> getDiscordIds() {
@@ -105,6 +82,8 @@ public class UserImpl implements User {
     public @NotNull Action<Void> removeDiscordId(long discordId) {
         return new ActionImpl<>(client, Routes.User.DEL_DISCORD.compile(null, this.id, discordId), null);
     }
+
+    /* - MINECRAFT - */
 
     @Override
     public @NotNull List<UUID> getMinecraftIds() {
