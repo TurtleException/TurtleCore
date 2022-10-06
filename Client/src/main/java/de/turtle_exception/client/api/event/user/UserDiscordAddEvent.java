@@ -1,6 +1,5 @@
 package de.turtle_exception.client.api.event.user;
 
-import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.api.entities.User;
 import org.jetbrains.annotations.NotNull;
 
@@ -8,8 +7,8 @@ import org.jetbrains.annotations.NotNull;
 public class UserDiscordAddEvent extends UserEvent {
     protected final long discordId;
 
-    public UserDiscordAddEvent(@NotNull TurtleClient client, @NotNull User user, long discordId) {
-        super(client, user);
+    public UserDiscordAddEvent(@NotNull User user, long discordId) {
+        super(user);
         this.discordId = discordId;
     }
 
