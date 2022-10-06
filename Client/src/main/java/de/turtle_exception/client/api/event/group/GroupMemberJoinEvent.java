@@ -4,10 +4,10 @@ import de.turtle_exception.client.api.entities.Group;
 import de.turtle_exception.client.api.entities.User;
 import org.jetbrains.annotations.NotNull;
 
-public class GroupMemberAddEvent extends GroupEvent {
+public class GroupMemberJoinEvent extends GroupEvent {
     protected final User user;
 
-    public GroupMemberAddEvent(@NotNull Group group, @NotNull User user) {
+    public GroupMemberJoinEvent(@NotNull Group group, @NotNull User user) {
         super(group);
         this.user = user;
     }

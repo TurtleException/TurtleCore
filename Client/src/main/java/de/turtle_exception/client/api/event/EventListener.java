@@ -18,7 +18,7 @@ public abstract class EventListener {
     public void onGroupCreate(@NotNull GroupCreateEvent event) { }
     public void onGroupDelete(@NotNull GroupDeleteEvent event) { }
     public void onGroupUpdateName(@NotNull GroupUpdateNameEvent event) { }
-    public void onGroupMemberAdd(@NotNull GroupMemberAddEvent event) { }
+    public void onGroupMemberJoin(@NotNull GroupMemberJoinEvent event) { }
     public void onGroupMemberLeave(@NotNull GroupMemberLeaveEvent event) { }
 
     // User Events
