@@ -1,5 +1,6 @@
 package de.turtle_exception.client.api.requests;
 
+import de.turtle_exception.client.api.event.net.ResponseEvent;
 import de.turtle_exception.client.internal.ActionImpl;
 import de.turtle_exception.client.internal.TurtleClientImpl;
 import de.turtle_exception.core.net.message.InboundMessage;
@@ -121,7 +122,6 @@ public class Request<T> {
 
     public void handleResponse(@NotNull InboundMessage response) {
         action.handleResponse(response, this);
-        // TODO: event system
-        //client.handleEvent(new NetRequestEvent(this, response));
+        client.getEventManager().handleEvent(new ResponseEvent(this, response));
     }
 }

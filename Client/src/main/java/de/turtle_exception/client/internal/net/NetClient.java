@@ -1,6 +1,7 @@
 package de.turtle_exception.client.internal.net;
 
 import com.google.gson.JsonObject;
+import de.turtle_exception.client.api.event.net.RequestEvent;
 import de.turtle_exception.client.api.requests.Request;
 import de.turtle_exception.client.internal.entities.EntityBuilder;
 import de.turtle_exception.client.api.TurtleClient;
@@ -117,6 +118,7 @@ public class NetClient extends NetworkAdapter {
     /* - - - */
 
     public <T> void request(@NotNull Request<T> request) {
+        client.getEventManager().handleEvent(new RequestEvent(request));
         try {
             this.submit(new OutboundMessage(client, newConversation(), request.getRoute(), request.getDeadline(), request::handleResponse));
         } catch (Throwable t) {

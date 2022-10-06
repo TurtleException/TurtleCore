@@ -1,6 +1,5 @@
 package de.turtle_exception.client.api.event.group;
 
-import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.api.entities.Group;
 import org.jetbrains.annotations.NotNull;
 
@@ -8,8 +7,8 @@ public class GroupUpdateNameEvent extends GroupEvent {
     private final String oldName;
     private final String newName;
 
-    public GroupUpdateNameEvent(@NotNull TurtleClient client, @NotNull Group group, @NotNull String oldName, @NotNull String newName) {
-        super(client, group);
+    public GroupUpdateNameEvent(@NotNull Group group, @NotNull String oldName, @NotNull String newName) {
+        super(group);
         this.oldName = oldName;
         this.newName = newName;
     }

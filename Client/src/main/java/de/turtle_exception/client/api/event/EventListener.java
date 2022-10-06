@@ -1,10 +1,10 @@
 package de.turtle_exception.client.api.event;
 
-import de.turtle_exception.client.api.event.group.GroupUpdateNameEvent;
-import de.turtle_exception.client.api.event.user.UserGroupJoinEvent;
-import de.turtle_exception.client.api.event.user.UserGroupLeaveEvent;
-import de.turtle_exception.client.api.event.user.UserUpdateNameEvent;
-import de.turtle_exception.core.netcore.util.StringUtil;
+import de.turtle_exception.client.api.event.group.*;
+import de.turtle_exception.client.api.event.net.RequestEvent;
+import de.turtle_exception.client.api.event.net.ResponseEvent;
+import de.turtle_exception.client.api.event.user.*;
+import de.turtle_exception.core.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Method;
@@ -14,12 +14,24 @@ public abstract class EventListener {
     public void onGenericEvent(@NotNull Event event) { }
 
     // Group Events
+    public void onGroupCreate(@NotNull GroupCreateEvent event) { }
+    public void onGroupDelete(@NotNull GroupDeleteEvent event) { }
     public void onGroupUpdateName(@NotNull GroupUpdateNameEvent event) { }
+    public void onGroupMemberAdd(@NotNull GroupMemberAddEvent event) { }
+    public void onGroupMemberLeave(@NotNull GroupMemberLeaveEvent event) { }
 
     // User Events
+    public void onUserCreate(@NotNull UserCreateEvent event) { }
+    public void onUserDelete(@NotNull UserDeleteEvent event) { }
     public void onUserUpdateName(@NotNull UserUpdateNameEvent event) { }
-    public void onUserGroupJoin(@NotNull UserGroupJoinEvent event) { }
-    public void onUserGroupLeave(@NotNull UserGroupLeaveEvent event) { }
+    public void onUserDiscordAdd(@NotNull UserDiscordAddEvent event) { }
+    public void onUserDiscordRemove(@NotNull UserDiscordRemoveEvent event) { }
+    public void onUserMinecraftAdd(@NotNull UserMinecraftAddEvent event) { }
+    public void onUserMinecraftRemove(@NotNull UserMinecraftRemoveEvent event) { }
+
+    // Network
+    public void onRequest(@NotNull RequestEvent event) { }
+    public void onResponse(@NotNull ResponseEvent event) { }
 
     /* - - - */
 
