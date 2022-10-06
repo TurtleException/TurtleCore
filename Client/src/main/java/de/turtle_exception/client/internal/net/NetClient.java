@@ -80,7 +80,7 @@ public class NetClient extends NetworkAdapter {
         this.in  = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
         this.status = ConnectionStatus.LOGIN;
-        new LoginHandler(out, in, client.getVersion().toString(), login).await(10, TimeUnit.SECONDS);
+        new LoginHandler(out, in, TurtleClientImpl.VERSION.toString(), login).await(10, TimeUnit.SECONDS);
 
         this.receiver = new AsyncLoopThread(() -> status != ConnectionStatus.DISCONNECTED, () -> {
             try {

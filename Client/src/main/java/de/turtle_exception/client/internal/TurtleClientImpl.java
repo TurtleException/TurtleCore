@@ -12,6 +12,7 @@ import de.turtle_exception.client.internal.net.NetClient;
 import de.turtle_exception.client.internal.util.TurtleSet;
 import de.turtle_exception.core.TurtleCore;
 import de.turtle_exception.core.net.route.Routes;
+import de.turtle_exception.core.util.version.IllegalVersionException;
 import de.turtle_exception.core.util.version.Version;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -26,7 +27,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class TurtleClientImpl extends TurtleCore implements TurtleClient {
-    private final Version version;
+    public static final Version VERSION;
+    static {
+        VERSION = Version.retrieveFromResources(TurtleClientImpl.class);
+
+        // this can only happen with faulty code
+        if (VERSION == null)
+            throw new IllegalVersionException("Version may not be null.");
+    }
 
     /** The root logger of this core */
     private final Logger logger;
@@ -50,10 +58,6 @@ public class TurtleClientImpl extends TurtleCore implements TurtleClient {
     private final TurtleSet<Group> groupCache = new TurtleSet<>();
 
     public TurtleClientImpl(@Nullable String name, @NotNull Logger logger, @NotNull String host, @Range(from = 0, to = 65535) int port, @NotNull String login, @NotNull String pass) throws IOException, LoginException {
-        this.version = Version.retrieveFromResources(TurtleClient.class);
-        if (this.version == null)
-            throw new IOException("Illegal version");
-
         this.name = name;
         this.logger = logger;
 
@@ -88,10 +92,6 @@ public class TurtleClientImpl extends TurtleCore implements TurtleClient {
      */
     public @Nullable String getName() {
         return name;
-    }
-
-    public @NotNull Version getVersion() {
-        return this.version;
     }
 
     public NetClient getNetClient() {
