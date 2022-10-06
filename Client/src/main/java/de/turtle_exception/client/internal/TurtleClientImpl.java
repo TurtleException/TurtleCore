@@ -158,7 +158,7 @@ public class TurtleClientImpl extends TurtleCore implements TurtleClient {
     @Override
     public @NotNull Action<User> retrieveUser(long id) {
         return new ActionImpl<User>(this, Routes.User.GET.compile(null, String.valueOf(id)), (message, userRequest) -> {
-            return EntityBuilder.buildUser((JsonObject) message.getRoute().content());
+            return EntityBuilder.buildUser(this, (JsonObject) message.getRoute().content());
         }).onSuccess(user -> {
             userCache.removeIf(oldUser -> oldUser.getId() == id);
             userCache.add(user);
@@ -169,7 +169,7 @@ public class TurtleClientImpl extends TurtleCore implements TurtleClient {
     @Override
     public @NotNull Action<List<User>> retrieveUsers() {
         return new ActionImpl<List<User>>(this, Routes.User.GET_ALL.compile(null), (message, userRequest) -> {
-            return EntityBuilder.buildUsers((JsonArray) message.getRoute().content());
+            return EntityBuilder.buildUsers(this, (JsonArray) message.getRoute().content());
         }).onSuccess(l -> {
             userCache.clear();
             userCache.addAll(l);
@@ -180,7 +180,7 @@ public class TurtleClientImpl extends TurtleCore implements TurtleClient {
     @Override
     public @NotNull Action<Group> retrieveGroup(long id) {
         return new ActionImpl<Group>(this, Routes.Group.GET.compile(null, String.valueOf(id)), (message, userRequest) -> {
-            return EntityBuilder.buildGroup((JsonObject) message.getRoute().content());
+            return EntityBuilder.buildGroup(this, (JsonObject) message.getRoute().content());
         }).onSuccess(group -> {
             groupCache.removeIf(oldGroup -> oldGroup.getId() == id);
             groupCache.add(group);
@@ -191,7 +191,7 @@ public class TurtleClientImpl extends TurtleCore implements TurtleClient {
     @Override
     public @NotNull Action<List<Group>> retrieveGroups() {
         return new ActionImpl<List<Group>>(this, Routes.Group.GET_ALL.compile(null), (message, userRequest) -> {
-            return EntityBuilder.buildGroups((JsonArray) message.getRoute().content());
+            return EntityBuilder.buildGroups(this, (JsonArray) message.getRoute().content());
         }).onSuccess(l -> {
             groupCache.clear();
             groupCache.addAll(l);
