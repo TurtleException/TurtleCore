@@ -4,21 +4,17 @@ import de.turtle_exception.client.api.entities.Ticket;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class TicketUpdateTitleEvent extends TicketEvent {
-    protected final String oldName;
-    protected final String newName;
-
+@SuppressWarnings("unused")
+public class TicketUpdateTitleEvent extends TicketUpdateEvent<String> {
     public TicketUpdateTitleEvent(@NotNull Ticket ticket, @Nullable String oldName, @Nullable String newName) {
-        super(ticket);
-        this.oldName = oldName;
-        this.newName = newName;
+        super(ticket, oldName, newName);
     }
 
-    public @Nullable String getOldName() {
-        return oldName;
+    public @Nullable String getOldTitle() {
+        return super.getOldValue();
     }
 
-    public @Nullable String getNewName() {
-        return newName;
+    public @Nullable String getNewTitle() {
+        return super.getNewValue();
     }
 }

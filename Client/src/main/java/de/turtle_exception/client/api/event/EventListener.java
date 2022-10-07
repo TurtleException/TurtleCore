@@ -18,6 +18,7 @@ public abstract class EventListener {
     // Group Events
     public void onGroupCreate(@NotNull GroupCreateEvent event) { }
     public void onGroupDelete(@NotNull GroupDeleteEvent event) { }
+    public void onGroupUpdate(@NotNull GroupUpdateEvent<?> event) { }
     public void onGroupUpdateName(@NotNull GroupUpdateNameEvent event) { }
     public void onGroupMemberJoin(@NotNull GroupMemberJoinEvent event) { }
     public void onGroupMemberLeave(@NotNull GroupMemberLeaveEvent event) { }
@@ -25,6 +26,7 @@ public abstract class EventListener {
     // User Events
     public void onUserCreate(@NotNull UserCreateEvent event) { }
     public void onUserDelete(@NotNull UserDeleteEvent event) { }
+    public void onUserUpdate(@NotNull UserUpdateEvent<?> event) { }
     public void onUserUpdateName(@NotNull UserUpdateNameEvent event) { }
     public void onUserDiscordAdd(@NotNull UserDiscordAddEvent event) { }
     public void onUserDiscordRemove(@NotNull UserDiscordRemoveEvent event) { }
@@ -34,6 +36,7 @@ public abstract class EventListener {
     // Ticket Events
     public void onTicketCreate(@NotNull TicketCreateEvent event) { }
     public void onTicketDelete(@NotNull TicketDeleteEvent event) { }
+    public void onTicketUpdate(@NotNull TicketUpdateEvent<?> event) { }
     public void onTicketUpdateState(@NotNull TicketUpdateStateEvent event) { }
     public void onTicketUpdateTitle(@NotNull TicketUpdateTitleEvent event) { }
     public void onTicketUpdateCategory(@NotNull TicketUpdateCategoryEvent event) { }
