@@ -304,4 +304,11 @@ public class SQLService implements DataService {
     public void delUserMinecraft(long user, @NotNull UUID minecraft) throws DataAccessException {
         this.sqlConnector.executeSilent(Statements.DEL_USER_MINECRAFT, user, minecraft.toString());
     }
+
+    /* - - - */
+
+    @Override
+    public void stop() throws Exception {
+        this.sqlConnector.shutdown();
+    }
 }

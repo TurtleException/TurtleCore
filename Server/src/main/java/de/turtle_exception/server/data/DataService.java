@@ -182,4 +182,8 @@ public interface DataService {
      * @throws DataAccessException if the request fails.
      */
     void delUserMinecraft(long user, @NotNull UUID minecraft) throws DataAccessException;
+
+    /* - - - */
+
+    default void stop() throws Exception { }
 }

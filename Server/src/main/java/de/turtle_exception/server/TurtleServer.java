@@ -50,8 +50,14 @@ public class TurtleServer extends TurtleCore {
     public void run() throws Exception {
         status.set(Status.INIT);
 
+        logger.log(Level.INFO, "Initializing InternalServer...");
+        this.internalServer = new InternalServer(this, getPort());
+
         logger.log(Level.INFO, "Initializing DataService...");
         this.dataService = new DataServiceProvider(this).get();
+
+        logger.log(Level.INFO, "Starting InternalServer...");
+        this.internalServer.start();
 
         /* RUNNING */
 
@@ -70,15 +76,30 @@ public class TurtleServer extends TurtleCore {
     /**
      * Await execution of final tasks, proper shutdown of all active tasks and suspend all active threads.
      */
-    private void shutdown() {
+    private void shutdown() throws Exception {
         if (status.get() <= Status.RUNNING)
             throw new IllegalStateException("Cannot shutdown while main loop is still running. Call exit() first!");
 
         logger.log(Level.INFO, "Shutting down...");
 
-        // TODO
+        logger.log(Level.INFO, "Stopping InternalServer...");
+        this.internalServer.stop();
+
+        logger.log(Level.INFO, "Stopping DataService...");
+        this.dataService.stop();
 
         logger.log(Level.ALL, "OK bye.");
+    }
+
+    /* - - - */
+
+    private int getPort() throws IllegalArgumentException {
+        String str = config.getProperty("port");
+        try {
+            return Integer.parseInt(str);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Invalid port: " + str);
+        }
     }
 
     /* - - - */

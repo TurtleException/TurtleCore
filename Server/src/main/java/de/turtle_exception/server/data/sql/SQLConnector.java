@@ -73,4 +73,10 @@ class SQLConnector {
             return this.connection.createStatement().executeQuery(sql);
         }
     }
+
+    /* - - - */
+
+    public void shutdown() throws SQLException {
+        this.connection.close();
+    }
 }
