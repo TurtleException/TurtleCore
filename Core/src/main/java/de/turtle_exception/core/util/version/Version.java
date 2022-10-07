@@ -5,9 +5,21 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Objects;
 import java.util.Properties;
 
-public record Version(int[] versions, @Nullable String EXTRA) {
+@SuppressWarnings("unused")
+public final class Version {
+    private final int[] versions;
+    private final @Nullable String EXTRA;
+
+    private Version(int[] versions, @Nullable String EXTRA) {
+        this.versions = versions;
+        this.EXTRA = EXTRA;
+    }
+
+
     public static Version parse(String raw) throws IllegalVersionException {
         try {
             return doParse(raw);
@@ -33,6 +45,7 @@ public record Version(int[] versions, @Nullable String EXTRA) {
      * contain a valid version or could not be read <code>null</code> is returned and an {@link Exception} will be
      * printed to the console. It is recommended to check whether the version is <code>null</code> while constructing
      * the main class.
+     *
      * @return Version stored in resources.
      */
     public static Version retrieveFromResources(@NotNull Class<?> clazz) {
@@ -66,15 +79,41 @@ public record Version(int[] versions, @Nullable String EXTRA) {
 
     /**
      * Returns a string representation of the version.
-     * <p>
-     *     Schema: (depending on whether <code>EXTRA</code> is defined)
-     *     <li><code>MAJOR.MINOR-BUILD</code></li>
-     *     <li><code>MAJOR.MINOR-BUILD_EXTRA</code></li>
-     * </p>
+     * <p> Schema: (depending on whether <code>EXTRA</code> is defined)
+     * <li><code>MAJOR.MINOR-BUILD</code>
+     * <li><code>MAJOR.MINOR-BUILD_EXTRA</code>
      * @return a string representation of the object.
      */
     @Override
     public @NotNull String toString() {
         return StringUtil.join(".", versions) + ((EXTRA != null) ? ("-" + EXTRA) : "");
+    }
+
+    public int getMajor() {
+        return versions[0];
+    }
+
+    public int getMinor() {
+        return versions[1];
+    }
+
+    public int getBuilder() {
+        return versions[2];
+    }
+
+    public int[] getVersions() {
+        return versions;
+    }
+
+    public @Nullable String getExtra() {
+        return EXTRA;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) return true;
+        if (!(obj instanceof Version ver)) return false;
+        return Arrays.equals(this.versions, ver.versions) &&
+                Objects.equals(this.EXTRA, ver.EXTRA);
     }
 }
