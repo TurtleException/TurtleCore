@@ -3,6 +3,7 @@ package de.turtle_exception.server.net.handlers;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import de.turtle_exception.core.data.JsonChecks;
 import de.turtle_exception.core.net.message.InboundMessage;
 import de.turtle_exception.core.net.route.CompiledRoute;
 import de.turtle_exception.core.net.route.Routes;
@@ -33,6 +34,7 @@ public class UserHandler extends ResourceHandler {
             getDataService().deleteUser(id);
         } else if (route.isRoute(Routes.User.CREATE)) {
             JsonObject json = new Gson().fromJson(route.content(), JsonObject.class);
+            JsonChecks.validateUser(json);
             getDataService().setUser(json);
         } else if (route.isRoute(Routes.User.MODIFY)) {
             long id = Long.parseLong(route.args()[0]);
@@ -40,6 +42,7 @@ public class UserHandler extends ResourceHandler {
             getDataService().modifyUser(id, initialJson -> {
                 for (Map.Entry<String, JsonElement> entry : modifications.entrySet())
                     initialJson.add(entry.getKey(), entry.getValue());
+                JsonChecks.validateUser(initialJson);
                 return initialJson;
             });
         } else if (route.isRoute(Routes.User.ADD_DISCORD)) {

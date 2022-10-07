@@ -7,6 +7,8 @@ import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.api.entities.Group;
 import de.turtle_exception.client.api.entities.User;
 import de.turtle_exception.client.internal.util.TurtleSet;
+import de.turtle_exception.core.data.IllegalJsonException;
+import de.turtle_exception.core.data.JsonChecks;
 import de.turtle_exception.core.util.Checks;
 import org.jetbrains.annotations.NotNull;
 
@@ -24,8 +26,9 @@ public class EntityBuilder {
      * @throws IllegalArgumentException if the JSON String does not represent a valid User or is not a properly
      *                                  formatted JSON object.
      */
-    public static @NotNull User buildUser(TurtleClient client, JsonObject json) throws NullPointerException, IllegalArgumentException {
+    public static @NotNull User buildUser(TurtleClient client, JsonObject json) throws NullPointerException, IllegalArgumentException, IllegalJsonException {
         Checks.nonNull(json, "JSON");
+        JsonChecks.validateUser(json);
 
         long   id   = json.get("id").getAsLong();
         String name = json.get("name").getAsString();
@@ -43,7 +46,7 @@ public class EntityBuilder {
         return new UserImpl(client, id, name, discordList, minecraftList);
     }
 
-    public static @NotNull List<User> buildUsers(TurtleClient client, JsonArray json) throws NullPointerException, IllegalArgumentException {
+    public static @NotNull List<User> buildUsers(TurtleClient client, JsonArray json) throws NullPointerException, IllegalArgumentException, IllegalJsonException {
         Checks.nonNull(json, "JSON");
 
         List<User> users = new ArrayList<>();
@@ -60,8 +63,9 @@ public class EntityBuilder {
      * @throws IllegalArgumentException if the JSON String does not represent a valid Group or is not a properly
      *                                  formatted JSON object.
      */
-    public static @NotNull Group buildGroup(TurtleClient client, JsonObject json) throws NullPointerException, IllegalArgumentException {
+    public static @NotNull Group buildGroup(TurtleClient client, JsonObject json) throws NullPointerException, IllegalArgumentException, IllegalJsonException {
         Checks.nonNull(json, "JSON");
+        JsonChecks.validateGroup(json);
 
         long   id   = json.get("id").getAsLong();
         String name = json.get("name").getAsString();
@@ -74,7 +78,7 @@ public class EntityBuilder {
         return new GroupImpl(client, id, name, users);
     }
 
-    public static @NotNull List<Group> buildGroups(TurtleClient client, JsonArray json) throws NullPointerException, IllegalArgumentException {
+    public static @NotNull List<Group> buildGroups(TurtleClient client, JsonArray json) throws NullPointerException, IllegalArgumentException, IllegalJsonException {
         Checks.nonNull(json, "JSON");
 
         List<Group> groups = new ArrayList<>();
