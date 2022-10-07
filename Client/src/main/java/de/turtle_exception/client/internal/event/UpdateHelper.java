@@ -1,17 +1,20 @@
 package de.turtle_exception.client.internal.event;
 
 import de.turtle_exception.client.api.entities.Group;
+import de.turtle_exception.client.api.entities.Ticket;
 import de.turtle_exception.client.api.entities.User;
 import de.turtle_exception.client.api.event.EventManager;
 import de.turtle_exception.client.api.event.group.GroupCreateEvent;
 import de.turtle_exception.client.api.event.group.GroupMemberJoinEvent;
 import de.turtle_exception.client.api.event.group.GroupMemberLeaveEvent;
 import de.turtle_exception.client.api.event.group.GroupUpdateNameEvent;
+import de.turtle_exception.client.api.event.ticket.*;
 import de.turtle_exception.client.api.event.user.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 public class UpdateHelper {
@@ -71,4 +74,51 @@ public class UpdateHelper {
         for (UUID newEntry : newMinecraft)
             if (!oldMinecraft.contains(newEntry))
                 eventManager.handleEvent(new UserMinecraftRemoveEvent(newUser, newEntry));
-    }}
+    }
+
+    public static void handleTicketUpdate(@Nullable Ticket oldTicket, @NotNull Ticket newTicket) {
+        EventManager eventManager = newTicket.getClient().getEventManager();
+
+        if (oldTicket == null) {
+            eventManager.handleEvent(new TicketCreateEvent(newTicket));
+            return;
+        }
+
+        /* STATE */
+        if (newTicket.getState() != oldTicket.getState())
+            eventManager.handleEvent(new TicketUpdateStateEvent(newTicket, oldTicket.getState(), newTicket.getState()));
+
+        /* TITLE */
+        // null safe
+        if (!Objects.equals(newTicket.getTitle(), oldTicket.getTitle()))
+            eventManager.handleEvent(new TicketUpdateTitleEvent(newTicket, oldTicket.getTitle(), newTicket.getTitle()));
+
+        /* CATEGORY */
+        if (!newTicket.getCategory().equals(oldTicket.getCategory()))
+            eventManager.handleEvent(new TicketUpdateCategoryEvent(newTicket, oldTicket.getCategory(), newTicket.getCategory()));
+
+        /* DISCORD */
+        if (newTicket.getDiscordChannelId() != oldTicket.getDiscordChannelId())
+            eventManager.handleEvent(new TicketUpdateDiscordChannelEvent(newTicket, oldTicket.getDiscordChannelId(), newTicket.getDiscordChannelId()));
+
+        /* TAGS */
+        List<String> oldTags = oldTicket.getTags();
+        List<String> newTags = newTicket.getTags();
+        for (String oldTag : oldTags)
+            if (!newTags.contains(oldTag))
+                eventManager.handleEvent(new TicketTagAddEvent(newTicket, oldTag));
+        for (String newTag : newTags)
+            if (!oldTags.contains(newTag))
+                eventManager.handleEvent(new TicketTagRemoveEvent(newTicket, newTag));
+
+        /* USERS */
+        List<User> oldUsers = oldTicket.getUsers();
+        List<User> newUsers = newTicket.getUsers();
+        for (User oldUser : oldUsers)
+            if (!newUsers.contains(oldUser))
+                eventManager.handleEvent(new TicketUserAddEvent(newTicket, oldUser));
+        for (User newUser : newUsers)
+            if (!oldUsers.contains(newUser))
+                eventManager.handleEvent(new TicketUserRemoveEvent(newTicket, newUser));
+    }
+}

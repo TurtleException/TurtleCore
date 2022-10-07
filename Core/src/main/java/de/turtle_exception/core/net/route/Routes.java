@@ -78,6 +78,34 @@ public class Routes {
         public static final Route DEL_MINECRAFT = new Route(Method.DELETE, "users/{user.id}/minecraft/{minecraft.id}", false);
     }
 
+    public static class Ticket {
+        /** Requests a single ticket. <p><b>Direction: </b> Client -> Server */
+        public static final Route GET     = new Route(Method.GET   , "tickets/{ticket.id}", false);
+        /** Requests all a available ticket. <p><b>Direction: </b> Client -> Server */
+        public static final Route GET_ALL = new Route(Method.GET   , "tickets"            , false);
+        /** Completely deletes a ticket. <p><b>Direction: </b> Client -> Server */
+        public static final Route DEL     = new Route(Method.DELETE, "tickets/{ticket.id}", false);
+        /** Creates a new ticket. <p><b>Direction: </b> Client -> Server */
+        public static final Route CREATE  = new Route(Method.PUT   , "tickets"            , true );
+        /** Partially modifies a ticket. <p><b>Direction: </b> Client -> Server */
+        public static final Route MODIFY  = new Route(Method.PATCH , "tickets/{ticket.id}", true );
+
+        /** Provides a ticket that has been updated. <p><b>Direction: </b> Client <- Server */
+        public static final Route UPDATE = new Route(Method.UPDATE, "tickets/{ticket.id}", true );
+        /** Notifies that the specified ticket has been deleted. <p><b>Direction: </b> Client <- Server */
+        public static final Route REMOVE = new Route(Method.REMOVE, "tickets/{ticket.id}", false);
+
+        /** Adds a Discord account to a user. <p><b>Direction: </b> Client -> Server */
+        public static final Route ADD_TAG = new Route(Method.PUT   , "tickets/{ticket.id}/tags/{tag}", false);
+        /** Removes a Discord account from a user. <p><b>Direction: </b> Client -> Server */
+        public static final Route DEL_TAG = new Route(Method.DELETE, "tickets/{ticket.id}/tags/{tag}", false);
+
+        /** Adds a Discord account to a user. <p><b>Direction: </b> Client -> Server */
+        public static final Route ADD_USER = new Route(Method.PUT   , "tickets/{ticket.id}/users/{user.id}", false);
+        /** Removes a Discord account from a user. <p><b>Direction: </b> Client -> Server */
+        public static final Route DEL_USER = new Route(Method.DELETE, "tickets/{ticket.id}/users/{user.id}", false);
+    }
+
     /* --- */
 
     private static final Route[] ROUTES;

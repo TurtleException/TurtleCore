@@ -42,6 +42,36 @@ public class JsonChecks {
         }
     }
 
+    public static void validateTicket(@NotNull JsonObject json) throws IllegalJsonException {
+        try {
+            long   id             = json.get("id").getAsLong();
+            byte   state          = json.get("state").getAsByte();
+            // nullable
+            String title          = json.get("title").getAsString();
+            String category       = json.get("category").getAsString();
+            long   discordChannel = json.get("discord_channel").getAsLong();
+
+            Checks.nonNull(category, "Category");
+
+            validateStringArray(json.getAsJsonArray("tags"));
+            validateLongArray(json.getAsJsonArray("users"));
+        } catch (Exception e) {
+            if (e instanceof IllegalJsonException)
+                throw e;
+            throw new IllegalJsonException(e);
+        }
+    }
+
+    public static void validateStringArray(@NotNull JsonArray json) throws IllegalJsonException {
+        for (JsonElement element : json) {
+            try {
+                element.getAsString();
+            } catch (Exception e) {
+                throw new IllegalJsonException("Illegal entry: " + element);
+            }
+        }
+    }
+
     public static void validateLongArray(@NotNull JsonArray json) throws IllegalJsonException {
         for (JsonElement element : json) {
             try {

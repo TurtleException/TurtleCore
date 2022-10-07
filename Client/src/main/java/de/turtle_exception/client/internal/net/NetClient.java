@@ -1,8 +1,10 @@
 package de.turtle_exception.client.internal.net;
 
 import com.google.gson.JsonObject;
+import de.turtle_exception.client.api.entities.Ticket;
 import de.turtle_exception.client.api.event.group.GroupDeleteEvent;
 import de.turtle_exception.client.api.event.net.RequestEvent;
+import de.turtle_exception.client.api.event.ticket.TicketDeleteEvent;
 import de.turtle_exception.client.api.event.user.UserDeleteEvent;
 import de.turtle_exception.client.api.requests.Request;
 import de.turtle_exception.client.internal.entities.EntityBuilder;
@@ -68,6 +70,16 @@ public class NetClient extends NetworkAdapter {
             String id = msg.getRoute().args()[0];
             User  old = client.getUserCache().removeById(id);
             client.getEventManager().handleEvent(new UserDeleteEvent(old));
+        });
+        this.registerHandler(Routes.Ticket.UPDATE, (netAdapter, msg) -> {
+            Ticket newTicket = EntityBuilder.buildTicket(client, (JsonObject) msg.getRoute().content());
+            Ticket oldTicket = client.getTicketCache().put(newTicket);
+            UpdateHelper.handleTicketUpdate(oldTicket, newTicket);
+        });
+        this.registerHandler(Routes.Ticket.REMOVE, (netAdapter, msg) -> {
+            String id  = msg.getRoute().args()[0];
+            Ticket old = client.getTicketCache().removeById(id);
+            client.getEventManager().handleEvent(new TicketDeleteEvent(old));
         });
     }
 

@@ -3,6 +3,7 @@ package de.turtle_exception.client.api.event;
 import de.turtle_exception.client.api.event.group.*;
 import de.turtle_exception.client.api.event.net.RequestEvent;
 import de.turtle_exception.client.api.event.net.ResponseEvent;
+import de.turtle_exception.client.api.event.ticket.*;
 import de.turtle_exception.client.api.event.user.*;
 import de.turtle_exception.core.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
@@ -29,6 +30,18 @@ public abstract class EventListener {
     public void onUserDiscordRemove(@NotNull UserDiscordRemoveEvent event) { }
     public void onUserMinecraftAdd(@NotNull UserMinecraftAddEvent event) { }
     public void onUserMinecraftRemove(@NotNull UserMinecraftRemoveEvent event) { }
+
+    // Ticket Events
+    public void onTicketCreate(@NotNull TicketCreateEvent event) { }
+    public void onTicketDelete(@NotNull TicketDeleteEvent event) { }
+    public void onTicketUpdateState(@NotNull TicketUpdateStateEvent event) { }
+    public void onTicketUpdateTitle(@NotNull TicketUpdateTitleEvent event) { }
+    public void onTicketUpdateCategory(@NotNull TicketUpdateCategoryEvent event) { }
+    public void onTicketUpdateDiscordChannel(@NotNull TicketUpdateDiscordChannelEvent event) { }
+    public void onTicketTagAdd(@NotNull TicketTagAddEvent event) { }
+    public void onTicketTagRemove(@NotNull TicketTagRemoveEvent event) { }
+    public void onTicketUserAdd(@NotNull TicketUserAddEvent event) { }
+    public void onTicketUserRemove(@NotNull TicketUserRemoveEvent event) { }
 
     // Network
     public void onRequest(@NotNull RequestEvent event) { }

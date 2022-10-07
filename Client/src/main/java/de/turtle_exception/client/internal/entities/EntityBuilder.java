@@ -5,6 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.api.entities.Group;
+import de.turtle_exception.client.api.entities.Ticket;
 import de.turtle_exception.client.api.entities.User;
 import de.turtle_exception.client.internal.util.TurtleSet;
 import de.turtle_exception.core.data.IllegalJsonException;
@@ -86,5 +87,41 @@ public class EntityBuilder {
             groups.add(buildGroup(client, (JsonObject) jsonElement));
 
         return List.copyOf(groups);
+    }
+
+    public static @NotNull Ticket buildTicket(TurtleClient client, JsonObject json) throws NullPointerException, IllegalArgumentException, IllegalJsonException {
+        Checks.nonNull(json, "JSON");
+        JsonChecks.validateTicket(json);
+
+        long   id             = json.get("id").getAsLong();
+        byte   state          = json.get("state").getAsByte();
+        String title          = json.get("title").getAsString();
+        String category       = json.get("category").getAsString();
+        long   discordChannel = json.get("discord_channel").getAsLong();
+
+        if (title == null)
+            title = "null";
+
+        JsonArray         tagArr = json.getAsJsonArray("tags");
+        ArrayList<String> tags   = new ArrayList<>();
+        for (JsonElement element : tagArr)
+            tags.add(element.getAsString());
+
+        JsonArray       userArr  = json.getAsJsonArray("users");
+        TurtleSet<User> users    = new TurtleSet<>();
+        for (JsonElement element : userArr)
+            users.add(client.getUserById(element.getAsLong()));
+
+        return new TicketImpl(client, id, state, title, category, discordChannel, tags, users);
+    }
+
+    public static @NotNull List<Ticket> buildTickets(TurtleClient client, JsonArray json) throws NullPointerException, IllegalArgumentException, IllegalJsonException {
+        Checks.nonNull(json, "JSON");
+
+        List<Ticket> tickets = new ArrayList<>();
+        for (JsonElement jsonElement : json)
+            tickets.add(buildTicket(client, (JsonObject) jsonElement));
+
+        return List.copyOf(tickets);
     }
 }

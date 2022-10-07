@@ -6,6 +6,7 @@ import de.turtle_exception.core.net.route.Routes;
 import de.turtle_exception.core.util.AsyncLoopThread;
 import de.turtle_exception.core.util.logging.NestedLogger;
 import de.turtle_exception.server.net.handlers.GroupHandler;
+import de.turtle_exception.server.net.handlers.TicketHandler;
 import de.turtle_exception.server.net.handlers.UserHandler;
 import org.jetbrains.annotations.NotNull;
 
@@ -53,6 +54,18 @@ public class VirtualClient extends NetworkAdapter {
         this.registerHandler(Routes.User.DEL_DISCORD, userHandler);
         this.registerHandler(Routes.User.ADD_MINECRAFT, userHandler);
         this.registerHandler(Routes.User.DEL_MINECRAFT, userHandler);
+
+        /* --- TICKET */
+        TicketHandler ticketHandler = new TicketHandler(this);
+        this.registerHandler(Routes.Ticket.GET,     ticketHandler);
+        this.registerHandler(Routes.Ticket.GET_ALL, ticketHandler);
+        this.registerHandler(Routes.Ticket.DEL,     ticketHandler);
+        this.registerHandler(Routes.Ticket.CREATE,  ticketHandler);
+        this.registerHandler(Routes.Ticket.MODIFY,  ticketHandler);
+        this.registerHandler(Routes.Ticket.ADD_TAG, ticketHandler);
+        this.registerHandler(Routes.Ticket.DEL_TAG, ticketHandler);
+        this.registerHandler(Routes.Ticket.ADD_USER, ticketHandler);
+        this.registerHandler(Routes.Ticket.DEL_USER, ticketHandler);
 
 
         this.receiver = new AsyncLoopThread(() -> status != ConnectionStatus.DISCONNECTED, () -> {

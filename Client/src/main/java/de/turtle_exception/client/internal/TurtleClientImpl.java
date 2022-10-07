@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.api.entities.Group;
+import de.turtle_exception.client.api.entities.Ticket;
 import de.turtle_exception.client.api.entities.User;
 import de.turtle_exception.client.api.event.EventManager;
 import de.turtle_exception.client.api.requests.Action;
@@ -56,6 +57,7 @@ public class TurtleClientImpl extends TurtleCore implements TurtleClient {
 
     private final TurtleSet<User> userCache = new TurtleSet<>();
     private final TurtleSet<Group> groupCache = new TurtleSet<>();
+    private final TurtleSet<Ticket> ticketCache = new TurtleSet<>();
 
     public TurtleClientImpl(@Nullable String name, @NotNull Logger logger, @NotNull String host, @Range(from = 0, to = 65535) int port, @NotNull String login, @NotNull String pass) throws IOException, LoginException {
         this.name = name;
@@ -71,6 +73,7 @@ public class TurtleClientImpl extends TurtleCore implements TurtleClient {
         // initial requests
         this.retrieveUsers().await();
         this.retrieveGroups().await();
+        this.retrieveTickets().await();
     }
 
     /**
@@ -106,6 +109,10 @@ public class TurtleClientImpl extends TurtleCore implements TurtleClient {
         return userCache;
     }
 
+    public @NotNull TurtleSet<Ticket> getTicketCache() {
+        return ticketCache;
+    }
+
     @Override
     public @NotNull List<Group> getGroups() {
         return List.copyOf(groupCache);
@@ -117,6 +124,11 @@ public class TurtleClientImpl extends TurtleCore implements TurtleClient {
     }
 
     @Override
+    public @NotNull List<Ticket> getTickets() {
+        return List.copyOf(ticketCache);
+    }
+
+    @Override
     public @Nullable Group getGroupById(long id) {
         return groupCache.get(id);
     }
@@ -124,6 +136,11 @@ public class TurtleClientImpl extends TurtleCore implements TurtleClient {
     @Override
     public @Nullable User getUserById(long id) {
         return userCache.get(id);
+    }
+
+    @Override
+    public @Nullable Ticket getTicketById(long id) {
+        return ticketCache.get(id);
     }
 
     /* - - - */
@@ -160,7 +177,7 @@ public class TurtleClientImpl extends TurtleCore implements TurtleClient {
         return new ActionImpl<User>(this, Routes.User.GET.compile(null, String.valueOf(id)), (message, userRequest) -> {
             return EntityBuilder.buildUser(this, (JsonObject) message.getRoute().content());
         }).onSuccess(user -> {
-            userCache.removeIf(oldUser -> oldUser.getId() == id);
+            userCache.removeById(id);
             userCache.add(user);
         });
     }
@@ -182,7 +199,7 @@ public class TurtleClientImpl extends TurtleCore implements TurtleClient {
         return new ActionImpl<Group>(this, Routes.Group.GET.compile(null, String.valueOf(id)), (message, userRequest) -> {
             return EntityBuilder.buildGroup(this, (JsonObject) message.getRoute().content());
         }).onSuccess(group -> {
-            groupCache.removeIf(oldGroup -> oldGroup.getId() == id);
+            groupCache.removeById(id);
             groupCache.add(group);
         });
     }
@@ -195,6 +212,28 @@ public class TurtleClientImpl extends TurtleCore implements TurtleClient {
         }).onSuccess(l -> {
             groupCache.clear();
             groupCache.addAll(l);
+        });
+    }
+
+    @SuppressWarnings("CodeBlock2Expr")
+    @Override
+    public @NotNull Action<Ticket> retrieveTicket(long id) {
+        return new ActionImpl<Ticket>(this, Routes.Ticket.GET.compile(null, String.valueOf(id)), (message, userRequest) -> {
+            return EntityBuilder.buildTicket(this, (JsonObject) message.getRoute().content());
+        }).onSuccess(ticket -> {
+            ticketCache.removeById(id);
+            ticketCache.add(ticket);
+        });
+    }
+
+    @SuppressWarnings("CodeBlock2Expr")
+    @Override
+    public @NotNull Action<List<Ticket>> retrieveTickets() {
+        return new ActionImpl<List<Ticket>>(this, Routes.Ticket.GET_ALL.compile(null), (message, userRequest) -> {
+            return EntityBuilder.buildTickets(this, (JsonArray) message.getRoute().content());
+        }).onSuccess(l -> {
+            ticketCache.clear();
+            ticketCache.addAll(l);
         });
     }
 }

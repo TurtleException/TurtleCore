@@ -3,6 +3,7 @@ package de.turtle_exception.server.data.sql;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import de.turtle_exception.core.data.JsonChecks;
 import de.turtle_exception.core.util.ExceptionalFunction;
 import de.turtle_exception.server.data.DataAccessException;
 import de.turtle_exception.server.data.DataService;
@@ -23,8 +24,9 @@ public class SQLService implements DataService {
     private final SQLConnector sqlConnector;
 
     // These locks are used to prevent reading old data while it is being rewritten by another Thread
-    private final Object groupLock = new Object();
-    private final Object userLock  = new Object();
+    private final Object  groupLock = new Object();
+    private final Object   userLock = new Object();
+    private final Object ticketLock = new Object();
 
     public SQLService(@NotNull String host, int port, @NotNull String database, @NotNull String login, @NotNull String pass) throws SQLException {
         this.sqlConnector = new SQLConnector(host, port, database, login, pass);
@@ -36,6 +38,9 @@ public class SQLService implements DataService {
         this.sqlConnector.executeSilentRaw(Statements.CT_USERS);
         this.sqlConnector.executeSilentRaw(Statements.CT_USER_DISCORD);
         this.sqlConnector.executeSilentRaw(Statements.CT_USER_MINECRAFT);
+        this.sqlConnector.executeSilentRaw(Statements.CT_TICKETS);
+        this.sqlConnector.executeSilentRaw(Statements.CT_TICKET_TAGS);
+        this.sqlConnector.executeSilentRaw(Statements.CT_TICKET_USERS);
     }
 
     /* - - - */
@@ -160,6 +165,8 @@ public class SQLService implements DataService {
         this.sqlConnector.executeSilent(Statements.MEMBER_LEAVE, group, user);
     }
 
+    /* - - - */
+
     @Override
     public @NotNull List<Long> getUserIds() throws DataAccessException {
         try (ResultSet resultSet = this.sqlConnector.executeQuery(Statements.GET_USER_IDS)) {
@@ -191,7 +198,6 @@ public class SQLService implements DataService {
         } catch (Exception e) {
             throw new DataAccessException(e);
         }
-
     }
 
     @Override
@@ -231,7 +237,7 @@ public class SQLService implements DataService {
     public void deleteUser(long id) throws DataAccessException {
         JsonObject user = this.getGroup(id);
 
-        this.sqlConnector.executeSilent(Statements.DEL_GROUP, id);
+        this.sqlConnector.executeSilent(Statements.DEL_USER, id);
 
         for (JsonElement entry : user.getAsJsonArray("discord")) {
             long discord = entry.getAsLong();
@@ -297,12 +303,163 @@ public class SQLService implements DataService {
 
     @Override
     public void addUserMinecraft(long user, @NotNull UUID minecraft) throws DataAccessException {
-        this.sqlConnector.executeSilent(Statements.ADD_USER_MINECRAFT, user,  minecraft.toString());
+        this.sqlConnector.executeSilent(Statements.ADD_USER_MINECRAFT, user, minecraft.toString());
     }
 
     @Override
     public void delUserMinecraft(long user, @NotNull UUID minecraft) throws DataAccessException {
         this.sqlConnector.executeSilent(Statements.DEL_USER_MINECRAFT, user, minecraft.toString());
+    }
+
+    /* - - - */
+
+    @Override
+    public @NotNull List<Long> getTicketIds() throws DataAccessException {
+        try (ResultSet resultSet = this.sqlConnector.executeQuery(Statements.GET_TICKET_IDS)) {
+            ArrayList<Long> list = new ArrayList<>();
+
+            while (resultSet.next())
+                list.add(resultSet.getLong(1));
+
+            return List.copyOf(list);
+        } catch (Exception e) {
+            throw new DataAccessException(e);
+        }
+    }
+
+    @Override
+    public @NotNull JsonObject getTicket(long id) throws DataAccessException {
+        try (ResultSet resultUser = this.sqlConnector.executeQuery(Statements.GET_TICKET, id)) {
+            JsonObject json = new JsonObject();
+
+            if (!resultUser.next())
+                throw new DataAccessException("Could not parse ticket from empty ResultSet.");
+
+            json.addProperty("id"  , resultUser.getLong("id"));
+            json.addProperty("state", resultUser.getByte("state"));
+            json.addProperty("title", resultUser.getString("title"));
+            json.addProperty("category", resultUser.getString("category"));
+            json.add("tags"  , this.getTicketTags(id));
+            json.addProperty("discord_channel", resultUser.getLong("discord_channel"));
+            json.add("users", this.getTicketUsers(id));
+
+            return json;
+        } catch (Exception e) {
+            throw new DataAccessException(e);
+        }
+    }
+
+    @Override
+    public void setTicket(@NotNull JsonObject ticket) throws DataAccessException {
+        JsonChecks.validateTicket(ticket);
+
+        long id             = ticket.get("id").getAsLong();
+        byte state          = ticket.get("state").getAsByte();
+        long discordChannel = ticket.get("discord_channel").getAsLong();
+        String category     = ticket.get("category").getAsString();
+        String title = "NULL";
+
+        try {
+            title = "'" +  ticket.get("title").getAsString() + "'";
+        } catch (Exception ignored) { }
+
+        this.sqlConnector.executeSilent(Statements.SET_TICKET, id, state, title, category, discordChannel);
+
+        JsonArray tags = ticket.getAsJsonArray("tags");
+        if (tags != null) {
+            for (JsonElement entry : tags) {
+                try {
+                    this.addTicketTag(id, entry.getAsString());
+                } catch (Exception ignored) { }
+            }
+        }
+
+        JsonArray users = ticket.getAsJsonArray("users");
+        if (users != null) {
+            for (JsonElement entry : users) {
+                try {
+                    this.addTicketUser(id, entry.getAsLong());
+                } catch (Exception ignored) { }
+            }
+        }
+    }
+
+    @Override
+    public void deleteTicket(long id) throws DataAccessException {
+        JsonObject ticket = this.getGroup(id);
+
+        this.sqlConnector.executeSilent(Statements.DEL_TICKET, id);
+
+        for (JsonElement entry : ticket.getAsJsonArray("tags")) {
+            String tag = entry.getAsString();
+            this.delTicketTag(id, tag);
+        }
+
+        for (JsonElement entry : ticket.getAsJsonArray("users")) {
+            long user = entry.getAsLong();
+            this.delTicketUser(id, user);
+        }
+    }
+
+    @Override
+    public void modifyTicket(long ticket, @NotNull ExceptionalFunction<JsonObject, JsonObject> function) throws DataAccessException {
+        synchronized (ticketLock) {
+            JsonObject json = this.getTicket(ticket);
+            try {
+                json = function.apply(json);
+            } catch (Exception e) {
+                throw new DataAccessException(e);
+            }
+            this.setTicket(json);
+        }
+    }
+
+    @Override
+    public @NotNull JsonArray getTicketTags(long ticket) throws DataAccessException {
+        try (ResultSet resultSet = this.sqlConnector.executeQuery(Statements.GET_TICKET_TAGS, ticket)) {
+            JsonArray tags = new JsonArray();
+
+            while (resultSet.next())
+                tags.add(resultSet.getString("tags"));
+
+            return tags;
+        } catch (Exception e) {
+            throw new DataAccessException(e);
+        }
+    }
+
+    @Override
+    public void addTicketTag(long ticket, @NotNull String tag) throws DataAccessException {
+        this.sqlConnector.executeSilent(Statements.ADD_TICKET_TAG, ticket, tag);
+    }
+
+    @Override
+    public void delTicketTag(long ticket, @NotNull String tag) throws DataAccessException {
+        this.sqlConnector.executeSilent(Statements.DEL_TICKET_TAG, ticket, tag);
+    }
+
+    @Override
+    public @NotNull JsonArray getTicketUsers(long ticket) throws DataAccessException {
+        try (ResultSet resultSet = this.sqlConnector.executeQuery(Statements.GET_TICKET_USERS, ticket)) {
+            JsonArray users = new JsonArray();
+
+            while (resultSet.next())
+                users.add(resultSet.getLong("users"));
+
+            return users;
+        } catch (Exception e) {
+            throw new DataAccessException(e);
+        }
+    }
+
+    @Override
+    public void addTicketUser(long ticket, long user) throws DataAccessException {
+        this.sqlConnector.executeSilent(Statements.ADD_TICKET_USER, ticket, user);
+    }
+
+    @Override
+    public void delTicketUser(long ticket, long user) throws DataAccessException {
+        this.sqlConnector.executeSilent(Statements.DEL_TICKET_USER, ticket, user);
     }
 
     /* - - - */

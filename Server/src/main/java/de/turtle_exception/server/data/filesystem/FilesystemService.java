@@ -1,6 +1,7 @@
 package de.turtle_exception.server.data.filesystem;
 
 import com.google.gson.*;
+import de.turtle_exception.core.data.JsonChecks;
 import de.turtle_exception.core.util.ExceptionalFunction;
 import de.turtle_exception.server.data.DataAccessException;
 import de.turtle_exception.server.data.DataService;
@@ -18,9 +19,10 @@ import java.util.UUID;
  */
 public class FilesystemService implements DataService {
     // These locks are used to prevent reading old data while it is being rewritten by another Thread
-    private final Object metaLock  = new Object();
-    private final Object groupLock = new Object();
-    private final Object userLock  = new Object();
+    private final Object   metaLock = new Object();
+    private final Object  groupLock = new Object();
+    private final Object   userLock = new Object();
+    private final Object ticketLock = new Object();
 
     // file containing credential data
     private final File fileCredentials;
@@ -28,6 +30,7 @@ public class FilesystemService implements DataService {
     // directories
     private final File dirGroups;
     private final File dirUsers;
+    private final File dirTickets;
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public FilesystemService(@NotNull File dir) throws IOException {
@@ -40,10 +43,12 @@ public class FilesystemService implements DataService {
         this.fileCredentials = new File(dir, "credentials.json");
         this.dirGroups       = new File(dir, "groups");
         this.dirUsers        = new File(dir, "users");
+        this.dirTickets      = new File(dir, "tickets");
 
         this.fileCredentials.createNewFile();
         this.dirGroups.mkdir();
         this.dirUsers.mkdir();
+        this.dirTickets.mkdir();
     }
 
     /* - - - */
@@ -77,6 +82,14 @@ public class FilesystemService implements DataService {
         }
     }
 
+    private JsonObject getTicketJson(long ticket) throws DataAccessException {
+        try {
+            return this.getFile(new File(dirTickets, ticket + ".json"));
+        } catch (FileNotFoundException e) {
+            throw new DataAccessException(e);
+        }
+    }
+
     @SuppressWarnings("ResultOfMethodCallIgnored")
     private void setFile(@NotNull JsonObject json, @NotNull File file) throws IOException {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -103,6 +116,14 @@ public class FilesystemService implements DataService {
         }
     }
 
+    private void setTicketJson(@NotNull JsonObject ticket) throws DataAccessException {
+        try {
+            this.setFile(ticket, new File(dirTickets, ticket.get("id").getAsString()));
+        } catch (IOException e) {
+            throw new DataAccessException(e);
+        }
+    }
+
     /* - - - */
 
     @Override
@@ -116,6 +137,8 @@ public class FilesystemService implements DataService {
                 throw new DataAccessException("Invalid login");
         }
     }
+
+    /* - - - */
 
     @Override
     public @NotNull List<Long> getGroupIds() {
@@ -143,11 +166,12 @@ public class FilesystemService implements DataService {
     @Override
     public @NotNull JsonObject getGroup(long id) throws DataAccessException {
         synchronized (groupLock) {
-            try {
-                return this.getFile(new File(dirGroups, id + ".json"));
-            } catch (FileNotFoundException e) {
-                throw new DataAccessException(e);
-            }
+            JsonObject json = this.getGroupJson(id);
+
+            if (json == null)
+                throw new DataAccessException("Unknown group: " + id);
+
+            return json;
         }
     }
 
@@ -249,7 +273,7 @@ public class FilesystemService implements DataService {
             JsonObject json = this.getUserJson(id);
 
             if (json == null)
-                throw new DataAccessException("Unknown user");
+                throw new DataAccessException("Unknown user: " + id);
 
             return json;
         }
@@ -263,7 +287,7 @@ public class FilesystemService implements DataService {
             id = user.get("id").getAsLong();
             name = user.get("name").getAsString();
         } catch (Exception e) {
-            throw new DataAccessException("Malformed parameters for group object");
+            throw new DataAccessException("Malformed parameters for ticket object");
         }
 
         JsonObject json = new JsonObject();
@@ -282,7 +306,6 @@ public class FilesystemService implements DataService {
         }
 
         synchronized (userLock) {
-            // simpler to use this (all members will also be deleted)
             this.deleteUser(id);
 
             this.setUserJson(user);
@@ -367,6 +390,128 @@ public class FilesystemService implements DataService {
     public void delUserMinecraft(long user, @NotNull UUID minecraft) throws DataAccessException {
         this.modifyUser(user, json -> {
             removeElementFromJsonArray(json, "minecraft", minecraft.toString());
+            return json;
+        });
+    }
+
+    /* - - - */
+
+    @Override
+    public @NotNull List<Long> getTicketIds() throws DataAccessException {
+        File[] ticketFiles;
+        synchronized (ticketLock) {
+            ticketFiles = dirTickets.listFiles();
+        }
+
+        if (ticketFiles == null) return List.of();
+
+        ArrayList<Long> list = new ArrayList<>();
+        for (File file : ticketFiles) {
+            String name = file.getName();
+
+            if (!name.endsWith(".json")) continue;
+
+            try {
+                list.add(Long.parseLong(name.substring(0, name.length() - ".json".length())));
+            } catch (NumberFormatException ignored) { }
+        }
+
+        return List.copyOf(list);
+    }
+
+    @Override
+    public @NotNull JsonObject getTicket(long id) throws DataAccessException {
+        synchronized (ticketLock) {
+            JsonObject json = this.getTicketJson(id);
+
+            if (json == null)
+                throw new DataAccessException("Unknown ticket: " + id);
+
+            return json;
+        }
+    }
+
+    @Override
+    public void setTicket(@NotNull JsonObject ticket) throws DataAccessException {
+        JsonChecks.validateTicket(ticket);
+
+        long id = ticket.get("id").getAsLong();
+
+        synchronized (ticketLock) {
+            this.deleteTicket(id);
+
+            this.setTicketJson(ticket);
+        }
+    }
+
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    @Override
+    public void deleteTicket(long id) throws DataAccessException {
+        synchronized (ticketLock) {
+            File file = new File(dirTickets, id + ".json");
+            file.delete();
+        }
+    }
+
+    @Override
+    public void modifyTicket(long ticket, @NotNull ExceptionalFunction<JsonObject, JsonObject> function) throws DataAccessException {
+        synchronized (ticketLock) {
+            JsonObject json = this.getTicketJson(ticket);
+            try {
+                json = function.apply(json);
+            } catch (Exception e) {
+                throw new DataAccessException(e);
+            }
+            this.setTicketJson(json);
+        }
+    }
+
+    @Override
+    public @NotNull JsonArray getTicketTags(long ticket) throws DataAccessException {
+        try {
+            return this.getTicket(ticket).getAsJsonArray("users");
+        } catch (Exception e) {
+            throw new DataAccessException(e);
+        }
+    }
+
+    @Override
+    public void addTicketTag(long ticket, @NotNull String tag) throws DataAccessException {
+        this.modifyTicket(ticket, json -> {
+            addElementToJsonArray(json, "tags", new JsonPrimitive(tag));
+            return json;
+        });
+    }
+
+    @Override
+    public void delTicketTag(long ticket, @NotNull String tag) throws DataAccessException {
+        this.modifyTicket(ticket, json -> {
+            removeElementFromJsonArray(json, "tags", tag);
+            return json;
+        });
+    }
+
+    @Override
+    public @NotNull JsonArray getTicketUsers(long ticket) throws DataAccessException {
+        try {
+            return this.getTicket(ticket).getAsJsonArray("users");
+        } catch (Exception e) {
+            throw new DataAccessException(e);
+        }
+    }
+
+    @Override
+    public void addTicketUser(long ticket, long user) throws DataAccessException {
+        this.modifyTicket(ticket, json -> {
+            addElementToJsonArray(json, "users", new JsonPrimitive(user));
+            return json;
+        });
+    }
+
+    @Override
+    public void delTicketUser(long ticket, long user) throws DataAccessException {
+        this.modifyTicket(ticket, json -> {
+            removeElementFromJsonArray(json, "users", String.valueOf(user));
             return json;
         });
     }

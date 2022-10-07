@@ -1,8 +1,10 @@
 package de.turtle_exception.client.api;
 
 import de.turtle_exception.client.api.entities.Group;
+import de.turtle_exception.client.api.entities.Ticket;
 import de.turtle_exception.client.api.entities.User;
 import de.turtle_exception.client.api.entities.attribute.IGroupContainer;
+import de.turtle_exception.client.api.entities.attribute.ITicketContainer;
 import de.turtle_exception.client.api.entities.attribute.IUserContainer;
 import de.turtle_exception.client.api.event.EventManager;
 import de.turtle_exception.client.api.requests.Action;
@@ -14,7 +16,7 @@ import java.util.logging.Logger;
 
 // TODO: docs
 @SuppressWarnings("unused")
-public interface TurtleClient extends IUserContainer, IGroupContainer {
+public interface TurtleClient extends IUserContainer, IGroupContainer, ITicketContainer {
     @NotNull
     Logger getLogger();
 
@@ -37,4 +39,8 @@ public interface TurtleClient extends IUserContainer, IGroupContainer {
     @NotNull Action<Group> retrieveGroup(long id);
 
     @NotNull Action<List<Group>> retrieveGroups();
+
+    @NotNull Action<Ticket> retrieveTicket(long id);
+
+    @NotNull Action<List<Ticket>> retrieveTickets();
 }

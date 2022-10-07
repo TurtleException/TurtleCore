@@ -17,6 +17,8 @@ public interface DataService {
      */
     @NotNull String getPass(@NotNull String login) throws DataAccessException;
 
+    /* - - - */
+
     /**
      * Provides a List containing the ids of all groups.
      * @return List of group ids.
@@ -53,7 +55,6 @@ public interface DataService {
      */
     void setGroup(@NotNull JsonObject group) throws DataAccessException;
 
-    // TODO: (see impl note)
     /**
      * Deletes all data of the group specified by the id.
      * @param id id of the group that should be deleted.
@@ -88,6 +89,8 @@ public interface DataService {
      */
     void delGroupMember(long group, long user) throws DataAccessException;
 
+    /* - - - */
+
     /**
      * Provides a List containing the ids of all users.
      * @return List of user ids.
@@ -104,7 +107,7 @@ public interface DataService {
         JsonArray arr = new JsonArray();
 
         for (Long user : this.getUserIds())
-            arr.add(this.getGroup(user));
+            arr.add(this.getUser(user));
 
         return arr;
     }
@@ -124,7 +127,6 @@ public interface DataService {
      */
     void setUser(@NotNull JsonObject user) throws DataAccessException;
 
-    // TODO: (see impl note)
     /**
      * Deletes all data of the user specified by the id.
      * @param id id of the user that should be deleted.
@@ -182,6 +184,102 @@ public interface DataService {
      * @throws DataAccessException if the request fails.
      */
     void delUserMinecraft(long user, @NotNull UUID minecraft) throws DataAccessException;
+
+    /* - - - */
+
+    /**
+     * Provides a List containing the ids of all tickets.
+     * @return List of ticket ids.
+     * @throws DataAccessException if the request fails.
+     */
+    @NotNull List<Long> getTicketIds() throws DataAccessException;
+
+    /**
+     * Provides a {@link JsonArray} containing all tickets.
+     * @return Array of all tickets.
+     * @throws DataAccessException if the request fails.
+     */
+    default @NotNull JsonArray getTickets() throws DataAccessException {
+        JsonArray arr = new JsonArray();
+
+        for (Long ticket : this.getTicketIds())
+            arr.add(this.getTicket(ticket));
+
+        return arr;
+    }
+
+    /**
+     * Provides a single ticket specified by its id in form of a JSON object.
+     * @return JSON representation of the ticket.
+     * @throws DataAccessException if the request fails.
+     */
+    @NotNull JsonObject getTicket(long id) throws DataAccessException;
+
+    /**
+     * Takes in a JSON object representing a ticket and feeds it into the underlying database, overwriting any existing
+     * data of that ticket.
+     * @param ticket JSON representation of the ticket.
+     * @throws DataAccessException if the request fails.
+     */
+    void setTicket(@NotNull JsonObject ticket) throws DataAccessException;
+
+    /**
+     * Deletes all data of the ticket specified by the id.
+     * @param id id of the ticket that should be deleted.
+     * @throws DataAccessException if the request fails.
+     * @implNote This method should generally also delete all relational data (i.e. membership in a group).
+     */
+    void deleteTicket(long id) throws DataAccessException;
+
+    void modifyTicket(long ticket, @NotNull ExceptionalFunction<JsonObject, JsonObject> function) throws DataAccessException;
+
+    /**
+     * Provides a List containing the tags of this ticket.
+     * @param ticket id of the ticket.
+     * @return List ticket tags.
+     * @throws DataAccessException if the request fails.
+     */
+    @NotNull JsonArray getTicketTags(long ticket) throws DataAccessException;
+
+    /**
+     * Adds a tag to a ticket.
+     * @param ticket id of the ticket.
+     * @param tag the tag.
+     * @throws DataAccessException if the request fails.
+     */
+    void addTicketTag(long ticket, @NotNull String tag) throws DataAccessException;
+
+    /**
+     * Removes tag from a ticket.
+     * @param ticket id of the ticket.
+     * @param tag the tag.
+     * @throws DataAccessException if the request fails.
+     */
+    void delTicketTag(long ticket, @NotNull String tag) throws DataAccessException;
+
+    /**
+     * Provides a List containing the ids of all users that are part of the given ticket.
+     * @param ticket id of the ticket.
+     * @return List of user ids.
+     * @throws DataAccessException if the request fails.
+     */
+    @NotNull JsonArray getTicketUsers(long ticket) throws DataAccessException;
+
+    /**
+     * Adds a user id to the list of users that are part of the provided ticket.
+     * @param ticket id of the ticket.
+     * @param user id of the user.
+     * @throws DataAccessException if the request fails.
+     */
+    void addTicketUser(long ticket, long user) throws DataAccessException;
+
+    /**
+     * Removes a user id from the list of users that are part of the provided ticket.
+     * @param ticket id of the ticket.
+     * @param user id of the user.
+     * @throws DataAccessException if the request fails.
+     */
+    void delTicketUser(long ticket, long user) throws DataAccessException;
 
     /* - - - */
 
