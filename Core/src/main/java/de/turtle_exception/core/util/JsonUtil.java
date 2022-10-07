@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 
 public class JsonUtil {
+    private JsonUtil() { }
+
     /**
      * Converts a String representation of a JSON object into a {@link Map} with Strings as keys and values. Values may
      * be other (JSON) objects themselves. The String representation of values has been chosen because it is the only

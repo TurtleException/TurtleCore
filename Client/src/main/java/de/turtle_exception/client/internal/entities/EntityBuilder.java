@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.UUID;
 
 public class EntityBuilder {
+    private EntityBuilder() { }
+
     /**
      * Builds a {@link User} object from the provided JSON data.
      * @param json The JSON-formatted user data.

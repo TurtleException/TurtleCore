@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.UUID;
 
 public class UpdateHelper {
+    private UpdateHelper() { }
+
     public static void handleGroupUpdate(@Nullable Group oldGroup, @NotNull Group newGroup) {
         EventManager eventManager = newGroup.getClient().getEventManager();
 

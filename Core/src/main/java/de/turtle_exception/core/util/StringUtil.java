@@ -6,6 +6,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.UUID;
 
 public class StringUtil {
+    private StringUtil() { }
+
     public static String join(String delimiter, int[] arr) {
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < arr.length; i++) {

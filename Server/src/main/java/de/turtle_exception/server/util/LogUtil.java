@@ -20,6 +20,8 @@ public class LogUtil {
      */
     private static File logFile;
 
+    private LogUtil() { }
+
     /**
      * Provides a {@link FileHandler} that is already set up for the running {@link TurtleServer} instance.
      * @param formatter Log {@link Formatter} to assign to the handler.

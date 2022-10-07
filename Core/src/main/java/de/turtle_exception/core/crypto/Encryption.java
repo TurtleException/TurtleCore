@@ -24,6 +24,8 @@ public class Encryption {
     private static final int IV_LENGTH = 16;
     private static final int SALT_LENGTH = 16;
 
+    private Encryption() { }
+
     private static @NotNull SecretKey generateKeyFromPassword(@NotNull String pass, byte[] salt) throws NoSuchAlgorithmException, InvalidKeySpecException {
         SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
         KeySpec spec = new PBEKeySpec(pass.toCharArray(), salt, KEY_SPEC_PASS_ITERATIONS, KEY_SPEC_KEY_LENGTH);

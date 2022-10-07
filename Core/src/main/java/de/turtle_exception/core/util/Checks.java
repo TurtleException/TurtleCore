@@ -4,6 +4,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class Checks {
+    private Checks() { }
+
     public static boolean nonNulls(Object obj, Object... other) {
         if (obj == null) return false;
         for (Object o : other)

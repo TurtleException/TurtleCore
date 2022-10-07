@@ -5,6 +5,8 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 
 public class RouteErrors {
+    private RouteErrors() { }
+
     public static final RouteError UNKNOWN = new RouteError("Unknown error", "An unexpected internal error occurred.", null);
 
     public static final RouteError NOT_LOGGED_IN        = new RouteError("Not logged in", "You are not logged in.", null);

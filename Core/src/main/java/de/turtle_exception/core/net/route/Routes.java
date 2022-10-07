@@ -12,6 +12,8 @@ import java.util.ArrayList;
  * objects or as an anchor to provide information in {@link InboundMessage} objects.
  */
 public class Routes {
+    private Routes() { }
+
     /** Acknowledges a request as successful. <p><b>Direction: </b> Client <-> Server */
     public static final Route OK    = new Route(Method.RESPOND, "ok"   , false);
     /** Informs that a request failed and provides information on why. <p><b>Direction: </b> Client <-> Server */
