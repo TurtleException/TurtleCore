@@ -1,6 +1,7 @@
 package de.turtle_exception.client.api.entities;
 
 import de.turtle_exception.client.api.entities.attribute.IUserContainer;
+import de.turtle_exception.core.data.TicketState;
 import de.turtle_exception.client.api.requests.Action;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -10,9 +11,9 @@ import java.util.List;
 public interface Ticket extends Turtle, IUserContainer {
     /* - STATE - */
 
-    byte getState();
+    @NotNull TicketState getState();
 
-    @NotNull Action<Void> modifyState(byte state);
+    @NotNull Action<Void> modifyState(@NotNull TicketState state);
 
     /* - TITLE - */
 

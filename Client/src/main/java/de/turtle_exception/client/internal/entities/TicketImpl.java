@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.api.entities.Ticket;
 import de.turtle_exception.client.api.entities.User;
+import de.turtle_exception.core.data.TicketState;
 import de.turtle_exception.client.api.requests.Action;
 import de.turtle_exception.client.internal.ActionImpl;
 import de.turtle_exception.client.internal.util.TurtleSet;
@@ -20,7 +21,7 @@ public class TicketImpl implements Ticket {
     private final TurtleClient client;
     private final long id;
 
-    private byte state;
+    private TicketState state;
     private String title;
     private String category;
     private long discordChannel;
@@ -28,7 +29,7 @@ public class TicketImpl implements Ticket {
     private final Set<String> tags = Sets.newConcurrentHashSet();
     private final TurtleSet<User> users;
 
-    TicketImpl(TurtleClient client, long id, byte state, String title, String category, long discordChannel, Collection<String> tags, TurtleSet<User> users) {
+    TicketImpl(TurtleClient client, long id, TicketState state, String title, String category, long discordChannel, Collection<String> tags, TurtleSet<User> users) {
         this.client = client;
         this.id = id;
 
@@ -54,14 +55,14 @@ public class TicketImpl implements Ticket {
     /* - STATE - */
 
     @Override
-    public byte getState() {
+    public @NotNull TicketState getState() {
         return this.state;
     }
 
     @Override
-    public @NotNull Action<Void> modifyState(byte state) {
+    public @NotNull Action<Void> modifyState(@NotNull TicketState state) {
         JsonObject json = new JsonObject();
-        json.addProperty("state", state);
+        json.addProperty("state", state.getCode());
         return new ActionImpl<>(client, Routes.Ticket.MODIFY.compile(json, this.id), null);
     }
 

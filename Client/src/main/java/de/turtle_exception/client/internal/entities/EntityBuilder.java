@@ -7,6 +7,7 @@ import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.api.entities.Group;
 import de.turtle_exception.client.api.entities.Ticket;
 import de.turtle_exception.client.api.entities.User;
+import de.turtle_exception.core.data.TicketState;
 import de.turtle_exception.client.internal.util.TurtleSet;
 import de.turtle_exception.core.data.IllegalJsonException;
 import de.turtle_exception.core.data.JsonChecks;
@@ -94,13 +95,15 @@ public class EntityBuilder {
         JsonChecks.validateTicket(json);
 
         long   id             = json.get("id").getAsLong();
-        byte   state          = json.get("state").getAsByte();
+        byte   stateCode      = json.get("state").getAsByte();
         String title          = json.get("title").getAsString();
         String category       = json.get("category").getAsString();
         long   discordChannel = json.get("discord_channel").getAsLong();
 
         if (title == null)
             title = "null";
+
+        TicketState state = TicketState.of(stateCode);
 
         JsonArray         tagArr = json.getAsJsonArray("tags");
         ArrayList<String> tags   = new ArrayList<>();
