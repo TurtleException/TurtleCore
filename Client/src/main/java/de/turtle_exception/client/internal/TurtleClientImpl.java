@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.api.entities.Group;
 import de.turtle_exception.client.api.entities.Ticket;
+import de.turtle_exception.client.api.entities.Turtle;
 import de.turtle_exception.client.api.entities.User;
 import de.turtle_exception.client.api.event.EventManager;
 import de.turtle_exception.client.api.requests.Action;
@@ -21,6 +22,7 @@ import org.jetbrains.annotations.Range;
 
 import javax.security.auth.login.LoginException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.function.Consumer;
@@ -114,6 +116,15 @@ public class TurtleClientImpl extends TurtleCore implements TurtleClient {
     }
 
     @Override
+    public @NotNull List<Turtle> getTurtles() {
+        ArrayList<Turtle> list = new ArrayList<>();
+        list.addAll(groupCache);
+        list.addAll(userCache);
+        list.addAll(ticketCache);
+        return list;
+    }
+
+    @Override
     public @NotNull List<Group> getGroups() {
         return List.copyOf(groupCache);
     }
@@ -126,6 +137,18 @@ public class TurtleClientImpl extends TurtleCore implements TurtleClient {
     @Override
     public @NotNull List<Ticket> getTickets() {
         return List.copyOf(ticketCache);
+    }
+
+    @SuppressWarnings("RedundantIfStatement")
+    @Override
+    public @Nullable Turtle getTurtleById(long id) {
+        Group group = groupCache.get(id);
+        if (group != null) return group;
+        User user = userCache.get(id);
+        if (user != null) return user;
+        Ticket ticket = ticketCache.get(id);
+        if (ticket != null) return ticket;
+        return null;
     }
 
     @Override
