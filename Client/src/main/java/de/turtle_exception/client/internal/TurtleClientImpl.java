@@ -16,6 +16,8 @@ import de.turtle_exception.core.TurtleCore;
 import de.turtle_exception.core.net.route.Routes;
 import de.turtle_exception.core.util.version.IllegalVersionException;
 import de.turtle_exception.core.util.version.Version;
+import net.dv8tion.jda.api.JDA;
+import org.bukkit.Server;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Range;
@@ -60,6 +62,10 @@ public class TurtleClientImpl extends TurtleCore implements TurtleClient {
     private final TurtleSet<User> userCache = new TurtleSet<>();
     private final TurtleSet<Group> groupCache = new TurtleSet<>();
     private final TurtleSet<Ticket> ticketCache = new TurtleSet<>();
+
+    /* THIRD PARTY SERVICES */
+    private Server spigotServer = null;
+    private JDA    jda          = null;
 
     public TurtleClientImpl(@Nullable String name, @NotNull Logger logger, @NotNull String host, @Range(from = 0, to = 65535) int port, @NotNull String login, @NotNull String pass) throws IOException, LoginException {
         this.name = name;
@@ -258,5 +264,27 @@ public class TurtleClientImpl extends TurtleCore implements TurtleClient {
             ticketCache.clear();
             ticketCache.addAll(l);
         });
+    }
+
+    /* - - - */
+
+    @Override
+    public @Nullable Server getSpigotServer() {
+        return this.spigotServer;
+    }
+
+    @Override
+    public void setSpigotServer(@Nullable Server server) {
+        this.spigotServer = server;
+    }
+
+    @Override
+    public @Nullable JDA getJDA() {
+        return this.jda;
+    }
+
+    @Override
+    public void setJDA(@Nullable JDA jda) {
+        this.jda = jda;
     }
 }

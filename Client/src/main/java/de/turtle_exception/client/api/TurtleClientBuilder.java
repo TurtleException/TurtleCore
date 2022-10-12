@@ -2,6 +2,8 @@ package de.turtle_exception.client.api;
 
 import de.turtle_exception.client.internal.TurtleClientImpl;
 import de.turtle_exception.core.util.Checks;
+import net.dv8tion.jda.api.JDA;
+import org.bukkit.Server;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -28,6 +30,10 @@ public class TurtleClientBuilder {
 
     private @Nullable Logger logger;
 
+    /* THIRD PARTY SERVICES */
+    private @Nullable Server spigot;
+    private @Nullable JDA    jda;
+
     public TurtleClientBuilder() { }
 
     public @NotNull TurtleClient build() throws IllegalArgumentException, IOException, LoginException {
@@ -43,7 +49,15 @@ public class TurtleClientBuilder {
         String name   = String.valueOf(increment.getAndIncrement());
         Logger logger = this.logger != null ? this.logger : Logger.getLogger("CLIENT#" + name);
 
-        return new TurtleClientImpl(name, logger, host, port, login, pass);
+        TurtleClientImpl client = new TurtleClientImpl(name, logger, host, port, login, pass);
+
+        if (spigot != null)
+            client.setSpigotServer(spigot);
+
+        if (jda != null)
+            client.setJDA(jda);
+
+        return client;
     }
 
     /* - - - */
@@ -73,6 +87,16 @@ public class TurtleClientBuilder {
         return this;
     }
 
+    public TurtleClientBuilder setSpigot(Server spigot) {
+        this.spigot = spigot;
+        return this;
+    }
+
+    public TurtleClientBuilder setJda(JDA jda) {
+        this.jda = jda;
+        return this;
+    }
+
     /* - - - */
 
     public @Nullable String getHost() {
@@ -93,5 +117,13 @@ public class TurtleClientBuilder {
 
     public @Nullable Logger getLogger() {
         return logger;
+    }
+
+    public @Nullable Server getSpigot() {
+        return spigot;
+    }
+
+    public @Nullable JDA getJda() {
+        return jda;
     }
 }

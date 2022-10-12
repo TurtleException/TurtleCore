@@ -1,8 +1,10 @@
 package de.turtle_exception.client.api.entities;
 
 import de.turtle_exception.client.api.entities.attribute.IUserContainer;
-import de.turtle_exception.core.data.TicketState;
 import de.turtle_exception.client.api.requests.Action;
+import de.turtle_exception.core.data.TicketState;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -40,6 +42,15 @@ public interface Ticket extends Turtle, IUserContainer {
     long getDiscordChannelId();
 
     @NotNull Action<Void> modifyDiscordChannel(long channel);
+
+    default @Nullable GuildMessageChannel getDiscordChannel() throws IllegalStateException {
+        JDA jda = this.getClient().getJDA();
+
+        if (jda == null)
+            throw new IllegalStateException("No JDA instance registered");
+
+        return jda.getChannelById(GuildMessageChannel.class, this.getDiscordChannelId());
+    }
 
     /* - USERS - */
 

@@ -9,6 +9,8 @@ import de.turtle_exception.client.api.entities.attribute.ITicketContainer;
 import de.turtle_exception.client.api.entities.attribute.IUserContainer;
 import de.turtle_exception.client.api.event.EventManager;
 import de.turtle_exception.client.api.requests.Action;
+import net.dv8tion.jda.api.JDA;
+import org.bukkit.Server;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -51,4 +53,14 @@ public interface TurtleClient extends IUserContainer, IGroupContainer, ITicketCo
     @NotNull Action<Ticket> retrieveTicket(long id);
 
     @NotNull Action<List<Ticket>> retrieveTickets();
+
+    /* - - - */
+
+    @Nullable Server getSpigotServer();
+
+    void setSpigotServer(@Nullable Server server);
+
+    @Nullable JDA getJDA();
+
+    void setJDA(@Nullable JDA jda);
 }
