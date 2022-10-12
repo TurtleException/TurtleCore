@@ -16,6 +16,7 @@ public interface Group extends Turtle, IUserContainer {
 
     @NotNull Action<Void> modifyName(@NotNull String name);
 
+    @ResourceKey(path = "users")
     @NotNull List<User> getUsers();
 
     @NotNull Action<Void> addUser(long user);

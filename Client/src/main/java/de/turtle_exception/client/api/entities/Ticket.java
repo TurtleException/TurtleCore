@@ -35,6 +35,7 @@ public interface Ticket extends Turtle, IUserContainer {
 
     /* - TAGS - */
 
+    @ResourceKey(path = "tags")
     @NotNull List<String> getTags();
 
     @NotNull Action<Void> addTag(@NotNull String tag);
@@ -50,6 +51,7 @@ public interface Ticket extends Turtle, IUserContainer {
 
     /* - USERS - */
 
+    @ResourceKey(path = "users")
     @NotNull List<User> getUsers();
 
     @NotNull Action<Void> addUser(@NotNull User user);

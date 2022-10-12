@@ -37,6 +37,7 @@ public interface User extends Turtle {
 
     /* - DISCORD - */
 
+    @ResourceKey(path = "discord")
     @NotNull List<Long> getDiscordIds();
 
     @NotNull Action<Void> addDiscordId(long discordId);
@@ -45,6 +46,7 @@ public interface User extends Turtle {
 
     /* - MINECRAFT - */
 
+    @ResourceKey(path = "minecraft")
     @NotNull List<UUID> getMinecraftIds();
 
     @NotNull Action<Void> addMinecraftId(@NotNull UUID minecraftId);
