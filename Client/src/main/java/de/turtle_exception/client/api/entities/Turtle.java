@@ -1,6 +1,7 @@
 package de.turtle_exception.client.api.entities;
 
 import de.turtle_exception.client.api.TurtleClient;
+import de.turtle_exception.core.data.resource.ResourceKey;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -12,6 +13,7 @@ public interface Turtle {
      * Provides the unique turtle id of this entity. This id should never change and always only reference this entity.
      * @return Long representation of the id.
      */
+    @ResourceKey(path = "id", primary = true)
     long getId();
 
     // TODO: docs

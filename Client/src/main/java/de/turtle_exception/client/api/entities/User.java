@@ -1,6 +1,8 @@
 package de.turtle_exception.client.api.entities;
 
 import de.turtle_exception.client.api.requests.Action;
+import de.turtle_exception.core.data.resource.Resource;
+import de.turtle_exception.core.data.resource.ResourceKey;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -8,7 +10,9 @@ import java.util.List;
 import java.util.UUID;
 
 @SuppressWarnings("unused")
+@Resource(path = "users")
 public interface User extends Turtle {
+    @ResourceKey(path = "name")
     @NotNull String getName();
 
     @NotNull Action<Void> modifyName(@NotNull String name);
