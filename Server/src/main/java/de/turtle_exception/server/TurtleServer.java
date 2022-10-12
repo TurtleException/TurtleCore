@@ -5,6 +5,7 @@ import de.turtle_exception.core.util.logging.SimpleFormatter;
 import de.turtle_exception.server.data.DataService;
 import de.turtle_exception.server.data.DataServiceProvider;
 import de.turtle_exception.server.net.InternalServer;
+import de.turtle_exception.server.ui.cli.Receiver;
 import de.turtle_exception.server.util.LogUtil;
 import de.turtle_exception.server.util.Status;
 
@@ -36,6 +37,7 @@ public class TurtleServer extends TurtleCore {
 
     private final Properties config = new Properties();
 
+    private Receiver       receiver;
     private InternalServer internalServer;
     private DataService    dataService;
 
@@ -46,9 +48,10 @@ public class TurtleServer extends TurtleCore {
         this.config.load(new FileReader(new File(DIR, "server.properties")));
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
     public void run() throws Exception {
         status.set(Status.INIT);
+
+        this.receiver = new Receiver(System.in);
 
         logger.log(Level.INFO, "Initializing InternalServer...");
         this.internalServer = new InternalServer(this, getPort());
@@ -65,7 +68,7 @@ public class TurtleServer extends TurtleCore {
         logger.log(Level.INFO, "Startup done.");
 
         while (status.get() == Status.RUNNING) {
-            // TODO: CLI
+            this.receiver.receive();
         }
 
         logger.log(Level.WARNING, "Main loop has been interrupted.");
