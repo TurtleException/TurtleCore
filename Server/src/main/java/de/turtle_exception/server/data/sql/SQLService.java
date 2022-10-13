@@ -79,9 +79,9 @@ public class SQLService implements DataService {
             if (!resultSet.next())
                 throw new DataAccessException("Could not parse group from empty ResultSet.");
 
-            json.addProperty("id"         , resultSet.getString("id"));
+            json.addProperty("id"         , resultSet.getLong("id"));
             json.addProperty("name"       , resultSet.getString("name"));
-            json.addProperty("permissions", resultSet.getString("permissions"));
+            json.addProperty("permissions", resultSet.getLong("permissions"));
             json.add("members", this.getGroupMembers(id));
 
             return json;
@@ -191,9 +191,9 @@ public class SQLService implements DataService {
             if (!resultUser.next())
                 throw new DataAccessException("Could not parse user from empty ResultSet.");
 
-            json.addProperty("id"         , resultUser.getString("id"));
+            json.addProperty("id"         , resultUser.getLong("id"));
             json.addProperty("name"       , resultUser.getString("name"));
-            json.addProperty("permissions", resultUser.getString("permissions"));
+            json.addProperty("permissions", resultUser.getLong("permissions"));
             json.add("discord"  , this.getUserDiscord(id));
             json.add("minecraft", this.getUserMinecraft(id));
 
