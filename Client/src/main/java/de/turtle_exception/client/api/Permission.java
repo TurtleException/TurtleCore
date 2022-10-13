@@ -1,12 +1,14 @@
 package de.turtle_exception.client.api;
 
+import de.turtle_exception.client.api.entities.PermissionHolder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Range;
 
+import java.util.Collection;
 import java.util.EnumSet;
 
 /**
- * A permission may be applied to a PermissionHolder and authorizes them to use certain parts of the application.
+ * A permission may be applied to a {@link PermissionHolder} and authorizes them to use certain parts of the application.
  * Permissions are recorded in {@code long} numbers, where each bit represents a single permission that can either be
  * allowed (1) or denied (0).
  */
@@ -86,5 +88,14 @@ public enum Permission {
         }
 
         return raw;
+    }
+
+    /**
+     * Converts a {@link Collection} of Permissions into a raw long. If one of the permissions is
+     * {@link Permission#UNKNOWN} it will be ignored. Duplicates will be ignored and handled as if they were only
+     * provided once.
+     */
+    public static long toRaw(@NotNull Collection<Permission> permissions) {
+        return toRaw(permissions.toArray(new Permission[0]));
     }
 }
