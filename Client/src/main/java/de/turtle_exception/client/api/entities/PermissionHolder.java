@@ -7,7 +7,11 @@ import java.util.EnumSet;
 
 @SuppressWarnings("unused")
 public interface PermissionHolder extends Turtle {
-    boolean hasPermission(@NotNull Permission permission);
+    default boolean hasPermission(@NotNull Permission permission) {
+        return this.hasPermissionOverride(permission);
+    }
+
+    boolean hasPermissionOverride(@NotNull Permission permission);
 
     @NotNull EnumSet<Permission> getPermissionOverrides();
 
