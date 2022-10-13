@@ -14,21 +14,21 @@ import java.util.EnumSet;
  */
 public enum Permission {
     // just a filler
-    EXAMPLE((byte) 0, "Example permission"),
+    EXAMPLE(0, "Example permission"),
 
     /** An unknown or invalid permission. This will always be used as a default is no specific permission can be used. */
-    UNKNOWN((byte) -1, "Unknown");
+    UNKNOWN(-1, "Unknown");
 
-    private final byte   offset;
+    private final int    offset;
     private final String title;
 
-    Permission(@Range(from = -1, to = 63) byte offset, @NotNull String title) {
+    Permission(@Range(from = -1, to = 63) int offset, @NotNull String title) {
         this.offset = offset;
         this.title  = title;
     }
 
     /** The offset of this permission - i.e. the bit of a long that represents this permission. */
-    public byte getOffset() {
+    public int getOffset() {
         return offset;
     }
 
@@ -53,7 +53,7 @@ public enum Permission {
      * {@link Permission#UNKNOWN} will be returned.
      * @param offset Permission bit offset.
      */
-    public static @NotNull Permission fromOffset(byte offset) {
+    public static @NotNull Permission fromOffset(int offset) {
         for (Permission permission : values())
             if (permission.getOffset() == offset)
                 return permission;
