@@ -3,6 +3,7 @@ package de.turtle_exception.client.internal.entities;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import de.turtle_exception.client.api.Permission;
 import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.api.entities.Group;
 import de.turtle_exception.client.api.entities.Ticket;
@@ -15,6 +16,7 @@ import de.turtle_exception.core.util.Checks;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.UUID;
 
@@ -32,8 +34,9 @@ public class EntityBuilder {
         Checks.nonNull(json, "JSON");
         JsonChecks.validateUser(json);
 
-        long   id   = json.get("id").getAsLong();
-        String name = json.get("name").getAsString();
+        long   id          = json.get("id").getAsLong();
+        String name        = json.get("name").getAsString();
+        long   permissions = json.get("permissions").getAsLong();
 
         JsonArray       discordArr  = json.getAsJsonArray("discord");
         ArrayList<Long> discordList = new ArrayList<>();
@@ -45,7 +48,9 @@ public class EntityBuilder {
         for (JsonElement element : minecraftArr)
             minecraftList.add(UUID.fromString(element.getAsString()));
 
-        return new UserImpl(client, id, name, discordList, minecraftList);
+        EnumSet<Permission> permissionSet = Permission.fromRaw(permissions);
+
+        return new UserImpl(client, id, name, discordList, minecraftList, permissionSet);
     }
 
     public static @NotNull List<User> buildUsers(TurtleClient client, JsonArray json) throws NullPointerException, IllegalArgumentException, IllegalJsonException {
@@ -69,15 +74,18 @@ public class EntityBuilder {
         Checks.nonNull(json, "JSON");
         JsonChecks.validateGroup(json);
 
-        long   id   = json.get("id").getAsLong();
-        String name = json.get("name").getAsString();
+        long   id          = json.get("id").getAsLong();
+        String name        = json.get("name").getAsString();
+        long   permissions = json.get("permissions").getAsLong();
 
         JsonArray       userArr  = json.getAsJsonArray("members");
         TurtleSet<User> users    = new TurtleSet<>();
         for (JsonElement element : userArr)
             users.add(client.getUserById(element.getAsLong()));
 
-        return new GroupImpl(client, id, name, users);
+        EnumSet<Permission> permissionSet = Permission.fromRaw(permissions);
+
+        return new GroupImpl(client, id, name, users, permissionSet);
     }
 
     public static @NotNull List<Group> buildGroups(TurtleClient client, JsonArray json) throws NullPointerException, IllegalArgumentException, IllegalJsonException {
