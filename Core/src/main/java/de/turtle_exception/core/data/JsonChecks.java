@@ -13,8 +13,9 @@ public class JsonChecks {
 
     public static void validateGroup(@NotNull JsonObject json) throws IllegalJsonException {
         try {
-            long id     = json.get("id").getAsLong();
-            String name = json.get("name").getAsString();
+            long   id          = json.get("id").getAsLong();
+            String name        = json.get("name").getAsString();
+            long   permissions = json.get("permissions").getAsLong();
 
             Checks.nonNull(name, "Name");
 
@@ -28,8 +29,9 @@ public class JsonChecks {
 
     public static void validateUser(@NotNull JsonObject json) throws IllegalJsonException {
         try {
-            long id     = json.get("id").getAsLong();
-            String name = json.get("name").getAsString();
+            long   id          = json.get("id").getAsLong();
+            String name        = json.get("name").getAsString();
+            long   permissions = json.get("permissions").getAsLong();
 
             Checks.nonNull(name, "Name");
 
