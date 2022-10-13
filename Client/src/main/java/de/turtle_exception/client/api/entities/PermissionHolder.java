@@ -13,6 +13,10 @@ public interface PermissionHolder extends Turtle {
 
     boolean hasPermissionOverride(@NotNull Permission permission);
 
+    default @NotNull EnumSet<Permission> getPermissions() {
+        return this.getPermissionOverrides();
+    }
+
     @NotNull EnumSet<Permission> getPermissionOverrides();
 
     default long getPermissionOverridesRaw() {

@@ -1,6 +1,7 @@
 package de.turtle_exception.client.internal.entities;
 
 import com.google.gson.JsonObject;
+import de.turtle_exception.client.api.Permission;
 import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.api.entities.Group;
 import de.turtle_exception.client.api.entities.User;
@@ -11,6 +12,7 @@ import de.turtle_exception.core.net.route.Routes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.EnumSet;
 import java.util.List;
 
 public class GroupImpl implements Group {
@@ -21,12 +23,16 @@ public class GroupImpl implements Group {
 
     private final TurtleSet<User> users;
 
-    GroupImpl(TurtleClient client, long id, String name, TurtleSet<User> users) {
+    private final EnumSet<Permission> permissions;
+
+    GroupImpl(TurtleClient client, long id, String name, TurtleSet<User> users, EnumSet<Permission> permissions) {
         this.client = client;
         this.id = id;
         this.name = name;
 
         this.users = users;
+
+        this.permissions = permissions;
     }
 
     @Override
@@ -81,5 +87,18 @@ public class GroupImpl implements Group {
     @Override
     public @NotNull Action<Void> removeUser(long user) {
         return new ActionImpl<>(client, Routes.Group.DEL_USER.compile(null, this.id, user), null);
+    }
+
+    /* - PERMISSIONS - */
+
+    @Override
+    public boolean hasPermissionOverride(@NotNull Permission permission) {
+        if (permission == Permission.UNKNOWN) return false;
+        return permissions.contains(permission);
+    }
+
+    @Override
+    public @NotNull EnumSet<Permission> getPermissionOverrides() {
+        return EnumSet.copyOf(permissions);
     }
 }

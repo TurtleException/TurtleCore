@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.UUID;
 
 @SuppressWarnings("unused")
-public interface User extends Turtle {
+public interface User extends Turtle, PermissionHolder {
     @NotNull String getName();
 
     @NotNull Action<Void> modifyName(@NotNull String name);

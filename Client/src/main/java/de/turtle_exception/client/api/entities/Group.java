@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 @SuppressWarnings("unused")
-public interface Group extends Turtle, IUserContainer {
+public interface Group extends Turtle, PermissionHolder, IUserContainer {
     @NotNull String getName();
 
     @NotNull Action<Void> modifyName(@NotNull String name);
