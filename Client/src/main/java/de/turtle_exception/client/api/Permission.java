@@ -13,8 +13,29 @@ import java.util.EnumSet;
  * allowed (1) or denied (0).
  */
 public enum Permission {
-    // just a filler
-    EXAMPLE(0, "Example permission"),
+    // BASICS
+    CHAT(0, "Use Chats"),
+
+    // NAMES
+    NICK_CHANGE(1, "Change nickname"),
+    NICK_MANAGE(2, "Manage nicknames"),
+
+    // GROUPS & PERMISSIONS
+    MANAGE_GROUPS(       3, "Manage groups"),
+    MANAGE_GROUP_MEMBERS(4, "Manage group members"),
+    MANAGE_PERMISSIONS(  5, "Manage permissions"),
+
+    // MODERATION
+    MOD_MUTE(       6, "Mute users"),
+    MOD_KICK(       7, "Kick users"),
+    MOD_BAN(        8, "Ban users"),
+    MANAGE_MESSAGES(9, "Manage messages"),
+
+    // LOGS
+    LOG_VIEW(  10, "View logs"),
+    LOG_MANAGE(11, "Manage logs"),
+
+    ADMIN(63, "Administrator"),
 
     /** An unknown or invalid permission. This will always be used as a default is no specific permission can be used. */
     UNKNOWN(-1, "Unknown");
