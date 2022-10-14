@@ -9,8 +9,14 @@ import de.turtle_exception.client.api.entities.Turtle;
 import de.turtle_exception.client.api.entities.User;
 import de.turtle_exception.client.api.event.EventManager;
 import de.turtle_exception.client.api.requests.Action;
+import de.turtle_exception.client.api.requests.action.GroupAction;
+import de.turtle_exception.client.api.requests.action.TicketAction;
+import de.turtle_exception.client.api.requests.action.UserAction;
 import de.turtle_exception.client.internal.entities.EntityBuilder;
 import de.turtle_exception.client.internal.net.NetClient;
+import de.turtle_exception.client.internal.requests.action.GroupActionImpl;
+import de.turtle_exception.client.internal.requests.action.TicketActionImpl;
+import de.turtle_exception.client.internal.requests.action.UserActionImpl;
 import de.turtle_exception.client.internal.util.TurtleSet;
 import de.turtle_exception.core.TurtleCore;
 import de.turtle_exception.core.net.route.Routes;
@@ -264,6 +270,32 @@ public class TurtleClientImpl extends TurtleCore implements TurtleClient {
             ticketCache.clear();
             ticketCache.addAll(l);
         });
+    }
+
+    /* - - - */
+
+    @SuppressWarnings("CodeBlock2Expr")
+    @Override
+    public @NotNull GroupAction createGroup() {
+        return new GroupActionImpl(this, (message, groupRequest) -> {
+            return EntityBuilder.buildGroup(this, (JsonObject) message.getRoute().content());
+        }).onSuccess(groupCache::add);
+    }
+
+    @SuppressWarnings("CodeBlock2Expr")
+    @Override
+    public @NotNull TicketAction createTicket() {
+        return new TicketActionImpl(this, (message, ticketRequest) -> {
+            return EntityBuilder.buildTicket(this, (JsonObject) message.getRoute().content());
+        }).onSuccess(ticketCache::add);
+    }
+
+    @SuppressWarnings("CodeBlock2Expr")
+    @Override
+    public @NotNull UserAction createUser() {
+        return new UserActionImpl(this, (message, userRequest) -> {
+            return EntityBuilder.buildUser(this, (JsonObject) message.getRoute().content());
+        }).onSuccess(userCache::add);
     }
 
     /* - - - */

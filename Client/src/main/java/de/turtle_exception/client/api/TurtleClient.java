@@ -9,6 +9,9 @@ import de.turtle_exception.client.api.entities.attribute.ITicketContainer;
 import de.turtle_exception.client.api.entities.attribute.IUserContainer;
 import de.turtle_exception.client.api.event.EventManager;
 import de.turtle_exception.client.api.requests.Action;
+import de.turtle_exception.client.api.requests.action.GroupAction;
+import de.turtle_exception.client.api.requests.action.TicketAction;
+import de.turtle_exception.client.api.requests.action.UserAction;
 import net.dv8tion.jda.api.JDA;
 import org.bukkit.Server;
 import org.jetbrains.annotations.NotNull;
@@ -53,6 +56,14 @@ public interface TurtleClient extends IUserContainer, IGroupContainer, ITicketCo
     @NotNull Action<Ticket> retrieveTicket(long id);
 
     @NotNull Action<List<Ticket>> retrieveTickets();
+
+    /* - - - */
+
+    @NotNull GroupAction createGroup();
+
+    @NotNull TicketAction createTicket();
+
+    @NotNull UserAction createUser();
 
     /* - - - */
 
