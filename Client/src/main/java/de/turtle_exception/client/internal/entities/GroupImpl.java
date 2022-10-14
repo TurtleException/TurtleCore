@@ -6,6 +6,7 @@ import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.api.entities.Group;
 import de.turtle_exception.client.api.entities.User;
 import de.turtle_exception.client.api.requests.Action;
+import de.turtle_exception.client.api.util.PermissionUtil;
 import de.turtle_exception.client.internal.ActionImpl;
 import de.turtle_exception.client.internal.util.TurtleSet;
 import de.turtle_exception.core.net.route.Routes;
@@ -92,7 +93,7 @@ public class GroupImpl implements Group {
         return new ActionImpl<>(client, Routes.Group.DEL_USER.compile(null, this.id, user), null);
     }
 
-    /* - PERMISSIONS - */
+    /* - PERMISSIONS / TURTLE - */
 
     @Override
     public boolean hasTurtlePermissionOverride(@NotNull TurtlePermission permission) {
@@ -103,6 +104,22 @@ public class GroupImpl implements Group {
     @Override
     public @NotNull EnumSet<TurtlePermission> getTurtlePermissionOverrides() {
         return EnumSet.copyOf(permissionsTurtle);
+    }
+
+    @Override
+    public @NotNull Action<Void> addTurtlePermissionOverrides(@NotNull TurtlePermission... permissions) {
+        long raw = TurtlePermission.toRaw(PermissionUtil.sum(this, permissions));
+        JsonObject json = new JsonObject();
+        json.addProperty("permissions_turtle", raw);
+        return new ActionImpl<>(client, Routes.Group.MODIFY.compile(json, this.id), null);
+    }
+
+    @Override
+    public @NotNull Action<Void> removeTurtlePermissionOverrides(@NotNull TurtlePermission... permissions) {
+        long raw = TurtlePermission.toRaw(PermissionUtil.subtract(this, permissions));
+        JsonObject json = new JsonObject();
+        json.addProperty("permissions_turtle", raw);
+        return new ActionImpl<>(client, Routes.Group.MODIFY.compile(json, this.id), null);
     }
 
     /* - PERMISSIONS / DISCORD - */
@@ -116,5 +133,21 @@ public class GroupImpl implements Group {
     @Override
     public @NotNull EnumSet<Permission> getDiscordPermissionOverrides() {
         return EnumSet.copyOf(permissionsDiscord);
+    }
+
+    @Override
+    public @NotNull Action<Void> addDiscordPermissionOverrides(@NotNull Permission... permissions) {
+        long raw = Permission.getRaw(PermissionUtil.sum(this, permissions));
+        JsonObject json = new JsonObject();
+        json.addProperty("permissions_discord", raw);
+        return new ActionImpl<>(client, Routes.Group.MODIFY.compile(json, this.id), null);
+    }
+
+    @Override
+    public @NotNull Action<Void> removeDiscordPermissionOverrides(@NotNull Permission... permissions) {
+        long raw = Permission.getRaw(PermissionUtil.subtract(this, permissions));
+        JsonObject json = new JsonObject();
+        json.addProperty("permissions_discord", raw);
+        return new ActionImpl<>(client, Routes.Group.MODIFY.compile(json, this.id), null);
     }
 }

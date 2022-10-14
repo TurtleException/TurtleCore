@@ -1,6 +1,7 @@
 package de.turtle_exception.client.api.entities;
 
 import de.turtle_exception.client.api.TurtlePermission;
+import de.turtle_exception.client.api.requests.Action;
 import net.dv8tion.jda.api.Permission;
 import org.jetbrains.annotations.NotNull;
 
@@ -24,6 +25,10 @@ public interface PermissionHolder extends Turtle {
         return TurtlePermission.toRaw(this.getTurtlePermissionOverrides());
     }
 
+    @NotNull Action<Void> addTurtlePermissionOverrides(@NotNull TurtlePermission... permissions);
+
+    @NotNull Action<Void> removeTurtlePermissionOverrides(@NotNull TurtlePermission... permissions);
+
     /* - DISCORD - */
 
     default boolean hasDiscordPermission(@NotNull Permission permission) {
@@ -41,4 +46,8 @@ public interface PermissionHolder extends Turtle {
     default long getDiscordPermissionOverridesRaw() {
         return Permission.getRaw(this.getDiscordPermissionOverrides());
     }
+
+    @NotNull Action<Void> addDiscordPermissionOverrides(@NotNull Permission... permissions);
+
+    @NotNull Action<Void> removeDiscordPermissionOverrides(@NotNull Permission... permissions);
 }
