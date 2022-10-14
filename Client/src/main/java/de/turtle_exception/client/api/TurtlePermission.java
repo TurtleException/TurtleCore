@@ -12,7 +12,7 @@ import java.util.EnumSet;
  * Permissions are recorded in {@code long} numbers, where each bit represents a single permission that can either be
  * allowed (1) or denied (0).
  */
-public enum Permission {
+public enum TurtlePermission {
     // BASICS
     CHAT(0, "Use Chats"),
 
@@ -43,7 +43,7 @@ public enum Permission {
     private final int    offset;
     private final String title;
 
-    Permission(@Range(from = -1, to = 63) int offset, @NotNull String title) {
+    TurtlePermission(@Range(from = -1, to = 63) int offset, @NotNull String title) {
         this.offset = offset;
         this.title  = title;
     }
@@ -60,7 +60,7 @@ public enum Permission {
 
     /**
      * The mask of this permission - i.e. a long with all bits set to 0, except the one defined by
-     * {@link Permission#getOffset()}.
+     * {@link TurtlePermission#getOffset()}.
      * */
     public long getRaw() {
         if (this == UNKNOWN) return 0;
@@ -70,22 +70,22 @@ public enum Permission {
     /* - - - */
 
     /**
-     * Provides a single {@link Permission} defined by the specified offset. If no permission suits that offset
-     * {@link Permission#UNKNOWN} will be returned.
+     * Provides a single {@link TurtlePermission} defined by the specified offset. If no permission suits that offset
+     * {@link TurtlePermission#UNKNOWN} will be returned.
      * @param offset Permission bit offset.
      */
-    public static @NotNull Permission fromOffset(int offset) {
-        for (Permission permission : values())
+    public static @NotNull TurtlePermission fromOffset(int offset) {
+        for (TurtlePermission permission : values())
             if (permission.getOffset() == offset)
                 return permission;
         return UNKNOWN;
     }
 
     /** Provides an {@link EnumSet} containing the permissions defined by the specified raw long. */
-    public static @NotNull EnumSet<Permission> fromRaw(long raw) {
-        EnumSet<Permission> permissions = EnumSet.noneOf(Permission.class);
+    public static @NotNull EnumSet<TurtlePermission> fromRaw(long raw) {
+        EnumSet<TurtlePermission> permissions = EnumSet.noneOf(TurtlePermission.class);
 
-        for (Permission p : values()) {
+        for (TurtlePermission p : values()) {
             if (p == UNKNOWN) continue;
 
             long mask = p.getOffset();
@@ -97,13 +97,13 @@ public enum Permission {
     }
 
     /**
-     * Converts one or more Permissions into a raw long. If one of the permissions is {@link Permission#UNKNOWN} it will
+     * Converts one or more Permissions into a raw long. If one of the permissions is {@link TurtlePermission#UNKNOWN} it will
      * be ignored. Duplicates will be ignored and handled as if they were only provided once.
      */
-    public static long toRaw(@NotNull Permission... permissions) {
+    public static long toRaw(@NotNull TurtlePermission... permissions) {
         long raw = 0;
 
-        for (Permission permission : permissions) {
+        for (TurtlePermission permission : permissions) {
             if (permission == UNKNOWN) continue;
             raw = raw | permission.getRaw();
         }
@@ -113,10 +113,10 @@ public enum Permission {
 
     /**
      * Converts a {@link Collection} of Permissions into a raw long. If one of the permissions is
-     * {@link Permission#UNKNOWN} it will be ignored. Duplicates will be ignored and handled as if they were only
+     * {@link TurtlePermission#UNKNOWN} it will be ignored. Duplicates will be ignored and handled as if they were only
      * provided once.
      */
-    public static long toRaw(@NotNull Collection<Permission> permissions) {
-        return toRaw(permissions.toArray(new Permission[0]));
+    public static long toRaw(@NotNull Collection<TurtlePermission> permissions) {
+        return toRaw(permissions.toArray(new TurtlePermission[0]));
     }
 }

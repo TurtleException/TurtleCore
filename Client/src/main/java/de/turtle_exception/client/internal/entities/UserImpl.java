@@ -1,13 +1,14 @@
 package de.turtle_exception.client.internal.entities;
 
 import com.google.gson.JsonObject;
-import de.turtle_exception.client.api.Permission;
+import de.turtle_exception.client.api.TurtlePermission;
 import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.api.entities.Group;
 import de.turtle_exception.client.api.entities.User;
 import de.turtle_exception.client.api.requests.Action;
 import de.turtle_exception.client.internal.ActionImpl;
 import de.turtle_exception.core.net.route.Routes;
+import net.dv8tion.jda.api.Permission;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -24,10 +25,10 @@ public class UserImpl implements User {
     private final ArrayList<Long> discord;
     private final ArrayList<UUID> minecraft;
 
-    private final EnumSet<Permission> permissionOverrides;
-    private final EnumSet<net.dv8tion.jda.api.Permission> permissionOverridesDiscord;
+    private final EnumSet<TurtlePermission> permissionOverridesTurtle;
+    private final EnumSet<Permission> permissionOverridesDiscord;
 
-    UserImpl(TurtleClient client, long id, String name, ArrayList<Long> discord, ArrayList<UUID> minecraft, EnumSet<Permission> permissionOverrides, EnumSet<net.dv8tion.jda.api.Permission> permissionOverridesDiscord) {
+    UserImpl(TurtleClient client, long id, String name, ArrayList<Long> discord, ArrayList<UUID> minecraft, EnumSet<TurtlePermission> permissionOverridesTurtle, EnumSet<Permission> permissionOverridesDiscord) {
         this.client = client;
         this.id = id;
         this.name = name;
@@ -35,7 +36,7 @@ public class UserImpl implements User {
         this.discord   = discord;
         this.minecraft = minecraft;
 
-        this.permissionOverrides = permissionOverrides;
+        this.permissionOverridesTurtle = permissionOverridesTurtle;
         this.permissionOverridesDiscord = permissionOverridesDiscord;
     }
 
@@ -105,36 +106,36 @@ public class UserImpl implements User {
     /* - PERMISSIONS - */
 
     @Override
-    public boolean hasPermission(@NotNull Permission permission) {
-        if (this.hasPermissionOverride(permission)) return true;
+    public boolean hasTurtlePermission(@NotNull TurtlePermission permission) {
+        if (this.hasTurtlePermissionOverride(permission)) return true;
         for (Group group : getGroups())
-            if (group.hasPermission(permission)) return true;
+            if (group.hasTurtlePermission(permission)) return true;
         return false;
     }
 
     @Override
-    public boolean hasPermissionOverride(@NotNull Permission permission) {
-        if (permission == Permission.UNKNOWN) return false;
-        return permissionOverrides.contains(permission);
+    public boolean hasTurtlePermissionOverride(@NotNull TurtlePermission permission) {
+        if (permission == TurtlePermission.UNKNOWN) return false;
+        return permissionOverridesTurtle.contains(permission);
     }
 
     @Override
-    public @NotNull EnumSet<Permission> getPermissions() {
-        EnumSet<Permission> permissions = EnumSet.copyOf(permissionOverrides);
+    public @NotNull EnumSet<TurtlePermission> getTurtlePermissions() {
+        EnumSet<TurtlePermission> permissions = EnumSet.copyOf(permissionOverridesTurtle);
         for (Group group : getGroups())
-            permissions.addAll(group.getPermissions());
+            permissions.addAll(group.getTurtlePermissions());
         return permissions;
     }
 
     @Override
-    public @NotNull EnumSet<Permission> getPermissionOverrides() {
-        return EnumSet.copyOf(permissionOverrides);
+    public @NotNull EnumSet<TurtlePermission> getTurtlePermissionOverrides() {
+        return EnumSet.copyOf(permissionOverridesTurtle);
     }
 
     /* - PERMISSIONS / DISCORD - */
 
     @Override
-    public boolean hasDiscordPermission(@NotNull net.dv8tion.jda.api.Permission permission) {
+    public boolean hasDiscordPermission(@NotNull Permission permission) {
         if (this.hasDiscordPermissionOverride(permission)) return true;
         for (Group group : getGroups())
             if (group.hasDiscordPermission(permission)) return true;
@@ -142,21 +143,21 @@ public class UserImpl implements User {
     }
 
     @Override
-    public boolean hasDiscordPermissionOverride(@NotNull net.dv8tion.jda.api.Permission permission) {
-        if (permission == net.dv8tion.jda.api.Permission.UNKNOWN) return false;
+    public boolean hasDiscordPermissionOverride(@NotNull Permission permission) {
+        if (permission == Permission.UNKNOWN) return false;
         return permissionOverridesDiscord.contains(permission);
     }
 
     @Override
-    public @NotNull EnumSet<net.dv8tion.jda.api.Permission> getDiscordPermissions() {
-        EnumSet<net.dv8tion.jda.api.Permission> permissions = EnumSet.copyOf(permissionOverridesDiscord);
+    public @NotNull EnumSet<Permission> getDiscordPermissions() {
+        EnumSet<Permission> permissions = EnumSet.copyOf(permissionOverridesDiscord);
         for (Group group : getGroups())
             permissions.addAll(group.getDiscordPermissions());
         return permissions;
     }
 
     @Override
-    public @NotNull EnumSet<net.dv8tion.jda.api.Permission> getDiscordPermissionOverrides() {
+    public @NotNull EnumSet<Permission> getDiscordPermissionOverrides() {
         return EnumSet.copyOf(permissionOverridesDiscord);
     }
 }

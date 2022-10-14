@@ -3,7 +3,7 @@ package de.turtle_exception.client.internal.entities;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import de.turtle_exception.client.api.Permission;
+import de.turtle_exception.client.api.TurtlePermission;
 import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.api.entities.Group;
 import de.turtle_exception.client.api.entities.Ticket;
@@ -49,7 +49,7 @@ public class EntityBuilder {
         for (JsonElement element : minecraftArr)
             minecraftList.add(UUID.fromString(element.getAsString()));
 
-        EnumSet<Permission> permissionSet = Permission.fromRaw(permissions);
+        EnumSet<TurtlePermission> permissionSet = TurtlePermission.fromRaw(permissions);
         EnumSet<net.dv8tion.jda.api.Permission> permissionDiscordSet = net.dv8tion.jda.api.Permission.getPermissions(permissionsDiscord);
 
         return new UserImpl(client, id, name, discordList, minecraftList, permissionSet, permissionDiscordSet);
@@ -86,7 +86,7 @@ public class EntityBuilder {
         for (JsonElement element : userArr)
             users.add(client.getUserById(element.getAsLong()));
 
-        EnumSet<Permission> permissionSet = Permission.fromRaw(permissions);
+        EnumSet<TurtlePermission> permissionSet = TurtlePermission.fromRaw(permissions);
         EnumSet< net.dv8tion.jda.api.Permission> permissionDiscordSet = net.dv8tion.jda.api.Permission.getPermissions(permissionsDiscord);
 
         return new GroupImpl(client, id, name, users, permissionSet, permissionDiscordSet);

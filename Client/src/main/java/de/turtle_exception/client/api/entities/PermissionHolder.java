@@ -1,43 +1,44 @@
 package de.turtle_exception.client.api.entities;
 
-import de.turtle_exception.client.api.Permission;
+import de.turtle_exception.client.api.TurtlePermission;
+import net.dv8tion.jda.api.Permission;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.EnumSet;
 
 @SuppressWarnings("unused")
 public interface PermissionHolder extends Turtle {
-    default boolean hasPermission(@NotNull Permission permission) {
-        return this.hasPermissionOverride(permission);
+    default boolean hasTurtlePermission(@NotNull TurtlePermission permission) {
+        return this.hasTurtlePermissionOverride(permission);
     }
 
-    boolean hasPermissionOverride(@NotNull Permission permission);
+    boolean hasTurtlePermissionOverride(@NotNull TurtlePermission permission);
 
-    default @NotNull EnumSet<Permission> getPermissions() {
-        return this.getPermissionOverrides();
+    default @NotNull EnumSet<TurtlePermission> getTurtlePermissions() {
+        return this.getTurtlePermissionOverrides();
     }
 
-    @NotNull EnumSet<Permission> getPermissionOverrides();
+    @NotNull EnumSet<TurtlePermission> getTurtlePermissionOverrides();
 
-    default long getPermissionOverridesRaw() {
-        return Permission.toRaw(this.getPermissionOverrides());
+    default long getTurtlePermissionOverridesRaw() {
+        return TurtlePermission.toRaw(this.getTurtlePermissionOverrides());
     }
 
     /* - DISCORD - */
 
-    default boolean hasDiscordPermission(@NotNull net.dv8tion.jda.api.Permission permission) {
+    default boolean hasDiscordPermission(@NotNull Permission permission) {
         return this.hasDiscordPermissionOverride(permission);
     }
 
-    boolean hasDiscordPermissionOverride(@NotNull net.dv8tion.jda.api.Permission permission);
+    boolean hasDiscordPermissionOverride(@NotNull Permission permission);
 
-    default @NotNull EnumSet<net.dv8tion.jda.api.Permission> getDiscordPermissions() {
+    default @NotNull EnumSet<Permission> getDiscordPermissions() {
         return this.getDiscordPermissionOverrides();
     }
 
-    @NotNull EnumSet<net.dv8tion.jda.api.Permission> getDiscordPermissionOverrides();
+    @NotNull EnumSet<Permission> getDiscordPermissionOverrides();
 
     default long getDiscordPermissionOverridesRaw() {
-        return net.dv8tion.jda.api.Permission.getRaw(this.getDiscordPermissionOverrides());
+        return Permission.getRaw(this.getDiscordPermissionOverrides());
     }
 }

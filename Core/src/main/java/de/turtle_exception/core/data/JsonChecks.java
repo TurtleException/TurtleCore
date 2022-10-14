@@ -15,7 +15,7 @@ public class JsonChecks {
         try {
             long   id          = json.get("id").getAsLong();
             String name        = json.get("name").getAsString();
-            long   permissions = json.get("permissions").getAsLong();
+            long   permissionsTurtle = json.get("permissions_turtle").getAsLong();
             long   permissionsDiscord = json.get("permissions_discord").getAsLong();
 
             Checks.nonNull(name, "Name");
@@ -32,7 +32,7 @@ public class JsonChecks {
         try {
             long   id          = json.get("id").getAsLong();
             String name        = json.get("name").getAsString();
-            long   permissions = json.get("permissions").getAsLong();
+            long   permissionsTurtle = json.get("permissions_turtle").getAsLong();
             long   permissionsDiscord = json.get("permissions_discord").getAsLong();
 
             Checks.nonNull(name, "Name");
