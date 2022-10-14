@@ -13,8 +13,10 @@ public class JsonChecks {
 
     public static void validateGroup(@NotNull JsonObject json) throws IllegalJsonException {
         try {
-            long id     = json.get("id").getAsLong();
-            String name = json.get("name").getAsString();
+            long   id          = json.get("id").getAsLong();
+            String name        = json.get("name").getAsString();
+            long   permissionsTurtle = json.get("permissions_turtle").getAsLong();
+            long   permissionsDiscord = json.get("permissions_discord").getAsLong();
 
             Checks.nonNull(name, "Name");
 
@@ -28,8 +30,10 @@ public class JsonChecks {
 
     public static void validateUser(@NotNull JsonObject json) throws IllegalJsonException {
         try {
-            long id     = json.get("id").getAsLong();
-            String name = json.get("name").getAsString();
+            long   id          = json.get("id").getAsLong();
+            String name        = json.get("name").getAsString();
+            long   permissionsTurtle = json.get("permissions_turtle").getAsLong();
+            long   permissionsDiscord = json.get("permissions_discord").getAsLong();
 
             Checks.nonNull(name, "Name");
 
