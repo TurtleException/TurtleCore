@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
+@SuppressWarnings("unused")
 public interface UserAction extends Action<User> {
     @NotNull UserAction setName(@NotNull String name);
 

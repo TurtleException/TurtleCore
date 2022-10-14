@@ -6,6 +6,7 @@ import de.turtle_exception.client.api.entities.User;
 import de.turtle_exception.client.api.requests.Action;
 import org.jetbrains.annotations.NotNull;
 
+@SuppressWarnings("unused")
 public interface TicketAction extends Action<Ticket> {
     @NotNull TicketAction setState(byte state);
 

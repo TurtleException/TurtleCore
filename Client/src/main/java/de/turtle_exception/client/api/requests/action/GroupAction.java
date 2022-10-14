@@ -5,6 +5,7 @@ import de.turtle_exception.client.api.entities.User;
 import de.turtle_exception.client.api.requests.Action;
 import org.jetbrains.annotations.NotNull;
 
+@SuppressWarnings("unused")
 public interface GroupAction extends Action<Group> {
     @NotNull GroupAction setName(@NotNull String name);
 
