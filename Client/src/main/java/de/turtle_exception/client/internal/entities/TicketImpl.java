@@ -63,7 +63,9 @@ public class TicketImpl implements Ticket {
     public @NotNull Action<Void> modifyState(@NotNull TicketState state) {
         JsonObject json = new JsonObject();
         json.addProperty("state", state.getCode());
-        return new ActionImpl<>(client, Routes.Ticket.MODIFY.compile(json, this.id), null);
+        return new ActionImpl<Void>(client, Routes.Ticket.MODIFY, null)
+                .setRouteArgs(this.id)
+                .setContent(json);
     }
 
     /* - TITLE - */
@@ -77,7 +79,9 @@ public class TicketImpl implements Ticket {
     public @NotNull Action<Void> modifyTitle(@Nullable String title) {
         JsonObject json = new JsonObject();
         json.addProperty("title", String.valueOf(title));
-        return new ActionImpl<>(client, Routes.Ticket.MODIFY.compile(json, this.id), null);
+        return new ActionImpl<Void>(client, Routes.Ticket.MODIFY, null)
+                .setRouteArgs(this.id)
+                .setContent(json);
     }
 
     /* - CATEGORY - */
@@ -91,7 +95,9 @@ public class TicketImpl implements Ticket {
     public @NotNull Action<Void> modifyCategory(@NotNull String category) {
         JsonObject json = new JsonObject();
         json.addProperty("category", category);
-        return new ActionImpl<>(client, Routes.Ticket.MODIFY.compile(json, this.id), null);
+        return new ActionImpl<Void>(client, Routes.Ticket.MODIFY, null)
+                .setRouteArgs(this.id)
+                .setContent(json);
     }
 
     /* - TAGS - */
@@ -103,12 +109,14 @@ public class TicketImpl implements Ticket {
 
     @Override
     public @NotNull Action<Void> addTag(@NotNull String tag) {
-        return new ActionImpl<>(client, Routes.Ticket.ADD_TAG.compile(null, this.id, tag), null);
+        return new ActionImpl<Void>(client, Routes.Ticket.ADD_TAG, null)
+                .setRouteArgs(this.id, tag);
     }
 
     @Override
     public @NotNull Action<Void> removeTag(@NotNull String tag) {
-        return new ActionImpl<>(client, Routes.Ticket.DEL_TAG.compile(null, this.id, tag), null);
+        return new ActionImpl<Void>(client, Routes.Ticket.DEL_TAG, null)
+                .setRouteArgs(this.id, tag);
     }
 
     /* - DISCORD - */
@@ -122,7 +130,9 @@ public class TicketImpl implements Ticket {
     public @NotNull Action<Void> modifyDiscordChannel(long channel) {
         JsonObject json = new JsonObject();
         json.addProperty("channel", channel);
-        return new ActionImpl<>(client, Routes.Ticket.MODIFY.compile(json, this.id), null);
+        return new ActionImpl<Void>(client, Routes.Ticket.MODIFY, null)
+                .setRouteArgs(this.id)
+                .setContent(json);
     }
 
     /* - USERS - */
@@ -143,11 +153,13 @@ public class TicketImpl implements Ticket {
 
     @Override
     public @NotNull Action<Void> addUser(@NotNull User user) {
-        return new ActionImpl<>(client, Routes.Ticket.ADD_USER.compile(null, this.id, user), null);
+        return new ActionImpl<Void>(client, Routes.Ticket.ADD_USER, null)
+                .setRouteArgs(this.id, user);
     }
 
     @Override
     public @NotNull Action<Void> removeUser(@NotNull User user) {
-        return new ActionImpl<>(client, Routes.Ticket.ADD_USER.compile(null, this.id, user), null);
+        return new ActionImpl<Void>(client, Routes.Ticket.ADD_USER, null)
+                .setRouteArgs(this.id, user);
     }
 }

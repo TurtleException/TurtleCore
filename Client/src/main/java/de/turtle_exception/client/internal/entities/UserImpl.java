@@ -56,7 +56,9 @@ public class UserImpl implements User {
     public @NotNull Action<Void> modifyName(@NotNull String name) {
         JsonObject json = new JsonObject();
         json.addProperty("name", name);
-        return new ActionImpl<>(client, Routes.User.MODIFY.compile(json, this.id), null);
+        return new ActionImpl<Void>(client, Routes.User.MODIFY, null)
+                .setRouteArgs(this.id)
+                .setContent(json);
     }
 
     /* - DISCORD - */
@@ -68,12 +70,14 @@ public class UserImpl implements User {
 
     @Override
     public @NotNull Action<Void> addDiscordId(long discordId) {
-        return new ActionImpl<>(client, Routes.User.ADD_DISCORD.compile(null, this.id, discordId), null);
+        return new ActionImpl<Void>(client, Routes.User.ADD_DISCORD, null)
+                .setRouteArgs(this.id, discordId);
     }
 
     @Override
     public @NotNull Action<Void> removeDiscordId(long discordId) {
-        return new ActionImpl<>(client, Routes.User.DEL_DISCORD.compile(null, this.id, discordId), null);
+        return new ActionImpl<Void>(client, Routes.User.DEL_DISCORD, null)
+                .setRouteArgs(this.id, discordId);
     }
 
     /* - MINECRAFT - */
@@ -85,11 +89,13 @@ public class UserImpl implements User {
 
     @Override
     public @NotNull Action<Void> addMinecraftId(@NotNull UUID minecraftId) {
-        return new ActionImpl<>(client, Routes.User.ADD_MINECRAFT.compile(null, this.id, minecraftId), null);
+        return new ActionImpl<Void>(client, Routes.User.ADD_MINECRAFT, null)
+                .setRouteArgs(this.id, minecraftId);
     }
 
     @Override
     public @NotNull Action<Void> removeMinecraftId(@NotNull UUID minecraftId) {
-        return new ActionImpl<>(client, Routes.User.DEL_MINECRAFT.compile(null, this.id, minecraftId), null);
+        return new ActionImpl<Void>(client, Routes.User.DEL_MINECRAFT, null)
+                .setRouteArgs(this.id, minecraftId);
     }
 }

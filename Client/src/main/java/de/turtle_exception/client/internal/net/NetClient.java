@@ -108,7 +108,7 @@ public class NetClient extends NetworkAdapter {
     @Override
     public void stop() throws IOException {
         // notify server
-        new ActionImpl<Void>(client, Routes.QUIT.compile(null), null).queue();
+        new ActionImpl<Void>(client, Routes.QUIT, null).queue();
 
         this.quit();
     }

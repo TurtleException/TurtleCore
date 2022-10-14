@@ -1,5 +1,6 @@
 package de.turtle_exception.client.internal;
 
+import com.google.gson.JsonElement;
 import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.api.requests.Action;
 import de.turtle_exception.client.api.requests.ActionFuture;
@@ -7,6 +8,7 @@ import de.turtle_exception.client.api.requests.Request;
 import de.turtle_exception.client.api.requests.ActionHandler;
 import de.turtle_exception.core.net.message.InboundMessage;
 import de.turtle_exception.core.net.route.CompiledRoute;
+import de.turtle_exception.core.net.route.Route;
 import de.turtle_exception.core.net.route.RouteError;
 import de.turtle_exception.core.net.route.Routes;
 import org.jetbrains.annotations.NotNull;
@@ -17,8 +19,11 @@ import java.util.function.Consumer;
 
 public class ActionImpl<T> implements Action<T> {
     private final @NotNull TurtleClientImpl client;
-    protected CompiledRoute route;
     protected ActionHandler<T> handler;
+
+    protected Route route;
+    protected @Nullable JsonElement content;
+    protected @NotNull  Object[]    routeArgs;
 
     private Consumer<? super T>         onSuccess = null;
     private Consumer<? super Throwable> onFailure = null;
@@ -26,10 +31,13 @@ public class ActionImpl<T> implements Action<T> {
     private boolean priority = false;
     private long deadline = 0;
 
-    public ActionImpl(@NotNull TurtleClient client, CompiledRoute route, ActionHandler<T> handler) {
+    public ActionImpl(@NotNull TurtleClient client, Route route, ActionHandler<T> handler) {
         this.client = (TurtleClientImpl) client;
-        this.route = route;
         this.handler = handler;
+
+        this.route = route;
+        this.content = null;
+        this.routeArgs = new Object[0];
     }
 
     @Override
@@ -44,13 +52,27 @@ public class ActionImpl<T> implements Action<T> {
     }
 
     @Override
-    public void queue(@Nullable Consumer<? super T> success, @Nullable Consumer<? super Throwable> failure) {
-        client.getNetClient().request(new Request<>(client, this, success, failure, route, deadline, priority));
+    public void queue(@Nullable Consumer<? super T> success, @Nullable Consumer<? super Throwable> failure) throws IllegalArgumentException {
+        client.getNetClient().request(new Request<>(client, this, success, failure, compileRoute(), deadline, priority));
     }
 
     @Override
-    public @NotNull CompletableFuture<T> submit() {
-        return new ActionFuture<>(this, deadline, priority, route);
+    public @NotNull CompletableFuture<T> submit() throws IllegalArgumentException {
+        return new ActionFuture<>(this, deadline, priority, compileRoute());
+    }
+
+    protected @NotNull CompiledRoute compileRoute() throws IllegalArgumentException {
+        return route.compile(content, routeArgs);
+    }
+
+    public @NotNull ActionImpl<T> setContent(@Nullable JsonElement content) {
+        this.content = content;
+        return this;
+    }
+
+    public @NotNull ActionImpl<T> setRouteArgs(@NotNull Object... routeArgs) {
+        this.routeArgs = routeArgs;
+        return this;
     }
 
     /**
