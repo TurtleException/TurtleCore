@@ -54,7 +54,7 @@ public class GroupImpl implements Group {
     public @NotNull Action<Void> modifyName(@NotNull String name) {
         JsonObject json = new JsonObject();
         json.addProperty("name", name);
-        return new ActionImpl<Void>(client, Routes.Group.MODIFY, null)
+        return new ActionImpl<Void>(client, Routes.Group.MODIFY)
                 .setRouteArgs(this.id)
                 .setContent(json);
     }
@@ -77,13 +77,13 @@ public class GroupImpl implements Group {
 
     @Override
     public @NotNull Action<Void> addUser(long user) {
-        return new ActionImpl<Void>(client, Routes.Group.ADD_USER, null)
+        return new ActionImpl<Void>(client, Routes.Group.ADD_USER)
                 .setRouteArgs(this.id, user);
     }
 
     @Override
     public @NotNull Action<Void> removeUser(long user) {
-        return new ActionImpl<Void>(client, Routes.Group.DEL_USER, null)
+        return new ActionImpl<Void>(client, Routes.Group.DEL_USER)
                 .setRouteArgs(this.id, user);
     }
 }

@@ -40,6 +40,10 @@ public class ActionImpl<T> implements Action<T> {
         this.routeArgs = new Object[0];
     }
 
+    public ActionImpl(@NotNull TurtleClient client, Route route) {
+        this(client, route, null);
+    }
+
     @Override
     public @NotNull TurtleClient getClient() {
         return this.client;
