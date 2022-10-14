@@ -7,7 +7,7 @@ import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.api.entities.Group;
 import de.turtle_exception.client.api.entities.Ticket;
 import de.turtle_exception.client.api.entities.User;
-import de.turtle_exception.core.data.TicketState;
+import de.turtle_exception.client.api.TicketState;
 import de.turtle_exception.client.internal.util.TurtleSet;
 import de.turtle_exception.core.data.IllegalJsonException;
 import de.turtle_exception.core.data.JsonChecks;

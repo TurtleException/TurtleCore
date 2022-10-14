@@ -1,4 +1,4 @@
-package de.turtle_exception.core.data;
+package de.turtle_exception.client.api;
 
 import org.jetbrains.annotations.NotNull;
 
