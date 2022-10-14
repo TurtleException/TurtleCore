@@ -82,6 +82,7 @@ public class SQLService implements DataService {
             json.addProperty("id"         , resultSet.getLong("id"));
             json.addProperty("name"       , resultSet.getString("name"));
             json.addProperty("permissions", resultSet.getLong("permissions"));
+            json.addProperty("permissions_discord", resultSet.getLong("permissions_discord"));
             json.add("members", this.getGroupMembers(id));
 
             return json;
@@ -92,13 +93,14 @@ public class SQLService implements DataService {
 
     @Override
     public void setGroup(@NotNull JsonObject group) throws DataAccessException {
-        long id, permissions;
+        long id, permissions, permissionsDiscord;
         String name;
 
         try {
             id = group.get("id").getAsLong();
             name = group.get("name").getAsString();
             permissions = group.get("permissions").getAsLong();
+            permissionsDiscord = group.get("permissions_discord").getAsLong();
         } catch (Exception e) {
             throw new DataAccessException("Malformed parameters for group object");
         }
@@ -106,7 +108,7 @@ public class SQLService implements DataService {
         // simpler to use this (all members will also be deleted)
         this.deleteGroup(id);
 
-        this.sqlConnector.executeSilent(Statements.SET_GROUP, id, name, permissions);
+        this.sqlConnector.executeSilent(Statements.SET_GROUP, id, name, permissions, permissionsDiscord);
 
         JsonArray members = group.getAsJsonArray("members");
         if (members != null) {
@@ -194,6 +196,7 @@ public class SQLService implements DataService {
             json.addProperty("id"         , resultUser.getLong("id"));
             json.addProperty("name"       , resultUser.getString("name"));
             json.addProperty("permissions", resultUser.getLong("permissions"));
+            json.addProperty("permissions_discord", resultUser.getLong("permissions_discord"));
             json.add("discord"  , this.getUserDiscord(id));
             json.add("minecraft", this.getUserMinecraft(id));
 
@@ -205,18 +208,19 @@ public class SQLService implements DataService {
 
     @Override
     public void setUser(@NotNull JsonObject user) throws DataAccessException {
-        long id, permissions;
+        long id, permissions, permissionsDiscord;
         String name;
 
         try {
             id = user.get("id").getAsLong();
             name = user.get("name").getAsString();
             permissions = user.get("permissions").getAsLong();
+            permissionsDiscord = user.get("permissions_discord").getAsLong();
         } catch (Exception e) {
             throw new DataAccessException("Malformed parameters for user object");
         }
 
-        this.sqlConnector.executeSilent(Statements.SET_USER, id, name, permissions);
+        this.sqlConnector.executeSilent(Statements.SET_USER, id, name, permissions, permissionsDiscord);
 
         JsonArray discord = user.getAsJsonArray("discord");
         if (discord != null) {

@@ -37,6 +37,7 @@ public class EntityBuilder {
         long   id          = json.get("id").getAsLong();
         String name        = json.get("name").getAsString();
         long   permissions = json.get("permissions").getAsLong();
+        long   permissionsDiscord = json.get("permissions_discord").getAsLong();
 
         JsonArray       discordArr  = json.getAsJsonArray("discord");
         ArrayList<Long> discordList = new ArrayList<>();
@@ -49,8 +50,9 @@ public class EntityBuilder {
             minecraftList.add(UUID.fromString(element.getAsString()));
 
         EnumSet<Permission> permissionSet = Permission.fromRaw(permissions);
+        EnumSet<net.dv8tion.jda.api.Permission> permissionDiscordSet = net.dv8tion.jda.api.Permission.getPermissions(permissionsDiscord);
 
-        return new UserImpl(client, id, name, discordList, minecraftList, permissionSet);
+        return new UserImpl(client, id, name, discordList, minecraftList, permissionSet, permissionDiscordSet);
     }
 
     public static @NotNull List<User> buildUsers(TurtleClient client, JsonArray json) throws NullPointerException, IllegalArgumentException, IllegalJsonException {
@@ -77,6 +79,7 @@ public class EntityBuilder {
         long   id          = json.get("id").getAsLong();
         String name        = json.get("name").getAsString();
         long   permissions = json.get("permissions").getAsLong();
+        long   permissionsDiscord = json.get("permissions_discord").getAsLong();
 
         JsonArray       userArr  = json.getAsJsonArray("members");
         TurtleSet<User> users    = new TurtleSet<>();
@@ -84,8 +87,9 @@ public class EntityBuilder {
             users.add(client.getUserById(element.getAsLong()));
 
         EnumSet<Permission> permissionSet = Permission.fromRaw(permissions);
+        EnumSet< net.dv8tion.jda.api.Permission> permissionDiscordSet = net.dv8tion.jda.api.Permission.getPermissions(permissionsDiscord);
 
-        return new GroupImpl(client, id, name, users, permissionSet);
+        return new GroupImpl(client, id, name, users, permissionSet, permissionDiscordSet);
     }
 
     public static @NotNull List<Group> buildGroups(TurtleClient client, JsonArray json) throws NullPointerException, IllegalArgumentException, IllegalJsonException {

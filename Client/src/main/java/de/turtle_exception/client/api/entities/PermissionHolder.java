@@ -22,4 +22,22 @@ public interface PermissionHolder extends Turtle {
     default long getPermissionOverridesRaw() {
         return Permission.toRaw(this.getPermissionOverrides());
     }
+
+    /* - DISCORD - */
+
+    default boolean hasDiscordPermission(@NotNull net.dv8tion.jda.api.Permission permission) {
+        return this.hasDiscordPermissionOverride(permission);
+    }
+
+    boolean hasDiscordPermissionOverride(@NotNull net.dv8tion.jda.api.Permission permission);
+
+    default @NotNull EnumSet<net.dv8tion.jda.api.Permission> getDiscordPermissions() {
+        return this.getDiscordPermissionOverrides();
+    }
+
+    @NotNull EnumSet<net.dv8tion.jda.api.Permission> getDiscordPermissionOverrides();
+
+    default long getDiscordPermissionOverridesRaw() {
+        return net.dv8tion.jda.api.Permission.getRaw(this.getDiscordPermissionOverrides());
+    }
 }

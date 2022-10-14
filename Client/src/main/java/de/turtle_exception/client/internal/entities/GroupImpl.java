@@ -24,8 +24,9 @@ public class GroupImpl implements Group {
     private final TurtleSet<User> users;
 
     private final EnumSet<Permission> permissions;
+    private final EnumSet<net.dv8tion.jda.api.Permission> permissionsDiscord;
 
-    GroupImpl(TurtleClient client, long id, String name, TurtleSet<User> users, EnumSet<Permission> permissions) {
+    GroupImpl(TurtleClient client, long id, String name, TurtleSet<User> users, EnumSet<Permission> permissions, EnumSet<net.dv8tion.jda.api.Permission> permissionsDiscord) {
         this.client = client;
         this.id = id;
         this.name = name;
@@ -33,6 +34,7 @@ public class GroupImpl implements Group {
         this.users = users;
 
         this.permissions = permissions;
+        this.permissionsDiscord = permissionsDiscord;
     }
 
     @Override
@@ -100,5 +102,18 @@ public class GroupImpl implements Group {
     @Override
     public @NotNull EnumSet<Permission> getPermissionOverrides() {
         return EnumSet.copyOf(permissions);
+    }
+
+    /* - PERMISSIONS / DISCORD - */
+
+    @Override
+    public boolean hasDiscordPermissionOverride(@NotNull net.dv8tion.jda.api.Permission permission) {
+        if (permission == net.dv8tion.jda.api.Permission.UNKNOWN) return false;
+        return permissionsDiscord.contains(permission);
+    }
+
+    @Override
+    public @NotNull EnumSet<net.dv8tion.jda.api.Permission> getDiscordPermissionOverrides() {
+        return EnumSet.copyOf(permissionsDiscord);
     }
 }

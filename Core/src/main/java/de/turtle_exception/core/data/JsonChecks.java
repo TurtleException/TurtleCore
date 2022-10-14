@@ -16,6 +16,7 @@ public class JsonChecks {
             long   id          = json.get("id").getAsLong();
             String name        = json.get("name").getAsString();
             long   permissions = json.get("permissions").getAsLong();
+            long   permissionsDiscord = json.get("permissions_discord").getAsLong();
 
             Checks.nonNull(name, "Name");
 
@@ -32,6 +33,7 @@ public class JsonChecks {
             long   id          = json.get("id").getAsLong();
             String name        = json.get("name").getAsString();
             long   permissions = json.get("permissions").getAsLong();
+            long   permissionsDiscord = json.get("permissions_discord").getAsLong();
 
             Checks.nonNull(name, "Name");
 
