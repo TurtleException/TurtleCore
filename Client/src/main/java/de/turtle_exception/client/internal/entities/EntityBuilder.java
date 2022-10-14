@@ -13,6 +13,7 @@ import de.turtle_exception.client.internal.util.TurtleSet;
 import de.turtle_exception.core.data.IllegalJsonException;
 import de.turtle_exception.core.data.JsonChecks;
 import de.turtle_exception.core.util.Checks;
+import net.dv8tion.jda.api.Permission;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -34,10 +35,10 @@ public class EntityBuilder {
         Checks.nonNull(json, "JSON");
         JsonChecks.validateUser(json);
 
-        long   id          = json.get("id").getAsLong();
-        String name        = json.get("name").getAsString();
-        long   permissions = json.get("permissions").getAsLong();
-        long   permissionsDiscord = json.get("permissions_discord").getAsLong();
+        long   id   = json.get("id").getAsLong();
+        String name = json.get("name").getAsString();
+        long permissionsTurtle  = json.get("permissions_turtle").getAsLong();
+        long permissionsDiscord = json.get("permissions_discord").getAsLong();
 
         JsonArray       discordArr  = json.getAsJsonArray("discord");
         ArrayList<Long> discordList = new ArrayList<>();
@@ -49,10 +50,10 @@ public class EntityBuilder {
         for (JsonElement element : minecraftArr)
             minecraftList.add(UUID.fromString(element.getAsString()));
 
-        EnumSet<TurtlePermission> permissionSet = TurtlePermission.fromRaw(permissions);
-        EnumSet<net.dv8tion.jda.api.Permission> permissionDiscordSet = net.dv8tion.jda.api.Permission.getPermissions(permissionsDiscord);
+        EnumSet<TurtlePermission> permissionTurtleSet  = TurtlePermission.fromRaw(permissionsTurtle);
+        EnumSet<Permission>       permissionDiscordSet = Permission.getPermissions(permissionsDiscord);
 
-        return new UserImpl(client, id, name, discordList, minecraftList, permissionSet, permissionDiscordSet);
+        return new UserImpl(client, id, name, discordList, minecraftList, permissionTurtleSet, permissionDiscordSet);
     }
 
     public static @NotNull List<User> buildUsers(TurtleClient client, JsonArray json) throws NullPointerException, IllegalArgumentException, IllegalJsonException {
@@ -76,20 +77,20 @@ public class EntityBuilder {
         Checks.nonNull(json, "JSON");
         JsonChecks.validateGroup(json);
 
-        long   id          = json.get("id").getAsLong();
-        String name        = json.get("name").getAsString();
-        long   permissions = json.get("permissions").getAsLong();
-        long   permissionsDiscord = json.get("permissions_discord").getAsLong();
+        long   id   = json.get("id").getAsLong();
+        String name = json.get("name").getAsString();
+        long permissionsTurtle  = json.get("permissions_turtle").getAsLong();
+        long permissionsDiscord = json.get("permissions_discord").getAsLong();
 
         JsonArray       userArr  = json.getAsJsonArray("members");
         TurtleSet<User> users    = new TurtleSet<>();
         for (JsonElement element : userArr)
             users.add(client.getUserById(element.getAsLong()));
 
-        EnumSet<TurtlePermission> permissionSet = TurtlePermission.fromRaw(permissions);
-        EnumSet< net.dv8tion.jda.api.Permission> permissionDiscordSet = net.dv8tion.jda.api.Permission.getPermissions(permissionsDiscord);
+        EnumSet<TurtlePermission> permissionTurtleSet  = TurtlePermission.fromRaw(permissionsTurtle);
+        EnumSet<Permission>       permissionDiscordSet = Permission.getPermissions(permissionsDiscord);
 
-        return new GroupImpl(client, id, name, users, permissionSet, permissionDiscordSet);
+        return new GroupImpl(client, id, name, users, permissionTurtleSet, permissionDiscordSet);
     }
 
     public static @NotNull List<Group> buildGroups(TurtleClient client, JsonArray json) throws NullPointerException, IllegalArgumentException, IllegalJsonException {

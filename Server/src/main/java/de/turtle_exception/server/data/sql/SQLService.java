@@ -79,9 +79,9 @@ public class SQLService implements DataService {
             if (!resultSet.next())
                 throw new DataAccessException("Could not parse group from empty ResultSet.");
 
-            json.addProperty("id"         , resultSet.getLong("id"));
-            json.addProperty("name"       , resultSet.getString("name"));
-            json.addProperty("permissions_turtle", resultSet.getLong("permissions_turtle"));
+            json.addProperty("id"  , resultSet.getLong("id"));
+            json.addProperty("name", resultSet.getString("name"));
+            json.addProperty("permissions_turtle" , resultSet.getLong("permissions_turtle"));
             json.addProperty("permissions_discord", resultSet.getLong("permissions_discord"));
             json.add("members", this.getGroupMembers(id));
 
@@ -97,9 +97,9 @@ public class SQLService implements DataService {
         String name;
 
         try {
-            id = group.get("id").getAsLong();
+            id   = group.get("id").getAsLong();
             name = group.get("name").getAsString();
-            permissionsTurtle = group.get("permissions_turtle").getAsLong();
+            permissionsTurtle  = group.get("permissions_turtle").getAsLong();
             permissionsDiscord = group.get("permissions_discord").getAsLong();
         } catch (Exception e) {
             throw new DataAccessException("Malformed parameters for group object");
@@ -193,9 +193,9 @@ public class SQLService implements DataService {
             if (!resultUser.next())
                 throw new DataAccessException("Could not parse user from empty ResultSet.");
 
-            json.addProperty("id"         , resultUser.getLong("id"));
-            json.addProperty("name"       , resultUser.getString("name"));
-            json.addProperty("permissions_turtle", resultUser.getLong("permissions_turtle"));
+            json.addProperty("id"  , resultUser.getLong("id"));
+            json.addProperty("name", resultUser.getString("name"));
+            json.addProperty("permissions_turtle" , resultUser.getLong("permissions_turtle"));
             json.addProperty("permissions_discord", resultUser.getLong("permissions_discord"));
             json.add("discord"  , this.getUserDiscord(id));
             json.add("minecraft", this.getUserMinecraft(id));
@@ -212,9 +212,9 @@ public class SQLService implements DataService {
         String name;
 
         try {
-            id = user.get("id").getAsLong();
+            id   = user.get("id").getAsLong();
             name = user.get("name").getAsString();
-            permissionsTurtle = user.get("permissions_turtle").getAsLong();
+            permissionsTurtle  = user.get("permissions_turtle").getAsLong();
             permissionsDiscord = user.get("permissions_discord").getAsLong();
         } catch (Exception e) {
             throw new DataAccessException("Malformed parameters for user object");
@@ -343,11 +343,11 @@ public class SQLService implements DataService {
             if (!resultUser.next())
                 throw new DataAccessException("Could not parse ticket from empty ResultSet.");
 
-            json.addProperty("id"  , resultUser.getLong("id"));
-            json.addProperty("state", resultUser.getByte("state"));
-            json.addProperty("title", resultUser.getString("title"));
+            json.addProperty("id"      , resultUser.getLong("id"));
+            json.addProperty("state"   , resultUser.getByte("state"));
+            json.addProperty("title"   , resultUser.getString("title"));
             json.addProperty("category", resultUser.getString("category"));
-            json.add("tags"  , this.getTicketTags(id));
+            json.add("tags", this.getTicketTags(id));
             json.addProperty("discord_channel", resultUser.getLong("discord_channel"));
             json.add("users", this.getTicketUsers(id));
 

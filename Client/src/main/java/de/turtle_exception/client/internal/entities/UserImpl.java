@@ -26,17 +26,17 @@ public class UserImpl implements User {
     private final ArrayList<UUID> minecraft;
 
     private final EnumSet<TurtlePermission> permissionOverridesTurtle;
-    private final EnumSet<Permission> permissionOverridesDiscord;
+    private final EnumSet<Permission>       permissionOverridesDiscord;
 
     UserImpl(TurtleClient client, long id, String name, ArrayList<Long> discord, ArrayList<UUID> minecraft, EnumSet<TurtlePermission> permissionOverridesTurtle, EnumSet<Permission> permissionOverridesDiscord) {
         this.client = client;
-        this.id = id;
-        this.name = name;
+        this.id     = id;
+        this.name   = name;
 
         this.discord   = discord;
         this.minecraft = minecraft;
 
-        this.permissionOverridesTurtle = permissionOverridesTurtle;
+        this.permissionOverridesTurtle  = permissionOverridesTurtle;
         this.permissionOverridesDiscord = permissionOverridesDiscord;
     }
 

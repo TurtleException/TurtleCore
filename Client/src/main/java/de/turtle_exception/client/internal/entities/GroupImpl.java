@@ -25,16 +25,16 @@ public class GroupImpl implements Group {
     private final TurtleSet<User> users;
 
     private final EnumSet<TurtlePermission> permissionsTurtle;
-    private final EnumSet<Permission> permissionsDiscord;
+    private final EnumSet<Permission>       permissionsDiscord;
 
     GroupImpl(TurtleClient client, long id, String name, TurtleSet<User> users, EnumSet<TurtlePermission> permissionsTurtle, EnumSet<Permission> permissionsDiscord) {
         this.client = client;
-        this.id = id;
-        this.name = name;
+        this.id     = id;
+        this.name   = name;
 
         this.users = users;
 
-        this.permissionsTurtle = permissionsTurtle;
+        this.permissionsTurtle  = permissionsTurtle;
         this.permissionsDiscord = permissionsDiscord;
     }
 
