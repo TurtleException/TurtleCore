@@ -1,6 +1,7 @@
 package de.turtle_exception.client.internal.util;
 
 import de.turtle_exception.client.api.entities.Turtle;
+import de.turtle_exception.core.data.resource.Repository;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -13,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * <p> This implementation should be thread-safe.
  * @see Turtle#getId()
  */
-public class TurtleSet<T extends Turtle> implements Set<T> {
+public class TurtleSet<T extends Turtle> implements Set<T>, Repository<T, Long> {
     private final ConcurrentHashMap<Long, T> content = new ConcurrentHashMap<>();
 
     /** Returns the value with the specified id, or {@code null} if this set does not contain that value. */
