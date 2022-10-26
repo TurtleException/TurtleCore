@@ -13,4 +13,6 @@ public @interface Key {
     @NotNull String name();
 
     boolean primary() default false;
+
+    @NotNull Relation relation() default Relation.ONE_TO_ONE;
 }
