@@ -15,10 +15,10 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.stream.Stream;
 
-public class DataBuilder {
+public class JsonBuilder {
     private static final String BUILD_METHOD_NAME = "build";
 
-    private DataBuilder() { }
+    private JsonBuilder() { }
 
     public static <T> @NotNull T buildObject(@NotNull Class<T> type, @NotNull JsonObject json) throws IllegalArgumentException, AnnotationFormatError {
         // Make sure the @Resource annotation is present
