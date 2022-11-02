@@ -2,6 +2,7 @@ package de.turtle_exception.core.internal.data;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import de.turtle_exception.core.api.TurtleCore;
 import de.turtle_exception.core.internal.data.annotations.Key;
 import de.turtle_exception.core.internal.data.annotations.Relation;
 import de.turtle_exception.core.internal.data.annotations.Resource;
@@ -18,14 +19,18 @@ import java.util.stream.Stream;
 public class JsonBuilder {
     private static final String BUILD_METHOD_NAME = "build";
 
-    private JsonBuilder() { }
+    private final TurtleCore core;
 
-    public static <T> @NotNull T buildObject(@NotNull Class<T> type, @NotNull JsonObject json) throws IllegalArgumentException, AnnotationFormatError {
+    public JsonBuilder(@NotNull TurtleCore core) {
+        this.core = core;
+    }
+
+    public <T> @NotNull T buildObject(@NotNull Class<T> type, @NotNull JsonObject json) throws IllegalArgumentException, AnnotationFormatError {
         // Make sure the @Resource annotation is present
         getResourceAnnotation(type);
 
         try {
-            return type.cast(type.getMethod(BUILD_METHOD_NAME, JsonObject.class).invoke(null, json));
+            return type.cast(type.getMethod(BUILD_METHOD_NAME, JsonObject.class, TurtleCore.class).invoke(null, json, core));
         } catch (NoSuchMethodException | SecurityException e) {
             throw new IllegalArgumentException("No build method available: " + type.getName(), e);
         } catch (ClassCastException e) {
@@ -35,7 +40,7 @@ public class JsonBuilder {
         }
     }
 
-    public static @NotNull JsonObject buildJson(@NotNull Object object) throws IllegalArgumentException, AnnotationFormatError {
+    public @NotNull JsonObject buildJson(@NotNull Object object) throws IllegalArgumentException, AnnotationFormatError {
         Resource resource = getResourceAnnotation(object.getClass());
 
         JsonObject json = new JsonObject();
