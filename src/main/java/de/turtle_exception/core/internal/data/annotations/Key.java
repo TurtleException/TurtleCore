@@ -15,4 +15,11 @@ public @interface Key {
     boolean primary() default false;
 
     @NotNull Relation relation() default Relation.ONE_TO_ONE;
+
+    @NotNull String table() default "";
+
+    // foreign key (column in reference table)
+    @NotNull String fKey() default "";
+
+    @NotNull Class<?> type() default Object.class;
 }

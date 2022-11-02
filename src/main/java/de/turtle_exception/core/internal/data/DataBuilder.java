@@ -1,19 +1,23 @@
 package de.turtle_exception.core.internal.data;
 
 import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import de.turtle_exception.core.internal.data.annotations.Key;
-import de.turtle_exception.core.internal.data.annotations.Reference;
+import de.turtle_exception.core.internal.data.annotations.Relation;
 import de.turtle_exception.core.internal.data.annotations.Resource;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.annotation.AnnotationFormatError;
+import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.Collection;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.stream.Stream;
 
 public class DataBuilder {
+    private static final String BUILD_METHOD_NAME = "build";
+
     private DataBuilder() { }
 
     public static <T> @NotNull T buildObject(@NotNull Class<T> type, @NotNull JsonObject json) throws IllegalArgumentException, AnnotationFormatError {
@@ -21,7 +25,7 @@ public class DataBuilder {
         getResourceAnnotation(type);
 
         try {
-            return type.cast(type.getMethod("build", JsonObject.class).invoke(null, json));
+            return type.cast(type.getMethod(BUILD_METHOD_NAME, JsonObject.class).invoke(null, json));
         } catch (NoSuchMethodException | SecurityException e) {
             throw new IllegalArgumentException("No build method available: " + type.getName(), e);
         } catch (ClassCastException e) {
@@ -36,76 +40,40 @@ public class DataBuilder {
 
         JsonObject json = new JsonObject();
 
+        Stream<AccessibleObject> stream = Stream.concat(
+                Arrays.stream(object.getClass().getMethods()),
+                Arrays.stream(object.getClass().getFields())
+        );
 
-        /* - Primitive keys */
+        for (Iterator<AccessibleObject> it = stream.iterator(); it.hasNext(); ) {
+            AccessibleObject accObj = it.next();
+            Key atKey = accObj.getAnnotation(Key.class);
 
-        for (Method method : object.getClass().getMethods()) {
-            Key atKey = method.getAnnotation(Key.class);
-
-            // method should be ignored
+            // value should be ignored
             if (atKey == null) continue;
 
             Object value;
-            try {
-                value = method.invoke(object);
-            } catch (Throwable t) {
-                throw new AnnotationFormatError("Unable to invoke key method: " + method.getName(), t);
+            if (accObj instanceof Method method) {
+                try {
+                    value = method.invoke(object);
+                } catch (Throwable t) {
+                    throw new AnnotationFormatError("Unable to invoke key method: " + method.getName(), t);
+                }
+            } else if (accObj instanceof Field field) {
+                try {
+                    value = field.get(object);
+                } catch (Throwable t) {
+                    throw new AnnotationFormatError("Unable to access key field: " + field.getName(), t);
+                }
+            } else {
+                throw new AssertionError("Unexpected type: " + accObj.getClass().getName());
             }
 
-            addValue(json, atKey.name(), value);
+            if (atKey.relation() == Relation.ONE_TO_ONE)
+                addValue(json, atKey.name(), value);
+            else
+                json.add(atKey.name(), handleReference(atKey, value));
         }
-
-        for (Field field : object.getClass().getFields()) {
-            Key atKey = field.getAnnotation(Key.class);
-
-            // field should be ignored
-            if (atKey == null) continue;
-
-            Object value;
-            try {
-                value = field.get(object);
-            } catch (Throwable t) {
-                throw new AnnotationFormatError("Unable to access key field: " + field.getName(), t);
-            }
-
-            addValue(json, atKey.name(), value);
-        }
-
-
-        /* - Reference keys */
-
-        for (Method method : object.getClass().getMethods()) {
-            Reference atReference = method.getAnnotation(Reference.class);
-
-            // method should be ignored
-            if (atReference == null) continue;
-
-            Object value;
-            try {
-                value = method.invoke(object);
-            } catch (Throwable t) {
-                throw new AnnotationFormatError("Unable to invoke reference method: " + method.getName(), t);
-            }
-
-            json.add(atReference.name(), handleReference(atReference, value));
-        }
-
-        for (Field field : object.getClass().getFields()) {
-            Reference atReference = field.getAnnotation(Reference.class);
-
-            // field should be ignored
-            if (atReference == null) continue;
-
-            Object value;
-            try {
-                value = field.get(object);
-            } catch (Throwable t) {
-                throw new AnnotationFormatError("Unable to access reference field: " + field.getName(), t);
-            }
-
-            json.add(atReference.name(), handleReference(atReference, value));
-        }
-
 
         return json;
     }
@@ -141,62 +109,68 @@ public class DataBuilder {
         }
     }
 
-    private static JsonElement handleReference(@NotNull Reference annotation, @NotNull Object value) {
-        // TODO: add support for other relation types
+    private static JsonArray handleReference(@NotNull Key annotation, @NotNull Object value) {
+        if (annotation.relation() == Relation.ONE_TO_ONE)
+            throw new IllegalArgumentException("Key may not mark a 1:1 relation");
 
-        if (!(value instanceof Collection<?> collection))
-            throw new AnnotationFormatError("Unexpected type " + value.getClass().getSimpleName() + " on reference: " + annotation.name());
+        if (!(value instanceof Iterable<?> iterable))
+            throw new AnnotationFormatError("Unexpected type " + value.getClass().getName() + "on reference: " + annotation.name());
 
         JsonArray arr = new JsonArray();
 
-        entries:
-        for (Object entry : collection) {
-            // TODO: don't handle every entry by itself
+        // reference to another resource
+        if (annotation.type().getAnnotation(Resource.class) != null)
+            return handleResourceReference(iterable);
 
-            Resource atReferenceResource = entry.getClass().getAnnotation(Resource.class);
-
-            if (atReferenceResource != null) {
-                // reference is a resource itself
-
-                for (Method refMethod : entry.getClass().getMethods()) {
-                    Key atMethod = refMethod.getAnnotation(Key.class);
-                    if (atMethod == null)    continue;
-                    if (!atMethod.primary()) continue;
-
-                    // found primary!
-                    Object primaryValue;
-                    try {
-                        primaryValue = refMethod.invoke(entry);
-                    } catch (Throwable t) {
-                        throw new AnnotationFormatError("Unable to invoke reference primary key method: " + refMethod.getName(), t);
-                    }
-                    addValue(arr, primaryValue);
-
-                    continue entries;
-                }
-
-                for (Field refField : entry.getClass().getFields()) {
-                    Key atField = refField.getAnnotation(Key.class);
-                    if (atField == null)    continue;
-                    if (!atField.primary()) continue;
-
-                    // found primary!
-                    Object primaryValue;
-                    try {
-                        primaryValue = refField.get(entry);
-                    } catch (Throwable t) {
-                        throw new AnnotationFormatError("Unable to get reference primary key field: " + refField.getName(), t);
-                    }
-                    addValue(arr, primaryValue);
-
-                    continue entries;
-                }
-            } else {
-                // reference is a primitive
-                addValue(arr, entry);
-            }
-        }
+        // reference to a primitive type
+        for (Object o : iterable)
+            addValue(arr, o);
 
         return arr;
+    }
+
+    private static JsonArray handleResourceReference(@NotNull Iterable<?> iterable) {
+        JsonArray arr = new JsonArray();
+        for (Object entry : iterable)
+            addValue(arr, getPrimary(entry));
+
+        return arr;
+    }
+
+    private static @NotNull Object getPrimary(@NotNull Object obj) throws AnnotationFormatError {
+        getResourceAnnotation(obj.getClass());
+
+        Stream<AccessibleObject> stream = Stream.concat(
+                Arrays.stream(obj.getClass().getMethods()),
+                Arrays.stream(obj.getClass().getFields())
+        );
+
+        for (Iterator<AccessibleObject> it = stream.iterator(); it.hasNext(); ) {
+            AccessibleObject accObj = it.next();
+            Key key = accObj.getAnnotation(Key.class);
+
+            if (key != null && key.primary())
+                return getValue(accObj, obj);
+        }
+
+        throw new AnnotationFormatError("Could not find primary key!");
+    }
+
+    private static Object getValue(@NotNull AccessibleObject accObj, @NotNull Object instance) {
+        if (accObj instanceof Method method) {
+            try {
+                return method.invoke(instance);
+            } catch (Throwable t) {
+                throw new AnnotationFormatError("Unable to invoke key method: " + method.getName(), t);
+            }
+        } else if (accObj instanceof Field field) {
+            try {
+                return field.get(instance);
+            } catch (Throwable t) {
+                throw new AnnotationFormatError("Unable to access key field: " + field.getName(), t);
+            }
+        } else {
+            throw new AssertionError("Unexpected type: " + accObj.getClass().getName());
+        }
     }
 }
