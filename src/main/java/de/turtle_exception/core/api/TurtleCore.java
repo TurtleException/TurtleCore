@@ -5,6 +5,7 @@ import de.turtle_exception.core.api.entitites.attribute.GroupContainer;
 import de.turtle_exception.core.api.entitites.attribute.TicketContainer;
 import de.turtle_exception.core.api.entitites.attribute.TurtleContainer;
 import de.turtle_exception.core.api.entitites.attribute.UserContainer;
+import de.turtle_exception.core.util.version.Version;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -12,6 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public interface TurtleCore extends TurtleContainer, GroupContainer, TicketContainer, UserContainer {
+    @NotNull Version getVersion();
+
     @Override
     default @NotNull List<Turtle> getTurtles() {
         ArrayList<Turtle> list = new ArrayList<>();

@@ -7,12 +7,16 @@ import de.turtle_exception.core.api.entitites.User;
 import de.turtle_exception.core.internal.data.Provider;
 import de.turtle_exception.core.internal.net.TurtleServer;
 import de.turtle_exception.core.internal.util.TurtleSet;
+import de.turtle_exception.core.util.version.IllegalVersionException;
+import de.turtle_exception.core.util.version.Version;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
 public class TurtleCoreImpl implements TurtleCore {
+    private static final Version VERSION = Version.retrieveFromResources(TurtleCore.class);
+
     private final TurtleSet<Group> groupCache = new TurtleSet<>();
     private final TurtleSet<Ticket> ticketCache = new TurtleSet<>();
     private final TurtleSet<User> userCache = new TurtleSet<>();
@@ -21,6 +25,9 @@ public class TurtleCoreImpl implements TurtleCore {
     private @NotNull Provider provider;
 
     public TurtleCoreImpl() {
+        if (VERSION == null)
+            throw new IllegalVersionException("Version may not be null");
+
         // TODO
     }
 
@@ -33,6 +40,12 @@ public class TurtleCoreImpl implements TurtleCore {
     }
 
     /* - API methods - */
+
+    @SuppressWarnings("ConstantConditions")
+    @Override
+    public @NotNull Version getVersion() {
+        return VERSION;
+    }
 
     @Override
     public @NotNull List<Group> getGroups() {
