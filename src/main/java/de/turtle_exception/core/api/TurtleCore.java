@@ -37,4 +37,8 @@ public interface TurtleCore extends TurtleContainer, GroupContainer, TicketConta
 
         return null;
     }
+
+    /* - - - */
+
+    // TODO: retrieve methods
 }
