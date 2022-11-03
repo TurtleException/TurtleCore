@@ -1,9 +1,9 @@
 package de.turtle_exception.server.net;
 
-import de.turtle_exception.core.net.NetworkAdapter;
+import de.turtle_exception.client.internal.net.NetworkAdapter;
+import de.turtle_exception.client.internal.util.version.IllegalVersionException;
+import de.turtle_exception.client.internal.util.version.Version;
 import de.turtle_exception.server.Main;
-import de.turtle_exception.core.util.version.IllegalVersionException;
-import de.turtle_exception.core.util.version.Version;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.BufferedReader;

@@ -1,7 +1,6 @@
 package de.turtle_exception.server;
 
-import de.turtle_exception.core.TurtleCore;
-import de.turtle_exception.core.util.logging.SimpleFormatter;
+import de.turtle_exception.client.internal.util.logging.SimpleFormatter;
 import de.turtle_exception.server.data.DataService;
 import de.turtle_exception.server.data.DataServiceProvider;
 import de.turtle_exception.server.net.InternalServer;
@@ -15,7 +14,7 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class TurtleServer extends TurtleCore {
+public class TurtleServer {
     private final Status status = new Status();
 
     /** The root logger of this server */

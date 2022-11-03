@@ -1,8 +1,8 @@
 package de.turtle_exception.server.net;
 
 import com.google.common.collect.Sets;
-import de.turtle_exception.core.util.Worker;
-import de.turtle_exception.core.util.logging.NestedLogger;
+import de.turtle_exception.client.internal.util.Worker;
+import de.turtle_exception.client.internal.util.logging.NestedLogger;
 import de.turtle_exception.server.TurtleServer;
 import de.turtle_exception.server.data.DataAccessException;
 import org.jetbrains.annotations.NotNull;

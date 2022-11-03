@@ -3,10 +3,10 @@ package de.turtle_exception.server.net.handlers;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import de.turtle_exception.core.data.JsonChecks;
-import de.turtle_exception.core.net.message.InboundMessage;
-import de.turtle_exception.core.net.route.CompiledRoute;
-import de.turtle_exception.core.net.route.Routes;
+import de.turtle_exception.client.internal.data.JsonChecks;
+import de.turtle_exception.client.internal.net.message.InboundMessage;
+import de.turtle_exception.client.internal.net.route.CompiledRoute;
+import de.turtle_exception.client.internal.net.route.Routes;
 import de.turtle_exception.server.net.VirtualClient;
 import org.jetbrains.annotations.NotNull;
 

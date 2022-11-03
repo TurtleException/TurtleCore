@@ -2,7 +2,7 @@ package de.turtle_exception.server.data;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import de.turtle_exception.core.util.ExceptionalFunction;
+import de.turtle_exception.client.internal.util.ExceptionalFunction;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;

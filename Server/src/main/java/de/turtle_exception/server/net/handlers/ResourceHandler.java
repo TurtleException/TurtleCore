@@ -1,9 +1,9 @@
 package de.turtle_exception.server.net.handlers;
 
-import de.turtle_exception.core.net.NetworkAdapter;
-import de.turtle_exception.core.net.message.InboundMessage;
-import de.turtle_exception.core.net.route.RouteErrors;
-import de.turtle_exception.core.net.route.RouteHandler;
+import de.turtle_exception.client.internal.net.NetworkAdapter;
+import de.turtle_exception.client.internal.net.message.InboundMessage;
+import de.turtle_exception.client.internal.net.route.RouteErrors;
+import de.turtle_exception.client.internal.net.route.RouteHandler;
 import de.turtle_exception.server.data.DataAccessException;
 import de.turtle_exception.server.data.DataService;
 import de.turtle_exception.server.net.VirtualClient;

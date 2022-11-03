@@ -1,7 +1,7 @@
 package de.turtle_exception.server;
 
-import de.turtle_exception.core.util.version.IllegalVersionException;
-import de.turtle_exception.core.util.version.Version;
+import de.turtle_exception.client.internal.util.version.IllegalVersionException;
+import de.turtle_exception.client.internal.util.version.Version;
 
 /**
  * Technical main class used to initialize {@link TurtleServer} and to prevent accidentally initializing multiple

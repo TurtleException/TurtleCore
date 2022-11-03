@@ -1,10 +1,10 @@
 package de.turtle_exception.server.net;
 
-import de.turtle_exception.core.net.ConnectionStatus;
-import de.turtle_exception.core.net.NetworkAdapter;
-import de.turtle_exception.core.net.route.Routes;
-import de.turtle_exception.core.util.Worker;
-import de.turtle_exception.core.util.logging.NestedLogger;
+import de.turtle_exception.client.internal.net.ConnectionStatus;
+import de.turtle_exception.client.internal.net.NetworkAdapter;
+import de.turtle_exception.client.internal.net.route.Routes;
+import de.turtle_exception.client.internal.util.Worker;
+import de.turtle_exception.client.internal.util.logging.NestedLogger;
 import de.turtle_exception.server.net.handlers.GroupHandler;
 import de.turtle_exception.server.net.handlers.TicketHandler;
 import de.turtle_exception.server.net.handlers.UserHandler;
