@@ -35,6 +35,8 @@ public class JsonBuilder {
             throw new IllegalArgumentException("No build method available: " + type.getName(), e);
         } catch (ClassCastException e) {
             throw new IllegalArgumentException("Illegal return type on build method.");
+        } catch (IllegalArgumentException e) {
+            throw e;
         } catch (Throwable t) {
             throw new IllegalArgumentException(t);
         }
