@@ -42,10 +42,6 @@ public class TicketImpl implements Ticket {
         this.users = users;
     }
 
-    public static @NotNull TicketImpl build(@NotNull JsonObject data, @NotNull TurtleClient client) throws Exception {
-        return (TicketImpl) EntityBuilder.buildTicket(client, data);
-    }
-
     @Override
     public @NotNull TurtleClient getClient() {
         return this.client;

@@ -30,10 +30,6 @@ public class UserImpl implements User {
         this.minecraft = minecraft;
     }
 
-    public static @NotNull UserImpl build(@NotNull JsonObject data, @NotNull TurtleClient client) throws Exception {
-        return (UserImpl) EntityBuilder.buildUser(client, data);
-    }
-
     @Override
     public @NotNull TurtleClient getClient() {
         return this.client;

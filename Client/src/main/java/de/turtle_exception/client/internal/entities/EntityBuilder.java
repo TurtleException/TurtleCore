@@ -3,11 +3,11 @@ package de.turtle_exception.client.internal.entities;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import de.turtle_exception.client.api.TicketState;
 import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.api.entities.Group;
 import de.turtle_exception.client.api.entities.Ticket;
 import de.turtle_exception.client.api.entities.User;
-import de.turtle_exception.client.api.TicketState;
 import de.turtle_exception.client.internal.data.IllegalJsonException;
 import de.turtle_exception.client.internal.data.JsonChecks;
 import de.turtle_exception.client.internal.util.Checks;
@@ -15,7 +15,6 @@ import de.turtle_exception.client.internal.util.TurtleSet;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 public class EntityBuilder {
@@ -23,24 +22,24 @@ public class EntityBuilder {
 
     /**
      * Builds a {@link User} object from the provided JSON data.
-     * @param json The JSON-formatted user data.
+     * @param data The JSON-formatted user data.
      * @return A User with the provided attributes from the JSON data.
      * @throws IllegalArgumentException if the JSON String does not represent a valid User or is not a properly
      *                                  formatted JSON object.
      */
-    public static @NotNull User buildUser(TurtleClient client, JsonObject json) throws NullPointerException, IllegalArgumentException, IllegalJsonException {
-        Checks.nonNull(json, "JSON");
-        JsonChecks.validateUser(json);
+    public static @NotNull User buildUser(@NotNull JsonObject data, @NotNull TurtleClient client) throws NullPointerException, IllegalArgumentException, IllegalJsonException {
+        Checks.nonNull(data, "JSON");
+        JsonChecks.validateUser(data);
 
-        long   id   = json.get("id").getAsLong();
-        String name = json.get("name").getAsString();
+        long id = data.get("id").getAsLong();
+        String name = data.get("name").getAsString();
 
-        JsonArray       discordArr  = json.getAsJsonArray("discord");
+        JsonArray discordArr = data.getAsJsonArray("discord");
         ArrayList<Long> discordList = new ArrayList<>();
         for (JsonElement element : discordArr)
             discordList.add(element.getAsLong());
 
-        JsonArray       minecraftArr  = json.getAsJsonArray("discord");
+        JsonArray minecraftArr = data.getAsJsonArray("discord");
         ArrayList<UUID> minecraftList = new ArrayList<>();
         for (JsonElement element : minecraftArr)
             minecraftList.add(UUID.fromString(element.getAsString()));
@@ -48,31 +47,21 @@ public class EntityBuilder {
         return new UserImpl(client, id, name, discordList, minecraftList);
     }
 
-    public static @NotNull List<User> buildUsers(TurtleClient client, JsonArray json) throws NullPointerException, IllegalArgumentException, IllegalJsonException {
-        Checks.nonNull(json, "JSON");
-
-        List<User> users = new ArrayList<>();
-        for (JsonElement jsonElement : json)
-            users.add(buildUser(client, ((JsonObject) jsonElement)));
-
-        return List.copyOf(users);
-    }
-
     /**
      * Builds a {@link Group} object from the provided JSON data.
-     * @param json The JSON-formatted group data.
+     * @param data The JSON-formatted group data.
      * @return A Group with the provided attributes from the JSON data.
      * @throws IllegalArgumentException if the JSON String does not represent a valid Group or is not a properly
      *                                  formatted JSON object.
      */
-    public static @NotNull Group buildGroup(TurtleClient client, JsonObject json) throws NullPointerException, IllegalArgumentException, IllegalJsonException {
-        Checks.nonNull(json, "JSON");
-        JsonChecks.validateGroup(json);
+    public static @NotNull Group buildGroup(@NotNull JsonObject data, @NotNull TurtleClient client) throws NullPointerException, IllegalArgumentException, IllegalJsonException {
+        Checks.nonNull(data, "JSON");
+        JsonChecks.validateGroup(data);
 
-        long   id   = json.get("id").getAsLong();
-        String name = json.get("name").getAsString();
+        long   id   = data.get("id").getAsLong();
+        String name = data.get("name").getAsString();
 
-        JsonArray       userArr  = json.getAsJsonArray("members");
+        JsonArray       userArr  = data.getAsJsonArray("members");
         TurtleSet<User> users    = new TurtleSet<>();
         for (JsonElement element : userArr)
             users.add(client.getUserById(element.getAsLong()));
@@ -80,51 +69,31 @@ public class EntityBuilder {
         return new GroupImpl(client, id, name, users);
     }
 
-    public static @NotNull List<Group> buildGroups(TurtleClient client, JsonArray json) throws NullPointerException, IllegalArgumentException, IllegalJsonException {
-        Checks.nonNull(json, "JSON");
+    public static @NotNull Ticket buildTicket(@NotNull JsonObject data, @NotNull TurtleClient client) throws NullPointerException, IllegalArgumentException, IllegalJsonException {
+        Checks.nonNull(data, "JSON");
+        JsonChecks.validateTicket(data);
 
-        List<Group> groups = new ArrayList<>();
-        for (JsonElement jsonElement : json)
-            groups.add(buildGroup(client, (JsonObject) jsonElement));
-
-        return List.copyOf(groups);
-    }
-
-    public static @NotNull Ticket buildTicket(TurtleClient client, JsonObject json) throws NullPointerException, IllegalArgumentException, IllegalJsonException {
-        Checks.nonNull(json, "JSON");
-        JsonChecks.validateTicket(json);
-
-        long   id             = json.get("id").getAsLong();
-        byte   stateCode      = json.get("state").getAsByte();
-        String title          = json.get("title").getAsString();
-        String category       = json.get("category").getAsString();
-        long   discordChannel = json.get("discord_channel").getAsLong();
+        long   id             = data.get("id").getAsLong();
+        byte   stateCode      = data.get("state").getAsByte();
+        String title          = data.get("title").getAsString();
+        String category       = data.get("category").getAsString();
+        long   discordChannel = data.get("discord_channel").getAsLong();
 
         if (title == null)
             title = "null";
 
         TicketState state = TicketState.of(stateCode);
 
-        JsonArray         tagArr = json.getAsJsonArray("tags");
+        JsonArray         tagArr = data.getAsJsonArray("tags");
         ArrayList<String> tags   = new ArrayList<>();
         for (JsonElement element : tagArr)
             tags.add(element.getAsString());
 
-        JsonArray       userArr  = json.getAsJsonArray("users");
+        JsonArray       userArr  = data.getAsJsonArray("users");
         TurtleSet<User> users    = new TurtleSet<>();
         for (JsonElement element : userArr)
             users.add(client.getUserById(element.getAsLong()));
 
         return new TicketImpl(client, id, state, title, category, discordChannel, tags, users);
-    }
-
-    public static @NotNull List<Ticket> buildTickets(TurtleClient client, JsonArray json) throws NullPointerException, IllegalArgumentException, IllegalJsonException {
-        Checks.nonNull(json, "JSON");
-
-        List<Ticket> tickets = new ArrayList<>();
-        for (JsonElement jsonElement : json)
-            tickets.add(buildTicket(client, (JsonObject) jsonElement));
-
-        return List.copyOf(tickets);
     }
 }

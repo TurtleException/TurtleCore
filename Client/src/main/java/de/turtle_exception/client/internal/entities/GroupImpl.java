@@ -29,10 +29,6 @@ public class GroupImpl implements Group {
         this.users = users;
     }
 
-    public static @NotNull GroupImpl build(@NotNull JsonObject data, @NotNull TurtleClient client) throws Exception {
-        return (GroupImpl) EntityBuilder.buildGroup(client, data);
-    }
-
     @Override
     public @NotNull TurtleClient getClient() {
         return this.client;

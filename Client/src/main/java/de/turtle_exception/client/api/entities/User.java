@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-@Resource(name = "users")
+@Resource(name = "users", builder = "buildUser")
 @SuppressWarnings("unused")
 public interface User extends Turtle {
     @Key(name = "name")

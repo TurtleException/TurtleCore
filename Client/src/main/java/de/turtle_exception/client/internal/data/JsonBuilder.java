@@ -6,6 +6,7 @@ import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.internal.data.annotations.Key;
 import de.turtle_exception.client.internal.data.annotations.Relation;
 import de.turtle_exception.client.internal.data.annotations.Resource;
+import de.turtle_exception.client.internal.entities.EntityBuilder;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.annotation.AnnotationFormatError;
@@ -27,10 +28,11 @@ public class JsonBuilder {
 
     public <T> @NotNull T buildObject(@NotNull Class<T> type, @NotNull JsonObject json) throws IllegalArgumentException, AnnotationFormatError {
         // Make sure the @Resource annotation is present
-        getResourceAnnotation(type);
+        Resource annotation = getResourceAnnotation(type);
 
         try {
-            return type.cast(type.getMethod(BUILD_METHOD_NAME, JsonObject.class, TurtleClient.class).invoke(null, json, client));
+            Method buildMethod = EntityBuilder.class.getMethod(annotation.builder(), JsonObject.class, TurtleClient.class);
+            return type.cast(buildMethod.invoke(null, json, client));
         } catch (NoSuchMethodException | SecurityException e) {
             throw new IllegalArgumentException("No build method available: " + type.getName(), e);
         } catch (ClassCastException e) {

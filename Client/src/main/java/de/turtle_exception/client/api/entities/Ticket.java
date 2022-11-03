@@ -13,7 +13,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-@Resource(name = "tickets")
+@Resource(name = "tickets", builder = "buildTicket")
 public interface Ticket extends Turtle, IUserContainer {
     /* - STATE - */
 
