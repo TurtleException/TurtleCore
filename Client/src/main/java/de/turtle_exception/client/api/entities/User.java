@@ -1,6 +1,9 @@
 package de.turtle_exception.client.api.entities;
 
 import de.turtle_exception.client.api.requests.Action;
+import de.turtle_exception.client.internal.data.annotations.Key;
+import de.turtle_exception.client.internal.data.annotations.Relation;
+import de.turtle_exception.client.internal.data.annotations.Resource;
 import net.dv8tion.jda.api.JDA;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Server;
@@ -10,8 +13,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@Resource(name = "users")
 @SuppressWarnings("unused")
 public interface User extends Turtle {
+    @Key(name = "name")
     @NotNull String getName();
 
     @NotNull Action<Void> modifyName(@NotNull String name);
@@ -36,6 +41,7 @@ public interface User extends Turtle {
 
     /* - DISCORD - */
 
+    @Key(name = "user_discord", relation = Relation.ONE_TO_MANY)
     @NotNull List<Long> getDiscordIds();
 
     @NotNull Action<Void> addDiscordId(long discordId);
@@ -57,6 +63,7 @@ public interface User extends Turtle {
 
     /* - MINECRAFT - */
 
+    @Key(name = "user_minecraft", relation = Relation.ONE_TO_MANY)
     @NotNull List<UUID> getMinecraftIds();
 
     @NotNull Action<Void> addMinecraftId(@NotNull UUID minecraftId);
