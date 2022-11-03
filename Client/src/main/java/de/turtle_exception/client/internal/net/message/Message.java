@@ -1,12 +1,12 @@
 package de.turtle_exception.client.internal.net.message;
 
+import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.internal.net.route.CompiledRoute;
 import de.turtle_exception.client.internal.net.route.Routes;
-import de.turtle_exception.core.TurtleCore;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class Message {
-    protected final @NotNull TurtleCore core;
+    protected final @NotNull TurtleClient client;
 
     /**
      * The compiled Route, also containing the message content.
@@ -19,15 +19,15 @@ public abstract class Message {
     public boolean done      = false;
     public boolean cancelled = false;
 
-    public Message(@NotNull TurtleCore core, long conversation, @NotNull CompiledRoute route, long deadline) {
-        this.core         = core;
+    public Message(@NotNull TurtleClient client, long conversation, @NotNull CompiledRoute route, long deadline) {
+        this.client = client;
         this.route        = route;
         this.deadline     = deadline;
         this.conversation = conversation;
     }
 
-    public @NotNull TurtleCore getCore() {
-        return core;
+    public @NotNull TurtleClient getClient() {
+        return client;
     }
 
     public @NotNull CompiledRoute getRoute() {

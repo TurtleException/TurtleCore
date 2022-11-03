@@ -1,7 +1,7 @@
 package de.turtle_exception.client.api;
 
 import de.turtle_exception.client.internal.TurtleClientImpl;
-import de.turtle_exception.core.util.Checks;
+import de.turtle_exception.client.internal.util.Checks;
 import net.dv8tion.jda.api.JDA;
 import org.bukkit.Server;
 import org.jetbrains.annotations.NotNull;

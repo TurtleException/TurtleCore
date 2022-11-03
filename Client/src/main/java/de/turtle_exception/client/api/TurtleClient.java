@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.JDA;
 import org.bukkit.Server;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Range;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -63,4 +64,14 @@ public interface TurtleClient extends IUserContainer, IGroupContainer, ITicketCo
     @Nullable JDA getJDA();
 
     void setJDA(@Nullable JDA jda);
+
+    /* - - - */
+
+    @Range(from = 0, to = Long.MAX_VALUE) long getDefaultTimeoutInbound();
+
+    void setDefaultTimeoutInbound(@Range(from = 0, to = Long.MAX_VALUE) long defaultTimeoutInbound);
+
+    @Range(from = 0, to = Long.MAX_VALUE) long getDefaultTimeoutOutbound();
+
+    void setDefaultTimeoutOutbound(@Range(from = 0, to = Long.MAX_VALUE) long defaultTimeoutOutbound);
 }

@@ -1,6 +1,5 @@
 package de.turtle_exception.client.internal.net;
 
-import de.turtle_exception.core.net.NetworkAdapter;
 import org.jetbrains.annotations.NotNull;
 
 import javax.security.auth.login.LoginException;

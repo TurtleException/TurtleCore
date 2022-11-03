@@ -3,9 +3,9 @@ package de.turtle_exception.client.api.requests;
 import de.turtle_exception.client.api.event.net.ResponseEvent;
 import de.turtle_exception.client.internal.ActionImpl;
 import de.turtle_exception.client.internal.TurtleClientImpl;
-import de.turtle_exception.core.net.message.InboundMessage;
-import de.turtle_exception.core.net.route.CompiledRoute;
-import de.turtle_exception.core.net.route.RouteError;
+import de.turtle_exception.client.internal.net.message.InboundMessage;
+import de.turtle_exception.client.internal.net.route.CompiledRoute;
+import de.turtle_exception.client.internal.net.route.RouteError;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.CancellationException;

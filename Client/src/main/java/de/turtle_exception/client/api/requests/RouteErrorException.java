@@ -1,6 +1,6 @@
 package de.turtle_exception.client.api.requests;
 
-import de.turtle_exception.core.net.route.RouteError;
+import de.turtle_exception.client.internal.net.route.RouteError;
 import org.jetbrains.annotations.NotNull;
 
 public class RouteErrorException extends Exception {

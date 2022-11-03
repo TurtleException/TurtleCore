@@ -3,7 +3,7 @@ package de.turtle_exception.client.internal.data;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import de.turtle_exception.core.util.Checks;
+import de.turtle_exception.client.internal.util.Checks;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;

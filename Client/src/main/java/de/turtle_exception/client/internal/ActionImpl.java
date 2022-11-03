@@ -3,12 +3,12 @@ package de.turtle_exception.client.internal;
 import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.api.requests.Action;
 import de.turtle_exception.client.api.requests.ActionFuture;
-import de.turtle_exception.client.api.requests.Request;
 import de.turtle_exception.client.api.requests.ActionHandler;
-import de.turtle_exception.core.net.message.InboundMessage;
-import de.turtle_exception.core.net.route.CompiledRoute;
-import de.turtle_exception.core.net.route.RouteError;
-import de.turtle_exception.core.net.route.Routes;
+import de.turtle_exception.client.api.requests.Request;
+import de.turtle_exception.client.internal.net.message.InboundMessage;
+import de.turtle_exception.client.internal.net.route.CompiledRoute;
+import de.turtle_exception.client.internal.net.route.RouteError;
+import de.turtle_exception.client.internal.net.route.Routes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

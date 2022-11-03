@@ -1,5 +1,6 @@
 package de.turtle_exception.client.internal.net;
 
+import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.internal.net.message.InboundMessage;
 import de.turtle_exception.client.internal.net.message.Message;
 import de.turtle_exception.client.internal.net.message.MessageParser;
@@ -8,10 +9,9 @@ import de.turtle_exception.client.internal.net.route.Route;
 import de.turtle_exception.client.internal.net.route.RouteErrors;
 import de.turtle_exception.client.internal.net.route.RouteHandler;
 import de.turtle_exception.client.internal.net.route.Routes;
-import de.turtle_exception.core.TurtleCore;
-import de.turtle_exception.core.crypto.Encryption;
-import de.turtle_exception.core.util.Worker;
-import de.turtle_exception.core.util.logging.NestedLogger;
+import de.turtle_exception.client.internal.util.Worker;
+import de.turtle_exception.client.internal.util.crypto.Encryption;
+import de.turtle_exception.client.internal.util.logging.NestedLogger;
 import org.jetbrains.annotations.NotNull;
 
 import javax.crypto.BadPaddingException;
@@ -35,7 +35,7 @@ public abstract class NetworkAdapter {
     /** The last message that should be sent unencrypted to signal that from now on all traffic will be encrypted. */
     public static final String LOGGED_IN = "LOGGED IN";
 
-    private   final TurtleCore core;
+    private   final TurtleClient client;
     protected final NestedLogger logger;
 
     /**
@@ -64,8 +64,8 @@ public abstract class NetworkAdapter {
     /** The password used for en-/decryption */
     protected final String pass;
 
-    protected NetworkAdapter(TurtleCore core, NestedLogger logger, @NotNull String login, @NotNull String pass) {
-        this.core = core;
+    protected NetworkAdapter(TurtleClient client, NestedLogger logger, @NotNull String login, @NotNull String pass) {
+        this.client = client;
         this.logger = logger;
 
         this.executor = new ScheduledThreadPoolExecutor(4, (r, executor) -> logger.log(Level.WARNING, "An outbound message was rejected by the executor: " + r));
@@ -156,7 +156,7 @@ public abstract class NetworkAdapter {
         }
 
         try {
-            InboundMessage message = MessageParser.parse(core, this, decryptedMessage);
+            InboundMessage message = MessageParser.parse(client, this, decryptedMessage);
             this.submit(message);
         } catch (IllegalArgumentException e) {
             logger.log(Level.WARNING, "Could not parse inbound message: " + decryptedMessage, e);
@@ -279,11 +279,11 @@ public abstract class NetworkAdapter {
                 this.logger.log(Level.WARNING, e.getMessage());
                 return true;
             } catch (Exception e) {
-                msg.respond(RouteErrors.BAD_REQUEST.with(e).compile(), System.currentTimeMillis() + core.getDefaultTimeoutOutbound(), in -> { });
+                msg.respond(RouteErrors.BAD_REQUEST.with(e).compile(), System.currentTimeMillis() + client.getDefaultTimeoutOutbound(), in -> { });
                 return true;
             }
         } else {
-            msg.respond(RouteErrors.NOT_SUPPORTED.compile(), core.getDefaultTimeoutOutbound(), in -> { });
+            msg.respond(RouteErrors.NOT_SUPPORTED.compile(), client.getDefaultTimeoutOutbound(), in -> { });
             return true;
         }
     }

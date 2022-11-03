@@ -5,7 +5,7 @@ import de.turtle_exception.client.api.event.net.RequestEvent;
 import de.turtle_exception.client.api.event.net.ResponseEvent;
 import de.turtle_exception.client.api.event.ticket.*;
 import de.turtle_exception.client.api.event.user.*;
-import de.turtle_exception.core.util.StringUtil;
+import de.turtle_exception.client.internal.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Method;

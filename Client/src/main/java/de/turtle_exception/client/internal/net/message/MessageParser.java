@@ -4,11 +4,11 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.internal.net.NetworkAdapter;
 import de.turtle_exception.client.internal.net.route.CompiledRoute;
 import de.turtle_exception.client.internal.net.route.Method;
-import de.turtle_exception.core.TurtleCore;
-import de.turtle_exception.core.util.Checks;
+import de.turtle_exception.client.internal.util.Checks;
 import org.jetbrains.annotations.NotNull;
 
 public class MessageParser {
@@ -31,7 +31,7 @@ public class MessageParser {
         return json.toString();
     }
 
-    public static @NotNull InboundMessage parse(@NotNull TurtleCore core, @NotNull NetworkAdapter adapter, @NotNull String msg) throws IllegalArgumentException {
+    public static @NotNull InboundMessage parse(@NotNull TurtleClient core, @NotNull NetworkAdapter adapter, @NotNull String msg) throws IllegalArgumentException {
         try {
             JsonObject json = new Gson().fromJson(msg, JsonObject.class);
 
@@ -58,8 +58,8 @@ public class MessageParser {
                 }
             }
 
-            Checks.nonNull(routeRaw , "Raw Route"     );
-            Checks.nonNull(method   , "Method"        );
+            Checks.nonNull(routeRaw, "Raw Route");
+            Checks.nonNull(method  , "Method"   );
 
             CompiledRoute route = CompiledRoute.of(routeRaw, args, method, content);
             long deadline = System.currentTimeMillis() + core.getDefaultTimeoutInbound();

@@ -1,6 +1,6 @@
 package de.turtle_exception.client.api.requests;
 
-import de.turtle_exception.core.net.message.InboundMessage;
+import de.turtle_exception.client.internal.net.message.InboundMessage;
 import org.jetbrains.annotations.NotNull;
 
 @FunctionalInterface

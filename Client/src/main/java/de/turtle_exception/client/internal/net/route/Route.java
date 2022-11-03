@@ -1,7 +1,7 @@
 package de.turtle_exception.client.internal.net.route;
 
 import com.google.gson.JsonElement;
-import de.turtle_exception.core.util.StringUtil;
+import de.turtle_exception.client.internal.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 
 /**

@@ -8,10 +8,10 @@ import de.turtle_exception.client.api.entities.Group;
 import de.turtle_exception.client.api.entities.Ticket;
 import de.turtle_exception.client.api.entities.User;
 import de.turtle_exception.client.api.TicketState;
+import de.turtle_exception.client.internal.data.IllegalJsonException;
+import de.turtle_exception.client.internal.data.JsonChecks;
+import de.turtle_exception.client.internal.util.Checks;
 import de.turtle_exception.client.internal.util.TurtleSet;
-import de.turtle_exception.core.data.IllegalJsonException;
-import de.turtle_exception.core.data.JsonChecks;
-import de.turtle_exception.core.util.Checks;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;

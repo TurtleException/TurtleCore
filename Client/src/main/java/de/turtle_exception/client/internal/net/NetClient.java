@@ -1,25 +1,23 @@
 package de.turtle_exception.client.internal.net;
 
 import com.google.gson.JsonObject;
+import de.turtle_exception.client.api.TurtleClient;
+import de.turtle_exception.client.api.entities.Group;
 import de.turtle_exception.client.api.entities.Ticket;
+import de.turtle_exception.client.api.entities.User;
 import de.turtle_exception.client.api.event.group.GroupDeleteEvent;
 import de.turtle_exception.client.api.event.net.RequestEvent;
 import de.turtle_exception.client.api.event.ticket.TicketDeleteEvent;
 import de.turtle_exception.client.api.event.user.UserDeleteEvent;
 import de.turtle_exception.client.api.requests.Request;
-import de.turtle_exception.client.internal.entities.EntityBuilder;
-import de.turtle_exception.client.api.TurtleClient;
-import de.turtle_exception.client.api.entities.Group;
-import de.turtle_exception.client.api.entities.User;
 import de.turtle_exception.client.internal.ActionImpl;
 import de.turtle_exception.client.internal.TurtleClientImpl;
+import de.turtle_exception.client.internal.entities.EntityBuilder;
 import de.turtle_exception.client.internal.event.UpdateHelper;
-import de.turtle_exception.core.net.ConnectionStatus;
-import de.turtle_exception.core.net.NetworkAdapter;
-import de.turtle_exception.core.net.message.OutboundMessage;
-import de.turtle_exception.core.net.route.Routes;
-import de.turtle_exception.core.util.Worker;
-import de.turtle_exception.core.util.logging.NestedLogger;
+import de.turtle_exception.client.internal.net.message.OutboundMessage;
+import de.turtle_exception.client.internal.net.route.Routes;
+import de.turtle_exception.client.internal.util.Worker;
+import de.turtle_exception.client.internal.util.logging.NestedLogger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Range;
 

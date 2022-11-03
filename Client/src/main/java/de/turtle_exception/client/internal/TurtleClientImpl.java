@@ -11,10 +11,10 @@ import de.turtle_exception.client.api.event.EventManager;
 import de.turtle_exception.client.api.requests.Action;
 import de.turtle_exception.client.internal.entities.EntityBuilder;
 import de.turtle_exception.client.internal.net.NetClient;
+import de.turtle_exception.client.internal.net.route.Routes;
 import de.turtle_exception.client.internal.util.TurtleSet;
-import de.turtle_exception.core.net.route.Routes;
-import de.turtle_exception.core.util.version.IllegalVersionException;
-import de.turtle_exception.core.util.version.Version;
+import de.turtle_exception.client.internal.util.version.IllegalVersionException;
+import de.turtle_exception.client.internal.util.version.Version;
 import net.dv8tion.jda.api.JDA;
 import org.bukkit.Server;
 import org.jetbrains.annotations.NotNull;
@@ -293,18 +293,22 @@ public class TurtleClientImpl implements TurtleClient {
 
     /* - - - */
 
+    @Override
     public @Range(from = 0, to = Long.MAX_VALUE) long getDefaultTimeoutInbound() {
         return defaultTimeoutInbound;
     }
 
+    @Override
     public void setDefaultTimeoutInbound(@Range(from = 0, to = Long.MAX_VALUE) long defaultTimeoutInbound) {
         this.defaultTimeoutInbound = defaultTimeoutInbound;
     }
 
+    @Override
     public @Range(from = 0, to = Long.MAX_VALUE) long getDefaultTimeoutOutbound() {
         return defaultTimeoutOutbound;
     }
 
+    @Override
     public void setDefaultTimeoutOutbound(@Range(from = 0, to = Long.MAX_VALUE) long defaultTimeoutOutbound) {
         this.defaultTimeoutOutbound = defaultTimeoutOutbound;
     }
