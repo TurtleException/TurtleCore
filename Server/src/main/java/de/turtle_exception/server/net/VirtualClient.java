@@ -3,7 +3,7 @@ package de.turtle_exception.server.net;
 import de.turtle_exception.core.net.ConnectionStatus;
 import de.turtle_exception.core.net.NetworkAdapter;
 import de.turtle_exception.core.net.route.Routes;
-import de.turtle_exception.core.util.AsyncLoopThread;
+import de.turtle_exception.core.util.Worker;
 import de.turtle_exception.core.util.logging.NestedLogger;
 import de.turtle_exception.server.net.handlers.GroupHandler;
 import de.turtle_exception.server.net.handlers.TicketHandler;
@@ -68,7 +68,7 @@ public class VirtualClient extends NetworkAdapter {
         this.registerHandler(Routes.Ticket.DEL_USER, ticketHandler);
 
 
-        this.receiver = new AsyncLoopThread(() -> status != ConnectionStatus.DISCONNECTED, () -> {
+        this.receiver = new Worker(() -> status != ConnectionStatus.DISCONNECTED, () -> {
             try {
                 this.handleInbound(in.readLine());
             } catch (IOException e) {

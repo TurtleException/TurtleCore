@@ -1,7 +1,7 @@
 package de.turtle_exception.server.net;
 
 import com.google.common.collect.Sets;
-import de.turtle_exception.core.util.AsyncLoopThread;
+import de.turtle_exception.core.util.Worker;
 import de.turtle_exception.core.util.logging.NestedLogger;
 import de.turtle_exception.server.TurtleServer;
 import de.turtle_exception.server.data.DataAccessException;
@@ -27,7 +27,7 @@ public class InternalServer {
     private ServerSocket socket;
     Set<VirtualClient> clients;
 
-    protected AsyncLoopThread receiver;
+    protected Worker receiver;
 
     // note: this should only be used by #registerLogin()
     private final HashSet<String> registeredLogins = new HashSet<>();
@@ -51,7 +51,7 @@ public class InternalServer {
         // create the underlying socket (the spicy part)
         this.socket = new ServerSocket(port);
 
-        this.receiver = new AsyncLoopThread(() -> online, () -> {
+        this.receiver = new Worker(() -> online, () -> {
             try {
                 Socket client = socket.accept();
                 new LoginHandler(this, client);

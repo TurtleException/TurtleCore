@@ -18,7 +18,7 @@ import de.turtle_exception.core.net.ConnectionStatus;
 import de.turtle_exception.core.net.NetworkAdapter;
 import de.turtle_exception.core.net.message.OutboundMessage;
 import de.turtle_exception.core.net.route.Routes;
-import de.turtle_exception.core.util.AsyncLoopThread;
+import de.turtle_exception.core.util.Worker;
 import de.turtle_exception.core.util.logging.NestedLogger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Range;
@@ -94,7 +94,7 @@ public class NetClient extends NetworkAdapter {
         this.status = ConnectionStatus.LOGIN;
         new LoginHandler(out, in, TurtleClientImpl.VERSION.toString(), login).await(10, TimeUnit.SECONDS);
 
-        this.receiver = new AsyncLoopThread(() -> status != ConnectionStatus.DISCONNECTED, () -> {
+        this.receiver = new Worker(() -> status != ConnectionStatus.DISCONNECTED, () -> {
             try {
                 this.handleInbound(in.readLine());
             } catch (IOException e) {

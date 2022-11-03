@@ -10,7 +10,7 @@ import de.turtle_exception.core.net.route.Route;
 import de.turtle_exception.core.net.route.RouteErrors;
 import de.turtle_exception.core.net.route.Routes;
 import de.turtle_exception.core.net.route.RouteHandler;
-import de.turtle_exception.core.util.AsyncLoopThread;
+import de.turtle_exception.core.util.Worker;
 import de.turtle_exception.core.util.logging.NestedLogger;
 import org.jetbrains.annotations.NotNull;
 
@@ -56,7 +56,7 @@ public abstract class NetworkAdapter {
     /** A simple executor to await responses to outbound messages. */
     protected ScheduledThreadPoolExecutor executor;
     /** Constantly receives data from the remote connection and passes it on to {@link NetworkAdapter#handleInbound(String)} */
-    protected AsyncLoopThread receiver;
+    protected Worker receiver;
     protected ConnectionStatus status;
 
     /** The username to log in with */
