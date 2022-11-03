@@ -1,20 +1,24 @@
 package de.turtle_exception.client.internal.data;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.internal.data.annotations.Key;
 import de.turtle_exception.client.internal.data.annotations.Relation;
 import de.turtle_exception.client.internal.data.annotations.Resource;
 import de.turtle_exception.client.internal.entities.EntityBuilder;
+import de.turtle_exception.client.internal.util.Checks;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.annotation.AnnotationFormatError;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 import java.util.stream.Stream;
 
 public class JsonBuilder {
@@ -26,7 +30,9 @@ public class JsonBuilder {
         this.client = client;
     }
 
-    public <T> @NotNull T buildObject(@NotNull Class<T> type, @NotNull JsonObject json) throws IllegalArgumentException, AnnotationFormatError {
+    public <T> @NotNull T buildObject(@NotNull Class<T> type, JsonObject json) throws IllegalArgumentException, AnnotationFormatError {
+        Checks.nonNull(json, "JSON data");
+
         // Make sure the @Resource annotation is present
         Resource annotation = getResourceAnnotation(type);
 
@@ -42,6 +48,15 @@ public class JsonBuilder {
         } catch (Throwable t) {
             throw new IllegalArgumentException(t);
         }
+    }
+
+    public <T> @NotNull List<T> buildObjects(@NotNull Class<T> type, JsonArray json) throws IllegalArgumentException, AnnotationFormatError {
+        Checks.nonNull(json, "JSON data");
+
+        ArrayList<T> list = new ArrayList<>();
+        for (JsonElement element : json)
+            list.add(this.buildObject(type, (JsonObject) element));
+        return List.copyOf(list);
     }
 
     public @NotNull JsonObject buildJson(@NotNull Object object) throws IllegalArgumentException, AnnotationFormatError {

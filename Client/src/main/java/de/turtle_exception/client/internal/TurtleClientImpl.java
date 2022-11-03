@@ -9,7 +9,7 @@ import de.turtle_exception.client.api.entities.Turtle;
 import de.turtle_exception.client.api.entities.User;
 import de.turtle_exception.client.api.event.EventManager;
 import de.turtle_exception.client.api.requests.Action;
-import de.turtle_exception.client.internal.entities.EntityBuilder;
+import de.turtle_exception.client.internal.data.JsonBuilder;
 import de.turtle_exception.client.internal.net.NetClient;
 import de.turtle_exception.client.internal.net.route.Routes;
 import de.turtle_exception.client.internal.util.TurtleSet;
@@ -34,7 +34,7 @@ import java.util.logging.Logger;
 public class TurtleClientImpl implements TurtleClient {
     public static final Version VERSION;
     static {
-        VERSION = Version.retrieveFromResources(TurtleClientImpl.class);
+        VERSION = Version.retrieveFromResources(TurtleClient.class);
 
         // this can only happen with faulty code
         if (VERSION == null)
@@ -46,6 +46,8 @@ public class TurtleClientImpl implements TurtleClient {
 
     /** Name of this instance. Naming is not required, but it may be helpful when using multiple instances. */
     private final @Nullable String name;
+
+    private final JsonBuilder jsonBuilder;
 
     private final EventManager eventManager;
 
@@ -73,6 +75,8 @@ public class TurtleClientImpl implements TurtleClient {
     public TurtleClientImpl(@Nullable String name, @NotNull Logger logger, @NotNull String host, @Range(from = 0, to = 65535) int port, @NotNull String login, @NotNull String pass) throws IOException, LoginException {
         this.name = name;
         this.logger = logger;
+
+        this.jsonBuilder = new JsonBuilder(this);
 
         this.eventManager = new EventManager();
 
@@ -207,7 +211,7 @@ public class TurtleClientImpl implements TurtleClient {
     @Override
     public @NotNull Action<User> retrieveUser(long id) {
         return new ActionImpl<User>(this, Routes.User.GET.compile(null, String.valueOf(id)), (message, userRequest) -> {
-            return EntityBuilder.buildUser(this, (JsonObject) message.getRoute().content());
+            return jsonBuilder.buildObject(User.class, (JsonObject) message.getRoute().content());
         }).onSuccess(user -> {
             userCache.removeById(id);
             userCache.add(user);
@@ -218,7 +222,7 @@ public class TurtleClientImpl implements TurtleClient {
     @Override
     public @NotNull Action<List<User>> retrieveUsers() {
         return new ActionImpl<List<User>>(this, Routes.User.GET_ALL.compile(null), (message, userRequest) -> {
-            return EntityBuilder.buildUsers(this, (JsonArray) message.getRoute().content());
+            return jsonBuilder.buildObjects(User.class, (JsonArray) message.getRoute().content());
         }).onSuccess(l -> {
             userCache.clear();
             userCache.addAll(l);
@@ -229,7 +233,7 @@ public class TurtleClientImpl implements TurtleClient {
     @Override
     public @NotNull Action<Group> retrieveGroup(long id) {
         return new ActionImpl<Group>(this, Routes.Group.GET.compile(null, String.valueOf(id)), (message, userRequest) -> {
-            return EntityBuilder.buildGroup(this, (JsonObject) message.getRoute().content());
+            return jsonBuilder.buildObject(Group.class, (JsonObject) message.getRoute().content());
         }).onSuccess(group -> {
             groupCache.removeById(id);
             groupCache.add(group);
@@ -240,7 +244,7 @@ public class TurtleClientImpl implements TurtleClient {
     @Override
     public @NotNull Action<List<Group>> retrieveGroups() {
         return new ActionImpl<List<Group>>(this, Routes.Group.GET_ALL.compile(null), (message, userRequest) -> {
-            return EntityBuilder.buildGroups(this, (JsonArray) message.getRoute().content());
+            return jsonBuilder.buildObjects(Group.class, (JsonArray) message.getRoute().content());
         }).onSuccess(l -> {
             groupCache.clear();
             groupCache.addAll(l);
@@ -251,7 +255,7 @@ public class TurtleClientImpl implements TurtleClient {
     @Override
     public @NotNull Action<Ticket> retrieveTicket(long id) {
         return new ActionImpl<Ticket>(this, Routes.Ticket.GET.compile(null, String.valueOf(id)), (message, userRequest) -> {
-            return EntityBuilder.buildTicket(this, (JsonObject) message.getRoute().content());
+            return jsonBuilder.buildObject(Ticket.class, (JsonObject) message.getRoute().content());
         }).onSuccess(ticket -> {
             ticketCache.removeById(id);
             ticketCache.add(ticket);
@@ -262,7 +266,7 @@ public class TurtleClientImpl implements TurtleClient {
     @Override
     public @NotNull Action<List<Ticket>> retrieveTickets() {
         return new ActionImpl<List<Ticket>>(this, Routes.Ticket.GET_ALL.compile(null), (message, userRequest) -> {
-            return EntityBuilder.buildTickets(this, (JsonArray) message.getRoute().content());
+            return jsonBuilder.buildObjects(Ticket.class, (JsonArray) message.getRoute().content());
         }).onSuccess(l -> {
             ticketCache.clear();
             ticketCache.addAll(l);
