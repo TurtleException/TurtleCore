@@ -12,7 +12,6 @@ import de.turtle_exception.client.api.requests.Action;
 import de.turtle_exception.client.internal.entities.EntityBuilder;
 import de.turtle_exception.client.internal.net.NetClient;
 import de.turtle_exception.client.internal.util.TurtleSet;
-import de.turtle_exception.core.TurtleCore;
 import de.turtle_exception.core.net.route.Routes;
 import de.turtle_exception.core.util.version.IllegalVersionException;
 import de.turtle_exception.core.util.version.Version;
@@ -27,11 +26,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class TurtleClientImpl extends TurtleCore implements TurtleClient {
+public class TurtleClientImpl implements TurtleClient {
     public static final Version VERSION;
     static {
         VERSION = Version.retrieveFromResources(TurtleClientImpl.class);
@@ -58,6 +58,9 @@ public class TurtleClientImpl extends TurtleCore implements TurtleClient {
     private @NotNull Consumer<? super Throwable> defaultOnFailure = t -> {
         // TODO
     };
+
+    private long defaultTimeoutInbound  = TimeUnit.SECONDS.toMillis( 8);
+    private long defaultTimeoutOutbound = TimeUnit.SECONDS.toMillis(16);
 
     private final TurtleSet<User> userCache = new TurtleSet<>();
     private final TurtleSet<Group> groupCache = new TurtleSet<>();
@@ -286,5 +289,23 @@ public class TurtleClientImpl extends TurtleCore implements TurtleClient {
     @Override
     public void setJDA(@Nullable JDA jda) {
         this.jda = jda;
+    }
+
+    /* - - - */
+
+    public @Range(from = 0, to = Long.MAX_VALUE) long getDefaultTimeoutInbound() {
+        return defaultTimeoutInbound;
+    }
+
+    public void setDefaultTimeoutInbound(@Range(from = 0, to = Long.MAX_VALUE) long defaultTimeoutInbound) {
+        this.defaultTimeoutInbound = defaultTimeoutInbound;
+    }
+
+    public @Range(from = 0, to = Long.MAX_VALUE) long getDefaultTimeoutOutbound() {
+        return defaultTimeoutOutbound;
+    }
+
+    public void setDefaultTimeoutOutbound(@Range(from = 0, to = Long.MAX_VALUE) long defaultTimeoutOutbound) {
+        this.defaultTimeoutOutbound = defaultTimeoutOutbound;
     }
 }
