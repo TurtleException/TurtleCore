@@ -22,8 +22,6 @@ import java.util.List;
 import java.util.stream.Stream;
 
 public class JsonBuilder {
-    private static final String BUILD_METHOD_NAME = "build";
-
     private final TurtleClient client;
 
     public JsonBuilder(@NotNull TurtleClient client) {
