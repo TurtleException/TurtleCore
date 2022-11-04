@@ -45,7 +45,7 @@ public class ActionImpl<T> implements Action<T> {
 
     @Override
     public void queue(@Nullable Consumer<? super T> success, @Nullable Consumer<? super Throwable> failure) {
-        client.getNetClient().request(new Request<>(client, this, success, failure, route, deadline, priority));
+        client.getNetworkAdapter().request(new Request<>(client, this, success, failure, route, deadline, priority));
     }
 
     @Override

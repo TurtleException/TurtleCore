@@ -5,6 +5,10 @@ public class IllegalVersionException extends RuntimeException {
         super("'" + raw + "' could not be converted to Version", cause);
     }
 
+    public IllegalVersionException() {
+        super();
+    }
+
     public IllegalVersionException(String message) {
         super(message);
     }

@@ -1,6 +1,7 @@
 package de.turtle_exception.client.api;
 
 import de.turtle_exception.client.internal.TurtleClientImpl;
+import de.turtle_exception.client.internal.net.NetworkAdapter;
 import de.turtle_exception.client.internal.util.Checks;
 import net.dv8tion.jda.api.JDA;
 import org.bukkit.Server;
@@ -22,11 +23,7 @@ import java.util.logging.Logger;
 public class TurtleClientBuilder {
     private static final AtomicInteger increment = new AtomicInteger(0);
 
-    private @Nullable String host;
-    private @Nullable Integer port;
-
-    private @Nullable String login;
-    private @Nullable String pass;
+    private @Nullable NetworkAdapter networkAdapter;
 
     private @Nullable Logger logger;
 
@@ -38,10 +35,7 @@ public class TurtleClientBuilder {
 
     public @NotNull TurtleClient build() throws IllegalArgumentException, IOException, LoginException {
         try {
-            Checks.nonNull(host , "Host" );
-            Checks.nonNull(port , "Port" );
-            Checks.nonNull(login, "Login");
-            Checks.nonNull(pass , "Pass" );
+            Checks.nonNull(networkAdapter, "NetworkAdapter" );
         } catch (NullPointerException e) {
             throw new IllegalArgumentException(e);
         }
@@ -49,7 +43,7 @@ public class TurtleClientBuilder {
         String name   = String.valueOf(increment.getAndIncrement());
         Logger logger = this.logger != null ? this.logger : Logger.getLogger("CLIENT#" + name);
 
-        TurtleClientImpl client = new TurtleClientImpl(name, logger, host, port, login, pass);
+        TurtleClientImpl client = new TurtleClientImpl(name, logger, networkAdapter);
 
         if (spigot != null)
             client.setSpigotServer(spigot);
@@ -62,23 +56,8 @@ public class TurtleClientBuilder {
 
     /* - - - */
 
-    public TurtleClientBuilder setHost(String host) {
-        this.host = host;
-        return this;
-    }
-
-    public TurtleClientBuilder setPort(Integer port) {
-        this.port = port;
-        return this;
-    }
-
-    public TurtleClientBuilder setLogin(String login) {
-        this.login = login;
-        return this;
-    }
-
-    public TurtleClientBuilder setPass(String pass) {
-        this.pass = pass;
+    public TurtleClientBuilder setNetworkAdapter(NetworkAdapter networkAdapter) {
+        this.networkAdapter = networkAdapter;
         return this;
     }
 
@@ -99,20 +78,8 @@ public class TurtleClientBuilder {
 
     /* - - - */
 
-    public @Nullable String getHost() {
-        return host;
-    }
-
-    public @Nullable Integer getPort() {
-        return port;
-    }
-
-    public @Nullable String getLogin() {
-        return login;
-    }
-
-    public @Nullable String getPass() {
-        return pass;
+    public @Nullable NetworkAdapter getNetworkAdapter() {
+        return networkAdapter;
     }
 
     public @Nullable Logger getLogger() {

@@ -13,7 +13,7 @@ public class ActionFuture<T> extends CompletableFuture<T> {
     public ActionFuture(final ActionImpl<T> action, final long deadline, final boolean priority, final @NotNull CompiledRoute route) {
         this.request = new Request<>(((TurtleClientImpl) action.getClient()), action, this::complete, this::completeExceptionally, route, deadline, priority);
 
-        ((TurtleClientImpl) action.getClient()).getNetClient().request(this.request);
+        ((TurtleClientImpl) action.getClient()).getNetworkAdapter().request(this.request);
     }
 
     public ActionFuture(final T t) {

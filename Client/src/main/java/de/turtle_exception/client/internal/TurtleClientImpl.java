@@ -11,6 +11,7 @@ import de.turtle_exception.client.api.event.EventManager;
 import de.turtle_exception.client.api.requests.Action;
 import de.turtle_exception.client.internal.data.JsonBuilder;
 import de.turtle_exception.client.internal.net.NetClient;
+import de.turtle_exception.client.internal.net.NetworkAdapter;
 import de.turtle_exception.client.internal.net.route.Routes;
 import de.turtle_exception.client.internal.util.TurtleSet;
 import de.turtle_exception.client.internal.util.version.IllegalVersionException;
@@ -52,7 +53,7 @@ public class TurtleClientImpl implements TurtleClient {
     private final EventManager eventManager;
 
     /** The internal network part of the client */
-    private final NetClient netClient;
+    private final NetworkAdapter networkAdapter;
 
     private final ScheduledThreadPoolExecutor callbackExecutor;
 
@@ -72,7 +73,7 @@ public class TurtleClientImpl implements TurtleClient {
     private Server spigotServer = null;
     private JDA    jda          = null;
 
-    public TurtleClientImpl(@Nullable String name, @NotNull Logger logger, @NotNull String host, @Range(from = 0, to = 65535) int port, @NotNull String login, @NotNull String pass) throws IOException, LoginException {
+    public TurtleClientImpl(@Nullable String name, @NotNull Logger logger, @NotNull NetworkAdapter networkAdapter) throws IOException, LoginException {
         this.name = name;
         this.logger = logger;
 
@@ -81,9 +82,10 @@ public class TurtleClientImpl implements TurtleClient {
         this.eventManager = new EventManager();
 
         this.callbackExecutor = new ScheduledThreadPoolExecutor(4, (r, executor) -> logger.log(Level.WARNING, "A callback task was rejected by the executor: ", r));
-        this.netClient = new NetClient(this, host, port, login, pass);
 
-        this.netClient.start();
+        this.networkAdapter = networkAdapter;
+        this.networkAdapter.setClient(this);
+        this.networkAdapter.start();
 
         // initial requests
         this.retrieveUsers().await();
@@ -95,13 +97,24 @@ public class TurtleClientImpl implements TurtleClient {
      * Provides the root logger of this instance.
      * @return Instance root logger.
      */
+    @Override
     public @NotNull Logger getLogger() {
         return logger;
     }
 
     @Override
+    public @NotNull Version getVersion() {
+        return VERSION;
+    }
+
+    @Override
     public @NotNull EventManager getEventManager() {
         return this.eventManager;
+    }
+
+    @Override
+    public @NotNull NetworkAdapter getNetworkAdapter() {
+        return this.networkAdapter;
     }
 
     /**
@@ -110,10 +123,6 @@ public class TurtleClientImpl implements TurtleClient {
      */
     public @Nullable String getName() {
         return name;
-    }
-
-    public NetClient getNetClient() {
-        return netClient;
     }
 
     public @NotNull TurtleSet<Group> getGroupCache() {
@@ -315,5 +324,13 @@ public class TurtleClientImpl implements TurtleClient {
     @Override
     public void setDefaultTimeoutOutbound(@Range(from = 0, to = Long.MAX_VALUE) long defaultTimeoutOutbound) {
         this.defaultTimeoutOutbound = defaultTimeoutOutbound;
+    }
+
+    /* - - - */
+
+    @Override
+    public void shutdown() throws IOException {
+        logger.log(Level.INFO, "Shutting down...");
+        this.networkAdapter.stop();
     }
 }

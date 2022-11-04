@@ -1,9 +1,12 @@
 package de.turtle_exception.server;
 
+import de.turtle_exception.client.api.TurtleClient;
+import de.turtle_exception.client.api.TurtleClientBuilder;
+import de.turtle_exception.client.internal.util.logging.NestedLogger;
 import de.turtle_exception.client.internal.util.logging.SimpleFormatter;
 import de.turtle_exception.server.data.DataService;
 import de.turtle_exception.server.data.DataServiceProvider;
-import de.turtle_exception.server.net.InternalServer;
+import de.turtle_exception.server.net.NetServer;
 import de.turtle_exception.server.util.LogUtil;
 import de.turtle_exception.server.util.Status;
 
@@ -35,8 +38,8 @@ public class TurtleServer {
 
     private final Properties config = new Properties();
 
-    private InternalServer internalServer;
-    private DataService    dataService;
+    private TurtleClient turtleClient;
+    private DataService  dataService;
 
     public TurtleServer() throws Exception {
         this.logger = Logger.getLogger("SERVER");
@@ -49,14 +52,14 @@ public class TurtleServer {
     public void run() throws Exception {
         status.set(Status.INIT);
 
-        logger.log(Level.INFO, "Initializing InternalServer...");
-        this.internalServer = new InternalServer(this, getPort());
+        logger.log(Level.INFO, "Initializing TurtleClient...");
+        this.turtleClient = new TurtleClientBuilder()
+                .setNetworkAdapter(new NetServer(this, getPort()))
+                .setLogger(new NestedLogger("TurtleClient", logger))
+                .build();
 
         logger.log(Level.INFO, "Initializing DataService...");
         this.dataService = new DataServiceProvider(this).get();
-
-        logger.log(Level.INFO, "Starting InternalServer...");
-        this.internalServer.start();
 
         /* RUNNING */
 
@@ -81,8 +84,8 @@ public class TurtleServer {
 
         logger.log(Level.INFO, "Shutting down...");
 
-        logger.log(Level.INFO, "Stopping InternalServer...");
-        this.internalServer.stop();
+        logger.log(Level.INFO, "Stopping TurtleClient...");
+        this.turtleClient.shutdown();
 
         logger.log(Level.INFO, "Stopping DataService...");
         this.dataService.stop();
@@ -109,6 +112,10 @@ public class TurtleServer {
 
     public Properties getConfig() {
         return config;
+    }
+
+    public TurtleClient getClient() {
+        return turtleClient;
     }
 
     public DataService getDataService() {
