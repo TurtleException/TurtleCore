@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-@Resource(name = "groups", builder = "buildGroup")
+@Resource(path = "groups", builder = "buildGroup")
 @SuppressWarnings("unused")
 public interface Group extends Turtle, IUserContainer {
     @Key(name = "name")

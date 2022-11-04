@@ -1,6 +1,7 @@
 package de.turtle_exception.client.api;
 
 import de.turtle_exception.client.internal.TurtleClientImpl;
+import de.turtle_exception.client.internal.data.Provider;
 import de.turtle_exception.client.internal.net.NetworkAdapter;
 import de.turtle_exception.client.internal.util.Checks;
 import net.dv8tion.jda.api.JDA;
@@ -24,6 +25,7 @@ public class TurtleClientBuilder {
     private static final AtomicInteger increment = new AtomicInteger(0);
 
     private @Nullable NetworkAdapter networkAdapter;
+    private @Nullable Provider provider;
 
     private @Nullable Logger logger;
 
@@ -36,6 +38,7 @@ public class TurtleClientBuilder {
     public @NotNull TurtleClient build() throws IllegalArgumentException, IOException, LoginException {
         try {
             Checks.nonNull(networkAdapter, "NetworkAdapter" );
+            Checks.nonNull(provider, "Provider");
         } catch (NullPointerException e) {
             throw new IllegalArgumentException(e);
         }
@@ -43,6 +46,7 @@ public class TurtleClientBuilder {
         String name   = String.valueOf(increment.getAndIncrement());
         Logger logger = this.logger != null ? this.logger : Logger.getLogger("CLIENT#" + name);
 
+        // TODO: provider
         TurtleClientImpl client = new TurtleClientImpl(name, logger, networkAdapter);
 
         if (spigot != null)
@@ -58,6 +62,11 @@ public class TurtleClientBuilder {
 
     public TurtleClientBuilder setNetworkAdapter(NetworkAdapter networkAdapter) {
         this.networkAdapter = networkAdapter;
+        return this;
+    }
+
+    public TurtleClientBuilder setProvider(Provider provider) {
+        this.provider = provider;
         return this;
     }
 
@@ -80,6 +89,10 @@ public class TurtleClientBuilder {
 
     public @Nullable NetworkAdapter getNetworkAdapter() {
         return networkAdapter;
+    }
+
+    public @Nullable Provider getProvider() {
+        return provider;
     }
 
     public @Nullable Logger getLogger() {

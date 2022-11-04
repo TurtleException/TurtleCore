@@ -8,7 +8,7 @@ import de.turtle_exception.client.api.entities.attribute.IGroupContainer;
 import de.turtle_exception.client.api.entities.attribute.ITicketContainer;
 import de.turtle_exception.client.api.entities.attribute.IUserContainer;
 import de.turtle_exception.client.api.event.EventManager;
-import de.turtle_exception.client.api.requests.Action;
+import de.turtle_exception.client.api.request.DataAction;
 import de.turtle_exception.client.internal.net.NetworkAdapter;
 import de.turtle_exception.client.internal.util.version.Version;
 import net.dv8tion.jda.api.JDA;
@@ -46,20 +46,20 @@ public interface TurtleClient extends IUserContainer, IGroupContainer, ITicketCo
     @Override
     @NotNull List<Turtle> getTurtles();
 
-    @NotNull Action<User> retrieveUser(long id);
+    @NotNull DataAction<User> retrieveUser(long id);
 
-    @NotNull Action<List<User>> retrieveUsers();
+    @NotNull DataAction<List<User>> retrieveUsers();
 
-    @NotNull Action<Group> retrieveGroup(long id);
+    @NotNull DataAction<Group> retrieveGroup(long id);
 
     @Override
     @Nullable Turtle getTurtleById(long id);
 
-    @NotNull Action<List<Group>> retrieveGroups();
+    @NotNull DataAction<List<Group>> retrieveGroups();
 
-    @NotNull Action<Ticket> retrieveTicket(long id);
+    @NotNull DataAction<Ticket> retrieveTicket(long id);
 
-    @NotNull Action<List<Ticket>> retrieveTickets();
+    @NotNull DataAction<List<Ticket>> retrieveTickets();
 
     /* - - - */
 

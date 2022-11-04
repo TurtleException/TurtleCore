@@ -32,7 +32,7 @@ public class TurtleUtil {
     private TurtleUtil() { }
 
     @SuppressWarnings("StatementWithEmptyBody")
-    public static synchronized long newId(@Range(from = 0x0, to = 0xff) long type) {
+    public static synchronized long newId(@Range(from = 0x0, to = 0xff) /* TODO: see usages */ long type) {
         long time = getTime();
 
         if (time < lastTime)

@@ -8,11 +8,10 @@ import de.turtle_exception.client.api.entities.Ticket;
 import de.turtle_exception.client.api.entities.Turtle;
 import de.turtle_exception.client.api.entities.User;
 import de.turtle_exception.client.api.event.EventManager;
-import de.turtle_exception.client.api.requests.Action;
+import de.turtle_exception.client.api.request.DataAction;
 import de.turtle_exception.client.internal.data.JsonBuilder;
-import de.turtle_exception.client.internal.net.NetClient;
 import de.turtle_exception.client.internal.net.NetworkAdapter;
-import de.turtle_exception.client.internal.net.route.Routes;
+import de.turtle_exception.client.internal.request.DataActionImpl;
 import de.turtle_exception.client.internal.util.TurtleSet;
 import de.turtle_exception.client.internal.util.version.IllegalVersionException;
 import de.turtle_exception.client.internal.util.version.Version;
@@ -88,9 +87,9 @@ public class TurtleClientImpl implements TurtleClient {
         this.networkAdapter.start();
 
         // initial requests
-        this.retrieveUsers().await();
-        this.retrieveGroups().await();
-        this.retrieveTickets().await();
+        this.retrieveUsers().complete();
+        this.retrieveGroups().complete();
+        this.retrieveTickets().complete();
     }
 
     /**
@@ -105,6 +104,10 @@ public class TurtleClientImpl implements TurtleClient {
     @Override
     public @NotNull Version getVersion() {
         return VERSION;
+    }
+
+    public @NotNull JsonBuilder getJsonBuilder() {
+        return jsonBuilder;
     }
 
     @Override
@@ -218,8 +221,8 @@ public class TurtleClientImpl implements TurtleClient {
 
     @SuppressWarnings("CodeBlock2Expr")
     @Override
-    public @NotNull Action<User> retrieveUser(long id) {
-        return new ActionImpl<User>(this, Routes.User.GET.compile(null, String.valueOf(id)), (message, userRequest) -> {
+    public @NotNull DataAction<User> retrieveUser(long id) {
+        return new DataActionImpl<>(this, Routes.User.GET.compile(null, String.valueOf(id)), (message, userRequest) -> {
             return jsonBuilder.buildObject(User.class, (JsonObject) message.getRoute().content());
         }).onSuccess(user -> {
             userCache.removeById(id);
@@ -229,8 +232,8 @@ public class TurtleClientImpl implements TurtleClient {
 
     @SuppressWarnings("CodeBlock2Expr")
     @Override
-    public @NotNull Action<List<User>> retrieveUsers() {
-        return new ActionImpl<List<User>>(this, Routes.User.GET_ALL.compile(null), (message, userRequest) -> {
+    public @NotNull DataAction<List<User>> retrieveUsers() {
+        return new DataActionImpl<>(this, Routes.User.GET_ALL.compile(null), (message, userRequest) -> {
             return jsonBuilder.buildObjects(User.class, (JsonArray) message.getRoute().content());
         }).onSuccess(l -> {
             userCache.clear();
@@ -240,8 +243,8 @@ public class TurtleClientImpl implements TurtleClient {
 
     @SuppressWarnings("CodeBlock2Expr")
     @Override
-    public @NotNull Action<Group> retrieveGroup(long id) {
-        return new ActionImpl<Group>(this, Routes.Group.GET.compile(null, String.valueOf(id)), (message, userRequest) -> {
+    public @NotNull DataAction<Group> retrieveGroup(long id) {
+        return new DataActionImpl<>(this, Routes.Group.GET.compile(null, String.valueOf(id)), (message, userRequest) -> {
             return jsonBuilder.buildObject(Group.class, (JsonObject) message.getRoute().content());
         }).onSuccess(group -> {
             groupCache.removeById(id);
@@ -251,8 +254,8 @@ public class TurtleClientImpl implements TurtleClient {
 
     @SuppressWarnings("CodeBlock2Expr")
     @Override
-    public @NotNull Action<List<Group>> retrieveGroups() {
-        return new ActionImpl<List<Group>>(this, Routes.Group.GET_ALL.compile(null), (message, userRequest) -> {
+    public @NotNull DataAction<List<Group>> retrieveGroups() {
+        return new DataActionImpl<>(this, Routes.Group.GET_ALL.compile(null), (message, userRequest) -> {
             return jsonBuilder.buildObjects(Group.class, (JsonArray) message.getRoute().content());
         }).onSuccess(l -> {
             groupCache.clear();
@@ -262,8 +265,8 @@ public class TurtleClientImpl implements TurtleClient {
 
     @SuppressWarnings("CodeBlock2Expr")
     @Override
-    public @NotNull Action<Ticket> retrieveTicket(long id) {
-        return new ActionImpl<Ticket>(this, Routes.Ticket.GET.compile(null, String.valueOf(id)), (message, userRequest) -> {
+    public @NotNull DataAction<Ticket> retrieveTicket(long id) {
+        return new DataActionImpl<>(this, Routes.Ticket.GET.compile(null, String.valueOf(id)), (message, userRequest) -> {
             return jsonBuilder.buildObject(Ticket.class, (JsonObject) message.getRoute().content());
         }).onSuccess(ticket -> {
             ticketCache.removeById(id);
@@ -273,8 +276,8 @@ public class TurtleClientImpl implements TurtleClient {
 
     @SuppressWarnings("CodeBlock2Expr")
     @Override
-    public @NotNull Action<List<Ticket>> retrieveTickets() {
-        return new ActionImpl<List<Ticket>>(this, Routes.Ticket.GET_ALL.compile(null), (message, userRequest) -> {
+    public @NotNull DataAction<List<Ticket>> retrieveTickets() {
+        return new DataActionImpl<>(this, Routes.Ticket.GET_ALL.compile(null), (message, userRequest) -> {
             return jsonBuilder.buildObjects(Ticket.class, (JsonArray) message.getRoute().content());
         }).onSuccess(l -> {
             ticketCache.clear();

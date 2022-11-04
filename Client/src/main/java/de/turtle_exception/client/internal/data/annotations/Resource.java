@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface Resource {
-    @NotNull String name();
+    @NotNull String path();
 
     @NotNull String builder();
 }
