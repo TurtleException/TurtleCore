@@ -10,8 +10,7 @@ import de.turtle_exception.client.api.entities.User;
 import de.turtle_exception.client.api.event.EventManager;
 import de.turtle_exception.client.api.request.DataAction;
 import de.turtle_exception.client.internal.data.JsonBuilder;
-import de.turtle_exception.client.internal.net.NetworkAdapter;
-import de.turtle_exception.client.internal.request.DataActionImpl;
+import de.turtle_exception.client.internal.request.RemoteDataActionImpl;
 import de.turtle_exception.client.internal.util.TurtleSet;
 import de.turtle_exception.client.internal.util.version.IllegalVersionException;
 import de.turtle_exception.client.internal.util.version.Version;
@@ -48,11 +47,10 @@ public class TurtleClientImpl implements TurtleClient {
     private final @Nullable String name;
 
     private final JsonBuilder jsonBuilder;
-
     private final EventManager eventManager;
-
     /** The internal network part of the client */
     private final NetworkAdapter networkAdapter;
+    private final Provider provider;
 
     private final ScheduledThreadPoolExecutor callbackExecutor;
 
@@ -72,7 +70,7 @@ public class TurtleClientImpl implements TurtleClient {
     private Server spigotServer = null;
     private JDA    jda          = null;
 
-    public TurtleClientImpl(@Nullable String name, @NotNull Logger logger, @NotNull NetworkAdapter networkAdapter) throws IOException, LoginException {
+    public TurtleClientImpl(@Nullable String name, @NotNull Logger logger, @NotNull NetworkAdapter networkAdapter, @NotNull Provider provider) throws IOException, LoginException {
         this.name = name;
         this.logger = logger;
 
@@ -85,6 +83,9 @@ public class TurtleClientImpl implements TurtleClient {
         this.networkAdapter = networkAdapter;
         this.networkAdapter.setClient(this);
         this.networkAdapter.start();
+
+        this.provider = provider;
+        this.provider.setClient(this);
 
         // initial requests
         this.retrieveUsers().complete();
@@ -222,7 +223,7 @@ public class TurtleClientImpl implements TurtleClient {
     @SuppressWarnings("CodeBlock2Expr")
     @Override
     public @NotNull DataAction<User> retrieveUser(long id) {
-        return new DataActionImpl<>(this, Routes.User.GET.compile(null, String.valueOf(id)), (message, userRequest) -> {
+        return new RemoteDataActionImpl<>(this, Routes.User.GET.compile(null, String.valueOf(id)), (message, userRequest) -> {
             return jsonBuilder.buildObject(User.class, (JsonObject) message.getRoute().content());
         }).onSuccess(user -> {
             userCache.removeById(id);
@@ -233,7 +234,7 @@ public class TurtleClientImpl implements TurtleClient {
     @SuppressWarnings("CodeBlock2Expr")
     @Override
     public @NotNull DataAction<List<User>> retrieveUsers() {
-        return new DataActionImpl<>(this, Routes.User.GET_ALL.compile(null), (message, userRequest) -> {
+        return new RemoteDataActionImpl<>(this, Routes.User.GET_ALL.compile(null), (message, userRequest) -> {
             return jsonBuilder.buildObjects(User.class, (JsonArray) message.getRoute().content());
         }).onSuccess(l -> {
             userCache.clear();
@@ -244,7 +245,7 @@ public class TurtleClientImpl implements TurtleClient {
     @SuppressWarnings("CodeBlock2Expr")
     @Override
     public @NotNull DataAction<Group> retrieveGroup(long id) {
-        return new DataActionImpl<>(this, Routes.Group.GET.compile(null, String.valueOf(id)), (message, userRequest) -> {
+        return new RemoteDataActionImpl<>(this, Routes.Group.GET.compile(null, String.valueOf(id)), (message, userRequest) -> {
             return jsonBuilder.buildObject(Group.class, (JsonObject) message.getRoute().content());
         }).onSuccess(group -> {
             groupCache.removeById(id);
@@ -255,7 +256,7 @@ public class TurtleClientImpl implements TurtleClient {
     @SuppressWarnings("CodeBlock2Expr")
     @Override
     public @NotNull DataAction<List<Group>> retrieveGroups() {
-        return new DataActionImpl<>(this, Routes.Group.GET_ALL.compile(null), (message, userRequest) -> {
+        return new RemoteDataActionImpl<>(this, Routes.Group.GET_ALL.compile(null), (message, userRequest) -> {
             return jsonBuilder.buildObjects(Group.class, (JsonArray) message.getRoute().content());
         }).onSuccess(l -> {
             groupCache.clear();
@@ -266,7 +267,7 @@ public class TurtleClientImpl implements TurtleClient {
     @SuppressWarnings("CodeBlock2Expr")
     @Override
     public @NotNull DataAction<Ticket> retrieveTicket(long id) {
-        return new DataActionImpl<>(this, Routes.Ticket.GET.compile(null, String.valueOf(id)), (message, userRequest) -> {
+        return new RemoteDataActionImpl<>(this, Routes.Ticket.GET.compile(null, String.valueOf(id)), (message, userRequest) -> {
             return jsonBuilder.buildObject(Ticket.class, (JsonObject) message.getRoute().content());
         }).onSuccess(ticket -> {
             ticketCache.removeById(id);
@@ -277,7 +278,7 @@ public class TurtleClientImpl implements TurtleClient {
     @SuppressWarnings("CodeBlock2Expr")
     @Override
     public @NotNull DataAction<List<Ticket>> retrieveTickets() {
-        return new DataActionImpl<>(this, Routes.Ticket.GET_ALL.compile(null), (message, userRequest) -> {
+        return new RemoteDataActionImpl<>(this, Routes.Ticket.GET_ALL.compile(null), (message, userRequest) -> {
             return jsonBuilder.buildObjects(Ticket.class, (JsonArray) message.getRoute().content());
         }).onSuccess(l -> {
             ticketCache.clear();

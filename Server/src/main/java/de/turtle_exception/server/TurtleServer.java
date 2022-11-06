@@ -4,8 +4,7 @@ import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.api.TurtleClientBuilder;
 import de.turtle_exception.client.internal.util.logging.NestedLogger;
 import de.turtle_exception.client.internal.util.logging.SimpleFormatter;
-import de.turtle_exception.server.data.DataService;
-import de.turtle_exception.server.data.DataServiceProvider;
+import de.turtle_exception.server.data.DatabaseProvider;
 import de.turtle_exception.server.net.NetServer;
 import de.turtle_exception.server.util.LogUtil;
 import de.turtle_exception.server.util.Status;
@@ -39,7 +38,6 @@ public class TurtleServer {
     private final Properties config = new Properties();
 
     private TurtleClient turtleClient;
-    private DataService  dataService;
 
     public TurtleServer() throws Exception {
         this.logger = Logger.getLogger("SERVER");
@@ -55,11 +53,9 @@ public class TurtleServer {
         logger.log(Level.INFO, "Initializing TurtleClient...");
         this.turtleClient = new TurtleClientBuilder()
                 .setNetworkAdapter(new NetServer(this, getPort()))
+                .setProvider(new DatabaseProvider(new File(DIR, "data")))
                 .setLogger(new NestedLogger("TurtleClient", logger))
                 .build();
-
-        logger.log(Level.INFO, "Initializing DataService...");
-        this.dataService = new DataServiceProvider(this).get();
 
         /* RUNNING */
 
@@ -87,9 +83,6 @@ public class TurtleServer {
         logger.log(Level.INFO, "Stopping TurtleClient...");
         this.turtleClient.shutdown();
 
-        logger.log(Level.INFO, "Stopping DataService...");
-        this.dataService.stop();
-
         logger.log(Level.ALL, "OK bye.");
     }
 
@@ -116,9 +109,5 @@ public class TurtleServer {
 
     public TurtleClient getClient() {
         return turtleClient;
-    }
-
-    public DataService getDataService() {
-        return dataService;
     }
 }

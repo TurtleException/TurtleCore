@@ -2,21 +2,23 @@ package de.turtle_exception.client.internal.request;
 
 import com.google.gson.JsonObject;
 import de.turtle_exception.client.api.TurtleClient;
-import de.turtle_exception.client.api.request.Action;
+import de.turtle_exception.client.api.request.NetAction;
 import de.turtle_exception.client.internal.net.Connection;
 import de.turtle_exception.client.internal.net.message.Message;
 import de.turtle_exception.client.internal.net.message.Route;
+import de.turtle_exception.client.internal.util.ExceptionalFunction;
 import de.turtle_exception.client.internal.util.time.TurtleUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
-public class ActionImpl<T> implements Action<T> {
+public class NetActionImpl<T> implements NetAction<T> {
     protected @NotNull Connection connection;
     protected @NotNull Route route;
     protected @NotNull JsonObject json;
+
+    private final @NotNull ExceptionalFunction<? super Message, T> finalizer;
 
     protected final long conversation;
     protected long deadline;
@@ -24,10 +26,12 @@ public class ActionImpl<T> implements Action<T> {
     protected Consumer<? super T>         successFinalizer = null;
     protected Consumer<? super Throwable> failureFinalizer = null;
 
-    public ActionImpl(@NotNull Connection connection, @NotNull Route route, @NotNull JsonObject json) {
+    public NetActionImpl(@NotNull Connection connection, @NotNull Route route, @NotNull JsonObject json, @NotNull ExceptionalFunction<? super Message, T> finalizer) {
         this.connection = connection;
         this.route = route;
         this.json = json.deepCopy();
+
+        this.finalizer = finalizer;
 
         this.conversation = TurtleUtil.newId(0);
     }
@@ -37,25 +41,25 @@ public class ActionImpl<T> implements Action<T> {
         return connection.getAdapter().getClient();
     }
 
+    @Override
     public @NotNull Connection getConnection() {
         return connection;
     }
 
     @Override
-    public @NotNull CompletableFuture<T> submit() {
-        Message message = this.buildMessage();
-        // TODO: dispatch
+    public @NotNull Route getRoute() {
+        return route;
     }
 
     @Override
-    public void queue(@Nullable Consumer<T> success, @Nullable Consumer<Throwable> failure) {
-        Message message = this.buildMessage();
-        // TODO: dispatch
+    public @NotNull JsonObject getJson() {
+        this.prepareJson();
+        return json;
     }
 
-    protected @NotNull Message buildMessage() {
-        this.prepareJson();
-        return new Message(connection, route, conversation, deadline, json);
+    @Override
+    public @NotNull Message buildMessage() {
+        return new Message(connection, route, conversation, deadline, getJson());
     }
 
     protected void prepareJson() {
@@ -66,13 +70,18 @@ public class ActionImpl<T> implements Action<T> {
 
     /* - - - */
 
-    public @NotNull ActionImpl<T> onSuccess(@Nullable Consumer<? super T> successFinalizer) {
+    public @NotNull NetActionImpl<T> onSuccess(@Nullable Consumer<? super T> successFinalizer) {
         this.successFinalizer = successFinalizer;
         return this;
     }
 
-    public @NotNull ActionImpl<T> onFailure(@Nullable Consumer<? super Throwable> failureFinalizer) {
+    public @NotNull NetActionImpl<T> onFailure(@Nullable Consumer<? super Throwable> failureFinalizer) {
         this.failureFinalizer = failureFinalizer;
         return this;
+    }
+
+    @Override
+    public final @NotNull T createResult(@NotNull Message response) throws Exception {
+        return this.finalizer.apply(response);
     }
 }

@@ -1,8 +1,8 @@
 package de.turtle_exception.client.api;
 
 import de.turtle_exception.client.internal.TurtleClientImpl;
-import de.turtle_exception.client.internal.data.Provider;
-import de.turtle_exception.client.internal.net.NetworkAdapter;
+import de.turtle_exception.client.internal.Provider;
+import de.turtle_exception.client.internal.NetworkAdapter;
 import de.turtle_exception.client.internal.util.Checks;
 import net.dv8tion.jda.api.JDA;
 import org.bukkit.Server;
@@ -46,8 +46,7 @@ public class TurtleClientBuilder {
         String name   = String.valueOf(increment.getAndIncrement());
         Logger logger = this.logger != null ? this.logger : Logger.getLogger("CLIENT#" + name);
 
-        // TODO: provider
-        TurtleClientImpl client = new TurtleClientImpl(name, logger, networkAdapter);
+        TurtleClientImpl client = new TurtleClientImpl(name, logger, networkAdapter, provider);
 
         if (spigot != null)
             client.setSpigotServer(spigot);

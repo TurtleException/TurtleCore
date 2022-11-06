@@ -9,7 +9,7 @@ import de.turtle_exception.client.api.entities.attribute.ITicketContainer;
 import de.turtle_exception.client.api.entities.attribute.IUserContainer;
 import de.turtle_exception.client.api.event.EventManager;
 import de.turtle_exception.client.api.request.DataAction;
-import de.turtle_exception.client.internal.net.NetworkAdapter;
+import de.turtle_exception.client.internal.NetworkAdapter;
 import de.turtle_exception.client.internal.util.version.Version;
 import net.dv8tion.jda.api.JDA;
 import org.bukkit.Server;

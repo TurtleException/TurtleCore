@@ -2,6 +2,7 @@ package de.turtle_exception.client.internal.net;
 
 import de.turtle_exception.client.internal.util.version.Version;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.security.auth.login.LoginException;
 import java.io.BufferedReader;
@@ -65,5 +66,9 @@ public abstract class Handshake extends Thread {
         }
         this.interrupt();
         throw new LoginException("Timed out while attempting to log in.");
+    }
+
+    public @Nullable String getPass() {
+        return null;
     }
 }

@@ -4,6 +4,7 @@ import de.turtle_exception.client.internal.net.Handshake;
 import de.turtle_exception.client.internal.util.version.IllegalVersionException;
 import de.turtle_exception.client.internal.util.version.Version;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.security.auth.login.LoginException;
 import java.util.concurrent.atomic.AtomicReference;
@@ -11,6 +12,7 @@ import java.util.concurrent.atomic.AtomicReference;
 class ServerHandshake extends Handshake {
     private final AtomicReference<Version> clientVersion = new AtomicReference<>(null);
     private final AtomicReference<String>  clientLogin   = new AtomicReference<>(null);
+    private final AtomicReference<String>  clientPass    = new AtomicReference<>(null);
 
     private final NetServer server;
 
@@ -69,5 +71,10 @@ class ServerHandshake extends Handshake {
     @Override
     public void onRun() {
         this.out.println("VERSION");
+    }
+
+    @Override
+    public @Nullable String getPass() {
+        return this.clientPass.get();
     }
 }

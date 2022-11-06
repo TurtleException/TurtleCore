@@ -24,7 +24,14 @@ public interface Action<T> {
         this.queue(null, null);
     }
 
-    void queue(@Nullable Consumer<T> success, @Nullable Consumer<Throwable> failure);
+    default void queue(@Nullable Consumer<T> success, @Nullable Consumer<Throwable> failure) {
+        this.submit().whenComplete((result, throwable) -> {
+            if (result != null && success != null)
+                success.accept(result);
+            if (throwable != null && failure != null)
+                failure.accept(throwable);
+        });
+    }
 
     default @NotNull T complete() throws CancellationException, CompletionException {
         return this.submit().join();

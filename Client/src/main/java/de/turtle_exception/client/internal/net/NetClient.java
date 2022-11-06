@@ -1,5 +1,6 @@
 package de.turtle_exception.client.internal.net;
 
+import de.turtle_exception.client.internal.NetworkAdapter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Range;
 
@@ -32,5 +33,10 @@ public class NetClient extends NetworkAdapter {
         getLogger().log(Level.FINE, "Establishing connection...");
         this.connection = new Connection(this, new Socket(host, port), new ClientHandshake(getClient().getVersion(), login), pass);
         getLogger().log(Level.FINE, "Connection established. Login successful");
+    }
+
+    @Override
+    public void onStop() throws IOException {
+        this.connection.stop();
     }
 }

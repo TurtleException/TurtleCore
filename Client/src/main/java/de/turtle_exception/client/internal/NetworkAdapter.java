@@ -1,7 +1,6 @@
-package de.turtle_exception.client.internal.net;
+package de.turtle_exception.client.internal;
 
 import de.turtle_exception.client.api.TurtleClient;
-import de.turtle_exception.client.internal.TurtleClientImpl;
 import de.turtle_exception.client.internal.util.Checks;
 import de.turtle_exception.client.internal.util.logging.NestedLogger;
 import org.jetbrains.annotations.NotNull;
@@ -41,7 +40,7 @@ public abstract class NetworkAdapter {
     /** Called when the NetworkAdapter stops. */
     public void onStop() throws IOException { }
 
-    public final void setClient(TurtleClientImpl client) throws IllegalStateException {
+    final void setClient(TurtleClientImpl client) throws IllegalStateException {
         if (status != Status.PRE_INIT)
             throw new IllegalStateException("The client can only be set before initialization");
         this.client = client;

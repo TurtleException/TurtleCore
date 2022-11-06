@@ -32,7 +32,7 @@ public class JsonBuilder {
         Checks.nonNull(json, "JSON data");
 
         // Make sure the @Resource annotation is present
-        Resource annotation = getResourceAnnotation(type);
+        Resource annotation = DataUtil.getResourceAnnotation(type);
 
         try {
             Method buildMethod = EntityBuilder.class.getMethod(annotation.builder(), JsonObject.class, TurtleClient.class);
@@ -58,7 +58,7 @@ public class JsonBuilder {
     }
 
     public @NotNull JsonObject buildJson(@NotNull Object object) throws IllegalArgumentException, AnnotationFormatError {
-        Resource resource = getResourceAnnotation(object.getClass());
+        Resource resource = DataUtil.getResourceAnnotation(object.getClass());
 
         JsonObject json = new JsonObject();
 
@@ -92,43 +92,12 @@ public class JsonBuilder {
             }
 
             if (atKey.relation() == Relation.ONE_TO_ONE)
-                addValue(json, atKey.name(), value);
+                DataUtil.addValue(json, atKey.name(), value);
             else
                 json.add(atKey.name(), handleReference(atKey, value));
         }
 
         return json;
-    }
-
-    private static @NotNull Resource getResourceAnnotation(@NotNull Class<?> clazz) throws AnnotationFormatError {
-        Resource annotation = clazz.getAnnotation(Resource.class);
-        if (annotation == null)
-            throw new AnnotationFormatError("Missing annotation @Resource");
-        return annotation;
-    }
-
-    private static void addValue(@NotNull JsonArray json, Object object) {
-        if (object instanceof Boolean entryBoolean) {
-            json.add(entryBoolean);
-        } else if (object instanceof Character entryCharacter) {
-            json.add(entryCharacter);
-        } else if (object instanceof Number entryNumber) {
-            json.add(entryNumber);
-        } else {
-            json.add(String.valueOf(object));
-        }
-    }
-
-    private static void addValue(@NotNull JsonObject json, @NotNull String key, Object object) {
-        if (object instanceof Boolean objBoolean) {
-            json.addProperty(key, objBoolean);
-        } else if (object instanceof Character objCharacter) {
-            json.addProperty(key, objCharacter);
-        } else if (object instanceof Number objNumber) {
-            json.addProperty(key, objNumber);
-        } else {
-            json.addProperty(key, String.valueOf(object));
-        }
     }
 
     private static JsonArray handleReference(@NotNull Key annotation, @NotNull Object value) {
@@ -146,7 +115,7 @@ public class JsonBuilder {
 
         // reference to a primitive type
         for (Object o : iterable)
-            addValue(arr, o);
+            DataUtil.addValue(arr, o);
 
         return arr;
     }
@@ -154,45 +123,8 @@ public class JsonBuilder {
     private static JsonArray handleResourceReference(@NotNull Iterable<?> iterable) {
         JsonArray arr = new JsonArray();
         for (Object entry : iterable)
-            addValue(arr, getPrimary(entry));
+            DataUtil.addValue(arr, DataUtil.getPrimaryValue(entry));
 
         return arr;
-    }
-
-    private static @NotNull Object getPrimary(@NotNull Object obj) throws AnnotationFormatError {
-        getResourceAnnotation(obj.getClass());
-
-        Stream<AccessibleObject> stream = Stream.concat(
-                Arrays.stream(obj.getClass().getMethods()),
-                Arrays.stream(obj.getClass().getFields())
-        );
-
-        for (Iterator<AccessibleObject> it = stream.iterator(); it.hasNext(); ) {
-            AccessibleObject accObj = it.next();
-            Key key = accObj.getAnnotation(Key.class);
-
-            if (key != null && key.primary())
-                return getValue(accObj, obj);
-        }
-
-        throw new AnnotationFormatError("Could not find primary key!");
-    }
-
-    private static Object getValue(@NotNull AccessibleObject accObj, @NotNull Object instance) {
-        if (accObj instanceof Method method) {
-            try {
-                return method.invoke(instance);
-            } catch (Throwable t) {
-                throw new AnnotationFormatError("Unable to invoke key method: " + method.getName(), t);
-            }
-        } else if (accObj instanceof Field field) {
-            try {
-                return field.get(instance);
-            } catch (Throwable t) {
-                throw new AnnotationFormatError("Unable to access key field: " + field.getName(), t);
-            }
-        } else {
-            throw new AssertionError("Unexpected type: " + accObj.getClass().getName());
-        }
     }
 }
