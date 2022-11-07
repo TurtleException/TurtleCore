@@ -37,6 +37,6 @@ public class NetClient extends NetworkAdapter {
 
     @Override
     public void onStop() throws IOException {
-        this.connection.stop();
+        this.connection.stop(true);
     }
 }

@@ -4,6 +4,7 @@ import com.google.common.collect.Sets;
 import de.turtle_exception.client.internal.NetworkAdapter;
 import de.turtle_exception.client.internal.net.Connection;
 import de.turtle_exception.client.internal.net.Handshake;
+import de.turtle_exception.client.internal.request.HeartbeatActionImpl;
 import de.turtle_exception.client.internal.util.Worker;
 import de.turtle_exception.server.TurtleServer;
 import org.jetbrains.annotations.NotNull;
@@ -21,6 +22,7 @@ public class NetServer extends NetworkAdapter {
 
     private Set<Connection> clients;
     private ServerSocket socket;
+    private Worker heartbeats;
     private Worker listener;
 
     public NetServer(@NotNull TurtleServer server, int port) {
@@ -33,6 +35,12 @@ public class NetServer extends NetworkAdapter {
         this.clients = Sets.newConcurrentHashSet();
 
         this.socket = new ServerSocket(port);
+
+        this.heartbeats = new Worker(() -> status == Status.CONNECTED, () -> {
+            this.clients.forEach(connection -> {
+                new HeartbeatActionImpl(connection).queue();
+            });
+        });
 
         this.listener = new Worker(() -> status == Status.CONNECTED, () -> {
             try {
@@ -58,8 +66,11 @@ public class NetServer extends NetworkAdapter {
         this.listener = null;
 
         for (Connection connection : this.clients)
-            connection.stop();
+            connection.stop(true);
         this.clients.clear();
+
+        this.heartbeats.interrupt();
+        this.heartbeats = null;
 
         this.socket.close();
     }

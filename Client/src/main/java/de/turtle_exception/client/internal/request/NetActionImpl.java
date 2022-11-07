@@ -21,19 +21,30 @@ public class NetActionImpl<T> implements NetAction<T> {
     private final @NotNull ExceptionalFunction<? super Message, T> finalizer;
 
     protected final long conversation;
+    protected boolean terminating;
     protected long deadline;
 
     protected Consumer<? super T>         successFinalizer = null;
     protected Consumer<? super Throwable> failureFinalizer = null;
 
-    public NetActionImpl(@NotNull Connection connection, @NotNull Route route, @NotNull JsonObject json, @NotNull ExceptionalFunction<? super Message, T> finalizer) {
+    private NetActionImpl(@NotNull Connection connection, @NotNull Route route, @NotNull JsonObject json, boolean terminating, @NotNull ExceptionalFunction<? super Message, T> finalizer) {
         this.connection = connection;
         this.route = route;
         this.json = json.deepCopy();
 
         this.finalizer = finalizer;
 
+        this.terminating = terminating;
+
         this.conversation = TurtleUtil.newId(0);
+    }
+
+    public NetActionImpl(@NotNull Connection connection, @NotNull Route route, @NotNull JsonObject json) {
+        this(connection, route, json, true, message -> null);
+    }
+
+    public NetActionImpl(@NotNull Connection connection, @NotNull Route route, @NotNull JsonObject json, @NotNull ExceptionalFunction<? super Message, T> finalizer) {
+        this(connection, route, json, false, finalizer);
     }
 
     @Override

@@ -5,14 +5,15 @@ import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.api.request.DataAction;
 import de.turtle_exception.client.internal.net.message.DataMethod;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public abstract class DataActionImpl<T> implements DataAction<T> {
     protected final @NotNull TurtleClient client;
     protected final @NotNull DataMethod method;
     protected final @NotNull Class<T> type;
-    protected final @NotNull JsonObject content;
+    protected final @Nullable JsonObject content;
 
-    protected DataActionImpl(@NotNull TurtleClient client, @NotNull DataMethod method, @NotNull Class<T> type, @NotNull JsonObject content) {
+    protected DataActionImpl(@NotNull TurtleClient client, @NotNull DataMethod method, @NotNull Class<T> type, @Nullable JsonObject content) {
         this.client = client;
         this.method = method;
         this.type = type;
@@ -35,7 +36,7 @@ public abstract class DataActionImpl<T> implements DataAction<T> {
     }
 
     @Override
-    public @NotNull JsonObject getContent() {
+    public @Nullable JsonObject getContent() {
         return content;
     }
 }

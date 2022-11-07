@@ -44,4 +44,8 @@ public class Conversation {
     public @NotNull Map<Long, Message> getMessages() {
         return Map.copyOf(messages);
     }
+
+    public boolean isEmpty() {
+        return messages.isEmpty();
+    }
 }

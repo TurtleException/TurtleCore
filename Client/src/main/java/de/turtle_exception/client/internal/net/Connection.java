@@ -5,9 +5,12 @@ import com.google.gson.JsonObject;
 import de.turtle_exception.client.internal.NetworkAdapter;
 import de.turtle_exception.client.internal.net.message.Conversation;
 import de.turtle_exception.client.internal.net.message.Message;
+import de.turtle_exception.client.internal.net.message.Route;
+import de.turtle_exception.client.internal.request.HeartbeatAcknowledgeAction;
 import de.turtle_exception.client.internal.util.Worker;
 import de.turtle_exception.client.internal.util.crypto.Encryption;
 import de.turtle_exception.client.internal.util.logging.NestedLogger;
+import kotlin.NotImplementedError;
 import org.jetbrains.annotations.NotNull;
 
 import javax.crypto.BadPaddingException;
@@ -78,11 +81,20 @@ public class Connection {
         });
     }
 
-    public void stop() throws IOException {
-        // TODO: notify the other side
+    public boolean stop(boolean notify) {
+        if (notify) {
+            // TODO: notify the other side
+        }
+
         this.status = Status.DISCONNECTED;
         this.receiver.interrupt();
-        this.socket.close();
+        try {
+            this.socket.close();
+            return true;
+        } catch (IOException e) {
+            this.logger.log(Level.WARNING, "Could not close connection!", e);
+            return false;
+        }
     }
 
     /* - - - */
@@ -136,10 +148,40 @@ public class Connection {
     public void receive(@NotNull Message message) {
         Conversation conv = this.getConversation(message);
 
-        // TODO: handle new conversations
+        // store this value, so we can respond to the conversation AFTER adding the received message
+        boolean isNewConv = conv.isEmpty();
 
         // update conversation
         conv.append(message);
+
+        // stop here if the incoming message was a response
+        if (!isNewConv) return;
+
+        Route route = message.getRoute();
+
+        if (route == Route.ERROR || route == Route.HEARTBEAT_ACK) {
+            this.logger.log(Level.WARNING, "Received dangling " + route.name() + ": " + message.getJson());
+            conv.close();
+            return;
+        }
+
+        if (route == Route.QUIT) {
+            this.logger.log(Level.WARNING, "Received QUIT route.");
+            this.stop(false);
+            return;
+        }
+
+        if (route == Route.HEARTBEAT) {
+            new HeartbeatAcknowledgeAction(message).queue();
+            return;
+        }
+
+        if (route == Route.DATA) {
+            // TODO: data
+            return;
+        }
+
+        throw new NotImplementedError("Unknown route: " + route.name());
     }
 
     private @NotNull Conversation getConversation(@NotNull Message message) {
@@ -176,5 +218,9 @@ public class Connection {
 
     public NetworkAdapter getAdapter() {
         return adapter;
+    }
+
+    public NestedLogger getLogger() {
+        return logger;
     }
 }

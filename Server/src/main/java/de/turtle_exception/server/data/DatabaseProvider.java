@@ -4,20 +4,23 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import de.turtle_exception.client.api.request.DataAction;
 import de.turtle_exception.client.internal.Provider;
 import de.turtle_exception.client.internal.data.DataUtil;
 import de.turtle_exception.client.internal.data.annotations.Key;
 import de.turtle_exception.client.internal.data.annotations.Resource;
-import de.turtle_exception.client.internal.util.ExceptionalFunction;
+import de.turtle_exception.client.internal.net.message.DataMethod;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
 import java.lang.annotation.AnnotationFormatError;
 import java.util.Map;
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
-// FIXME
 public class DatabaseProvider extends Provider {
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final File dir;
@@ -31,7 +34,26 @@ public class DatabaseProvider extends Provider {
     /* - - - */
 
     @Override
-    public DatabaseActionImpl<Boolean> delete(@NotNull Class<?> type, @NotNull Object primary) throws AnnotationFormatError {
+    public DataAction<Boolean> delete(@NotNull Class<?> type, @NotNull Object primary) throws AnnotationFormatError {
+        return new DatabaseActionImpl<>(client, this, DataMethod.DELETE, boolean.class, () -> this.doDelete(type, primary));
+    }
+
+    @Override
+    public @Nullable DataAction<JsonObject> get(@NotNull Class<?> type, @NotNull Object primary) throws AnnotationFormatError {
+        return new DatabaseActionImpl<>(client, this, DataMethod.GET, JsonObject.class, () -> this.doGet(type, primary));
+    }
+
+    @Override
+    public @Nullable DataAction<JsonObject> put(@NotNull Class<?> type, @NotNull JsonObject data) throws AnnotationFormatError {
+        return new DatabaseActionImpl<>(client, this, DataMethod.PUT, JsonObject.class, () -> this.doPut(type, data));    }
+
+    @Override
+    public @NotNull DataAction<JsonObject> patch(@NotNull Class<?> type, @NotNull JsonObject data, @NotNull Object primary) throws AnnotationFormatError {
+        return new DatabaseActionImpl<>(client, this, DataMethod.PATCH, JsonObject.class, () -> this.doPatch(type, data, primary));    }
+
+    /* - - - */
+
+    private boolean doDelete(@NotNull Class<?> type, @NotNull Object primary) throws AnnotationFormatError {
         Resource annotation = DataUtil.getResourceAnnotation(type);
         File file = this.getFile(annotation, primary);
 
@@ -40,8 +62,7 @@ public class DatabaseProvider extends Provider {
         return file.delete();
     }
 
-    @Override
-    public @Nullable DatabaseActionImpl<JsonObject> get(@NotNull Class<?> type, @NotNull Object primary) throws AnnotationFormatError {
+    private @Nullable JsonObject doGet(@NotNull Class<?> type, @NotNull Object primary) throws AnnotationFormatError {
         Resource annotation = DataUtil.getResourceAnnotation(type);
         File file = this.getFile(annotation, primary);
 
@@ -54,9 +75,9 @@ public class DatabaseProvider extends Provider {
         }
     }
 
-    @Override
-    public @Nullable DatabaseActionImpl<JsonObject> put(@NotNull Class<?> type, @NotNull JsonObject data) throws AnnotationFormatError {
+    private @Nullable JsonObject doPut(@NotNull Class<?> type, @NotNull JsonObject data) throws AnnotationFormatError {
         Resource annotation = DataUtil.getResourceAnnotation(type);
+        Object primary = DataUtil.getPrimaryValue(data, type);
         File file = getFile(annotation, primary);
 
         // TODO: make sure the primary is created by the server
@@ -70,8 +91,7 @@ public class DatabaseProvider extends Provider {
         }
     }
 
-    @Override
-    public @NotNull DatabaseActionImpl<JsonObject> patch(@NotNull Class<?> type, @NotNull JsonObject data, @NotNull Object primary) throws AnnotationFormatError {
+    private @NotNull JsonObject doPatch(@NotNull Class<?> type, @NotNull JsonObject data, @NotNull Object primary) throws AnnotationFormatError {
         Resource annotation = DataUtil.getResourceAnnotation(type);
         File file = getFile(annotation, primary);
 
@@ -131,11 +151,11 @@ public class DatabaseProvider extends Provider {
         return dir;
     }
 
-    <T> CompletableFuture<T> submit(ExceptionalFunction<Void, T> function) {
+    <T> CompletableFuture<T> submit(Callable<T> callable) {
         CompletableFuture<T> future = new CompletableFuture<>();
         executor.submit(() -> {
             try {
-                future.complete(function.apply(null));
+                future.complete(callable.call());
             } catch (Exception e) {
                 future.completeExceptionally(e);
             }
