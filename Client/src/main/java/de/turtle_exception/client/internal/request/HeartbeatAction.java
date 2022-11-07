@@ -8,9 +8,9 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.logging.Level;
 
-public class HeartbeatActionImpl extends NetActionImpl<Long> {
-    public HeartbeatActionImpl(@NotNull Connection connection) {
-        super(connection, Route.HEARTBEAT, buildJson(), HeartbeatActionImpl::getPing);
+public class HeartbeatAction extends NetActionImpl<Long> {
+    public HeartbeatAction(@NotNull Connection connection) {
+        super(connection, Route.HEARTBEAT, buildJson(), HeartbeatAction::getPing);
 
         this.successFinalizer = ping -> {
             connection.getLogger().log(Level.FINER, "Heartbeat! Ping: " + ping);
