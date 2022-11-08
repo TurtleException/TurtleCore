@@ -34,21 +34,21 @@ public class DatabaseProvider extends Provider {
     /* - - - */
 
     @Override
-    public @NotNull DataAction<Boolean> delete(@NotNull Class<?> type, @NotNull Object primary) throws AnnotationFormatError {
+    public <T> @NotNull DataAction<Boolean> delete(@NotNull Class<T> type, @NotNull Object primary) throws AnnotationFormatError {
         return new DatabaseActionImpl<>(client, this, DataMethod.DELETE, boolean.class, () -> this.doDelete(type, primary));
     }
 
     @Override
-    public @NotNull DataAction<JsonObject> get(@NotNull Class<?> type, @NotNull Object primary) throws AnnotationFormatError {
+    public <T> @NotNull DataAction<JsonObject> get(@NotNull Class<T> type, @NotNull Object primary) throws AnnotationFormatError {
         return new DatabaseActionImpl<>(client, this, DataMethod.GET, JsonObject.class, () -> this.doGet(type, primary));
     }
 
     @Override
-    public @NotNull DataAction<JsonObject> put(@NotNull Class<?> type, @NotNull JsonObject data) throws AnnotationFormatError {
+    public <T> @NotNull DataAction<JsonObject> put(@NotNull Class<T> type, @NotNull JsonObject data) throws AnnotationFormatError {
         return new DatabaseActionImpl<>(client, this, DataMethod.PUT, JsonObject.class, () -> this.doPut(type, data));    }
 
     @Override
-    public @NotNull DataAction<JsonObject> patch(@NotNull Class<?> type, @NotNull JsonObject data, @NotNull Object primary) throws AnnotationFormatError {
+    public <T> @NotNull DataAction<JsonObject> patch(@NotNull Class<T> type, @NotNull JsonObject data, @NotNull Object primary) throws AnnotationFormatError {
         return new DatabaseActionImpl<>(client, this, DataMethod.PATCH, JsonObject.class, () -> this.doPatch(type, data, primary));    }
 
     /* - - - */

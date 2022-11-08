@@ -16,13 +16,13 @@ public abstract class Provider {
 
     /* - - - */
 
-    public abstract @NotNull DataAction<Boolean> delete(@NotNull Class<?> type, @NotNull Object primary) throws AnnotationFormatError;
+    public abstract <T> @NotNull DataAction<Boolean> delete(@NotNull Class<T> type, @NotNull Object primary) throws AnnotationFormatError;
 
-    public abstract @NotNull DataAction<JsonObject> get(@NotNull Class<?> type, @NotNull Object primary) throws AnnotationFormatError;
+    public abstract <T> @NotNull DataAction<JsonObject> get(@NotNull Class<T> type, @NotNull Object primary) throws AnnotationFormatError;
 
-    public abstract @NotNull DataAction<JsonObject> put(@NotNull Class<?> type, @NotNull JsonObject data) throws AnnotationFormatError;
+    public abstract <T> @NotNull DataAction<JsonObject> put(@NotNull Class<T> type, @NotNull JsonObject data) throws AnnotationFormatError;
 
-    public abstract @NotNull DataAction<JsonObject> patch(@NotNull Class<?> type, @NotNull JsonObject data, @NotNull Object primary) throws AnnotationFormatError;
+    public abstract <T> @NotNull DataAction<JsonObject> patch(@NotNull Class<T> type, @NotNull JsonObject data, @NotNull Object primary) throws AnnotationFormatError;
 
     /* - - - */
 

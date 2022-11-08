@@ -19,7 +19,7 @@ public class NetworkProvider extends Provider {
     }
 
     @Override
-    public DataAction<Boolean> delete(@NotNull Class<?> type, @NotNull Object primary) throws AnnotationFormatError {
+    public <T> @NotNull DataAction<Boolean> delete(@NotNull Class<T> type, @NotNull Object primary) throws AnnotationFormatError {
         JsonObject content = new JsonObject();
         Key key = DataUtil.getPrimary(type).getAnnotation(Key.class);
         DataUtil.addValue(content, key.name(), primary);
@@ -28,7 +28,7 @@ public class NetworkProvider extends Provider {
     }
 
     @Override
-    public @NotNull DataAction<JsonObject> get(@NotNull Class<?> type, @NotNull Object primary) throws AnnotationFormatError {
+    public <T> @NotNull DataAction<JsonObject> get(@NotNull Class<T> type, @NotNull Object primary) throws AnnotationFormatError {
         JsonObject content = new JsonObject();
         Key key = DataUtil.getPrimary(type).getAnnotation(Key.class);
         DataUtil.addValue(content, key.name(), primary);
@@ -37,7 +37,7 @@ public class NetworkProvider extends Provider {
     }
 
     @Override
-    public @NotNull DataAction<JsonObject> put(@NotNull Class<?> type, @NotNull JsonObject data) throws AnnotationFormatError {
+    public <T> @NotNull DataAction<JsonObject> put(@NotNull Class<T> type, @NotNull JsonObject data) throws AnnotationFormatError {
         JsonObject content = data.deepCopy();
 
         // make sure there is no primary value in the Json (The server should create it)
@@ -48,7 +48,7 @@ public class NetworkProvider extends Provider {
     }
 
     @Override
-    public @NotNull DataAction<JsonObject> patch(@NotNull Class<?> type, @NotNull JsonObject data, @NotNull Object primary) throws AnnotationFormatError {
+    public <T> @NotNull DataAction<JsonObject> patch(@NotNull Class<T> type, @NotNull JsonObject data, @NotNull Object primary) throws AnnotationFormatError {
         JsonObject content = data.deepCopy();
 
         // make sure the primary is in the Json

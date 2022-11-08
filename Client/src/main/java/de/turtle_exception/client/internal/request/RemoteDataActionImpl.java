@@ -2,7 +2,6 @@ package de.turtle_exception.client.internal.request;
 
 import com.google.gson.JsonObject;
 import de.turtle_exception.client.api.request.NetAction;
-import de.turtle_exception.client.internal.TurtleClientImpl;
 import de.turtle_exception.client.internal.net.Connection;
 import de.turtle_exception.client.internal.net.message.DataMessage;
 import de.turtle_exception.client.internal.net.message.DataMethod;
@@ -45,7 +44,6 @@ public class RemoteDataActionImpl<T> extends DataActionImpl<T> implements NetAct
 
     @Override
     public @NotNull T createResult(@NotNull Message response) throws Exception {
-        // TODO: Move TurtleClientImpl#getJsonBuilder to TurtleClient?
-        return ((TurtleClientImpl) getClient()).getJsonBuilder().buildObject(type, response.getJson().getAsJsonObject("content"));
+        return getClient().getJsonBuilder().buildObject(type, response.getJson().getAsJsonObject("content"));
     }
 }
