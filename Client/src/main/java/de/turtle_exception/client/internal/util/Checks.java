@@ -27,4 +27,10 @@ public class Checks {
             if (obj.equals(o)) return false;
         return true;
     }
+
+    public static boolean equalsAny(@NotNull Object obj, @NotNull Object... other) {
+        for (Object o : other)
+            if (obj.equals(o)) return true;
+        return false;
+    }
 }

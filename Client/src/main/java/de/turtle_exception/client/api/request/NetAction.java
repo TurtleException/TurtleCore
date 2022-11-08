@@ -15,13 +15,14 @@ public interface NetAction<T> extends Action<T> {
 
     @NotNull JsonObject getJson();
 
-    @NotNull Message buildMessage();
+    @NotNull Message buildMessage() throws Exception;
 
     @Override
     default @NotNull CompletableFuture<T> submit() {
         CompletableFuture<T> future = new CompletableFuture<>();
 
         // TODO: proofread docs
+        // TODO: handle exception
 
         getConnection().send(this.buildMessage()).whenComplete((message, throwable) -> {
             if (throwable != null)

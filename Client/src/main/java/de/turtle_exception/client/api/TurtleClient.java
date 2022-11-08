@@ -1,5 +1,6 @@
 package de.turtle_exception.client.api;
 
+import com.google.gson.JsonObject;
 import de.turtle_exception.client.api.entities.Group;
 import de.turtle_exception.client.api.entities.Ticket;
 import de.turtle_exception.client.api.entities.Turtle;
@@ -10,6 +11,8 @@ import de.turtle_exception.client.api.entities.attribute.IUserContainer;
 import de.turtle_exception.client.api.event.EventManager;
 import de.turtle_exception.client.api.request.DataAction;
 import de.turtle_exception.client.internal.NetworkAdapter;
+import de.turtle_exception.client.internal.Provider;
+import de.turtle_exception.client.internal.data.JsonBuilder;
 import de.turtle_exception.client.internal.util.version.Version;
 import net.dv8tion.jda.api.JDA;
 import org.bukkit.Server;
@@ -29,9 +32,13 @@ public interface TurtleClient extends IUserContainer, IGroupContainer, ITicketCo
 
     @NotNull Version getVersion();
 
+    @NotNull JsonBuilder getJsonBuilder();
+
     @NotNull EventManager getEventManager();
 
     @NotNull NetworkAdapter getNetworkAdapter();
+
+    @NotNull Provider getProvider();
 
     @NotNull Consumer<Object> getDefaultActionSuccess();
 
@@ -60,6 +67,10 @@ public interface TurtleClient extends IUserContainer, IGroupContainer, ITicketCo
     @NotNull DataAction<Ticket> retrieveTicket(long id);
 
     @NotNull DataAction<List<Ticket>> retrieveTickets();
+
+    void updateCache(@NotNull Class<?> type, @NotNull JsonObject contentJson) throws IllegalArgumentException;
+
+    void removeCache(@NotNull Class<?> type, @NotNull Object primary) throws IllegalArgumentException, ClassCastException;
 
     /* - - - */
 

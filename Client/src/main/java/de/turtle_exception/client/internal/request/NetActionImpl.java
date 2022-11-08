@@ -20,7 +20,7 @@ public class NetActionImpl<T> implements NetAction<T> {
 
     private final @NotNull ExceptionalFunction<? super Message, T> finalizer;
 
-    protected final long conversation;
+    protected long conversation;
     protected boolean terminating;
     protected long deadline;
 
@@ -69,7 +69,7 @@ public class NetActionImpl<T> implements NetAction<T> {
     }
 
     @Override
-    public @NotNull Message buildMessage() {
+    public @NotNull Message buildMessage() throws Exception {
         return new Message(connection, route, conversation, deadline, getJson());
     }
 

@@ -1,6 +1,7 @@
 package de.turtle_exception.client.api.entities;
 
 import de.turtle_exception.client.api.TurtleClient;
+import de.turtle_exception.client.api.request.Action;
 import de.turtle_exception.client.internal.data.annotations.Key;
 import org.jetbrains.annotations.NotNull;
 
@@ -18,4 +19,10 @@ public interface Turtle {
 
     // TODO: docs
     @NotNull TurtleClient getClient();
+
+    @NotNull Action<Void> delete();
+
+    @NotNull Action<Turtle> update();
+
+    void remove();
 }

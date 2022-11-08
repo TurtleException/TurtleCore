@@ -1,29 +1,34 @@
 package de.turtle_exception.client.internal.util;
 
-import com.google.common.reflect.TypeToken;
-import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.List;
-import java.util.Map;
 
 public class JsonUtil {
     private JsonUtil() { }
 
-    /**
-     * Converts a String representation of a JSON object into a {@link Map} with Strings as keys and values. Values may
-     * be other (JSON) objects themselves. The String representation of values has been chosen because it is the only
-     * type where its safe to assume that no conversion errors may occur.
-     */
-    public static @NotNull Map<String, String> jsonToMap(@NotNull String json) {
-        return new Gson().fromJson(json, new TypeToken<Map<String, String>>(){}.getType());
+    public static @NotNull JsonObject buildError(@NotNull String message) {
+        JsonObject json = new JsonObject();
+        json.addProperty("message", message);
+        return json;
     }
 
-    /**
-     * Converts a String representation of a JSON array into a {@link List}. The String representation of elements has
-     * been chosen because it is the only type where its safe to assume that no conversion errors may occur.
-     */
-    public static @NotNull List<String> jsonToList(@NotNull String json) {
-        return new Gson().fromJson(json, new TypeToken<List<String>>(){}.getType());
+    public static @NotNull JsonObject buildError(@NotNull Throwable t, @NotNull String message) {
+        JsonObject json = buildError(message);
+        json.add("exception", buildException(t));
+        return json;
+    }
+
+    public static @NotNull JsonObject buildException(@NotNull Throwable t) {
+        JsonArray stacktrace = new JsonArray();
+        for (StackTraceElement stackTraceElement : t.getStackTrace())
+            stacktrace.add(stackTraceElement.toString());
+
+        JsonObject ex = new JsonObject();
+        ex.addProperty("type", t.getClass().getName());
+        ex.addProperty("message", t.getMessage());
+        ex.add("stacktrace", stacktrace);
+
+        return ex;
     }
 }

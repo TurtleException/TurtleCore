@@ -34,17 +34,17 @@ public class DatabaseProvider extends Provider {
     /* - - - */
 
     @Override
-    public DataAction<Boolean> delete(@NotNull Class<?> type, @NotNull Object primary) throws AnnotationFormatError {
+    public @NotNull DataAction<Boolean> delete(@NotNull Class<?> type, @NotNull Object primary) throws AnnotationFormatError {
         return new DatabaseActionImpl<>(client, this, DataMethod.DELETE, boolean.class, () -> this.doDelete(type, primary));
     }
 
     @Override
-    public @Nullable DataAction<JsonObject> get(@NotNull Class<?> type, @NotNull Object primary) throws AnnotationFormatError {
+    public @NotNull DataAction<JsonObject> get(@NotNull Class<?> type, @NotNull Object primary) throws AnnotationFormatError {
         return new DatabaseActionImpl<>(client, this, DataMethod.GET, JsonObject.class, () -> this.doGet(type, primary));
     }
 
     @Override
-    public @Nullable DataAction<JsonObject> put(@NotNull Class<?> type, @NotNull JsonObject data) throws AnnotationFormatError {
+    public @NotNull DataAction<JsonObject> put(@NotNull Class<?> type, @NotNull JsonObject data) throws AnnotationFormatError {
         return new DatabaseActionImpl<>(client, this, DataMethod.PUT, JsonObject.class, () -> this.doPut(type, data));    }
 
     @Override

@@ -21,4 +21,11 @@ public enum DataMethod {
                 return value;
         return null;
     }
+
+    public static @Nullable DataMethod of(String name) {
+        for (DataMethod value : values())
+            if (value.name().equals(name))
+                return value;
+        return null;
+    }
 }

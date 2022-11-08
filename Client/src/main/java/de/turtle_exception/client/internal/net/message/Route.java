@@ -8,6 +8,7 @@ public enum Route {
     QUIT(2),
     HEARTBEAT(3),
     HEARTBEAT_ACK(4),
+    OK(5)
     ;
 
     public final int code;

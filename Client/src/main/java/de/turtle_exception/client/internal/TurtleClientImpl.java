@@ -9,6 +9,7 @@ import de.turtle_exception.client.api.entities.Turtle;
 import de.turtle_exception.client.api.entities.User;
 import de.turtle_exception.client.api.event.EventManager;
 import de.turtle_exception.client.api.request.DataAction;
+import de.turtle_exception.client.internal.data.DataUtil;
 import de.turtle_exception.client.internal.data.JsonBuilder;
 import de.turtle_exception.client.internal.request.RemoteDataActionImpl;
 import de.turtle_exception.client.internal.util.TurtleSet;
@@ -22,6 +23,7 @@ import org.jetbrains.annotations.Range;
 
 import javax.security.auth.login.LoginException;
 import java.io.IOException;
+import java.lang.annotation.AnnotationFormatError;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -107,6 +109,7 @@ public class TurtleClientImpl implements TurtleClient {
         return VERSION;
     }
 
+    @Override
     public @NotNull JsonBuilder getJsonBuilder() {
         return jsonBuilder;
     }
@@ -119,6 +122,11 @@ public class TurtleClientImpl implements TurtleClient {
     @Override
     public @NotNull NetworkAdapter getNetworkAdapter() {
         return this.networkAdapter;
+    }
+
+    @Override
+    public @NotNull Provider getProvider() {
+        return this.provider;
     }
 
     /**
@@ -284,6 +292,33 @@ public class TurtleClientImpl implements TurtleClient {
             ticketCache.clear();
             ticketCache.addAll(l);
         });
+    }
+
+    @Override
+    public void updateCache(@NotNull Class<?> type, @NotNull JsonObject contentJson) throws IllegalArgumentException {
+        Object obj;
+        try {
+            obj = jsonBuilder.buildObject(type, contentJson);
+        } catch (IllegalArgumentException | AnnotationFormatError e) {
+            throw new IllegalArgumentException("Failed to build object", e);
+        }
+
+        if (obj instanceof Group group)
+            groupCache.put(group);
+        if (obj instanceof Ticket ticket)
+            ticketCache.put(ticket);
+        if (obj instanceof User user)
+            userCache.put(user);
+    }
+
+    @Override
+    public void removeCache(@NotNull Class<?> type, @NotNull Object primary) throws IllegalArgumentException, ClassCastException {
+        if (Group.class.isAssignableFrom(type))
+            groupCache.removeById((long) primary);
+        if (Ticket.class.isAssignableFrom(type))
+            ticketCache.removeById((long) primary);
+        if (User.class.isAssignableFrom(type))
+            userCache.removeById((long) primary);
     }
 
     /* - - - */

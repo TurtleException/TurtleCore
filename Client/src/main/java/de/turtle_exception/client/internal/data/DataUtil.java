@@ -47,13 +47,13 @@ public class DataUtil {
         return getValue(getPrimary(obj.getClass()), obj);
     }
 
-    public static @NotNull Object getPrimaryValue(@NotNull JsonObject json, Class<?> type) throws AnnotationFormatError {
+    public static @NotNull Object getPrimaryValue(@NotNull JsonObject json, Class<?> type) throws AnnotationFormatError, ClassCastException {
         Key key = getPrimary(type).getAnnotation(Key.class);
 
         if (key == null)
             throw new AssertionError("AccessibleObject must have @Key annotation");
 
-        return json.get(key.name());
+        return key.type().cast(json.get(key.name()));
     }
 
     private static @NotNull Object getValue(@NotNull AccessibleObject accObj, @NotNull Object instance) {

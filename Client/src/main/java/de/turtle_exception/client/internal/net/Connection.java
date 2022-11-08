@@ -6,7 +6,9 @@ import de.turtle_exception.client.internal.NetworkAdapter;
 import de.turtle_exception.client.internal.net.message.Conversation;
 import de.turtle_exception.client.internal.net.message.Message;
 import de.turtle_exception.client.internal.net.message.Route;
+import de.turtle_exception.client.internal.request.DataRequestAction;
 import de.turtle_exception.client.internal.request.HeartbeatAcknowledgeAction;
+import de.turtle_exception.client.internal.util.Checks;
 import de.turtle_exception.client.internal.util.Worker;
 import de.turtle_exception.client.internal.util.crypto.Encryption;
 import de.turtle_exception.client.internal.util.logging.NestedLogger;
@@ -159,7 +161,7 @@ public class Connection {
 
         Route route = message.getRoute();
 
-        if (route == Route.ERROR || route == Route.HEARTBEAT_ACK) {
+        if (Checks.equalsAny(route, Route.ERROR, Route.HEARTBEAT_ACK, Route.OK)) {
             this.logger.log(Level.WARNING, "Received dangling " + route.name() + ": " + message.getJson());
             conv.close();
             return;
@@ -177,7 +179,7 @@ public class Connection {
         }
 
         if (route == Route.DATA) {
-            // TODO: data
+            new DataRequestAction(message).queue();
             return;
         }
 
