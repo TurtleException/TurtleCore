@@ -55,6 +55,12 @@ public class TurtleUtil {
                 | (increment);
     }
 
+    public static long getTime(long id) {
+        return Epoch.TURTLE.getOffset() + (id >> TIME_BITS);
+    }
+
+    /* - - - */
+
     private static long getTime() {
         return Epoch.TURTLE.currentTimeMillis();
     }
