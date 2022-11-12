@@ -44,7 +44,7 @@ public class NetworkProvider extends Provider {
         Key key = DataUtil.getPrimary(type).getAnnotation(Key.class);
         content.remove(key.name());
 
-        return new RemoteDataActionImpl<>(connection, DataMethod.PUT, type, content);
+        return new RemoteDataActionImpl<>(connection, DataMethod.PUT, type, content, client.getDefaultTimeoutOutbound());
     }
 
     @Override

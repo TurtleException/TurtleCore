@@ -10,7 +10,7 @@ import de.turtle_exception.client.internal.net.message.Route;
 import de.turtle_exception.client.internal.util.time.TurtleUtil;
 import org.jetbrains.annotations.NotNull;
 
-public class RemoteDataActionImpl<T> extends DataActionImpl<T> implements NetAction<T> {
+public class RemoteDataActionImpl<T> extends DataActionImpl<T> implements NetAction<JsonObject> {
     protected final @NotNull Connection connection;
     protected final long timeout;
 
