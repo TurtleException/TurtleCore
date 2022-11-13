@@ -5,6 +5,8 @@ import de.turtle_exception.client.internal.net.message.Conversation;
 import de.turtle_exception.client.internal.net.packets.*;
 import de.turtle_exception.client.internal.util.Worker;
 import de.turtle_exception.client.internal.util.logging.NestedLogger;
+import de.turtle_exception.client.internal.util.time.TurtleType;
+import de.turtle_exception.client.internal.util.time.TurtleUtil;
 import kotlin.NotImplementedError;
 import org.jetbrains.annotations.NotNull;
 
@@ -66,7 +68,7 @@ public class Connection {
 
     public boolean stop(boolean notify) {
         if (notify) {
-            this.send(new HandshakePacket(/* TODO: id */ 0, newConversation(), Direction.OUTBOUND, "QUIT").compile());
+            this.send(new HandshakePacket(TurtleUtil.newId(TurtleType.PACKET), newConversation(), Direction.OUTBOUND, "QUIT").compile());
         }
 
         this.status = Status.DISCONNECTED;
@@ -118,7 +120,7 @@ public class Connection {
             HeartbeatPacket pck = (HeartbeatPacket) packet.toPacket();
 
             if (pck.getStage() != HeartbeatPacket.Stage.RECEIVE) {
-                this.send(pck.buildResponse(/* TODO: id */ 0).compile());
+                this.send(pck.buildResponse(TurtleUtil.newId(TurtleType.PACKET)).compile());
                 return;
             }
 
@@ -166,7 +168,7 @@ public class Connection {
     }
 
     public @NotNull Conversation newConversation() {
-        Conversation conv = new Conversation(this, /* TODO: id */ 0);
+        Conversation conv = new Conversation(this, TurtleUtil.newId(TurtleType.CONVERSATION));
         this.conversations.put(conv.getId(), conv);
         return conv;
     }

@@ -1,5 +1,6 @@
 package de.turtle_exception.client.internal.util.time;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Range;
 
 /**
@@ -31,6 +32,10 @@ public class TurtleUtil {
 
     private TurtleUtil() { }
 
+    public static long newId(@NotNull TurtleType type) {
+        return newId(type.getAsByte());
+    }
+
     @SuppressWarnings("StatementWithEmptyBody")
     public static synchronized long newId(@Range(from = 0x0, to = 0xff) /* TODO: see usages */ long type) {
         long time = getTime();
@@ -58,8 +63,6 @@ public class TurtleUtil {
     public static long getTime(long id) {
         return Epoch.TURTLE.getOffset() + (id >> TIME_BITS);
     }
-
-    /* - - - */
 
     private static long getTime() {
         return Epoch.TURTLE.currentTimeMillis();
