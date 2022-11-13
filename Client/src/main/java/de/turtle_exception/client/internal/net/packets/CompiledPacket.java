@@ -104,6 +104,10 @@ public final class CompiledPacket {
         return conversation;
     }
 
+    public byte getTypeId() {
+        return type;
+    }
+
     public @NotNull Direction getDirection() {
         return direction;
     }

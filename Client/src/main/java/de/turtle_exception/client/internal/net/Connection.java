@@ -5,8 +5,7 @@ import com.google.gson.JsonObject;
 import de.turtle_exception.client.internal.NetworkAdapter;
 import de.turtle_exception.client.internal.net.message.Conversation;
 import de.turtle_exception.client.internal.net.message.Route;
-import de.turtle_exception.client.internal.net.packets.CompiledPacket;
-import de.turtle_exception.client.internal.net.packets.Packet;
+import de.turtle_exception.client.internal.net.packets.*;
 import de.turtle_exception.client.internal.util.Checks;
 import de.turtle_exception.client.internal.util.Worker;
 import de.turtle_exception.client.internal.util.crypto.Encryption;
@@ -98,12 +97,22 @@ public class Connection {
 
     public synchronized void send(@NotNull CompiledPacket packet) {
         try {
-            // TODO: this can't be the most efficient way to do this, right? right...?
+            // this can't be the most efficient way to do this, right? right...?
             this.out.println(new String(packet.getBytes()));
         } catch (Error e) {
             logger.log(Level.SEVERE, "Encountered an Error when attempting to send a packet", e);
         } catch (Throwable t) {
             logger.log(Level.WARNING, "Encountered an Exception when attempting to send a packet", t);
+        }
+    }
+
+    private void receive(@NotNull String msg) {
+        try {
+            this.receive(new CompiledPacket(msg.getBytes(), Direction.INBOUND, this));
+        } catch (Error e) {
+            logger.log(Level.SEVERE, "Encountered an Error when attempting to receive a packet", e);
+        } catch (Throwable t) {
+            logger.log(Level.WARNING, "Encountered an Exception when attempting to receive a packet", t);
         }
     }
 
@@ -117,6 +126,49 @@ public class Connection {
 
         // update conversation & return CompletableFuture for the response
         return conv.append(message);
+    }
+
+    public void receive(@NotNull CompiledPacket packet) throws ClassCastException, IllegalStateException, NotImplementedError {
+        Conversation conv = this.getConversation(packet.getConversation());
+
+        if (packet.getTypeId() == HeartbeatPacket.TYPE) {
+            // TODO: handle heartbeat
+
+            HeartbeatPacket pck = (HeartbeatPacket) packet.toPacket();
+
+            if (pck.getStage() != HeartbeatPacket.Stage.RECEIVE) {
+                
+            }
+
+            return;
+        }
+
+        if (packet.getTypeId() == HandshakePacket.TYPE) {
+            if (status != Status.LOGIN)
+                throw new IllegalStateException("Unexpected Handshake packet while not in login");
+
+            // TODO: handle handshake
+
+            HandshakePacket pck = (HandshakePacket) packet.toPacket();
+
+            return;
+        }
+
+        if (packet.getTypeId() == ErrorPacket.TYPE) {
+            // TODO
+
+            return;
+        }
+
+        if (status != Status.CONNECTED) return;
+
+        if (packet.getTypeId() == DataPacket.TYPE) {
+            // TODO
+
+            return;
+        }
+
+        throw new NotImplementedError("Unknown packet type: " + packet.getTypeId());
     }
 
     public void receive(@NotNull Message message) {
@@ -158,13 +210,12 @@ public class Connection {
         throw new NotImplementedError("Unknown route: " + route.name());
     }
 
-    private @NotNull Conversation getConversation(@NotNull Message message) {
-        long conversationId = message.getConversation();
-        Conversation conversation = this.conversations.get(conversationId);
+    private @NotNull Conversation getConversation(long responseCode) {
+        Conversation conversation = this.conversations.get(responseCode);
 
         if (conversation == null) {
-            conversation = new Conversation(this, conversationId);
-            this.conversations.put(conversationId, conversation);
+            conversation = new Conversation(this, responseCode);
+            this.conversations.put(responseCode, conversation);
         }
 
         return conversation;
