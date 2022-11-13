@@ -66,7 +66,7 @@ public class Connection {
 
     public boolean stop(boolean notify) {
         if (notify) {
-            // TODO: notify the other side
+            this.send(new HandshakePacket(/* TODO: id */ 0, newConversation(), Direction.OUTBOUND, "QUIT").compile());
         }
 
         this.status = Status.DISCONNECTED;
