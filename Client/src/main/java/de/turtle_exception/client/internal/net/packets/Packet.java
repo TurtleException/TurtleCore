@@ -3,6 +3,8 @@ package de.turtle_exception.client.internal.net.packets;
 import de.turtle_exception.client.internal.net.Direction;
 import de.turtle_exception.client.internal.net.message.Conversation;
 import de.turtle_exception.client.internal.util.crypto.Encryption;
+import de.turtle_exception.client.internal.util.time.TurtleType;
+import de.turtle_exception.client.internal.util.time.TurtleUtil;
 import org.jetbrains.annotations.NotNull;
 
 import javax.crypto.BadPaddingException;
@@ -27,6 +29,10 @@ public abstract class Packet {
         this.id = id;
         this.conversation = conversation;
         this.direction = direction;
+    }
+
+    protected Packet(@NotNull Conversation conversation, @NotNull Direction direction, byte type) {
+        this(TurtleUtil.newId(TurtleType.PACKET), conversation, direction, type);
     }
 
     public final @NotNull CompiledPacket compile() {

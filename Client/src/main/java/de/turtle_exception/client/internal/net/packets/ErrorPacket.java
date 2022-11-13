@@ -4,6 +4,8 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import de.turtle_exception.client.internal.net.Direction;
 import de.turtle_exception.client.internal.net.message.Conversation;
+import de.turtle_exception.client.internal.util.time.TurtleType;
+import de.turtle_exception.client.internal.util.time.TurtleUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -35,6 +37,10 @@ public class ErrorPacket extends Packet {
         this.json.addProperty("throwable", getString(t));
 
         this.throwable = t;
+    }
+
+    public ErrorPacket(@NotNull Conversation conversation, @NotNull String msg, @Nullable Throwable t) {
+        this(TurtleUtil.newId(TurtleType.PACKET), conversation, msg, t);
     }
 
     public ErrorPacket(long id, @NotNull Conversation conversation, byte[] bytes) {

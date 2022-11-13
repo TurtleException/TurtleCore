@@ -2,6 +2,8 @@ package de.turtle_exception.client.internal.net.packets;
 
 import de.turtle_exception.client.internal.net.Direction;
 import de.turtle_exception.client.internal.net.message.Conversation;
+import de.turtle_exception.client.internal.util.time.TurtleType;
+import de.turtle_exception.client.internal.util.time.TurtleUtil;
 import org.jetbrains.annotations.NotNull;
 
 public class HandshakePacket extends Packet {
@@ -16,6 +18,10 @@ public class HandshakePacket extends Packet {
     public HandshakePacket(long id, @NotNull Conversation conversation, @NotNull Direction direction, @NotNull String msg) {
         super(id, conversation, direction, TYPE);
         this.msg = msg;
+    }
+
+    public HandshakePacket(@NotNull Conversation conversation, @NotNull String str) {
+        this(TurtleUtil.newId(TurtleType.PACKET), conversation, Direction.OUTBOUND, str);
     }
 
     @Override

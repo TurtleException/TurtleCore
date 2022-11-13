@@ -4,6 +4,8 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import de.turtle_exception.client.internal.net.Direction;
 import de.turtle_exception.client.internal.net.message.Conversation;
+import de.turtle_exception.client.internal.util.time.TurtleType;
+import de.turtle_exception.client.internal.util.time.TurtleUtil;
 import org.jetbrains.annotations.NotNull;
 
 public class DataPacket extends Packet {
@@ -14,6 +16,10 @@ public class DataPacket extends Packet {
     public DataPacket(long id, @NotNull Conversation conversation, @NotNull Direction direction, @NotNull JsonObject data) {
         super(id, conversation, direction, TYPE);
         this.json = data;
+    }
+
+    public DataPacket(@NotNull Conversation conversation, @NotNull JsonObject data) {
+        this(TurtleUtil.newId(TurtleType.PACKET), conversation, Direction.OUTBOUND, data);
     }
 
     public DataPacket(long id, @NotNull Conversation conversation, @NotNull Direction direction, byte[] bytes) {

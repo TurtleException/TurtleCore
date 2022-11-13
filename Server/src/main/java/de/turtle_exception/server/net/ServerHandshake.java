@@ -1,7 +1,6 @@
 package de.turtle_exception.server.net;
 
 import de.turtle_exception.client.internal.net.Connection;
-import de.turtle_exception.client.internal.net.Direction;
 import de.turtle_exception.client.internal.net.Handshake;
 import de.turtle_exception.client.internal.net.packets.HandshakePacket;
 import de.turtle_exception.client.internal.util.version.IllegalVersionException;
@@ -26,7 +25,7 @@ class ServerHandshake extends Handshake {
     public void init() {
         // initial request (version)
         this.connection.send(
-                new HandshakePacket(/* TODO: id */ 0, connection.newConversation(), Direction.OUTBOUND, "VERSION").compile()
+                new HandshakePacket(connection.newConversation(), "VERSION").compile()
         );
     }
 

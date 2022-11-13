@@ -3,6 +3,8 @@ package de.turtle_exception.client.internal.net.packets;
 import de.turtle_exception.client.internal.net.Direction;
 import de.turtle_exception.client.internal.net.message.Conversation;
 import de.turtle_exception.client.internal.util.MathUtil;
+import de.turtle_exception.client.internal.util.time.TurtleType;
+import de.turtle_exception.client.internal.util.time.TurtleUtil;
 import org.jetbrains.annotations.NotNull;
 
 public class HeartbeatPacket extends Packet {
@@ -18,8 +20,8 @@ public class HeartbeatPacket extends Packet {
     protected long time3;
 
     /** Initiates a new heartbeat */
-    public HeartbeatPacket(long id, @NotNull Conversation conversation, @NotNull Direction direction) {
-        this(id, conversation, direction, new byte[BYTES_LENGTH]);
+    public HeartbeatPacket(@NotNull Conversation conversation, @NotNull Direction direction) {
+        this(TurtleUtil.newId(TurtleType.PACKET), conversation, direction, new byte[BYTES_LENGTH]);
     }
 
     public HeartbeatPacket(long id, @NotNull Conversation conversation, @NotNull Direction direction, byte[] receivedBytes) {
@@ -45,8 +47,8 @@ public class HeartbeatPacket extends Packet {
             this.time3 = time;
     }
 
-    private HeartbeatPacket(long id, @NotNull Conversation conv, long time1, long time2) {
-        super(id, conv, Direction.OUTBOUND, TYPE);
+    private HeartbeatPacket(@NotNull Conversation conv, long time1, long time2) {
+        super(conv, Direction.OUTBOUND, TYPE);
         this.time1 = time1;
         this.time2 = time2;
         this.time3 = 0;
@@ -90,10 +92,10 @@ public class HeartbeatPacket extends Packet {
         return time3 - time1;
     }
 
-    public @NotNull HeartbeatPacket buildResponse(long id) throws IllegalStateException {
+    public @NotNull HeartbeatPacket buildResponse() throws IllegalStateException {
         if (stage == Stage.RECEIVE)
             throw new IllegalStateException("Heartbeat may not go past state RECEIVE");
 
-        return new HeartbeatPacket(id, this.conversation, time1, time2);
+        return new HeartbeatPacket(this.conversation, time1, time2);
     }
 }

@@ -67,9 +67,8 @@ public class Connection {
     }
 
     public boolean stop(boolean notify) {
-        if (notify) {
-            this.send(new HandshakePacket(TurtleUtil.newId(TurtleType.PACKET), newConversation(), Direction.OUTBOUND, "QUIT").compile());
-        }
+        if (notify)
+            this.send(new HandshakePacket(newConversation(), "QUIT").compile());
 
         this.status = Status.DISCONNECTED;
         this.receiver.interrupt();
@@ -120,7 +119,7 @@ public class Connection {
             HeartbeatPacket pck = (HeartbeatPacket) packet.toPacket();
 
             if (pck.getStage() != HeartbeatPacket.Stage.RECEIVE) {
-                this.send(pck.buildResponse(TurtleUtil.newId(TurtleType.PACKET)).compile());
+                this.send(pck.buildResponse().compile());
                 return;
             }
 
