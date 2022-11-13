@@ -4,10 +4,9 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import de.turtle_exception.client.internal.NetworkAdapter;
 import de.turtle_exception.client.internal.net.message.Conversation;
-import de.turtle_exception.client.internal.net.message.Message;
 import de.turtle_exception.client.internal.net.message.Route;
-import de.turtle_exception.client.internal.request.DataRequestAction;
-import de.turtle_exception.client.internal.request.HeartbeatAcknowledgeAction;
+import de.turtle_exception.client.internal.net.packets.CompiledPacket;
+import de.turtle_exception.client.internal.net.packets.Packet;
 import de.turtle_exception.client.internal.util.Checks;
 import de.turtle_exception.client.internal.util.Worker;
 import de.turtle_exception.client.internal.util.crypto.Encryption;
@@ -19,17 +18,13 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.security.auth.login.LoginException;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -101,37 +96,14 @@ public class Connection {
 
     /* - - - */
 
-    public void send(@NotNull String msg) {
+    public synchronized void send(@NotNull CompiledPacket packet) {
         try {
-            this.out.println(Encryption.encrypt(msg, pass));
-        } catch (NoSuchAlgorithmException | InvalidKeySpecException | InvalidAlgorithmParameterException |
-                 NoSuchPaddingException | IllegalBlockSizeException | BadPaddingException | InvalidKeyException e) {
-            logger.log(Level.WARNING, "Could not encrypt outbound message: " + msg, e);
+            // TODO: this can't be the most efficient way to do this, right? right...?
+            this.out.println(new String(packet.getBytes()));
+        } catch (Error e) {
+            logger.log(Level.SEVERE, "Encountered an Error when attempting to send a packet", e);
         } catch (Throwable t) {
-            logger.log(Level.WARNING, "Could not handle outbound message: " + msg, t);
-        }
-    }
-
-    public void receive(@NotNull String msg) {
-        String decrypted = "";
-        try {
-            decrypted = Encryption.decrypt(msg, pass);
-        } catch (InvalidAlgorithmParameterException | NoSuchPaddingException | IllegalBlockSizeException |
-                 NoSuchAlgorithmException | InvalidKeySpecException | BadPaddingException | InvalidKeyException e) {
-            logger.log(Level.WARNING, "Could not decrypt inbound message.", e);
-        } catch (Throwable t) {
-            logger.log(Level.WARNING, "Could not handle inbound message.", t);
-        }
-
-        try {
-            Message message = Message.ofJson(this, new Gson().fromJson(decrypted, JsonObject.class));
-            this.receive(message);
-        } catch (IllegalArgumentException e) {
-            logger.log(Level.WARNING, "Could not parse inbound message: " + decrypted, e);
-        } catch (RejectedExecutionException e) {
-            logger.log(Level.WARNING, "Could not receive inbound message: " + decrypted, e);
-        } catch (Throwable t) {
-            logger.log(Level.WARNING, "Could not handle inbound message: " + decrypted, t);
+            logger.log(Level.WARNING, "Encountered an Exception when attempting to send a packet", t);
         }
     }
 

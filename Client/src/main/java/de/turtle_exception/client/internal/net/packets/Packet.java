@@ -43,4 +43,20 @@ public abstract class Packet {
     }
 
     public abstract byte[] getBytes();
+
+    public byte getType() {
+        return type;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public @NotNull Conversation getConversation() {
+        return conversation;
+    }
+
+    public @NotNull Direction getDirection() {
+        return direction;
+    }
 }

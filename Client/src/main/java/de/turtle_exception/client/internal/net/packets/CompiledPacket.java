@@ -32,7 +32,7 @@ public final class CompiledPacket {
 
     public CompiledPacket(final byte[] bytes, @NotNull Direction direction, @NotNull Connection connection) throws IllegalArgumentException {
         if (bytes.length < META_BYTES)
-            throw new IllegalArgumentException("Missing packet information: " + bytes.length + " of " + META_BYTES + "bytes present.");
+            throw new IllegalArgumentException("Missing packet information: " + bytes.length + " of " + META_BYTES + " bytes present.");
 
         this.bytes      = bytes;
         this.direction  = direction;
@@ -73,10 +73,13 @@ public final class CompiledPacket {
 
         if (type == HandshakePacket.TYPE)
             return new HandshakePacket(turtle, conv, direction, bytes);
+
         if (type == DataPacket.TYPE)
             return new DataPacket(turtle, conv, direction, bytes);
+
         if (type == HeartbeatPacket.TYPE)
             return new HeartbeatPacket(turtle, conv, direction, bytes);
+
         if (type == ErrorPacket.TYPE)
             return new ErrorPacket(turtle, conv, bytes);
 
