@@ -36,6 +36,7 @@ public class NetServer extends NetworkAdapter {
 
         this.socket = new ServerSocket(port);
 
+        // TODO: add delay between heartbeats
         this.heartbeats = new Worker(() -> status == Status.CONNECTED, () -> {
             this.clients.forEach(connection -> {
                 new HeartbeatAction(connection).queue();

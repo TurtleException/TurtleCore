@@ -1,32 +1,22 @@
 package de.turtle_exception.client.internal.net;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import de.turtle_exception.client.internal.NetworkAdapter;
 import de.turtle_exception.client.internal.net.message.Conversation;
-import de.turtle_exception.client.internal.net.message.Route;
 import de.turtle_exception.client.internal.net.packets.*;
-import de.turtle_exception.client.internal.util.Checks;
 import de.turtle_exception.client.internal.util.Worker;
-import de.turtle_exception.client.internal.util.crypto.Encryption;
 import de.turtle_exception.client.internal.util.logging.NestedLogger;
 import kotlin.NotImplementedError;
 import org.jetbrains.annotations.NotNull;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
 import javax.security.auth.login.LoginException;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.Socket;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
 public class Connection {
@@ -37,12 +27,13 @@ public class Connection {
     private final PrintWriter out;
     private final BufferedReader in;
 
-    private final String pass;
+    private final Handshake handshake;
+    private String pass;
 
     private final Worker receiver;
 
     public enum Status { INIT, LOGIN, CONNECTED, DISCONNECTED;}
-    private Status status;
+    volatile Status status;
 
     public static final long CONVERSATION_TIMEOUT_EXTRA = 10000L;
     private final ConcurrentHashMap<Long, Conversation> conversations = new ConcurrentHashMap<>();
@@ -58,16 +49,12 @@ public class Connection {
         this.in  = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
         this.status = Status.LOGIN;
-        handshake.start();
-        handshake.await(10, TimeUnit.SECONDS);
-        this.status = Status.CONNECTED;
+        this.handshake = handshake;
+        this.handshake.init();
 
-        this.pass = handshake.getPass() != null ? handshake.getPass() : pass;
+        this.pass = pass;
 
-        if (this.pass == null)
-            throw new LoginException("Pass must either be provided by Handshake or not be null.");
-
-        this.receiver = new Worker(() -> status == Status.CONNECTED, () -> {
+        this.receiver = new Worker(() -> status != Status.DISCONNECTED, () -> {
             try {
                 this.receive(in.readLine());
             } catch (IOException e) {
@@ -118,43 +105,50 @@ public class Connection {
 
     /* - - - */
 
-    public @NotNull CompletableFuture<Message> send(@NotNull Message message) {
-        Conversation conv = this.getConversation(message);
+    public @NotNull CompletableFuture<Response> send(@NotNull Request request) {
+        // TODO
 
-        // send message
-        this.send(new Gson().toJson(message.toJson()));
-
-        // update conversation & return CompletableFuture for the response
-        return conv.append(message);
+        return new CompletableFuture<>();
     }
 
-    public void receive(@NotNull CompiledPacket packet) throws ClassCastException, IllegalStateException, NotImplementedError {
+    public void receive(@NotNull CompiledPacket packet) throws Exception {
         Conversation conv = this.getConversation(packet.getConversation());
 
         if (packet.getTypeId() == HeartbeatPacket.TYPE) {
-            // TODO: handle heartbeat
-
             HeartbeatPacket pck = (HeartbeatPacket) packet.toPacket();
 
             if (pck.getStage() != HeartbeatPacket.Stage.RECEIVE) {
-                
+                this.send(pck.buildResponse(/* TODO: id */ 0).compile());
+                return;
             }
 
+            logger.log(Level.FINER, "Heartbeat successful: " + pck.getPing() + "ms");
             return;
         }
 
         if (packet.getTypeId() == HandshakePacket.TYPE) {
+            HandshakePacket pck = (HandshakePacket) packet.toPacket();
+
+            if (pck.getMessage().equals("QUIT")) {
+                this.stop(false);
+                return;
+            }
+
             if (status != Status.LOGIN)
                 throw new IllegalStateException("Unexpected Handshake packet while not in login");
 
-            // TODO: handle handshake
-
-            HandshakePacket pck = (HandshakePacket) packet.toPacket();
-
+            handshake.handle(pck);
             return;
         }
 
         if (packet.getTypeId() == ErrorPacket.TYPE) {
+            if (status == Status.LOGIN) {
+                // during LOGIN errors are not encrypted
+                handshake.handle((ErrorPacket) packet.toPacket());
+                return;
+            }
+
+            ErrorPacket pck = (ErrorPacket) packet.toPacket(pass);
             // TODO
 
             return;
@@ -171,52 +165,17 @@ public class Connection {
         throw new NotImplementedError("Unknown packet type: " + packet.getTypeId());
     }
 
-    public void receive(@NotNull Message message) {
-        Conversation conv = this.getConversation(message);
-
-        // store this value, so we can respond to the conversation AFTER adding the received message
-        boolean isNewConv = conv.isEmpty();
-
-        // update conversation
-        conv.append(message);
-
-        // stop here if the incoming message was a response
-        if (!isNewConv) return;
-
-        Route route = message.getRoute();
-
-        if (Checks.equalsAny(route, Route.ERROR, Route.HEARTBEAT_ACK, Route.OK)) {
-            this.logger.log(Level.WARNING, "Received dangling " + route.name() + ": " + message.getJson());
-            conv.close();
-            return;
-        }
-
-        if (route == Route.QUIT) {
-            this.logger.log(Level.WARNING, "Received QUIT route.");
-            this.stop(false);
-            return;
-        }
-
-        if (route == Route.HEARTBEAT) {
-            new HeartbeatAcknowledgeAction(message).queue();
-            return;
-        }
-
-        if (route == Route.DATA) {
-            new DataRequestAction(message).queue();
-            return;
-        }
-
-        throw new NotImplementedError("Unknown route: " + route.name());
+    public @NotNull Conversation newConversation() {
+        Conversation conv = new Conversation(this, /* TODO: id */ 0);
+        this.conversations.put(conv.getId(), conv);
+        return conv;
     }
 
     private @NotNull Conversation getConversation(long responseCode) {
         Conversation conversation = this.conversations.get(responseCode);
 
-        if (conversation == null) {
-            conversation = new Conversation(this, responseCode);
-            this.conversations.put(responseCode, conversation);
-        }
+        if (conversation == null)
+            conversation = newConversation();
 
         return conversation;
     }
@@ -247,5 +206,9 @@ public class Connection {
 
     public NestedLogger getLogger() {
         return logger;
+    }
+
+    public void setPass(@NotNull String pass) {
+        this.pass = pass;
     }
 }
