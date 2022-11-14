@@ -1,7 +1,6 @@
 package de.turtle_exception.client.internal.util.time;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Range;
 
 /**
  * A Turtle snowflake is composed like this:
@@ -37,7 +36,7 @@ public class TurtleUtil {
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
-    public static synchronized long newId(@Range(from = 0x0, to = 0xff) /* TODO: see usages */ long type) {
+    public static synchronized long newId(byte type) {
         long time = getTime();
 
         if (time < lastTime)

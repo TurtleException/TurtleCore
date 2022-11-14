@@ -113,7 +113,7 @@ public class Connection {
     }
 
     public void receive(@NotNull CompiledPacket packet) throws Exception {
-        Conversation conv = this.getConversation(packet.getConversation());
+        Conversation conv = this.getConversation(packet.getResponseCode());
 
         if (packet.getTypeId() == HeartbeatPacket.TYPE) {
             HeartbeatPacket pck = (HeartbeatPacket) packet.toPacket();
@@ -172,7 +172,7 @@ public class Connection {
         return conv;
     }
 
-    private @NotNull Conversation getConversation(long responseCode) {
+    public @NotNull Conversation getConversation(long responseCode) {
         Conversation conversation = this.conversations.get(responseCode);
 
         if (conversation == null)

@@ -23,7 +23,7 @@ public final class CompiledPacket {
 
     /* - META INFO - */
     private final long turtle;
-    private final long conversation;
+    private final long responseCode;
     private final byte type;
     /* ---  ---  --- */
 
@@ -39,12 +39,12 @@ public final class CompiledPacket {
         this.connection = connection;
 
         this.turtle       = MathUtil.bytesToLong(bytes, 0);
-        this.conversation = MathUtil.bytesToLong(bytes, Long.BYTES);
+        this.responseCode = MathUtil.bytesToLong(bytes, Long.BYTES);
         this.type         = bytes[Long.BYTES * 2];
     }
 
-    public CompiledPacket(final byte[] content, @NotNull Direction direction, @NotNull Connection connection, final long id, final long conversation, final byte type) {
-        this(buildBytes(content, id, conversation, type), direction, connection);
+    public CompiledPacket(final byte[] content, @NotNull Direction direction, @NotNull Connection connection, final long id, final long responseCode, final byte type) {
+        this(buildBytes(content, id, responseCode, type), direction, connection);
     }
 
     private static byte[] buildBytes(byte[] content, long id, long conversation, byte type) {
@@ -69,7 +69,7 @@ public final class CompiledPacket {
     }
 
     private @NotNull Packet doToPacket(byte[] bytes) {
-        Conversation conv = null; // TODO
+        Conversation conv = this.connection.getConversation(responseCode);
 
         if (type == HandshakePacket.TYPE)
             return new HandshakePacket(turtle, conv, direction, bytes);
@@ -100,8 +100,8 @@ public final class CompiledPacket {
         return TurtleUtil.getTime(getId());
     }
 
-    public long getConversation() {
-        return conversation;
+    public long getResponseCode() {
+        return responseCode;
     }
 
     public byte getTypeId() {
