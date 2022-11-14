@@ -1,7 +1,7 @@
 package de.turtle_exception.client.internal.net.packets;
 
+import de.turtle_exception.client.internal.net.Connection;
 import de.turtle_exception.client.internal.net.Direction;
-import de.turtle_exception.client.internal.net.message.Conversation;
 import de.turtle_exception.client.internal.util.time.TurtleType;
 import de.turtle_exception.client.internal.util.time.TurtleUtil;
 import org.jetbrains.annotations.NotNull;
@@ -11,17 +11,23 @@ public class HandshakePacket extends Packet {
 
     protected final @NotNull String msg;
 
-    public HandshakePacket(long id, @NotNull Conversation conversation, @NotNull Direction direction, byte[] bytes) {
-        this(id, conversation, direction, new String(bytes));
+    public HandshakePacket(long id, long deadline, @NotNull Connection connection, long responseCode, @NotNull Direction direction, byte[] bytes) {
+        this(id, deadline, connection, responseCode, direction, new String(bytes));
     }
 
-    public HandshakePacket(long id, @NotNull Conversation conversation, @NotNull Direction direction, @NotNull String msg) {
-        super(id, conversation, direction, TYPE);
+    public HandshakePacket(long id, long deadline, @NotNull Connection connection, long responseCode, @NotNull Direction direction, @NotNull String msg) {
+        super(id, deadline, connection, responseCode, direction, TYPE);
         this.msg = msg;
     }
 
-    public HandshakePacket(@NotNull Conversation conversation, @NotNull String str) {
-        this(TurtleUtil.newId(TurtleType.PACKET), conversation, Direction.OUTBOUND, str);
+    /** Sends a new message (response) */
+    public HandshakePacket(long deadline, @NotNull Connection connection, long responseCode, @NotNull String str) {
+        this(TurtleUtil.newId(TurtleType.PACKET), deadline, connection, responseCode, Direction.OUTBOUND, str);
+    }
+
+    /** Sends a new message (not a response) */
+    public HandshakePacket(long deadline, @NotNull Connection connection, @NotNull String str) {
+        this(deadline, connection, TurtleUtil.newId(TurtleType.RESPONSE_CODE), str);
     }
 
     @Override

@@ -1,6 +1,5 @@
 package de.turtle_exception.client.internal.net;
 
-import de.turtle_exception.client.internal.net.message.Conversation;
 import de.turtle_exception.client.internal.net.packets.Packet;
 import org.jetbrains.annotations.NotNull;
 

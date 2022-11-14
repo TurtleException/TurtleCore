@@ -3,7 +3,7 @@ package de.turtle_exception.client.internal.util.time;
 public enum TurtleType {
     UNKNOWN(0),
     PACKET(1),
-    CONVERSATION(2),
+    RESPONSE_CODE(2),
     RESOURCE_GENERIC(3),
     RESOURCE_GROUP(4),
     RESOURCE_TICKET(5),

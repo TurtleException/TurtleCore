@@ -33,13 +33,24 @@ public abstract class Handshake {
 
     protected final void sendError(@NotNull Packet respondingTo, @NotNull String msg, @Nullable Throwable t) {
         this.connection.send(
-                new ErrorPacket(respondingTo.getConversation(), msg, t).compile()
+                new ErrorPacket(
+                        connection.getAdapter().getClient().getDefaultTimeoutOutbound(),
+                        connection,
+                        respondingTo.getResponseCode(),
+                        msg,
+                        t
+                ).compile()
         );
     }
 
     protected final void sendMsg(@NotNull Packet respondingTo, @NotNull String msg) {
         this.connection.send(
-                new HandshakePacket(respondingTo.getConversation(), msg).compile()
+                new HandshakePacket(
+                        connection.getAdapter().getClient().getDefaultTimeoutOutbound(),
+                        connection,
+                        respondingTo.getResponseCode(),
+                        msg
+                ).compile()
         );
     }
 

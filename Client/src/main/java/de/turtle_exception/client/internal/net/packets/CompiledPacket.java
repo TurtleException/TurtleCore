@@ -2,7 +2,6 @@ package de.turtle_exception.client.internal.net.packets;
 
 import de.turtle_exception.client.internal.net.Connection;
 import de.turtle_exception.client.internal.net.Direction;
-import de.turtle_exception.client.internal.net.message.Conversation;
 import de.turtle_exception.client.internal.util.MathUtil;
 import de.turtle_exception.client.internal.util.crypto.Encryption;
 import de.turtle_exception.client.internal.util.time.TurtleUtil;
@@ -30,21 +29,24 @@ public final class CompiledPacket {
     private final @NotNull Direction  direction;
     private final @NotNull Connection connection;
 
-    public CompiledPacket(final byte[] bytes, @NotNull Direction direction, @NotNull Connection connection) throws IllegalArgumentException {
+    private final long deadline;
+
+    public CompiledPacket(final byte[] bytes, @NotNull Direction direction, @NotNull Connection connection, long deadline) throws IllegalArgumentException {
         if (bytes.length < META_BYTES)
             throw new IllegalArgumentException("Missing packet information: " + bytes.length + " of " + META_BYTES + " bytes present.");
 
         this.bytes      = bytes;
         this.direction  = direction;
         this.connection = connection;
+        this.deadline   = deadline;
 
         this.turtle       = MathUtil.bytesToLong(bytes, 0);
         this.responseCode = MathUtil.bytesToLong(bytes, Long.BYTES);
         this.type         = bytes[Long.BYTES * 2];
     }
 
-    public CompiledPacket(final byte[] content, @NotNull Direction direction, @NotNull Connection connection, final long id, final long responseCode, final byte type) {
-        this(buildBytes(content, id, responseCode, type), direction, connection);
+    public CompiledPacket(final byte[] content, @NotNull Direction direction, @NotNull Connection connection, final long deadline, final long id, final long responseCode, final byte type) {
+        this(buildBytes(content, id, responseCode, type), direction, connection, deadline);
     }
 
     private static byte[] buildBytes(byte[] content, long id, long conversation, byte type) {
@@ -69,19 +71,17 @@ public final class CompiledPacket {
     }
 
     private @NotNull Packet doToPacket(byte[] bytes) {
-        Conversation conv = this.connection.getConversation(responseCode);
-
         if (type == HandshakePacket.TYPE)
-            return new HandshakePacket(turtle, conv, direction, bytes);
+            return new HandshakePacket(turtle, deadline, connection, responseCode, direction, bytes);
 
         if (type == DataPacket.TYPE)
-            return new DataPacket(turtle, conv, direction, bytes);
+            return new DataPacket(turtle, deadline, connection, responseCode, direction, bytes);
 
         if (type == HeartbeatPacket.TYPE)
-            return new HeartbeatPacket(turtle, conv, direction, bytes);
+            return new HeartbeatPacket(turtle, deadline, connection, responseCode, direction, bytes);
 
         if (type == ErrorPacket.TYPE)
-            return new ErrorPacket(turtle, conv, bytes);
+            return new ErrorPacket(turtle, deadline, connection, responseCode, bytes);
 
         throw new IllegalStateException("Illegal packet type: " + type);
     }
@@ -98,6 +98,10 @@ public final class CompiledPacket {
 
     public long getTime() {
         return TurtleUtil.getTime(getId());
+    }
+
+    public long getDeadline() {
+        return deadline;
     }
 
     public long getResponseCode() {

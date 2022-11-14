@@ -1,12 +1,9 @@
 package de.turtle_exception.client.internal.net;
 
 import de.turtle_exception.client.internal.NetworkAdapter;
-import de.turtle_exception.client.internal.net.message.Conversation;
 import de.turtle_exception.client.internal.net.packets.*;
 import de.turtle_exception.client.internal.util.Worker;
 import de.turtle_exception.client.internal.util.logging.NestedLogger;
-import de.turtle_exception.client.internal.util.time.TurtleType;
-import de.turtle_exception.client.internal.util.time.TurtleUtil;
 import kotlin.NotImplementedError;
 import org.jetbrains.annotations.NotNull;
 
@@ -19,6 +16,7 @@ import java.net.Socket;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 
 public class Connection {
@@ -38,7 +36,7 @@ public class Connection {
     volatile Status status;
 
     public static final long CONVERSATION_TIMEOUT_EXTRA = 10000L;
-    private final ConcurrentHashMap<Long, Conversation> conversations = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<CompiledPacket, CompletableFuture<Packet>> responses = new ConcurrentHashMap<>();
 
     public Connection(@NotNull NetworkAdapter adapter, @NotNull Socket socket, @NotNull Handshake handshake, String pass) throws IOException, LoginException {
         this.status = Status.INIT;
@@ -62,13 +60,13 @@ public class Connection {
             } catch (IOException e) {
                 logger.log(Level.WARNING, "Could not read input", e);
             }
-            this.clearTimeoutConversations();
+            this.clearTimedOutResponses();
         });
     }
 
     public boolean stop(boolean notify) {
         if (notify)
-            this.send(new HandshakePacket(newConversation(), "QUIT").compile());
+            this.send(new HandshakePacket(Long.MAX_VALUE, this, "QUIT").compile());
 
         this.status = Status.DISCONNECTED;
         this.receiver.interrupt();
@@ -95,8 +93,10 @@ public class Connection {
     }
 
     private void receive(@NotNull String msg) {
+        long deadline = System.currentTimeMillis() + adapter.getClient().getDefaultTimeoutInbound();
+
         try {
-            this.receive(new CompiledPacket(msg.getBytes(), Direction.INBOUND, this));
+            this.receive(new CompiledPacket(msg.getBytes(), Direction.INBOUND, this, deadline));
         } catch (Error e) {
             logger.log(Level.SEVERE, "Encountered an Error when attempting to receive a packet", e);
         } catch (Throwable t) {
@@ -113,8 +113,6 @@ public class Connection {
     }
 
     public void receive(@NotNull CompiledPacket packet) throws Exception {
-        Conversation conv = this.getConversation(packet.getResponseCode());
-
         if (packet.getTypeId() == HeartbeatPacket.TYPE) {
             HeartbeatPacket pck = (HeartbeatPacket) packet.toPacket();
 
@@ -166,37 +164,13 @@ public class Connection {
         throw new NotImplementedError("Unknown packet type: " + packet.getTypeId());
     }
 
-    public @NotNull Conversation newConversation() {
-        Conversation conv = new Conversation(this, TurtleUtil.newId(TurtleType.CONVERSATION));
-        this.conversations.put(conv.getId(), conv);
-        return conv;
-    }
+    private synchronized void clearTimedOutResponses() {
+        for (CompiledPacket packet : Set.copyOf(this.responses.keySet())) {
+            if (System.currentTimeMillis() < packet.getDeadline()) continue;
 
-    public @NotNull Conversation getConversation(long responseCode) {
-        Conversation conversation = this.conversations.get(responseCode);
-
-        if (conversation == null)
-            conversation = newConversation();
-
-        return conversation;
-    }
-
-    private void clearTimeoutConversations() {
-        conv:
-        for (Conversation conversation : Set.copyOf(this.conversations.values())) {
-            for (Long time : conversation.getMessages().keySet()) {
-                if (time + CONVERSATION_TIMEOUT_EXTRA >= System.currentTimeMillis()) {
-                    // this conversation has a message that is not yet timed out
-                    continue conv;
-                }
-            }
-            // this conversation only has messages that are already timed out
-            this.conversations.remove(conversation.getId());
+            CompletableFuture<Packet> future = this.responses.get(packet);
+            future.completeExceptionally(new TimeoutException("Response deadline exceeded"));
         }
-    }
-
-    public void closeConversation(@NotNull Conversation conversation) {
-        this.conversations.remove(conversation.getId(), conversation);
     }
 
     /* - - - */

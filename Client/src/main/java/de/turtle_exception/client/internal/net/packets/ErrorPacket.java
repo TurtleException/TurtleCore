@@ -2,8 +2,8 @@ package de.turtle_exception.client.internal.net.packets;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import de.turtle_exception.client.internal.net.Connection;
 import de.turtle_exception.client.internal.net.Direction;
-import de.turtle_exception.client.internal.net.message.Conversation;
 import de.turtle_exception.client.internal.util.time.TurtleType;
 import de.turtle_exception.client.internal.util.time.TurtleUtil;
 import org.jetbrains.annotations.NotNull;
@@ -23,14 +23,14 @@ public class ErrorPacket extends Packet {
      */
     protected final @Nullable Throwable throwable;
 
-    protected ErrorPacket(long id, @NotNull Conversation conversation, @NotNull JsonObject json) {
-        super(id, conversation, Direction.INBOUND, TYPE);
+    protected ErrorPacket(long id, long deadline, @NotNull Connection connection, long responseCode, @NotNull JsonObject json) {
+        super(id, deadline, connection, responseCode, Direction.INBOUND, TYPE);
         this.json = json;
         this.throwable = getThrowable(json);
     }
 
-    public ErrorPacket(long id, @NotNull Conversation conversation, @NotNull String msg, @Nullable Throwable t) {
-        super(id, conversation, Direction.OUTBOUND, TYPE);
+    public ErrorPacket(long id, long deadline, @NotNull Connection connection, long responseCode, @NotNull String msg, @Nullable Throwable t) {
+        super(id, deadline, connection, responseCode, Direction.OUTBOUND, TYPE);
 
         this.json = new JsonObject();
         this.json.addProperty("message", msg);
@@ -39,12 +39,12 @@ public class ErrorPacket extends Packet {
         this.throwable = t;
     }
 
-    public ErrorPacket(@NotNull Conversation conversation, @NotNull String msg, @Nullable Throwable t) {
-        this(TurtleUtil.newId(TurtleType.PACKET), conversation, msg, t);
+    public ErrorPacket(long deadline, @NotNull Connection connection, long responseCode, @NotNull String msg, @Nullable Throwable t) {
+        this(TurtleUtil.newId(TurtleType.PACKET), deadline, connection, responseCode, msg, t);
     }
 
-    public ErrorPacket(long id, @NotNull Conversation conversation, byte[] bytes) {
-        this(id, conversation, new Gson().fromJson(new String(bytes), JsonObject.class));
+    public ErrorPacket(long id, long deadline, @NotNull Connection connection, long responseCode, byte[] bytes) {
+        this(id, deadline, connection, responseCode, new Gson().fromJson(new String(bytes), JsonObject.class));
     }
 
     @Override

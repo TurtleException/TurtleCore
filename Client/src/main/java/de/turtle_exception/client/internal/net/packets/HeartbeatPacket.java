@@ -1,7 +1,7 @@
 package de.turtle_exception.client.internal.net.packets;
 
+import de.turtle_exception.client.internal.net.Connection;
 import de.turtle_exception.client.internal.net.Direction;
-import de.turtle_exception.client.internal.net.message.Conversation;
 import de.turtle_exception.client.internal.util.MathUtil;
 import de.turtle_exception.client.internal.util.time.TurtleType;
 import de.turtle_exception.client.internal.util.time.TurtleUtil;
@@ -20,12 +20,12 @@ public class HeartbeatPacket extends Packet {
     protected long time3;
 
     /** Initiates a new heartbeat */
-    public HeartbeatPacket(@NotNull Conversation conversation, @NotNull Direction direction) {
-        this(TurtleUtil.newId(TurtleType.PACKET), conversation, direction, new byte[BYTES_LENGTH]);
+    public HeartbeatPacket(long deadline, @NotNull Connection connection, @NotNull Direction direction) {
+        this(TurtleUtil.newId(TurtleType.PACKET), deadline, connection, TurtleUtil.newId(TurtleType.RESPONSE_CODE), direction, new byte[BYTES_LENGTH]);
     }
 
-    public HeartbeatPacket(long id, @NotNull Conversation conversation, @NotNull Direction direction, byte[] receivedBytes) {
-        super(id, conversation, direction, TYPE);
+    public HeartbeatPacket(long id, long deadline, @NotNull Connection connection, long responseCode, @NotNull Direction direction, byte[] receivedBytes) {
+        super(id, deadline, connection, responseCode, direction, TYPE);
 
         if (receivedBytes.length < BYTES_LENGTH)
             throw new IllegalArgumentException("HeartbeatPacket missing timings: " + receivedBytes.length + " of " + BYTES_LENGTH + " bytes present.");
@@ -47,8 +47,8 @@ public class HeartbeatPacket extends Packet {
             this.time3 = time;
     }
 
-    private HeartbeatPacket(@NotNull Conversation conv, long time1, long time2) {
-        super(conv, Direction.OUTBOUND, TYPE);
+    private HeartbeatPacket(long deadline, @NotNull Connection connection, long responseCode, long time1, long time2) {
+        super(deadline, connection, responseCode, Direction.OUTBOUND, TYPE);
         this.time1 = time1;
         this.time2 = time2;
         this.time3 = 0;
@@ -93,9 +93,10 @@ public class HeartbeatPacket extends Packet {
     }
 
     public @NotNull HeartbeatPacket buildResponse() throws IllegalStateException {
-        if (stage == Stage.RECEIVE)
-            throw new IllegalStateException("Heartbeat may not go past state RECEIVE");
+        if (stage != Stage.SEND)
+            throw new IllegalStateException("Unable to respond to a heartbeat that is not in stage SEND");
 
-        return new HeartbeatPacket(this.conversation, time1, time2);
+        // keep the deadline from the initial packet
+        return new HeartbeatPacket(deadline, connection, responseCode, time1, time2);
     }
 }
