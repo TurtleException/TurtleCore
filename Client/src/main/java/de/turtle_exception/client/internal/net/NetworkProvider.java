@@ -5,7 +5,6 @@ import de.turtle_exception.client.api.request.DataAction;
 import de.turtle_exception.client.internal.Provider;
 import de.turtle_exception.client.internal.data.DataUtil;
 import de.turtle_exception.client.internal.data.annotations.Key;
-import de.turtle_exception.client.internal.net.message.DataMethod;
 import de.turtle_exception.client.internal.request.RemoteDataActionImpl;
 import org.jetbrains.annotations.NotNull;
 

@@ -9,7 +9,7 @@ import de.turtle_exception.client.internal.Provider;
 import de.turtle_exception.client.internal.data.DataUtil;
 import de.turtle_exception.client.internal.data.annotations.Key;
 import de.turtle_exception.client.internal.data.annotations.Resource;
-import de.turtle_exception.client.internal.net.message.DataMethod;
+import de.turtle_exception.client.internal.net.DataMethod;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

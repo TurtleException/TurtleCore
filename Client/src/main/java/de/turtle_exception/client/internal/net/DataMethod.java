@@ -1,4 +1,4 @@
-package de.turtle_exception.client.internal.net.message;
+package de.turtle_exception.client.internal.net;
 
 import org.jetbrains.annotations.Nullable;
 
