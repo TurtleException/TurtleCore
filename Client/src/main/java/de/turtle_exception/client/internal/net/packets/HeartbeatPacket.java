@@ -20,8 +20,8 @@ public class HeartbeatPacket extends Packet {
     protected long time3;
 
     /** Initiates a new heartbeat */
-    public HeartbeatPacket(long deadline, @NotNull Connection connection, @NotNull Direction direction) {
-        this(TurtleUtil.newId(TurtleType.PACKET), deadline, connection, TurtleUtil.newId(TurtleType.RESPONSE_CODE), direction, new byte[BYTES_LENGTH]);
+    public HeartbeatPacket(long deadline, @NotNull Connection connection) {
+        this(TurtleUtil.newId(TurtleType.PACKET), deadline, connection, TurtleUtil.newId(TurtleType.RESPONSE_CODE), Direction.OUTBOUND, new byte[BYTES_LENGTH]);
     }
 
     public HeartbeatPacket(long id, long deadline, @NotNull Connection connection, long responseCode, @NotNull Direction direction, byte[] receivedBytes) {
