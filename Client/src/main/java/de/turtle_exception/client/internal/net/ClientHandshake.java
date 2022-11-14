@@ -8,8 +8,8 @@ import org.jetbrains.annotations.NotNull;
 class ClientHandshake extends Handshake {
     protected final String login;
 
-    public ClientHandshake(@NotNull Connection connection, @NotNull Version version, @NotNull String login) {
-        super(connection, version);
+    public ClientHandshake(@NotNull Version version, @NotNull String login) {
+        super(version);
         this.login = login;
     }
 

@@ -10,12 +10,15 @@ import org.jetbrains.annotations.Nullable;
 import java.util.logging.Level;
 
 public abstract class Handshake {
-    protected final @NotNull Connection connection;
     protected final @NotNull Version version;
+    protected Connection connection;
 
-    protected Handshake(@NotNull Connection connection, @NotNull Version version) {
-        this.connection = connection;
+    protected Handshake(@NotNull Version version) {
         this.version = version;
+    }
+
+    final void setConnection(@NotNull Connection connection) {
+        this.connection = connection;
     }
 
     public void init() { }

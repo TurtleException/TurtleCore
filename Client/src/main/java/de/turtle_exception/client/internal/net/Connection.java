@@ -50,6 +50,7 @@ public class Connection {
 
         this.status = Status.LOGIN;
         this.handshake = handshake;
+        this.handshake.setConnection(this);
         this.handshake.init();
 
         this.pass = pass;

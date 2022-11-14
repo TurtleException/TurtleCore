@@ -1,6 +1,5 @@
 package de.turtle_exception.server.net;
 
-import de.turtle_exception.client.internal.net.Connection;
 import de.turtle_exception.client.internal.net.Handshake;
 import de.turtle_exception.client.internal.net.packets.HandshakePacket;
 import de.turtle_exception.client.internal.util.version.IllegalVersionException;
@@ -16,8 +15,8 @@ class ServerHandshake extends Handshake {
 
     private final NetServer server;
 
-    public ServerHandshake(@NotNull NetServer server, @NotNull Connection connection) {
-        super(connection, server.getClient().getVersion());
+    public ServerHandshake(@NotNull NetServer server) {
+        super(server.getClient().getVersion());
         this.server = server;
     }
 
@@ -25,7 +24,11 @@ class ServerHandshake extends Handshake {
     public void init() {
         // initial request (version)
         this.connection.send(
-                new HandshakePacket(connection.newConversation(), "VERSION").compile()
+                new HandshakePacket(
+                        server.getClient().getDefaultTimeoutOutbound(),
+                        connection,
+                        "VERSION"
+                ).compile()
         );
     }
 
