@@ -35,7 +35,6 @@ public class Connection {
     public enum Status { INIT, LOGIN, CONNECTED, DISCONNECTED;}
     volatile Status status;
 
-    public static final long CONVERSATION_TIMEOUT_EXTRA = 10000L;
     private final ConcurrentHashMap<CompiledPacket, CompletableFuture<Packet>> responses = new ConcurrentHashMap<>();
 
     public Connection(@NotNull NetworkAdapter adapter, @NotNull Socket socket, @NotNull Handshake handshake, String pass) throws IOException, LoginException {
