@@ -1,6 +1,7 @@
 package de.turtle_exception.client.api.request;
 
 import de.turtle_exception.client.api.TurtleClient;
+import de.turtle_exception.client.internal.Provider;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -10,7 +11,11 @@ import java.util.concurrent.CompletionException;
 import java.util.function.Consumer;
 
 public interface Action<T> {
-    @NotNull TurtleClient getClient();
+    @NotNull Provider getProvider();
+
+    default @NotNull TurtleClient getClient() {
+        return this.getProvider().getClient();
+    }
 
     /* - - - */
 

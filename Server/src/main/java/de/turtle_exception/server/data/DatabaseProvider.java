@@ -150,16 +150,4 @@ public class DatabaseProvider extends Provider {
     public @NotNull File getDir() {
         return dir;
     }
-
-    <T> CompletableFuture<T> submit(Callable<T> callable) {
-        CompletableFuture<T> future = new CompletableFuture<>();
-        executor.submit(() -> {
-            try {
-                future.complete(callable.call());
-            } catch (Exception e) {
-                future.completeExceptionally(e);
-            }
-        });
-        return future;
-    }
 }
