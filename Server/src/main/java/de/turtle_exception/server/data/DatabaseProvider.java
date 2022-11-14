@@ -4,29 +4,25 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import de.turtle_exception.client.api.request.DataAction;
+import de.turtle_exception.client.api.request.Action;
 import de.turtle_exception.client.internal.Provider;
 import de.turtle_exception.client.internal.data.DataUtil;
 import de.turtle_exception.client.internal.data.annotations.Key;
 import de.turtle_exception.client.internal.data.annotations.Resource;
-import de.turtle_exception.client.internal.net.DataMethod;
+import de.turtle_exception.client.internal.request.SimpleAction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
 import java.lang.annotation.AnnotationFormatError;
 import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class DatabaseProvider extends Provider {
-    private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final File dir;
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public DatabaseProvider(@NotNull File dir) {
+        super(1);
         this.dir = dir;
         this.dir.mkdirs();
     }
@@ -34,22 +30,24 @@ public class DatabaseProvider extends Provider {
     /* - - - */
 
     @Override
-    public <T> @NotNull DataAction<Boolean> delete(@NotNull Class<T> type, @NotNull Object primary) throws AnnotationFormatError {
-        return new DatabaseActionImpl<>(client, this, DataMethod.DELETE, boolean.class, () -> this.doDelete(type, primary));
+    public <T> @NotNull Action<Boolean> delete(@NotNull Class<T> type, @NotNull Object primary) throws AnnotationFormatError {
+        return new SimpleAction<>(this, () -> this.doDelete(type, primary));
     }
 
     @Override
-    public <T> @NotNull DataAction<JsonObject> get(@NotNull Class<T> type, @NotNull Object primary) throws AnnotationFormatError {
-        return new DatabaseActionImpl<>(client, this, DataMethod.GET, JsonObject.class, () -> this.doGet(type, primary));
+    public <T> @NotNull Action<JsonObject> get(@NotNull Class<T> type, @NotNull Object primary) throws AnnotationFormatError {
+        return new SimpleAction<>(this, () -> this.doGet(type, primary));
     }
 
     @Override
-    public <T> @NotNull DataAction<JsonObject> put(@NotNull Class<T> type, @NotNull JsonObject data) throws AnnotationFormatError {
-        return new DatabaseActionImpl<>(client, this, DataMethod.PUT, JsonObject.class, () -> this.doPut(type, data));    }
+    public <T> @NotNull Action<JsonObject> put(@NotNull Class<T> type, @NotNull JsonObject data) throws AnnotationFormatError {
+        return new SimpleAction<>(this, () -> this.doPut(type, data));
+    }
 
     @Override
-    public <T> @NotNull DataAction<JsonObject> patch(@NotNull Class<T> type, @NotNull JsonObject data, @NotNull Object primary) throws AnnotationFormatError {
-        return new DatabaseActionImpl<>(client, this, DataMethod.PATCH, JsonObject.class, () -> this.doPatch(type, data, primary));    }
+    public <T> @NotNull Action<JsonObject> patch(@NotNull Class<T> type, @NotNull JsonObject data, @NotNull Object primary) throws AnnotationFormatError {
+        return new SimpleAction<>(this, () -> this.doPatch(type, data, primary));
+    }
 
     /* - - - */
 

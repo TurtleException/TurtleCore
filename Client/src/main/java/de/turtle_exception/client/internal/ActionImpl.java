@@ -1,13 +1,12 @@
 package de.turtle_exception.client.internal;
 
 import de.turtle_exception.client.api.request.Action;
-import de.turtle_exception.client.internal.Provider;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 
-public class ActionImpl<T> implements Action<T> {
+public abstract class ActionImpl<T> implements Action<T> {
     protected final @NotNull Provider provider;
 
     protected boolean priority = false;
@@ -41,7 +40,10 @@ public class ActionImpl<T> implements Action<T> {
 
     /* - - - */
 
-    @NotNull Callable<T> asCallable() {
-        // TODO
+    /** Proxy method, so that {@link ActionImpl#asCallable()} can be used by the {@link Provider}. */
+    @NotNull Callable<T> getCallable() throws IllegalStateException {
+        return this.asCallable();
     }
+
+    protected abstract @NotNull Callable<T> asCallable() throws IllegalStateException;
 }

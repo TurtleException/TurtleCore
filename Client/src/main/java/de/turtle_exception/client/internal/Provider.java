@@ -75,7 +75,7 @@ public abstract class Provider {
 
         Runnable task = () -> {
             try {
-                T result = action.asCallable().call();
+                T result = action.getCallable().call();
                 future.complete(result);
             } catch (Throwable t) {
                 future.completeExceptionally(t);
