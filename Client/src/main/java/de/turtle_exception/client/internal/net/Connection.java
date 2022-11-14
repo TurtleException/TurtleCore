@@ -32,7 +32,7 @@ public class Connection {
 
     private final Worker receiver;
 
-    public enum Status { INIT, LOGIN, CONNECTED, DISCONNECTED;}
+    public enum Status { INIT, LOGIN, CONNECTED, DISCONNECTED }
     volatile Status status;
 
     private final ConcurrentHashMap<CompiledPacket, CompletableFuture<Packet>> responses = new ConcurrentHashMap<>();

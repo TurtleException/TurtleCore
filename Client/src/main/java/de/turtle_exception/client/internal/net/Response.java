@@ -16,8 +16,4 @@ public class Response {
     public @NotNull Packet getPacket() {
         return packet;
     }
-
-    public @NotNull Conversation getConversation() {
-        return packet.getConversation();
-    }
 }
