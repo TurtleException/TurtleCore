@@ -3,7 +3,6 @@ package de.turtle_exception.client.internal;
 import com.google.gson.JsonObject;
 import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.api.request.Action;
-import de.turtle_exception.client.api.request.DataAction;
 import de.turtle_exception.client.internal.util.Worker;
 import de.turtle_exception.client.internal.util.logging.NestedLogger;
 import org.jetbrains.annotations.NotNull;
@@ -12,7 +11,6 @@ import org.jetbrains.annotations.Range;
 import java.lang.annotation.AnnotationFormatError;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.logging.Level;
 
@@ -48,13 +46,13 @@ public abstract class Provider {
 
     /* - - - */
 
-    public abstract <T> @NotNull DataAction<Boolean> delete(@NotNull Class<T> type, @NotNull Object primary) throws AnnotationFormatError;
+    public abstract <T> @NotNull Action<Boolean> delete(@NotNull Class<T> type, @NotNull Object primary) throws AnnotationFormatError;
 
-    public abstract <T> @NotNull DataAction<JsonObject> get(@NotNull Class<T> type, @NotNull Object primary) throws AnnotationFormatError;
+    public abstract <T> @NotNull Action<JsonObject> get(@NotNull Class<T> type, @NotNull Object primary) throws AnnotationFormatError;
 
-    public abstract <T> @NotNull DataAction<JsonObject> put(@NotNull Class<T> type, @NotNull JsonObject data) throws AnnotationFormatError;
+    public abstract <T> @NotNull Action<JsonObject> put(@NotNull Class<T> type, @NotNull JsonObject data) throws AnnotationFormatError;
 
-    public abstract <T> @NotNull DataAction<JsonObject> patch(@NotNull Class<T> type, @NotNull JsonObject data, @NotNull Object primary) throws AnnotationFormatError;
+    public abstract <T> @NotNull Action<JsonObject> patch(@NotNull Class<T> type, @NotNull JsonObject data, @NotNull Object primary) throws AnnotationFormatError;
 
     /* - - - */
 
