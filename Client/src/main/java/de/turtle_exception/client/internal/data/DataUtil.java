@@ -1,10 +1,12 @@
 package de.turtle_exception.client.internal.data;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import de.turtle_exception.client.internal.data.annotations.Key;
 import de.turtle_exception.client.internal.data.annotations.Resource;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.annotation.AnnotationFormatError;
 import java.lang.reflect.AccessibleObject;
@@ -95,6 +97,24 @@ public class DataUtil {
             json.addProperty(key, objNumber);
         } else {
             json.addProperty(key, String.valueOf(object));
+        }
+    }
+
+    public static boolean equals(@Nullable JsonElement element, @Nullable Object object) {
+        if (element == null || element.isJsonNull() || object == null) return false;
+
+        try {
+            if (object instanceof Boolean objBoolean) {
+                return objBoolean.equals(element.getAsBoolean());
+            } else if (object instanceof Character objCharacter) {
+                return objCharacter.equals(element.getAsString().charAt(0));
+            } else if (object instanceof Number objNumber) {
+                return objNumber.equals(element.getAsNumber());
+            } else {
+                return String.valueOf(object).equals(element.getAsString());
+            }
+        } catch (ClassCastException | IllegalStateException | IndexOutOfBoundsException ignored) {
+            return false;
         }
     }
 }

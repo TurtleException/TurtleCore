@@ -2,6 +2,10 @@ package de.turtle_exception.client.internal.net;
 
 import de.turtle_exception.client.internal.NetworkAdapter;
 import de.turtle_exception.client.internal.net.packets.*;
+import de.turtle_exception.client.internal.request.ErrorResponse;
+import de.turtle_exception.client.internal.request.IResponse;
+import de.turtle_exception.client.internal.request.Request;
+import de.turtle_exception.client.internal.request.Response;
 import de.turtle_exception.client.internal.util.Worker;
 import de.turtle_exception.client.internal.util.logging.NestedLogger;
 import kotlin.NotImplementedError;
@@ -13,10 +17,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 
 public class Connection {
@@ -35,13 +36,15 @@ public class Connection {
     public enum Status { INIT, LOGIN, CONNECTED, DISCONNECTED }
     volatile Status status;
 
-    private final ConcurrentHashMap<CompiledPacket, CompletableFuture<Packet>> responses = new ConcurrentHashMap<>();
+    private final RequestCallbackPool requestCallbacks;
 
     public Connection(@NotNull NetworkAdapter adapter, @NotNull Socket socket, @NotNull Handshake handshake, String pass) throws IOException, LoginException {
         this.status = Status.INIT;
 
         this.adapter = adapter;
         this.logger = new NestedLogger("CON#" + socket.getInetAddress() + ":" + socket.getPort(), adapter.getLogger());
+
+        this.requestCallbacks = new RequestCallbackPool(adapter.getClient().getDefaultTimeoutOutbound());
 
         this.socket = socket;
         this.out = new PrintWriter(socket.getOutputStream(), true);
@@ -60,7 +63,6 @@ public class Connection {
             } catch (IOException e) {
                 logger.log(Level.WARNING, "Could not read input", e);
             }
-            this.clearTimedOutResponses();
         });
     }
 
@@ -106,10 +108,16 @@ public class Connection {
 
     /* - - - */
 
-    public @NotNull CompletableFuture<Response> send(@NotNull Request request) {
-        // TODO
-
-        return new CompletableFuture<>();
+    public @NotNull CompletableFuture<IResponse> send(@NotNull Request request) {
+        CompletableFuture<IResponse> future = new CompletableFuture<>();
+        this.requestCallbacks.put(request.getPacket().getResponseCode(), future);
+        try {
+            this.send(request.getPacket().compile(pass));
+        } catch (Exception e) {
+            this.requestCallbacks.remove(request.getPacket().getResponseCode());
+            return CompletableFuture.failedFuture(new IllegalArgumentException("Encryption error. Please check your pass!", e));
+        }
+        return future;
     }
 
     public void receive(@NotNull CompiledPacket packet) throws Exception {
@@ -140,6 +148,8 @@ public class Connection {
             return;
         }
 
+        CompletableFuture<IResponse> future = requestCallbacks.get(packet.getResponseCode());
+
         if (packet.getTypeId() == ErrorPacket.TYPE) {
             if (status == Status.LOGIN) {
                 // during LOGIN errors are not encrypted
@@ -148,29 +158,28 @@ public class Connection {
             }
 
             ErrorPacket pck = (ErrorPacket) packet.toPacket(pass);
-            // TODO
-
+            if (future != null) {
+                future.complete(new ErrorResponse(pck));
+            } else {
+                logger.log(Level.WARNING, "Dangling error: " + pck.getMessage(), pck.getThrowable());
+            }
             return;
         }
 
-        if (status != Status.CONNECTED) return;
+        if (status != Status.CONNECTED)
+            throw new IllegalStateException("Unable to process packet (type " + packet.getTypeId() + ").");
 
         if (packet.getTypeId() == DataPacket.TYPE) {
-            // TODO
-
+            DataPacket pck = (DataPacket) packet.toPacket(pass);
+            if (future != null) {
+                future.complete(new Response(pck));
+            } else {
+                // TODO: handle incoming request
+            }
             return;
         }
 
         throw new NotImplementedError("Unknown packet type: " + packet.getTypeId());
-    }
-
-    private synchronized void clearTimedOutResponses() {
-        for (CompiledPacket packet : Set.copyOf(this.responses.keySet())) {
-            if (System.currentTimeMillis() < packet.getDeadline()) continue;
-
-            CompletableFuture<Packet> future = this.responses.get(packet);
-            future.completeExceptionally(new TimeoutException("Response deadline exceeded"));
-        }
     }
 
     /* - - - */
