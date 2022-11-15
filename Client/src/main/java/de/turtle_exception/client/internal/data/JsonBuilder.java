@@ -14,7 +14,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.lang.annotation.AnnotationFormatError;
 import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -75,22 +74,7 @@ public class JsonBuilder {
             // value should be ignored
             if (atKey == null) continue;
 
-            Object value;
-            if (accObj instanceof Method method) {
-                try {
-                    value = method.invoke(object);
-                } catch (Throwable t) {
-                    throw new AnnotationFormatError("Unable to invoke key method: " + method.getName(), t);
-                }
-            } else if (accObj instanceof Field field) {
-                try {
-                    value = field.get(object);
-                } catch (Throwable t) {
-                    throw new AnnotationFormatError("Unable to access key field: " + field.getName(), t);
-                }
-            } else {
-                throw new AssertionError("Unexpected type: " + accObj.getClass().getName());
-            }
+            Object value = DataUtil.getValue(accObj, object);
 
             if (atKey.relation() == Relation.ONE_TO_ONE)
                 DataUtil.addValue(json, atKey.name(), value);

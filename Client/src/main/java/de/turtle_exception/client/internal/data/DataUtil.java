@@ -31,7 +31,7 @@ public class DataUtil {
         }
     }
 
-    private static @NotNull Object getValue(@NotNull AccessibleObject accObj, @NotNull Object instance) {
+    public static @NotNull Object getValue(@NotNull AccessibleObject accObj, @NotNull Object instance) {
         if (accObj instanceof Method method) {
             try {
                 return method.invoke(instance);
