@@ -12,10 +12,13 @@ import java.lang.annotation.AnnotationFormatError;
 
 @SuppressWarnings("CodeBlock2Expr")
 public class NetworkProvider extends Provider {
-    private final Connection connection;
+    private Connection connection;
 
-    public NetworkProvider(@NotNull Connection connection) {
-        super(4);
+    public NetworkProvider(int workers) {
+        super(workers);
+    }
+
+    public void setConnection(@NotNull Connection connection) {
         this.connection = connection;
     }
 

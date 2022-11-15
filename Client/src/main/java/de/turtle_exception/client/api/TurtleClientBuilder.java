@@ -3,6 +3,8 @@ package de.turtle_exception.client.api;
 import de.turtle_exception.client.internal.TurtleClientImpl;
 import de.turtle_exception.client.internal.Provider;
 import de.turtle_exception.client.internal.NetworkAdapter;
+import de.turtle_exception.client.internal.net.NetClient;
+import de.turtle_exception.client.internal.net.NetworkProvider;
 import de.turtle_exception.client.internal.util.Checks;
 import net.dv8tion.jda.api.JDA;
 import org.bukkit.Server;
@@ -55,6 +57,12 @@ public class TurtleClientBuilder {
             client.setJDA(jda);
 
         return client;
+    }
+
+    public static @NotNull TurtleClientBuilder createDefault(@NotNull String host, int port, @NotNull String login, @NotNull String pass) {
+        return new TurtleClientBuilder()
+                .setNetworkAdapter(new NetClient(host, port, login, pass))
+                .setProvider(new NetworkProvider(4));
     }
 
     /* - - - */

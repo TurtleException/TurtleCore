@@ -9,6 +9,8 @@ import de.turtle_exception.client.api.entities.User;
 import de.turtle_exception.client.api.event.EventManager;
 import de.turtle_exception.client.api.request.Action;
 import de.turtle_exception.client.internal.data.JsonBuilder;
+import de.turtle_exception.client.internal.net.NetClient;
+import de.turtle_exception.client.internal.net.NetworkProvider;
 import de.turtle_exception.client.internal.util.TurtleSet;
 import de.turtle_exception.client.internal.util.version.IllegalVersionException;
 import de.turtle_exception.client.internal.util.version.Version;
@@ -85,6 +87,13 @@ public class TurtleClientImpl implements TurtleClient {
 
         this.provider = provider;
         this.provider.setClient(this);
+
+        if (this.provider instanceof NetworkProvider netProvider) {
+            if (networkAdapter instanceof NetClient netClient)
+                netProvider.setConnection(netClient.getConnection());
+            else
+                throw new LoginException("NetworkProvider is not supported without NetClient");
+        }
 
         // initial requests
         this.retrieveUsers().complete();
