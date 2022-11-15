@@ -17,6 +17,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.UUID;
 
+@SuppressWarnings("unused")
 public class EntityBuilder {
     private EntityBuilder() { }
 

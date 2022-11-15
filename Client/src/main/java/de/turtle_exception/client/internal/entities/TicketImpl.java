@@ -1,13 +1,12 @@
 package de.turtle_exception.client.internal.entities;
 
 import com.google.common.collect.Sets;
-import com.google.gson.JsonObject;
+import com.google.gson.JsonArray;
+import de.turtle_exception.client.api.TicketState;
 import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.api.entities.Ticket;
 import de.turtle_exception.client.api.entities.User;
-import de.turtle_exception.client.api.TicketState;
-import de.turtle_exception.client.api.requests.Action;
-import de.turtle_exception.client.internal.net.route.Routes;
+import de.turtle_exception.client.api.request.Action;
 import de.turtle_exception.client.internal.util.TurtleSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -42,13 +41,18 @@ public class TicketImpl implements Ticket {
     }
 
     @Override
+    public long getId() {
+        return this.id;
+    }
+
+    @Override
     public @NotNull TurtleClient getClient() {
         return this.client;
     }
 
     @Override
-    public long getId() {
-        return this.id;
+    public @NotNull Action<Ticket> update() {
+        return getClient().getProvider().get(this.getClass(), getId()).andThenParse(Ticket.class);
     }
 
     /* - STATE - */
@@ -59,10 +63,8 @@ public class TicketImpl implements Ticket {
     }
 
     @Override
-    public @NotNull Action<Void> modifyState(@NotNull TicketState state) {
-        JsonObject json = new JsonObject();
-        json.addProperty("state", state.getCode());
-        return new ActionImpl<>(client, Routes.Ticket.MODIFY.compile(json, this.id), null);
+    public @NotNull Action<Ticket> modifyState(@NotNull TicketState state) {
+        return getClient().getProvider().patch(this, "state", state.getCode()).andThenParse(Ticket.class);
     }
 
     /* - TITLE - */
@@ -73,10 +75,8 @@ public class TicketImpl implements Ticket {
     }
 
     @Override
-    public @NotNull Action<Void> modifyTitle(@Nullable String title) {
-        JsonObject json = new JsonObject();
-        json.addProperty("title", String.valueOf(title));
-        return new ActionImpl<>(client, Routes.Ticket.MODIFY.compile(json, this.id), null);
+    public @NotNull Action<Ticket> modifyTitle(@Nullable String title) {
+        return getClient().getProvider().patch(this, "title", String.valueOf(title)).andThenParse(Ticket.class);
     }
 
     /* - CATEGORY - */
@@ -87,10 +87,8 @@ public class TicketImpl implements Ticket {
     }
 
     @Override
-    public @NotNull Action<Void> modifyCategory(@NotNull String category) {
-        JsonObject json = new JsonObject();
-        json.addProperty("category", category);
-        return new ActionImpl<>(client, Routes.Ticket.MODIFY.compile(json, this.id), null);
+    public @NotNull Action<Ticket> modifyCategory(@NotNull String category) {
+        return getClient().getProvider().patch(this, "category", category).andThenParse(Ticket.class);
     }
 
     /* - TAGS - */
@@ -101,13 +99,21 @@ public class TicketImpl implements Ticket {
     }
 
     @Override
-    public @NotNull Action<Void> addTag(@NotNull String tag) {
-        return new ActionImpl<>(client, Routes.Ticket.ADD_TAG.compile(null, this.id, tag), null);
+    public @NotNull Action<Ticket> addTag(@NotNull String tag) {
+        JsonArray arr = new JsonArray();
+        for (String aTag : tags)
+            arr.add(aTag);
+        arr.add(tag);
+        return getClient().getProvider().patch(this, "tags", arr).andThenParse(Ticket.class);
     }
 
     @Override
-    public @NotNull Action<Void> removeTag(@NotNull String tag) {
-        return new ActionImpl<>(client, Routes.Ticket.DEL_TAG.compile(null, this.id, tag), null);
+    public @NotNull Action<Ticket> removeTag(@NotNull String tag) {
+        JsonArray arr = new JsonArray();
+        for (String aTag : tags)
+            if (!aTag.equals(tag))
+                arr.add(aTag);
+        return getClient().getProvider().patch(this, "tags", arr).andThenParse(Ticket.class);
     }
 
     /* - DISCORD - */
@@ -118,10 +124,8 @@ public class TicketImpl implements Ticket {
     }
 
     @Override
-    public @NotNull Action<Void> modifyDiscordChannel(long channel) {
-        JsonObject json = new JsonObject();
-        json.addProperty("channel", channel);
-        return new ActionImpl<>(client, Routes.Ticket.MODIFY.compile(json, this.id), null);
+    public @NotNull Action<Ticket> modifyDiscordChannel(long channel) {
+        return getClient().getProvider().patch(this, "channel", channel).andThenParse(Ticket.class);
     }
 
     /* - USERS - */
@@ -141,12 +145,20 @@ public class TicketImpl implements Ticket {
     }
 
     @Override
-    public @NotNull Action<Void> addUser(@NotNull User user) {
-        return new ActionImpl<>(client, Routes.Ticket.ADD_USER.compile(null, this.id, user), null);
+    public @NotNull Action<Ticket> addUser(long user) {
+        JsonArray arr = new JsonArray();
+        for (User aUser : users)
+            arr.add(aUser.getId());
+        arr.add(user);
+        return getClient().getProvider().patch(this, "users", arr).andThenParse(Ticket.class);
     }
 
     @Override
-    public @NotNull Action<Void> removeUser(@NotNull User user) {
-        return new ActionImpl<>(client, Routes.Ticket.ADD_USER.compile(null, this.id, user), null);
+    public @NotNull Action<Ticket> removeUser(long user) {
+        JsonArray arr = new JsonArray();
+        for (User aUser : users)
+            if (aUser.getId() != user)
+                arr.add(aUser.getId());
+        return getClient().getProvider().patch(this, "users", arr).andThenParse(Ticket.class);
     }
 }

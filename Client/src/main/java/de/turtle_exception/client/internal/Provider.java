@@ -1,9 +1,10 @@
 package de.turtle_exception.client.internal;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.api.entities.Turtle;
-import de.turtle_exception.client.api.request.Action;
+import de.turtle_exception.client.internal.data.DataUtil;
 import de.turtle_exception.client.internal.util.Worker;
 import de.turtle_exception.client.internal.util.logging.NestedLogger;
 import org.jetbrains.annotations.NotNull;
@@ -47,13 +48,25 @@ public abstract class Provider {
 
     /* - - - */
 
-    public abstract <T extends Turtle> @NotNull Action<Boolean> delete(@NotNull Class<T> type, long id) throws AnnotationFormatError;
+    public abstract <T extends Turtle> @NotNull ActionImpl<Boolean> delete(@NotNull Class<T> type, long id) throws AnnotationFormatError;
 
-    public abstract <T extends Turtle> @NotNull Action<JsonObject> get(@NotNull Class<T> type, long id) throws AnnotationFormatError;
+    public <T extends Turtle> @NotNull ActionImpl<Boolean> delete(@NotNull T turtle) throws AnnotationFormatError {
+        return this.delete(turtle.getClass(), turtle.getId());
+    }
 
-    public abstract <T extends Turtle> @NotNull Action<JsonObject> put(@NotNull Class<T> type, @NotNull JsonObject content) throws AnnotationFormatError;
+    public abstract <T extends Turtle> @NotNull ActionImpl<JsonObject> get(@NotNull Class<T> type, long id) throws AnnotationFormatError;
 
-    public abstract <T extends Turtle> @NotNull Action<JsonObject> patch(@NotNull Class<T> type, @NotNull JsonObject content, long id) throws AnnotationFormatError;
+    public abstract <T extends Turtle> @NotNull ActionImpl<JsonArray> get(@NotNull Class<T> type) throws AnnotationFormatError;
+
+    public abstract <T extends Turtle> @NotNull ActionImpl<JsonObject> put(@NotNull Class<T> type, @NotNull JsonObject content) throws AnnotationFormatError;
+
+    public abstract <T extends Turtle> @NotNull ActionImpl<JsonObject> patch(@NotNull Class<T> type, @NotNull JsonObject content, long id) throws AnnotationFormatError;
+
+    public <T extends Turtle> @NotNull ActionImpl<JsonObject> patch(@NotNull T turtle, @NotNull String key, @NotNull Object obj) throws AnnotationFormatError {
+        JsonObject json = new JsonObject();
+        DataUtil.addValue(json, key, obj);
+        return this.patch(turtle.getClass(), json, turtle.getId());
+    }
 
     /* - - - */
 
@@ -130,5 +143,9 @@ public abstract class Provider {
 
         this.status = Status.STOPPED;
         logger.log(Level.INFO, "OK!");
+    }
+
+    public final int getWorkerAmount() {
+        return workers.length;
     }
 }

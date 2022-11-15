@@ -1,11 +1,7 @@
 package de.turtle_exception.server.data;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
 import de.turtle_exception.client.api.entities.Turtle;
-import de.turtle_exception.client.api.request.Action;
 import de.turtle_exception.client.internal.Provider;
 import de.turtle_exception.client.internal.data.DataUtil;
 import de.turtle_exception.client.internal.data.annotations.Resource;
@@ -30,22 +26,27 @@ public class DatabaseProvider extends Provider {
     /* - - - */
 
     @Override
-    public <T extends Turtle> @NotNull Action<Boolean> delete(@NotNull Class<T> type, long id) throws AnnotationFormatError {
+    public <T extends Turtle> @NotNull SimpleAction<Boolean> delete(@NotNull Class<T> type, long id) throws AnnotationFormatError {
         return new SimpleAction<>(this, () -> this.doDelete(type, id));
     }
 
     @Override
-    public <T extends Turtle> @NotNull Action<JsonObject> get(@NotNull Class<T> type, long id) throws AnnotationFormatError {
+    public <T extends Turtle> @NotNull SimpleAction<JsonObject> get(@NotNull Class<T> type, long id) throws AnnotationFormatError {
         return new SimpleAction<>(this, () -> this.doGet(type, id));
     }
 
     @Override
-    public <T extends Turtle> @NotNull Action<JsonObject> put(@NotNull Class<T> type, @NotNull JsonObject content) throws AnnotationFormatError {
+    public <T extends Turtle> @NotNull SimpleAction<JsonArray> get(@NotNull Class<T> type) throws AnnotationFormatError {
+        return new SimpleAction<>(this, () -> this.doGet(type));
+    }
+
+    @Override
+    public <T extends Turtle> @NotNull SimpleAction<JsonObject> put(@NotNull Class<T> type, @NotNull JsonObject content) throws AnnotationFormatError {
         return new SimpleAction<>(this, () -> this.doPut(type, content));
     }
 
     @Override
-    public <T extends Turtle> @NotNull Action<JsonObject> patch(@NotNull Class<T> type, @NotNull JsonObject content, long id) throws AnnotationFormatError {
+    public <T extends Turtle> @NotNull SimpleAction<JsonObject> patch(@NotNull Class<T> type, @NotNull JsonObject content, long id) throws AnnotationFormatError {
         return new SimpleAction<>(this, () -> this.doPatch(type, content, id));
     }
 
@@ -71,6 +72,28 @@ public class DatabaseProvider extends Provider {
         } catch (FileNotFoundException e) {
             throw new AssertionError("File should exist and not be a directory.");
         }
+    }
+
+    private @NotNull JsonArray doGet(@NotNull Class<? extends Turtle> type) throws AnnotationFormatError {
+        Resource annotation = DataUtil.getResourceAnnotation(type);
+        File file = this.getFile(annotation);
+
+        JsonArray arr = new JsonArray();
+
+        if (!file.exists()) return arr;
+
+        File[] files = file.listFiles();
+
+        if (files == null) return arr;
+
+        for (File singleFile : files) {
+            if (!singleFile.getName().endsWith(".json")) continue;
+
+            long id = Long.parseLong(singleFile.getName().substring(0, singleFile.getName().lastIndexOf(".")));
+            arr.add(this.doGet(type, id));
+        }
+
+        return arr;
     }
 
     private @Nullable JsonObject doPut(@NotNull Class<? extends Turtle> type, @NotNull JsonObject data) throws AnnotationFormatError {
@@ -124,6 +147,10 @@ public class DatabaseProvider extends Provider {
 
     private @NotNull File getFile(@NotNull Resource resource, long id) {
         return new File(dir, resource.path() + File.separator + id + ".json");
+    }
+
+    private @NotNull File getFile(@NotNull Resource resource) {
+        return new File(dir, resource.path());
     }
 
     private @NotNull JsonObject getJson(@NotNull File file) throws FileNotFoundException {

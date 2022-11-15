@@ -2,7 +2,7 @@ package de.turtle_exception.client.api.entities;
 
 import de.turtle_exception.client.api.TicketState;
 import de.turtle_exception.client.api.entities.attribute.IUserContainer;
-import de.turtle_exception.client.api.requests.Action;
+import de.turtle_exception.client.api.request.Action;
 import de.turtle_exception.client.internal.data.annotations.Key;
 import de.turtle_exception.client.internal.data.annotations.Relation;
 import de.turtle_exception.client.internal.data.annotations.Resource;
@@ -15,6 +15,9 @@ import java.util.List;
 
 @Resource(path = "tickets", builder = "buildTicket")
 public interface Ticket extends Turtle, IUserContainer {
+    @Override
+    @NotNull Action<Ticket> update();
+
     /* - STATE - */
 
     @NotNull TicketState getState();
@@ -24,37 +27,37 @@ public interface Ticket extends Turtle, IUserContainer {
         return this.getState().getCode();
     }
 
-    @NotNull Action<Void> modifyState(@NotNull TicketState state);
+    @NotNull Action<Ticket> modifyState(@NotNull TicketState state);
 
     /* - TITLE - */
 
     @Key(name = "title")
     @Nullable String getTitle();
 
-    @NotNull Action<Void> modifyTitle(@Nullable String title);
+    @NotNull Action<Ticket> modifyTitle(@Nullable String title);
 
     /* - CATEGORY - */
 
     @Key(name = "category")
     @NotNull String getCategory();
 
-    @NotNull Action<Void> modifyCategory(@NotNull String category);
+    @NotNull Action<Ticket> modifyCategory(@NotNull String category);
 
     /* - TAGS - */
 
     @Key(name = "tags", relation = Relation.MANY_TO_MANY)
     @NotNull List<String> getTags();
 
-    @NotNull Action<Void> addTag(@NotNull String tag);
+    @NotNull Action<Ticket> addTag(@NotNull String tag);
 
-    @NotNull Action<Void> removeTag(@NotNull String tag);
+    @NotNull Action<Ticket> removeTag(@NotNull String tag);
 
     /* - DISCORD - */
 
     @Key(name = "discord_channel")
     long getDiscordChannelId();
 
-    @NotNull Action<Void> modifyDiscordChannel(long channel);
+    @NotNull Action<Ticket> modifyDiscordChannel(long channel);
 
     default @Nullable GuildMessageChannel getDiscordChannel() throws IllegalStateException {
         JDA jda = this.getClient().getJDA();
@@ -67,10 +70,18 @@ public interface Ticket extends Turtle, IUserContainer {
 
     /* - USERS - */
 
-    @Key(name = "ticket_users", relation = Relation.MANY_TO_MANY)
+    @Key(name = "users", relation = Relation.MANY_TO_MANY)
     @NotNull List<User> getUsers();
 
-    @NotNull Action<Void> addUser(@NotNull User user);
+    @NotNull Action<Ticket> addUser(long user);
 
-    @NotNull Action<Void> removeUser(@NotNull User user);
+    default @NotNull Action<Ticket> addUser(@NotNull User user) {
+        return this.addUser(user.getId());
+    }
+
+    @NotNull Action<Ticket> removeUser(long user);
+
+    default @NotNull Action<Ticket> removeUser(@NotNull User user) {
+        return this.removeUser(user.getId());
+    }
 }

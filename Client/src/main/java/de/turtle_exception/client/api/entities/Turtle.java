@@ -20,9 +20,11 @@ public interface Turtle {
     // TODO: docs
     @NotNull TurtleClient getClient();
 
-    @NotNull Action<Void> delete();
+    @NotNull
+    default Action<Boolean> delete() {
+        return getClient().getProvider().delete(this);
+    }
 
-    @NotNull Action<Turtle> update();
-
-    void remove();
+    @NotNull
+    Action<? extends Turtle> update();
 }

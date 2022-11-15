@@ -1,10 +1,9 @@
 package de.turtle_exception.client.internal.entities;
 
-import com.google.gson.JsonObject;
+import com.google.gson.JsonArray;
 import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.api.entities.User;
-import de.turtle_exception.client.api.requests.Action;
-import de.turtle_exception.client.internal.net.route.Routes;
+import de.turtle_exception.client.api.request.Action;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -30,13 +29,18 @@ public class UserImpl implements User {
     }
 
     @Override
+    public long getId() {
+        return this.id;
+    }
+
+    @Override
     public @NotNull TurtleClient getClient() {
         return this.client;
     }
 
     @Override
-    public long getId() {
-        return this.id;
+    public @NotNull Action<User> update() {
+        return getClient().getProvider().get(this.getClass(), getId()).andThenParse(User.class);
     }
 
     /* - NAME - */
@@ -52,10 +56,8 @@ public class UserImpl implements User {
     }
 
     @Override
-    public @NotNull Action<Void> modifyName(@NotNull String name) {
-        JsonObject json = new JsonObject();
-        json.addProperty("name", name);
-        return new ActionImpl<>(client, Routes.User.MODIFY.compile(json, this.id), null);
+    public @NotNull Action<User> modifyName(@NotNull String name) {
+        return getClient().getProvider().patch(this, "name", name).andThenParse(User.class);
     }
 
     /* - DISCORD - */
@@ -66,13 +68,21 @@ public class UserImpl implements User {
     }
 
     @Override
-    public @NotNull Action<Void> addDiscordId(long discordId) {
-        return new ActionImpl<>(client, Routes.User.ADD_DISCORD.compile(null, this.id, discordId), null);
+    public @NotNull Action<User> addDiscordId(long discordId) {
+        JsonArray arr = new JsonArray();
+        for (Long aDiscordId : discord)
+            arr.add(aDiscordId);
+        arr.add(discordId);
+        return getClient().getProvider().patch(this, "discord", arr).andThenParse(User.class);
     }
 
     @Override
-    public @NotNull Action<Void> removeDiscordId(long discordId) {
-        return new ActionImpl<>(client, Routes.User.DEL_DISCORD.compile(null, this.id, discordId), null);
+    public @NotNull Action<User> removeDiscordId(long discordId) {
+        JsonArray arr = new JsonArray();
+        for (Long aDiscordId : discord)
+            if (!aDiscordId.equals(discordId))
+                arr.add(aDiscordId);
+        return getClient().getProvider().patch(this, "discord", arr).andThenParse(User.class);
     }
 
     /* - MINECRAFT - */
@@ -83,12 +93,20 @@ public class UserImpl implements User {
     }
 
     @Override
-    public @NotNull Action<Void> addMinecraftId(@NotNull UUID minecraftId) {
-        return new ActionImpl<>(client, Routes.User.ADD_MINECRAFT.compile(null, this.id, minecraftId), null);
+    public @NotNull Action<User> addMinecraftId(@NotNull UUID minecraftId) {
+        JsonArray arr = new JsonArray();
+        for (UUID aMinecraftId : minecraft)
+            arr.add(String.valueOf(aMinecraftId));
+        arr.add(String.valueOf(minecraftId));
+        return getClient().getProvider().patch(this, "minecraft", arr).andThenParse(User.class);
     }
 
     @Override
-    public @NotNull Action<Void> removeMinecraftId(@NotNull UUID minecraftId) {
-        return new ActionImpl<>(client, Routes.User.DEL_MINECRAFT.compile(null, this.id, minecraftId), null);
+    public @NotNull Action<User> removeMinecraftId(@NotNull UUID minecraftId) {
+        JsonArray arr = new JsonArray();
+        for (UUID aMinecraftId : minecraft)
+            if (!aMinecraftId.equals(minecraftId))
+                arr.add(String.valueOf(aMinecraftId));
+        return getClient().getProvider().patch(this, "minecraft", arr).andThenParse(User.class);
     }
 }

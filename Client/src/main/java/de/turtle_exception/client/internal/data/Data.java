@@ -1,5 +1,8 @@
 package de.turtle_exception.client.internal.data;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import de.turtle_exception.client.api.entities.Turtle;
 import de.turtle_exception.client.internal.net.DataMethod;
@@ -9,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
 public record Data (
         @NotNull DataMethod method,
         @NotNull Class<? extends Turtle> type,
-        @NotNull JsonObject content
+        @NotNull JsonElement content
 ) {
     public @NotNull JsonObject asJson() {
         JsonObject json = new JsonObject();
@@ -21,8 +24,16 @@ public record Data (
         return json;
     }
 
+    public @NotNull JsonObject contentObject() throws ClassCastException {
+        return (JsonObject) content;
+    }
+
+    public @NotNull JsonArray contentArray() throws ClassCastException {
+        return (JsonArray) content;
+    }
+
     public long id() {
-        return DataUtil.getTurtleId(content);
+        return DataUtil.getTurtleId(contentObject());
     }
 
     /* - - - */
@@ -48,6 +59,10 @@ public record Data (
 
     public static @NotNull Data buildGet(@NotNull Class<? extends Turtle> type, long id) {
         return ofIdentifierMethod(DataMethod.GET, type, id);
+    }
+
+    public static @NotNull Data buildGet(@NotNull Class<? extends Turtle> type) {
+        return new Data(DataMethod.GET, type, JsonNull.INSTANCE);
     }
 
     public static @NotNull Data buildPut(@NotNull Class<? extends Turtle> type, @NotNull JsonObject content) {

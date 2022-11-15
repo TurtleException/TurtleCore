@@ -1,6 +1,5 @@
 package de.turtle_exception.client.internal;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.api.entities.Group;
@@ -8,10 +7,8 @@ import de.turtle_exception.client.api.entities.Ticket;
 import de.turtle_exception.client.api.entities.Turtle;
 import de.turtle_exception.client.api.entities.User;
 import de.turtle_exception.client.api.event.EventManager;
-import de.turtle_exception.client.api.request.DataAction;
-import de.turtle_exception.client.internal.data.DataUtil;
+import de.turtle_exception.client.api.request.Action;
 import de.turtle_exception.client.internal.data.JsonBuilder;
-import de.turtle_exception.client.internal.request.RemoteDataActionImpl;
 import de.turtle_exception.client.internal.util.TurtleSet;
 import de.turtle_exception.client.internal.util.version.IllegalVersionException;
 import de.turtle_exception.client.internal.util.version.Version;
@@ -227,67 +224,49 @@ public class TurtleClientImpl implements TurtleClient {
 
     /* - - - */
 
-    @SuppressWarnings("CodeBlock2Expr")
     @Override
-    public @NotNull DataAction<User> retrieveUser(long id) {
-        return new RemoteDataActionImpl<>(this, Routes.User.GET.compile(null, String.valueOf(id)), (message, userRequest) -> {
-            return jsonBuilder.buildObject(User.class, (JsonObject) message.getRoute().content());
-        }).onSuccess(user -> {
+    public @NotNull Action<User> retrieveUser(long id) {
+        return provider.get(User.class, id).andThenParse(User.class).onSuccess(user -> {
             userCache.removeById(id);
             userCache.add(user);
         });
     }
 
-    @SuppressWarnings("CodeBlock2Expr")
     @Override
-    public @NotNull DataAction<List<User>> retrieveUsers() {
-        return new RemoteDataActionImpl<>(this, Routes.User.GET_ALL.compile(null), (message, userRequest) -> {
-            return jsonBuilder.buildObjects(User.class, (JsonArray) message.getRoute().content());
-        }).onSuccess(l -> {
+    public @NotNull Action<List<User>> retrieveUsers() {
+        return provider.get(User.class).andThenParseList(User.class).onSuccess(l -> {
             userCache.clear();
             userCache.addAll(l);
         });
     }
 
-    @SuppressWarnings("CodeBlock2Expr")
     @Override
-    public @NotNull DataAction<Group> retrieveGroup(long id) {
-        return new RemoteDataActionImpl<>(this, Routes.Group.GET.compile(null, String.valueOf(id)), (message, userRequest) -> {
-            return jsonBuilder.buildObject(Group.class, (JsonObject) message.getRoute().content());
-        }).onSuccess(group -> {
+    public @NotNull Action<Group> retrieveGroup(long id) {
+        return provider.get(Group.class, id).andThenParse(Group.class).onSuccess(group -> {
             groupCache.removeById(id);
             groupCache.add(group);
         });
     }
 
-    @SuppressWarnings("CodeBlock2Expr")
     @Override
-    public @NotNull DataAction<List<Group>> retrieveGroups() {
-        return new RemoteDataActionImpl<>(this, Routes.Group.GET_ALL.compile(null), (message, userRequest) -> {
-            return jsonBuilder.buildObjects(Group.class, (JsonArray) message.getRoute().content());
-        }).onSuccess(l -> {
+    public @NotNull Action<List<Group>> retrieveGroups() {
+        return provider.get(Group.class).andThenParseList(Group.class).onSuccess(l -> {
             groupCache.clear();
             groupCache.addAll(l);
         });
     }
 
-    @SuppressWarnings("CodeBlock2Expr")
     @Override
-    public @NotNull DataAction<Ticket> retrieveTicket(long id) {
-        return new RemoteDataActionImpl<>(this, Routes.Ticket.GET.compile(null, String.valueOf(id)), (message, userRequest) -> {
-            return jsonBuilder.buildObject(Ticket.class, (JsonObject) message.getRoute().content());
-        }).onSuccess(ticket -> {
+    public @NotNull Action<Ticket> retrieveTicket(long id) {
+        return provider.get(Ticket.class, id).andThenParse(Ticket.class).onSuccess(ticket -> {
             ticketCache.removeById(id);
             ticketCache.add(ticket);
         });
     }
 
-    @SuppressWarnings("CodeBlock2Expr")
     @Override
-    public @NotNull DataAction<List<Ticket>> retrieveTickets() {
-        return new RemoteDataActionImpl<>(this, Routes.Ticket.GET_ALL.compile(null), (message, userRequest) -> {
-            return jsonBuilder.buildObjects(Ticket.class, (JsonArray) message.getRoute().content());
-        }).onSuccess(l -> {
+    public @NotNull Action<List<Ticket>> retrieveTickets() {
+        return provider.get(Ticket.class).andThenParseList(Ticket.class).onSuccess(l -> {
             ticketCache.clear();
             ticketCache.addAll(l);
         });

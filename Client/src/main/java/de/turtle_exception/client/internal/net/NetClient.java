@@ -1,5 +1,8 @@
 package de.turtle_exception.client.internal.net;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import de.turtle_exception.client.internal.NetworkAdapter;
 import de.turtle_exception.client.internal.net.packets.DataPacket;
 import org.jetbrains.annotations.NotNull;
@@ -52,12 +55,15 @@ public class NetClient extends NetworkAdapter {
     }
 
     private void handleUpdate(@NotNull DataPacket packet) {
-        getClientImpl().updateCache(packet.getData().type(), packet.getData().content());
-        // TODO: respond?
+        JsonElement json = packet.getData().content();
+        if (json instanceof JsonObject jsonObj)
+            getClientImpl().updateCache(packet.getData().type(), jsonObj);
+        if (json instanceof JsonArray jsonArr)
+            for (JsonElement element : jsonArr)
+                getClientImpl().updateCache(packet.getData().type(), (JsonObject) element);
     }
 
     private void handleRemove(@NotNull DataPacket packet) {
         getClientImpl().removeCache(packet.getData().type(), packet.getData().id());
-        // TODO: respond?
     }
 }

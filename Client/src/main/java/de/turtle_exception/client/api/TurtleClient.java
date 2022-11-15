@@ -1,6 +1,5 @@
 package de.turtle_exception.client.api;
 
-import com.google.gson.JsonObject;
 import de.turtle_exception.client.api.entities.Group;
 import de.turtle_exception.client.api.entities.Ticket;
 import de.turtle_exception.client.api.entities.Turtle;
@@ -9,10 +8,9 @@ import de.turtle_exception.client.api.entities.attribute.IGroupContainer;
 import de.turtle_exception.client.api.entities.attribute.ITicketContainer;
 import de.turtle_exception.client.api.entities.attribute.IUserContainer;
 import de.turtle_exception.client.api.event.EventManager;
-import de.turtle_exception.client.api.request.DataAction;
+import de.turtle_exception.client.api.request.Action;
 import de.turtle_exception.client.internal.NetworkAdapter;
 import de.turtle_exception.client.internal.Provider;
-import de.turtle_exception.client.internal.data.JsonBuilder;
 import de.turtle_exception.client.internal.util.version.Version;
 import net.dv8tion.jda.api.JDA;
 import org.bukkit.Server;
@@ -51,20 +49,22 @@ public interface TurtleClient extends IUserContainer, IGroupContainer, ITicketCo
     @Override
     @NotNull List<Turtle> getTurtles();
 
-    @NotNull DataAction<User> retrieveUser(long id);
-
-    @NotNull DataAction<List<User>> retrieveUsers();
-
-    @NotNull DataAction<Group> retrieveGroup(long id);
-
     @Override
     @Nullable Turtle getTurtleById(long id);
 
-    @NotNull DataAction<List<Group>> retrieveGroups();
+    /* - - - */
 
-    @NotNull DataAction<Ticket> retrieveTicket(long id);
+    @NotNull Action<Group> retrieveGroup(long id);
 
-    @NotNull DataAction<List<Ticket>> retrieveTickets();
+    @NotNull Action<List<Group>> retrieveGroups();
+
+    @NotNull Action<Ticket> retrieveTicket(long id);
+
+    @NotNull Action<List<Ticket>> retrieveTickets();
+
+    @NotNull Action<User> retrieveUser(long id);
+
+    @NotNull Action<List<User>> retrieveUsers();
 
     /* - - - */
 

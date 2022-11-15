@@ -50,7 +50,9 @@ public class DataUtil {
     }
 
     public static void addValue(@NotNull JsonArray json, Object object) {
-        if (object instanceof Boolean entryBoolean) {
+        if (object instanceof JsonElement entryElement) {
+            json.add(entryElement);
+        } else if (object instanceof Boolean entryBoolean) {
             json.add(entryBoolean);
         } else if (object instanceof Character entryCharacter) {
             json.add(entryCharacter);
@@ -62,7 +64,9 @@ public class DataUtil {
     }
 
     public static void addValue(@NotNull JsonObject json, @NotNull String key, Object object) {
-        if (object instanceof Boolean objBoolean) {
+        if (object instanceof JsonElement objElement) {
+            json.add(key, objElement);
+        } else if (object instanceof Boolean objBoolean) {
             json.addProperty(key, objBoolean);
         } else if (object instanceof Character objCharacter) {
             json.addProperty(key, objCharacter);
