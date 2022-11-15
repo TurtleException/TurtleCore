@@ -106,6 +106,7 @@ public class TurtleClientImpl implements TurtleClient {
         return VERSION;
     }
 
+    @Override
     public @NotNull JsonBuilder getJsonBuilder() {
         return jsonBuilder;
     }

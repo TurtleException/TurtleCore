@@ -11,6 +11,7 @@ import de.turtle_exception.client.api.event.EventManager;
 import de.turtle_exception.client.api.request.Action;
 import de.turtle_exception.client.internal.NetworkAdapter;
 import de.turtle_exception.client.internal.Provider;
+import de.turtle_exception.client.internal.data.JsonBuilder;
 import de.turtle_exception.client.internal.util.version.Version;
 import net.dv8tion.jda.api.JDA;
 import org.bukkit.Server;
@@ -29,6 +30,8 @@ public interface TurtleClient extends IUserContainer, IGroupContainer, ITicketCo
     @NotNull Logger getLogger();
 
     @NotNull Version getVersion();
+
+    @NotNull JsonBuilder getJsonBuilder();
 
     @NotNull EventManager getEventManager();
 
