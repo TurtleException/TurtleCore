@@ -2,6 +2,7 @@ package de.turtle_exception.client.internal;
 
 import com.google.gson.JsonObject;
 import de.turtle_exception.client.api.TurtleClient;
+import de.turtle_exception.client.api.entities.Turtle;
 import de.turtle_exception.client.api.request.Action;
 import de.turtle_exception.client.internal.util.Worker;
 import de.turtle_exception.client.internal.util.logging.NestedLogger;
@@ -46,13 +47,13 @@ public abstract class Provider {
 
     /* - - - */
 
-    public abstract <T> @NotNull Action<Boolean> delete(@NotNull Class<T> type, @NotNull Object primary) throws AnnotationFormatError;
+    public abstract <T extends Turtle> @NotNull Action<Boolean> delete(@NotNull Class<T> type, long id) throws AnnotationFormatError;
 
-    public abstract <T> @NotNull Action<JsonObject> get(@NotNull Class<T> type, @NotNull Object primary) throws AnnotationFormatError;
+    public abstract <T extends Turtle> @NotNull Action<JsonObject> get(@NotNull Class<T> type, long id) throws AnnotationFormatError;
 
-    public abstract <T> @NotNull Action<JsonObject> put(@NotNull Class<T> type, @NotNull JsonObject content) throws AnnotationFormatError;
+    public abstract <T extends Turtle> @NotNull Action<JsonObject> put(@NotNull Class<T> type, @NotNull JsonObject content) throws AnnotationFormatError;
 
-    public abstract <T> @NotNull Action<JsonObject> patch(@NotNull Class<T> type, @NotNull JsonObject content, @NotNull Object primary) throws AnnotationFormatError;
+    public abstract <T extends Turtle> @NotNull Action<JsonObject> patch(@NotNull Class<T> type, @NotNull JsonObject content, long id) throws AnnotationFormatError;
 
     /* - - - */
 

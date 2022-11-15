@@ -293,7 +293,7 @@ public class TurtleClientImpl implements TurtleClient {
         });
     }
 
-    public void updateCache(@NotNull Class<?> type, @NotNull JsonObject contentJson) throws IllegalArgumentException {
+    public void updateCache(@NotNull Class<? extends Turtle> type, @NotNull JsonObject contentJson) throws IllegalArgumentException {
         Object obj;
         try {
             obj = jsonBuilder.buildObject(type, contentJson);
@@ -309,13 +309,13 @@ public class TurtleClientImpl implements TurtleClient {
             userCache.put(user);
     }
 
-    public void removeCache(@NotNull Class<?> type, @NotNull Object primary) throws IllegalArgumentException, ClassCastException {
+    public void removeCache(@NotNull Class<? extends Turtle> type, long id) throws IllegalArgumentException, ClassCastException {
         if (Group.class.isAssignableFrom(type))
-            groupCache.removeById((long) primary);
+            groupCache.removeById(id);
         if (Ticket.class.isAssignableFrom(type))
-            ticketCache.removeById((long) primary);
+            ticketCache.removeById(id);
         if (User.class.isAssignableFrom(type))
-            userCache.removeById((long) primary);
+            userCache.removeById(id);
     }
 
     /* - - - */

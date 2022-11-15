@@ -1,11 +1,10 @@
 package de.turtle_exception.client.internal.net;
 
 import com.google.gson.JsonObject;
+import de.turtle_exception.client.api.entities.Turtle;
 import de.turtle_exception.client.api.request.Action;
 import de.turtle_exception.client.internal.Provider;
 import de.turtle_exception.client.internal.data.Data;
-import de.turtle_exception.client.internal.data.DataUtil;
-import de.turtle_exception.client.internal.data.annotations.Key;
 import de.turtle_exception.client.internal.request.NetAction;
 import org.jetbrains.annotations.NotNull;
 
@@ -21,31 +20,29 @@ public class NetworkProvider extends Provider {
     }
 
     @Override
-    public <T> @NotNull Action<Boolean> delete(@NotNull Class<T> type, @NotNull Object primary) throws AnnotationFormatError {
-        Key key = DataUtil.getPrimary(type).getAnnotation(Key.class);
-
-        return new NetAction<>(this, connection, Data.buildDelete(type, primary), (request, response) -> {
+    public <T extends Turtle> @NotNull Action<Boolean> delete(@NotNull Class<T> type, long id) throws AnnotationFormatError {
+        return new NetAction<>(this, connection, Data.buildDelete(type, id), (request, response) -> {
             // this point should not be reached unless the response is a successful REMOVE call
             return true;
         });
     }
 
     @Override
-    public <T> @NotNull Action<JsonObject> get(@NotNull Class<T> type, @NotNull Object primary) throws AnnotationFormatError {
-        return new NetAction<>(this, connection, Data.buildGet(type, primary), (request, response) -> {
+    public <T extends Turtle> @NotNull Action<JsonObject> get(@NotNull Class<T> type, long id) throws AnnotationFormatError {
+        return new NetAction<>(this, connection, Data.buildGet(type, id), (request, response) -> {
             return response.getData().content();
         });
     }
 
     @Override
-    public <T> @NotNull Action<JsonObject> put(@NotNull Class<T> type, @NotNull JsonObject content) throws AnnotationFormatError {
+    public <T extends Turtle> @NotNull Action<JsonObject> put(@NotNull Class<T> type, @NotNull JsonObject content) throws AnnotationFormatError {
         return new NetAction<>(this, connection, Data.buildPut(type, content.deepCopy()), (request, response) -> {
             return response.getData().content();
         });
     }
 
     @Override
-    public <T> @NotNull Action<JsonObject> patch(@NotNull Class<T> type, @NotNull JsonObject content, @NotNull Object primary) throws AnnotationFormatError {
+    public <T extends Turtle> @NotNull Action<JsonObject> patch(@NotNull Class<T> type, @NotNull JsonObject content, long id) throws AnnotationFormatError {
         return new NetAction<>(this, connection, Data.buildPatch(type, content), (request, response) -> {
             return response.getData().content();
         });

@@ -4,10 +4,10 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import de.turtle_exception.client.api.entities.Turtle;
 import de.turtle_exception.client.api.request.Action;
 import de.turtle_exception.client.internal.Provider;
 import de.turtle_exception.client.internal.data.DataUtil;
-import de.turtle_exception.client.internal.data.annotations.Key;
 import de.turtle_exception.client.internal.data.annotations.Resource;
 import de.turtle_exception.client.internal.request.SimpleAction;
 import org.jetbrains.annotations.NotNull;
@@ -30,39 +30,39 @@ public class DatabaseProvider extends Provider {
     /* - - - */
 
     @Override
-    public <T> @NotNull Action<Boolean> delete(@NotNull Class<T> type, @NotNull Object primary) throws AnnotationFormatError {
-        return new SimpleAction<>(this, () -> this.doDelete(type, primary));
+    public <T extends Turtle> @NotNull Action<Boolean> delete(@NotNull Class<T> type, long id) throws AnnotationFormatError {
+        return new SimpleAction<>(this, () -> this.doDelete(type, id));
     }
 
     @Override
-    public <T> @NotNull Action<JsonObject> get(@NotNull Class<T> type, @NotNull Object primary) throws AnnotationFormatError {
-        return new SimpleAction<>(this, () -> this.doGet(type, primary));
+    public <T extends Turtle> @NotNull Action<JsonObject> get(@NotNull Class<T> type, long id) throws AnnotationFormatError {
+        return new SimpleAction<>(this, () -> this.doGet(type, id));
     }
 
     @Override
-    public <T> @NotNull Action<JsonObject> put(@NotNull Class<T> type, @NotNull JsonObject content) throws AnnotationFormatError {
+    public <T extends Turtle> @NotNull Action<JsonObject> put(@NotNull Class<T> type, @NotNull JsonObject content) throws AnnotationFormatError {
         return new SimpleAction<>(this, () -> this.doPut(type, content));
     }
 
     @Override
-    public <T> @NotNull Action<JsonObject> patch(@NotNull Class<T> type, @NotNull JsonObject content, @NotNull Object primary) throws AnnotationFormatError {
-        return new SimpleAction<>(this, () -> this.doPatch(type, content, primary));
+    public <T extends Turtle> @NotNull Action<JsonObject> patch(@NotNull Class<T> type, @NotNull JsonObject content, long id) throws AnnotationFormatError {
+        return new SimpleAction<>(this, () -> this.doPatch(type, content, id));
     }
 
     /* - - - */
 
-    private boolean doDelete(@NotNull Class<?> type, @NotNull Object primary) throws AnnotationFormatError {
+    private boolean doDelete(@NotNull Class<? extends Turtle> type, long id) throws AnnotationFormatError {
         Resource annotation = DataUtil.getResourceAnnotation(type);
-        File file = this.getFile(annotation, primary);
+        File file = this.getFile(annotation, id);
 
         // TODO: associations?
 
         return file.delete();
     }
 
-    private @Nullable JsonObject doGet(@NotNull Class<?> type, @NotNull Object primary) throws AnnotationFormatError {
+    private @Nullable JsonObject doGet(@NotNull Class<? extends Turtle> type, long id) throws AnnotationFormatError {
         Resource annotation = DataUtil.getResourceAnnotation(type);
-        File file = this.getFile(annotation, primary);
+        File file = this.getFile(annotation, id);
 
         if (!file.exists()) return null;
 
@@ -73,12 +73,12 @@ public class DatabaseProvider extends Provider {
         }
     }
 
-    private @Nullable JsonObject doPut(@NotNull Class<?> type, @NotNull JsonObject data) throws AnnotationFormatError {
+    private @Nullable JsonObject doPut(@NotNull Class<? extends Turtle> type, @NotNull JsonObject data) throws AnnotationFormatError {
         Resource annotation = DataUtil.getResourceAnnotation(type);
-        Object primary = DataUtil.getPrimaryValue(data, type);
-        File file = getFile(annotation, primary);
+        long id = DataUtil.getTurtleId(data);
+        File file = getFile(annotation, id);
 
-        // TODO: make sure the primary is created by the server
+        // TODO: make sure the id is created by the server
 
         try {
             this.setJson(data, file);
@@ -89,9 +89,9 @@ public class DatabaseProvider extends Provider {
         }
     }
 
-    private @NotNull JsonObject doPatch(@NotNull Class<?> type, @NotNull JsonObject data, @NotNull Object primary) throws AnnotationFormatError {
+    private @NotNull JsonObject doPatch(@NotNull Class<? extends Turtle> type, @NotNull JsonObject data, long id) throws AnnotationFormatError {
         Resource annotation = DataUtil.getResourceAnnotation(type);
-        File file = getFile(annotation, primary);
+        File file = getFile(annotation, id);
 
         if (!file.exists())
             throw new NullPointerException("Entry does not exist!");
@@ -99,11 +99,9 @@ public class DatabaseProvider extends Provider {
         try {
             JsonObject json = this.getJson(file);
 
-            Key primaryKey = DataUtil.getPrimary(type).getAnnotation(Key.class);
-
             for (Map.Entry<String, JsonElement> entry : data.entrySet()) {
-                // don't overwrite the primary key
-                if (entry.getKey().equals(primaryKey.name())) continue;
+                // don't overwrite the id
+                if (entry.getKey().equals("id")) continue;
 
                 json.add(entry.getKey(), entry.getValue());
             }
@@ -124,8 +122,8 @@ public class DatabaseProvider extends Provider {
 
     /* - - - */
 
-    private @NotNull File getFile(@NotNull Resource resource, @NotNull Object primary) {
-        return new File(dir, resource.path() + File.separator + primary + ".json");
+    private @NotNull File getFile(@NotNull Resource resource, long id) {
+        return new File(dir, resource.path() + File.separator + id + ".json");
     }
 
     private @NotNull JsonObject getJson(@NotNull File file) throws FileNotFoundException {

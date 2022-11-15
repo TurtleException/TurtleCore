@@ -105,29 +105,29 @@ public class NetServer extends NetworkAdapter {
     // TODO: use the server cache first
 
     private void handleDelete(@NotNull DataPacket packet) {
-        Class<?>  type = packet.getData().type();
-        Object primary = packet.getData().primary();
+        Class<?> type = packet.getData().type();
+        long id = packet.getData().id();
 
         // TODO
     }
 
     private void handleGet(@NotNull DataPacket packet) {
-        Class<?>  type = packet.getData().type();
-        Object primary = packet.getData().primary();
+        Class<?> type = packet.getData().type();
+        long id = packet.getData().id();
 
         // TODO
     }
 
     private void handlePut(@NotNull DataPacket packet) {
-        Class<?>  type = packet.getData().type();
-        Object primary = packet.getData().primary();
+        Class<?> type = packet.getData().type();
+        long id = packet.getData().id();
 
         // TODO
     }
 
     private void handlePatch(@NotNull DataPacket packet) {
-        Class<?>  type = packet.getData().type();
-        Object primary = packet.getData().primary();
+        Class<?> type = packet.getData().type();
+        long id = packet.getData().id();
 
         // TODO
     }

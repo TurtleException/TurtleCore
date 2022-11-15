@@ -12,14 +12,7 @@ import java.lang.annotation.Target;
 public @interface Key {
     @NotNull String name();
 
-    boolean primary() default false;
-
     @NotNull Relation relation() default Relation.ONE_TO_ONE;
-
-    @NotNull String table() default "";
-
-    // foreign key (column in reference table)
-    @NotNull String fKey() default "";
 
     @NotNull Class<?> type() default Object.class;
 }

@@ -57,7 +57,7 @@ public class NetClient extends NetworkAdapter {
     }
 
     private void handleRemove(@NotNull DataPacket packet) {
-        getClientImpl().removeCache(packet.getData().type(), packet.getData().primary());
+        getClientImpl().removeCache(packet.getData().type(), packet.getData().id());
         // TODO: respond?
     }
 }

@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import de.turtle_exception.client.api.TurtleClient;
+import de.turtle_exception.client.api.entities.Turtle;
 import de.turtle_exception.client.internal.data.annotations.Key;
 import de.turtle_exception.client.internal.data.annotations.Relation;
 import de.turtle_exception.client.internal.data.annotations.Resource;
@@ -28,7 +29,7 @@ public class JsonBuilder {
         this.client = client;
     }
 
-    public <T> @NotNull T buildObject(@NotNull Class<T> type, JsonObject json) throws IllegalArgumentException, AnnotationFormatError {
+    public <T extends Turtle> @NotNull T buildObject(@NotNull Class<T> type, JsonObject json) throws IllegalArgumentException, AnnotationFormatError {
         Checks.nonNull(json, "JSON data");
 
         // Make sure the @Resource annotation is present
@@ -48,7 +49,7 @@ public class JsonBuilder {
         }
     }
 
-    public <T> @NotNull List<T> buildObjects(@NotNull Class<T> type, JsonArray json) throws IllegalArgumentException, AnnotationFormatError {
+    public <T extends Turtle> @NotNull List<T> buildObjects(@NotNull Class<T> type, JsonArray json) throws IllegalArgumentException, AnnotationFormatError {
         Checks.nonNull(json, "JSON data");
 
         ArrayList<T> list = new ArrayList<>();
@@ -57,7 +58,7 @@ public class JsonBuilder {
         return List.copyOf(list);
     }
 
-    public @NotNull JsonObject buildJson(@NotNull Object object) throws IllegalArgumentException, AnnotationFormatError {
+    public @NotNull JsonObject buildJson(@NotNull Turtle object) throws IllegalArgumentException, AnnotationFormatError {
         Resource resource = DataUtil.getResourceAnnotation(object.getClass());
 
         JsonObject json = new JsonObject();
@@ -110,20 +111,19 @@ public class JsonBuilder {
         JsonArray arr = new JsonArray();
 
         // reference to another resource
-        if (annotation.type().getAnnotation(Resource.class) != null)
-            return handleResourceReference(iterable);
+        if (annotation.type().getAnnotation(Resource.class) != null) {
+            try {
+                for (Object o : iterable)
+                    arr.add(((Turtle) o).getId());
+                return arr;
+            } catch (ClassCastException e) {
+                throw new AnnotationFormatError("Illegal Resource annotation on Iterable that is not of type Turtle");
+            }
+        }
 
         // reference to a primitive type
         for (Object o : iterable)
             DataUtil.addValue(arr, o);
-
-        return arr;
-    }
-
-    private static JsonArray handleResourceReference(@NotNull Iterable<?> iterable) {
-        JsonArray arr = new JsonArray();
-        for (Object entry : iterable)
-            DataUtil.addValue(arr, DataUtil.getPrimaryValue(entry));
 
         return arr;
     }
