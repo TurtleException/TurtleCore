@@ -50,9 +50,9 @@ public abstract class Provider {
 
     public abstract <T> @NotNull Action<JsonObject> get(@NotNull Class<T> type, @NotNull Object primary) throws AnnotationFormatError;
 
-    public abstract <T> @NotNull Action<JsonObject> put(@NotNull Class<T> type, @NotNull JsonObject data) throws AnnotationFormatError;
+    public abstract <T> @NotNull Action<JsonObject> put(@NotNull Class<T> type, @NotNull JsonObject content) throws AnnotationFormatError;
 
-    public abstract <T> @NotNull Action<JsonObject> patch(@NotNull Class<T> type, @NotNull JsonObject data, @NotNull Object primary) throws AnnotationFormatError;
+    public abstract <T> @NotNull Action<JsonObject> patch(@NotNull Class<T> type, @NotNull JsonObject content, @NotNull Object primary) throws AnnotationFormatError;
 
     /* - - - */
 

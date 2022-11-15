@@ -32,8 +32,6 @@ public interface TurtleClient extends IUserContainer, IGroupContainer, ITicketCo
 
     @NotNull Version getVersion();
 
-    @NotNull JsonBuilder getJsonBuilder();
-
     @NotNull EventManager getEventManager();
 
     @NotNull NetworkAdapter getNetworkAdapter();
@@ -67,10 +65,6 @@ public interface TurtleClient extends IUserContainer, IGroupContainer, ITicketCo
     @NotNull DataAction<Ticket> retrieveTicket(long id);
 
     @NotNull DataAction<List<Ticket>> retrieveTickets();
-
-    void updateCache(@NotNull Class<?> type, @NotNull JsonObject contentJson) throws IllegalArgumentException;
-
-    void removeCache(@NotNull Class<?> type, @NotNull Object primary) throws IllegalArgumentException, ClassCastException;
 
     /* - - - */
 

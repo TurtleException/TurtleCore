@@ -40,13 +40,13 @@ public class DatabaseProvider extends Provider {
     }
 
     @Override
-    public <T> @NotNull Action<JsonObject> put(@NotNull Class<T> type, @NotNull JsonObject data) throws AnnotationFormatError {
-        return new SimpleAction<>(this, () -> this.doPut(type, data));
+    public <T> @NotNull Action<JsonObject> put(@NotNull Class<T> type, @NotNull JsonObject content) throws AnnotationFormatError {
+        return new SimpleAction<>(this, () -> this.doPut(type, content));
     }
 
     @Override
-    public <T> @NotNull Action<JsonObject> patch(@NotNull Class<T> type, @NotNull JsonObject data, @NotNull Object primary) throws AnnotationFormatError {
-        return new SimpleAction<>(this, () -> this.doPatch(type, data, primary));
+    public <T> @NotNull Action<JsonObject> patch(@NotNull Class<T> type, @NotNull JsonObject content, @NotNull Object primary) throws AnnotationFormatError {
+        return new SimpleAction<>(this, () -> this.doPatch(type, content, primary));
     }
 
     /* - - - */

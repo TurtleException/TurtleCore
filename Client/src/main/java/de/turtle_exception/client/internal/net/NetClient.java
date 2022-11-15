@@ -1,6 +1,7 @@
 package de.turtle_exception.client.internal.net;
 
 import de.turtle_exception.client.internal.NetworkAdapter;
+import de.turtle_exception.client.internal.net.packets.DataPacket;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Range;
 
@@ -38,5 +39,25 @@ public class NetClient extends NetworkAdapter {
     @Override
     public void onStop() throws IOException {
         this.connection.stop(true);
+    }
+
+    @Override
+    public void handleDataRequest(@NotNull DataPacket packet) {
+        switch (packet.getData().method()) {
+            case DELETE, GET, PUT, PATCH -> throw new UnsupportedOperationException();
+            case UPDATE -> this.handleUpdate(packet);
+            case REMOVE -> this.handleRemove(packet);
+            default -> throw new AssertionError();
+        }
+    }
+
+    private void handleUpdate(@NotNull DataPacket packet) {
+        getClientImpl().updateCache(packet.getData().type(), packet.getData().content());
+        // TODO: respond?
+    }
+
+    private void handleRemove(@NotNull DataPacket packet) {
+        getClientImpl().removeCache(packet.getData().type(), packet.getData().primary());
+        // TODO: respond?
     }
 }

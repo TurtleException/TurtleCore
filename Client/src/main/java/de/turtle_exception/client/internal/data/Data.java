@@ -21,6 +21,12 @@ public record Data(
         return json;
     }
 
+    public @NotNull Object primary() {
+        return DataUtil.getPrimaryValue(content, type);
+    }
+
+    /* - - - */
+
     public static @NotNull Data of(@NotNull JsonObject data) throws IllegalArgumentException {
         try {
             DataMethod method  = DataMethod.of(data.get("method").getAsString());

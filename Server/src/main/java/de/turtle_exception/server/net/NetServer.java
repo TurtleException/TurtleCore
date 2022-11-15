@@ -2,12 +2,18 @@ package de.turtle_exception.server.net;
 
 import com.google.common.collect.Sets;
 import de.turtle_exception.client.internal.NetworkAdapter;
+import de.turtle_exception.client.internal.data.Data;
 import de.turtle_exception.client.internal.net.Connection;
 import de.turtle_exception.client.internal.net.Handshake;
+import de.turtle_exception.client.internal.net.NetworkProvider;
+import de.turtle_exception.client.internal.net.packets.DataPacket;
+import de.turtle_exception.client.internal.net.packets.ErrorPacket;
 import de.turtle_exception.client.internal.net.packets.HeartbeatPacket;
+import de.turtle_exception.client.internal.net.packets.Packet;
 import de.turtle_exception.client.internal.util.Worker;
 import de.turtle_exception.server.TurtleServer;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.security.auth.login.LoginException;
 import java.io.IOException;
@@ -76,5 +82,71 @@ public class NetServer extends NetworkAdapter {
         this.heartbeats = null;
 
         this.socket.close();
+    }
+
+    @Override
+    public void handleDataRequest(@NotNull DataPacket packet) {
+        // this would create a loop
+        if (getClient().getProvider() instanceof NetworkProvider)
+            throw new AssertionError("Unsupported provider");
+
+        switch (packet.getData().method()) {
+            case DELETE -> this.handleDelete(packet);
+            case GET    -> this.handleGet(packet);
+            case PUT    -> this.handlePut(packet);
+            case PATCH  -> this.handlePatch(packet);
+            case UPDATE, REMOVE -> throw new UnsupportedOperationException();
+            default -> throw new AssertionError();
+        }
+    }
+
+    /* - - - */
+
+    // TODO: use the server cache first
+
+    private void handleDelete(@NotNull DataPacket packet) {
+        Class<?>  type = packet.getData().type();
+        Object primary = packet.getData().primary();
+
+        // TODO
+    }
+
+    private void handleGet(@NotNull DataPacket packet) {
+        Class<?>  type = packet.getData().type();
+        Object primary = packet.getData().primary();
+
+        // TODO
+    }
+
+    private void handlePut(@NotNull DataPacket packet) {
+        Class<?>  type = packet.getData().type();
+        Object primary = packet.getData().primary();
+
+        // TODO
+    }
+
+    private void handlePatch(@NotNull DataPacket packet) {
+        Class<?>  type = packet.getData().type();
+        Object primary = packet.getData().primary();
+
+        // TODO
+    }
+
+    /* - HELPER METHODS - */
+
+    private void respond(@NotNull Packet packet, @NotNull Data data) {
+        packet.getConnection().send(
+                new DataPacket(defaultDeadline(), packet.getConnection(), packet.getResponseCode(), data), true
+        );
+    }
+
+    private void respond(@NotNull Packet packet, @NotNull String error, @Nullable Throwable t) {
+        packet.getConnection().send(
+                new ErrorPacket(defaultDeadline(), packet.getConnection(), packet.getResponseCode(), error, t), true
+        );
+    }
+
+    private long defaultDeadline() {
+        return System.currentTimeMillis() + getClient().getDefaultTimeoutOutbound();
     }
 }

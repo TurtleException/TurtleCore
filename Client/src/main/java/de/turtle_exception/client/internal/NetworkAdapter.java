@@ -1,6 +1,7 @@
 package de.turtle_exception.client.internal;
 
 import de.turtle_exception.client.api.TurtleClient;
+import de.turtle_exception.client.internal.net.packets.DataPacket;
 import de.turtle_exception.client.internal.util.Checks;
 import de.turtle_exception.client.internal.util.logging.NestedLogger;
 import org.jetbrains.annotations.NotNull;
@@ -48,7 +49,15 @@ public abstract class NetworkAdapter {
 
     /* - - -*/
 
+    public abstract void handleDataRequest(@NotNull DataPacket packet);
+
+    /* - - -*/
+
     public final @NotNull TurtleClient getClient() {
+        return client;
+    }
+
+    protected final @NotNull TurtleClientImpl getClientImpl() {
         return client;
     }
 

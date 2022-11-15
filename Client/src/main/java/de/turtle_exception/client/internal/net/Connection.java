@@ -83,6 +83,20 @@ public class Connection {
 
     /* - - - */
 
+    public synchronized void send(@NotNull Packet packet, boolean encrypt) {
+        if (encrypt) {
+            try {
+                this.send(packet.compile(pass));
+            } catch (Error e) {
+                logger.log(Level.SEVERE, "Encountered an Error when attempting to encrypt a packet", e);
+            } catch (Throwable t) {
+                logger.log(Level.WARNING, "Encountered an Exception when attempting to encrypt a packet", t);
+            }
+        } else {
+            this.send(packet.compile());
+        }
+    }
+
     public synchronized void send(@NotNull CompiledPacket packet) {
         try {
             // this can't be the most efficient way to do this, right? right...?
@@ -173,9 +187,9 @@ public class Connection {
             DataPacket pck = (DataPacket) packet.toPacket(pass);
             if (future != null) {
                 future.complete(new Response(pck));
-            } else {
-                // TODO: handle incoming request
             }
+            // handle cache operation
+            adapter.handleDataRequest(pck);
             return;
         }
 
