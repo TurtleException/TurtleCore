@@ -5,7 +5,7 @@ import de.turtle_exception.client.api.entities.Turtle;
 import de.turtle_exception.client.internal.Provider;
 import de.turtle_exception.client.internal.data.DataUtil;
 import de.turtle_exception.client.internal.data.annotations.Resource;
-import de.turtle_exception.client.internal.request.SimpleAction;
+import de.turtle_exception.client.internal.request.actions.SimpleAction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

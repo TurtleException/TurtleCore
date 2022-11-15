@@ -5,7 +5,7 @@ import com.google.gson.JsonObject;
 import de.turtle_exception.client.api.entities.Turtle;
 import de.turtle_exception.client.internal.Provider;
 import de.turtle_exception.client.internal.data.Data;
-import de.turtle_exception.client.internal.request.NetAction;
+import de.turtle_exception.client.internal.request.actions.NetAction;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.annotation.AnnotationFormatError;

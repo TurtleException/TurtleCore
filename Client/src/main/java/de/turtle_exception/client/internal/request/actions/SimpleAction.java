@@ -1,4 +1,4 @@
-package de.turtle_exception.client.internal.request;
+package de.turtle_exception.client.internal.request.actions;
 
 import de.turtle_exception.client.internal.ActionImpl;
 import de.turtle_exception.client.internal.Provider;
