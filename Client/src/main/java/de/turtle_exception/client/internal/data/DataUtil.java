@@ -16,6 +16,7 @@ import java.lang.reflect.Method;
 public class DataUtil {
     private DataUtil() { }
 
+    // TODO: should this really throw an Error? Maybe an IllegalArgumentException would be better
     public static @NotNull Resource getResourceAnnotation(@NotNull Class<? extends Turtle> clazz) throws AnnotationFormatError {
         Resource annotation = clazz.getAnnotation(Resource.class);
         if (annotation == null)

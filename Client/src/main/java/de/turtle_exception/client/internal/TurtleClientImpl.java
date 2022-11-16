@@ -282,8 +282,8 @@ public class TurtleClientImpl implements TurtleClient {
         });
     }
 
-    public void updateCache(@NotNull Class<? extends Turtle> type, @NotNull JsonObject contentJson) throws IllegalArgumentException {
-        Object obj;
+    public <T extends Turtle> @NotNull T updateCache(@NotNull Class<T> type, @NotNull JsonObject contentJson) throws IllegalArgumentException {
+        T obj;
         try {
             obj = jsonBuilder.buildObject(type, contentJson);
         } catch (IllegalArgumentException | AnnotationFormatError e) {
@@ -296,6 +296,8 @@ public class TurtleClientImpl implements TurtleClient {
             ticketCache.put(ticket);
         if (obj instanceof User user)
             userCache.put(user);
+
+        return obj;
     }
 
     public void removeCache(@NotNull Class<? extends Turtle> type, long id) throws IllegalArgumentException, ClassCastException {
