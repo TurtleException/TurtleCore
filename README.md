@@ -2,13 +2,12 @@
 
 # TurtleCore
 This is the core application / library used for all management of userdata and communications by TurtleException.
-It is composed of 3 parts:
-- The **Core** contains shared classes and functionality. It is not part of the API, but rather a dependency.
-- The **Client** is an API library that can be used within other applications.
-- The **Server** provides all means of communication and data transfer to the Client and is responsible for central management of all data.
+
+
+_tbd_
 
 ## Using the client API
-tbd
+_tbd_
 
 ## Credits and special thanks
 - [JDA](https://github.com/DV8FromTheWorld/JDA)
