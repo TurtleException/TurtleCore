@@ -48,16 +48,20 @@ public final class Version {
      *
      * @return Version stored in resources.
      */
-    public static Version retrieveFromResources(@NotNull Class<?> clazz) {
+    public static Version retrieveFromResources(@NotNull Class<?> clazz, @NotNull String filename) {
         try {
             Properties properties = new Properties();
-            properties.load(clazz.getClassLoader().getResourceAsStream("version.properties"));
+            properties.load(clazz.getClassLoader().getResourceAsStream(filename + ".properties"));
             return parse(properties.getProperty("version"));
         } catch (NullPointerException | IOException | IllegalVersionException e) {
             System.out.println("Unable to retrieve version from resources.");
             e.printStackTrace();
             return null;
         }
+    }
+
+    public static Version retrieveFromResources(@NotNull Class<?> clazz) {
+        return retrieveFromResources(clazz, "version");
     }
 
     /**

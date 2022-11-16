@@ -14,7 +14,7 @@ public class Main {
     }
 
     public static TurtleServer singleton;
-    public static final Version VERSION = Version.retrieveFromResources(Main.class);
+    public static final Version VERSION = Version.retrieveFromResources(Main.class, "server");
 
     /**
      * Called by the JVM when starting this program.
