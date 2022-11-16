@@ -1,7 +1,11 @@
 package de.turtle_exception.client.api;
 
 import de.turtle_exception.client.internal.TurtleClientImpl;
-import de.turtle_exception.core.util.Checks;
+import de.turtle_exception.client.internal.Provider;
+import de.turtle_exception.client.internal.NetworkAdapter;
+import de.turtle_exception.client.internal.net.NetClient;
+import de.turtle_exception.client.internal.net.NetworkProvider;
+import de.turtle_exception.client.internal.util.Checks;
 import net.dv8tion.jda.api.JDA;
 import org.bukkit.Server;
 import org.jetbrains.annotations.NotNull;
@@ -22,11 +26,8 @@ import java.util.logging.Logger;
 public class TurtleClientBuilder {
     private static final AtomicInteger increment = new AtomicInteger(0);
 
-    private @Nullable String host;
-    private @Nullable Integer port;
-
-    private @Nullable String login;
-    private @Nullable String pass;
+    private @Nullable NetworkAdapter networkAdapter;
+    private @Nullable Provider provider;
 
     private @Nullable Logger logger;
 
@@ -38,10 +39,8 @@ public class TurtleClientBuilder {
 
     public @NotNull TurtleClient build() throws IllegalArgumentException, IOException, LoginException {
         try {
-            Checks.nonNull(host , "Host" );
-            Checks.nonNull(port , "Port" );
-            Checks.nonNull(login, "Login");
-            Checks.nonNull(pass , "Pass" );
+            Checks.nonNull(networkAdapter, "NetworkAdapter" );
+            Checks.nonNull(provider, "Provider");
         } catch (NullPointerException e) {
             throw new IllegalArgumentException(e);
         }
@@ -49,7 +48,7 @@ public class TurtleClientBuilder {
         String name   = String.valueOf(increment.getAndIncrement());
         Logger logger = this.logger != null ? this.logger : Logger.getLogger("CLIENT#" + name);
 
-        TurtleClientImpl client = new TurtleClientImpl(name, logger, host, port, login, pass);
+        TurtleClientImpl client = new TurtleClientImpl(name, logger, networkAdapter, provider);
 
         if (spigot != null)
             client.setSpigotServer(spigot);
@@ -60,25 +59,21 @@ public class TurtleClientBuilder {
         return client;
     }
 
+    public static @NotNull TurtleClientBuilder createDefault(@NotNull String host, int port, @NotNull String login, @NotNull String pass) {
+        return new TurtleClientBuilder()
+                .setNetworkAdapter(new NetClient(host, port, login, pass))
+                .setProvider(new NetworkProvider(4));
+    }
+
     /* - - - */
 
-    public TurtleClientBuilder setHost(String host) {
-        this.host = host;
+    public TurtleClientBuilder setNetworkAdapter(NetworkAdapter networkAdapter) {
+        this.networkAdapter = networkAdapter;
         return this;
     }
 
-    public TurtleClientBuilder setPort(Integer port) {
-        this.port = port;
-        return this;
-    }
-
-    public TurtleClientBuilder setLogin(String login) {
-        this.login = login;
-        return this;
-    }
-
-    public TurtleClientBuilder setPass(String pass) {
-        this.pass = pass;
+    public TurtleClientBuilder setProvider(Provider provider) {
+        this.provider = provider;
         return this;
     }
 
@@ -99,20 +94,12 @@ public class TurtleClientBuilder {
 
     /* - - - */
 
-    public @Nullable String getHost() {
-        return host;
+    public @Nullable NetworkAdapter getNetworkAdapter() {
+        return networkAdapter;
     }
 
-    public @Nullable Integer getPort() {
-        return port;
-    }
-
-    public @Nullable String getLogin() {
-        return login;
-    }
-
-    public @Nullable String getPass() {
-        return pass;
+    public @Nullable Provider getProvider() {
+        return provider;
     }
 
     public @Nullable Logger getLogger() {

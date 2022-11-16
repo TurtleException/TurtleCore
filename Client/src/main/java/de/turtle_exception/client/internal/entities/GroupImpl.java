@@ -1,13 +1,11 @@
 package de.turtle_exception.client.internal.entities;
 
-import com.google.gson.JsonObject;
+import com.google.gson.JsonArray;
 import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.api.entities.Group;
 import de.turtle_exception.client.api.entities.User;
-import de.turtle_exception.client.api.requests.Action;
-import de.turtle_exception.client.internal.ActionImpl;
+import de.turtle_exception.client.api.request.Action;
 import de.turtle_exception.client.internal.util.TurtleSet;
-import de.turtle_exception.core.net.route.Routes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -30,13 +28,18 @@ public class GroupImpl implements Group {
     }
 
     @Override
+    public long getId() {
+        return this.id;
+    }
+
+    @Override
     public @NotNull TurtleClient getClient() {
         return this.client;
     }
 
     @Override
-    public long getId() {
-        return this.id;
+    public @NotNull Action<Group> update() {
+        return getClient().getProvider().get(this.getClass(), getId()).andThenParse(Group.class);
     }
 
     /* - NAME - */
@@ -51,10 +54,8 @@ public class GroupImpl implements Group {
     }
 
     @Override
-    public @NotNull Action<Void> modifyName(@NotNull String name) {
-        JsonObject json = new JsonObject();
-        json.addProperty("name", name);
-        return new ActionImpl<>(client, Routes.Group.MODIFY.compile(json, this.id), null);
+    public @NotNull Action<Group> modifyName(@NotNull String name) {
+        return getClient().getProvider().patch(this, "name", name).andThenParse(Group.class);
     }
 
     /* - MEMBERS - */
@@ -74,12 +75,20 @@ public class GroupImpl implements Group {
     }
 
     @Override
-    public @NotNull Action<Void> addUser(long user) {
-        return new ActionImpl<>(client, Routes.Group.ADD_USER.compile(null, this.id, user), null);
+    public @NotNull Action<Group> addUser(long user) {
+        JsonArray arr = new JsonArray();
+        for (User aUser : users)
+            arr.add(aUser.getId());
+        arr.add(user);
+        return getClient().getProvider().patch(this, "users", arr).andThenParse(Group.class);
     }
 
     @Override
-    public @NotNull Action<Void> removeUser(long user) {
-        return new ActionImpl<>(client, Routes.Group.DEL_USER.compile(null, this.id, user), null);
+    public @NotNull Action<Group> removeUser(long user) {
+        JsonArray arr = new JsonArray();
+        for (User aUser : users)
+            if (aUser.getId() != user)
+                arr.add(aUser.getId());
+        return getClient().getProvider().patch(this, "users", arr).andThenParse(Group.class);
     }
 }

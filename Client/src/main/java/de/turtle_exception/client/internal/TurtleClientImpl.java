@@ -1,6 +1,5 @@
 package de.turtle_exception.client.internal;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.api.entities.Group;
@@ -8,14 +7,13 @@ import de.turtle_exception.client.api.entities.Ticket;
 import de.turtle_exception.client.api.entities.Turtle;
 import de.turtle_exception.client.api.entities.User;
 import de.turtle_exception.client.api.event.EventManager;
-import de.turtle_exception.client.api.requests.Action;
-import de.turtle_exception.client.internal.entities.EntityBuilder;
+import de.turtle_exception.client.api.request.Action;
+import de.turtle_exception.client.internal.data.JsonBuilder;
 import de.turtle_exception.client.internal.net.NetClient;
+import de.turtle_exception.client.internal.net.NetworkProvider;
 import de.turtle_exception.client.internal.util.TurtleSet;
-import de.turtle_exception.core.TurtleCore;
-import de.turtle_exception.core.net.route.Routes;
-import de.turtle_exception.core.util.version.IllegalVersionException;
-import de.turtle_exception.core.util.version.Version;
+import de.turtle_exception.client.internal.util.version.IllegalVersionException;
+import de.turtle_exception.client.internal.util.version.Version;
 import net.dv8tion.jda.api.JDA;
 import org.bukkit.Server;
 import org.jetbrains.annotations.NotNull;
@@ -24,17 +22,19 @@ import org.jetbrains.annotations.Range;
 
 import javax.security.auth.login.LoginException;
 import java.io.IOException;
+import java.lang.annotation.AnnotationFormatError;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class TurtleClientImpl extends TurtleCore implements TurtleClient {
+public class TurtleClientImpl implements TurtleClient {
     public static final Version VERSION;
     static {
-        VERSION = Version.retrieveFromResources(TurtleClientImpl.class);
+        VERSION = Version.retrieveFromResources(TurtleClient.class);
 
         // this can only happen with faulty code
         if (VERSION == null)
@@ -47,10 +47,11 @@ public class TurtleClientImpl extends TurtleCore implements TurtleClient {
     /** Name of this instance. Naming is not required, but it may be helpful when using multiple instances. */
     private final @Nullable String name;
 
+    private final JsonBuilder jsonBuilder;
     private final EventManager eventManager;
-
     /** The internal network part of the client */
-    private final NetClient netClient;
+    private final NetworkAdapter networkAdapter;
+    private final Provider provider;
 
     private final ScheduledThreadPoolExecutor callbackExecutor;
 
@@ -58,6 +59,9 @@ public class TurtleClientImpl extends TurtleCore implements TurtleClient {
     private @NotNull Consumer<? super Throwable> defaultOnFailure = t -> {
         // TODO
     };
+
+    private long defaultTimeoutInbound  = TimeUnit.SECONDS.toMillis( 8);
+    private long defaultTimeoutOutbound = TimeUnit.SECONDS.toMillis(16);
 
     private final TurtleSet<User> userCache = new TurtleSet<>();
     private final TurtleSet<Group> groupCache = new TurtleSet<>();
@@ -67,34 +71,68 @@ public class TurtleClientImpl extends TurtleCore implements TurtleClient {
     private Server spigotServer = null;
     private JDA    jda          = null;
 
-    public TurtleClientImpl(@Nullable String name, @NotNull Logger logger, @NotNull String host, @Range(from = 0, to = 65535) int port, @NotNull String login, @NotNull String pass) throws IOException, LoginException {
+    public TurtleClientImpl(@Nullable String name, @NotNull Logger logger, @NotNull NetworkAdapter networkAdapter, @NotNull Provider provider) throws IOException, LoginException {
         this.name = name;
         this.logger = logger;
+
+        this.jsonBuilder = new JsonBuilder(this);
 
         this.eventManager = new EventManager();
 
         this.callbackExecutor = new ScheduledThreadPoolExecutor(4, (r, executor) -> logger.log(Level.WARNING, "A callback task was rejected by the executor: ", r));
-        this.netClient = new NetClient(this, host, port, login, pass);
 
-        this.netClient.start();
+        this.networkAdapter = networkAdapter;
+        this.networkAdapter.setClient(this);
+        this.networkAdapter.start();
+
+        this.provider = provider;
+        this.provider.setClient(this);
+
+        if (this.provider instanceof NetworkProvider netProvider) {
+            if (networkAdapter instanceof NetClient netClient)
+                netProvider.setConnection(netClient.getConnection());
+            else
+                throw new LoginException("NetworkProvider is not supported without NetClient");
+        }
 
         // initial requests
-        this.retrieveUsers().await();
-        this.retrieveGroups().await();
-        this.retrieveTickets().await();
+        this.retrieveUsers().complete();
+        this.retrieveGroups().complete();
+        this.retrieveTickets().complete();
     }
 
     /**
      * Provides the root logger of this instance.
      * @return Instance root logger.
      */
+    @Override
     public @NotNull Logger getLogger() {
         return logger;
     }
 
     @Override
+    public @NotNull Version getVersion() {
+        return VERSION;
+    }
+
+    @Override
+    public @NotNull JsonBuilder getJsonBuilder() {
+        return jsonBuilder;
+    }
+
+    @Override
     public @NotNull EventManager getEventManager() {
         return this.eventManager;
+    }
+
+    @Override
+    public @NotNull NetworkAdapter getNetworkAdapter() {
+        return this.networkAdapter;
+    }
+
+    @Override
+    public @NotNull Provider getProvider() {
+        return this.provider;
     }
 
     /**
@@ -103,10 +141,6 @@ public class TurtleClientImpl extends TurtleCore implements TurtleClient {
      */
     public @Nullable String getName() {
         return name;
-    }
-
-    public NetClient getNetClient() {
-        return netClient;
     }
 
     public @NotNull TurtleSet<Group> getGroupCache() {
@@ -200,70 +234,79 @@ public class TurtleClientImpl extends TurtleCore implements TurtleClient {
 
     /* - - - */
 
-    @SuppressWarnings("CodeBlock2Expr")
     @Override
     public @NotNull Action<User> retrieveUser(long id) {
-        return new ActionImpl<User>(this, Routes.User.GET.compile(null, String.valueOf(id)), (message, userRequest) -> {
-            return EntityBuilder.buildUser(this, (JsonObject) message.getRoute().content());
-        }).onSuccess(user -> {
+        return provider.get(User.class, id).andThenParse(User.class).onSuccess(user -> {
             userCache.removeById(id);
             userCache.add(user);
         });
     }
 
-    @SuppressWarnings("CodeBlock2Expr")
     @Override
     public @NotNull Action<List<User>> retrieveUsers() {
-        return new ActionImpl<List<User>>(this, Routes.User.GET_ALL.compile(null), (message, userRequest) -> {
-            return EntityBuilder.buildUsers(this, (JsonArray) message.getRoute().content());
-        }).onSuccess(l -> {
+        return provider.get(User.class).andThenParseList(User.class).onSuccess(l -> {
             userCache.clear();
             userCache.addAll(l);
         });
     }
 
-    @SuppressWarnings("CodeBlock2Expr")
     @Override
     public @NotNull Action<Group> retrieveGroup(long id) {
-        return new ActionImpl<Group>(this, Routes.Group.GET.compile(null, String.valueOf(id)), (message, userRequest) -> {
-            return EntityBuilder.buildGroup(this, (JsonObject) message.getRoute().content());
-        }).onSuccess(group -> {
+        return provider.get(Group.class, id).andThenParse(Group.class).onSuccess(group -> {
             groupCache.removeById(id);
             groupCache.add(group);
         });
     }
 
-    @SuppressWarnings("CodeBlock2Expr")
     @Override
     public @NotNull Action<List<Group>> retrieveGroups() {
-        return new ActionImpl<List<Group>>(this, Routes.Group.GET_ALL.compile(null), (message, userRequest) -> {
-            return EntityBuilder.buildGroups(this, (JsonArray) message.getRoute().content());
-        }).onSuccess(l -> {
+        return provider.get(Group.class).andThenParseList(Group.class).onSuccess(l -> {
             groupCache.clear();
             groupCache.addAll(l);
         });
     }
 
-    @SuppressWarnings("CodeBlock2Expr")
     @Override
     public @NotNull Action<Ticket> retrieveTicket(long id) {
-        return new ActionImpl<Ticket>(this, Routes.Ticket.GET.compile(null, String.valueOf(id)), (message, userRequest) -> {
-            return EntityBuilder.buildTicket(this, (JsonObject) message.getRoute().content());
-        }).onSuccess(ticket -> {
+        return provider.get(Ticket.class, id).andThenParse(Ticket.class).onSuccess(ticket -> {
             ticketCache.removeById(id);
             ticketCache.add(ticket);
         });
     }
 
-    @SuppressWarnings("CodeBlock2Expr")
     @Override
     public @NotNull Action<List<Ticket>> retrieveTickets() {
-        return new ActionImpl<List<Ticket>>(this, Routes.Ticket.GET_ALL.compile(null), (message, userRequest) -> {
-            return EntityBuilder.buildTickets(this, (JsonArray) message.getRoute().content());
-        }).onSuccess(l -> {
+        return provider.get(Ticket.class).andThenParseList(Ticket.class).onSuccess(l -> {
             ticketCache.clear();
             ticketCache.addAll(l);
         });
+    }
+
+    public <T extends Turtle> @NotNull T updateCache(@NotNull Class<T> type, @NotNull JsonObject contentJson) throws IllegalArgumentException {
+        T obj;
+        try {
+            obj = jsonBuilder.buildObject(type, contentJson);
+        } catch (IllegalArgumentException | AnnotationFormatError e) {
+            throw new IllegalArgumentException("Failed to build object", e);
+        }
+
+        if (obj instanceof Group group)
+            groupCache.put(group);
+        if (obj instanceof Ticket ticket)
+            ticketCache.put(ticket);
+        if (obj instanceof User user)
+            userCache.put(user);
+
+        return obj;
+    }
+
+    public void removeCache(@NotNull Class<? extends Turtle> type, long id) throws IllegalArgumentException, ClassCastException {
+        if (Group.class.isAssignableFrom(type))
+            groupCache.removeById(id);
+        if (Ticket.class.isAssignableFrom(type))
+            ticketCache.removeById(id);
+        if (User.class.isAssignableFrom(type))
+            userCache.removeById(id);
     }
 
     /* - - - */
@@ -286,5 +329,35 @@ public class TurtleClientImpl extends TurtleCore implements TurtleClient {
     @Override
     public void setJDA(@Nullable JDA jda) {
         this.jda = jda;
+    }
+
+    /* - - - */
+
+    @Override
+    public @Range(from = 0, to = Long.MAX_VALUE) long getDefaultTimeoutInbound() {
+        return defaultTimeoutInbound;
+    }
+
+    @Override
+    public void setDefaultTimeoutInbound(@Range(from = 0, to = Long.MAX_VALUE) long defaultTimeoutInbound) {
+        this.defaultTimeoutInbound = defaultTimeoutInbound;
+    }
+
+    @Override
+    public @Range(from = 0, to = Long.MAX_VALUE) long getDefaultTimeoutOutbound() {
+        return defaultTimeoutOutbound;
+    }
+
+    @Override
+    public void setDefaultTimeoutOutbound(@Range(from = 0, to = Long.MAX_VALUE) long defaultTimeoutOutbound) {
+        this.defaultTimeoutOutbound = defaultTimeoutOutbound;
+    }
+
+    /* - - - */
+
+    @Override
+    public void shutdown() throws IOException {
+        logger.log(Level.INFO, "Shutting down...");
+        this.networkAdapter.stop();
     }
 }

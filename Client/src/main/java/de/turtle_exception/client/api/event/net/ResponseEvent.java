@@ -2,7 +2,7 @@ package de.turtle_exception.client.api.event.net;
 
 import de.turtle_exception.client.api.event.Event;
 import de.turtle_exception.client.api.requests.Request;
-import de.turtle_exception.core.net.message.InboundMessage;
+import de.turtle_exception.client.internal.net.message.InboundMessage;
 import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings("unused")

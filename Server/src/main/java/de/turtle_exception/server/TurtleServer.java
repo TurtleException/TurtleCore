@@ -1,10 +1,11 @@
 package de.turtle_exception.server;
 
-import de.turtle_exception.core.TurtleCore;
-import de.turtle_exception.core.util.logging.SimpleFormatter;
-import de.turtle_exception.server.data.DataService;
-import de.turtle_exception.server.data.DataServiceProvider;
-import de.turtle_exception.server.net.InternalServer;
+import de.turtle_exception.client.api.TurtleClient;
+import de.turtle_exception.client.api.TurtleClientBuilder;
+import de.turtle_exception.client.internal.util.logging.NestedLogger;
+import de.turtle_exception.client.internal.util.logging.SimpleFormatter;
+import de.turtle_exception.server.data.DatabaseProvider;
+import de.turtle_exception.server.net.NetServer;
 import de.turtle_exception.server.util.LogUtil;
 import de.turtle_exception.server.util.Status;
 
@@ -15,7 +16,7 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class TurtleServer extends TurtleCore {
+public class TurtleServer {
     private final Status status = new Status();
 
     /** The root logger of this server */
@@ -36,8 +37,7 @@ public class TurtleServer extends TurtleCore {
 
     private final Properties config = new Properties();
 
-    private InternalServer internalServer;
-    private DataService    dataService;
+    private TurtleClient turtleClient;
 
     public TurtleServer() throws Exception {
         this.logger = Logger.getLogger("SERVER");
@@ -50,14 +50,12 @@ public class TurtleServer extends TurtleCore {
     public void run() throws Exception {
         status.set(Status.INIT);
 
-        logger.log(Level.INFO, "Initializing InternalServer...");
-        this.internalServer = new InternalServer(this, getPort());
-
-        logger.log(Level.INFO, "Initializing DataService...");
-        this.dataService = new DataServiceProvider(this).get();
-
-        logger.log(Level.INFO, "Starting InternalServer...");
-        this.internalServer.start();
+        logger.log(Level.INFO, "Initializing TurtleClient...");
+        this.turtleClient = new TurtleClientBuilder()
+                .setNetworkAdapter(new NetServer(this, getPort()))
+                .setProvider(new DatabaseProvider(new File(DIR, "data")))
+                .setLogger(new NestedLogger("TurtleClient", logger))
+                .build();
 
         /* RUNNING */
 
@@ -82,11 +80,8 @@ public class TurtleServer extends TurtleCore {
 
         logger.log(Level.INFO, "Shutting down...");
 
-        logger.log(Level.INFO, "Stopping InternalServer...");
-        this.internalServer.stop();
-
-        logger.log(Level.INFO, "Stopping DataService...");
-        this.dataService.stop();
+        logger.log(Level.INFO, "Stopping TurtleClient...");
+        this.turtleClient.shutdown();
 
         logger.log(Level.ALL, "OK bye.");
     }
@@ -112,7 +107,7 @@ public class TurtleServer extends TurtleCore {
         return config;
     }
 
-    public DataService getDataService() {
-        return dataService;
+    public TurtleClient getClient() {
+        return turtleClient;
     }
 }

@@ -1,6 +1,8 @@
 package de.turtle_exception.client.api.entities;
 
 import de.turtle_exception.client.api.TurtleClient;
+import de.turtle_exception.client.api.request.Action;
+import de.turtle_exception.client.internal.data.annotations.Key;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -12,8 +14,17 @@ public interface Turtle {
      * Provides the unique turtle id of this entity. This id should never change and always only reference this entity.
      * @return Long representation of the id.
      */
+    @Key(name = "id")
     long getId();
 
     // TODO: docs
     @NotNull TurtleClient getClient();
+
+    @NotNull
+    default Action<Boolean> delete() {
+        return getClient().getProvider().delete(this);
+    }
+
+    @NotNull
+    Action<? extends Turtle> update();
 }

@@ -1,104 +1,88 @@
 package de.turtle_exception.client.internal;
 
-import de.turtle_exception.client.api.TurtleClient;
-import de.turtle_exception.client.api.requests.Action;
-import de.turtle_exception.client.api.requests.ActionFuture;
-import de.turtle_exception.client.api.requests.Request;
-import de.turtle_exception.client.api.requests.ActionHandler;
-import de.turtle_exception.core.net.message.InboundMessage;
-import de.turtle_exception.core.net.route.CompiledRoute;
-import de.turtle_exception.core.net.route.RouteError;
-import de.turtle_exception.core.net.route.Routes;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import de.turtle_exception.client.api.entities.Turtle;
+import de.turtle_exception.client.api.request.Action;
+import de.turtle_exception.client.internal.request.actions.ProxyAction;
+import de.turtle_exception.client.internal.util.ExceptionalFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
-public class ActionImpl<T> implements Action<T> {
-    private final @NotNull TurtleClientImpl client;
-    protected CompiledRoute route;
-    protected ActionHandler<T> handler;
+public abstract class ActionImpl<T> implements Action<T> {
+    protected final @NotNull Provider provider;
 
-    private Consumer<? super T>         onSuccess = null;
-    private Consumer<? super Throwable> onFailure = null;
+    protected boolean priority = false;
 
-    private boolean priority = false;
-    private long deadline = 0;
+    protected @NotNull Consumer<T> consumer = t -> { };
 
-    public ActionImpl(@NotNull TurtleClient client, CompiledRoute route, ActionHandler<T> handler) {
-        this.client = (TurtleClientImpl) client;
-        this.route = route;
-        this.handler = handler;
+    public ActionImpl(@NotNull Provider provider) {
+        this.provider = provider;
     }
 
     @Override
-    public @NotNull TurtleClient getClient() {
-        return this.client;
-    }
-
-    @Override
-    public @NotNull Action<T> deadline(long timestamp) {
-        this.deadline = timestamp;
-        return this;
-    }
-
-    @Override
-    public void queue(@Nullable Consumer<? super T> success, @Nullable Consumer<? super Throwable> failure) {
-        client.getNetClient().request(new Request<>(client, this, success, failure, route, deadline, priority));
+    public @NotNull Provider getProvider() {
+        return provider;
     }
 
     @Override
     public @NotNull CompletableFuture<T> submit() {
-        return new ActionFuture<>(this, deadline, priority, route);
+        return provider.submit(this);
     }
 
-    /**
-     * Marks this Action as a priority.
-     * @return This ActionImpl, useful for chaining.
-     */
-    public @NotNull ActionImpl<T> setPriority() {
-        this.priority = true;
+    /* - BUILDER - */
+
+    public ActionImpl<T> priority() {
+        priority = true;
         return this;
     }
 
-    /**
-     * An optional Consumer that can accept a success object before it gets passed to the Request Consumer. This is
-     * useful to process caching before allowing the user to process the object.
-     * @return This ActionImpl, useful for chaining.
-     */
-    public ActionImpl<T> onSuccess(Consumer<? super T> consumer) {
-        this.onSuccess = consumer;
+    public ActionImpl<T> onSuccess(@Nullable Consumer<T> consumer) {
+        this.consumer = consumer != null ? consumer : t -> { };
         return this;
     }
 
-    public void handleResponse(InboundMessage response, Request<T> request) {
-        if (response.getRoute().isRoute(Routes.ERROR)) {
-            try {
-                request.onFailure(RouteError.of(response.getRoute().content()));
-            } catch (IllegalArgumentException e) {
-                request.onFailure(e);
-            }
-            return;
-        }
-
-        if (onSuccess == null)
-            onSuccess = obj -> { };
-        if (onFailure == null)
-            onFailure = thr -> { };
-
-        if (handler == null) {
-            onSuccess.accept(null);
-            request.onSuccess(null);
-        } else {
-            try {
-                T obj = handler.handle(response, request);
-                onSuccess.accept(obj);
-                request.onSuccess(obj);
-            } catch (Exception e) {
-                onFailure.accept(e);
-                request.onFailure(e);
-            }
-        }
+    public <U> ProxyAction<T, U> andThen(@NotNull ExceptionalFunction<T, U> function) {
+        return new ProxyAction<>(this, function);
     }
+
+    public <U extends Turtle> ProxyAction<T, U> andThenParse(@NotNull Class<U> type) {
+        return this.andThen(t -> {
+            if (t instanceof JsonObject json)
+                return getClient().getJsonBuilder().buildObject(type, json);
+            throw new ClassCastException("Expected return type JsonObject");
+        });
+    }
+
+    public <U extends Turtle> ProxyAction<T, List<U>> andThenParseList(@NotNull Class<U> type) {
+        return this.andThen(t -> {
+            if (t instanceof JsonArray json)
+                return getClient().getJsonBuilder().buildObjects(type, json);
+            throw new ClassCastException("Expected return type JsonArray");
+        });
+    }
+
+    /* - - - */
+
+    public boolean isPriority() {
+        return priority;
+    }
+
+    /* - - - */
+
+    /** Proxy method, so that {@link ActionImpl#asCallable()} can be used by the {@link Provider}. */
+    @NotNull Callable<T> getCallable() throws IllegalStateException {
+        return () -> {
+            T result = this.asCallable().call();
+            this.consumer.accept(result);
+            return result;
+        };
+    }
+
+    protected abstract @NotNull Callable<T> asCallable() throws IllegalStateException;
 }
