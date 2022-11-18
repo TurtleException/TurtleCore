@@ -9,7 +9,11 @@ import de.turtle_exception.client.api.entities.User;
 import de.turtle_exception.client.api.event.EventManager;
 import de.turtle_exception.client.api.request.Action;
 import de.turtle_exception.client.internal.data.JsonBuilder;
-import de.turtle_exception.client.internal.entities.*;
+import de.turtle_exception.client.internal.entities.GroupImpl;
+import de.turtle_exception.client.internal.entities.TicketImpl;
+import de.turtle_exception.client.internal.entities.TurtleImpl;
+import de.turtle_exception.client.internal.entities.UserImpl;
+import de.turtle_exception.client.internal.event.UpdateHelper;
 import de.turtle_exception.client.internal.net.NetClient;
 import de.turtle_exception.client.internal.net.NetworkProvider;
 import de.turtle_exception.client.internal.util.TurtleSet;
@@ -262,11 +266,10 @@ public class TurtleClientImpl implements TurtleClient {
         long id = content.get("id").getAsLong();
         T turtle = this.getTurtleById(id, type);
 
-        // TODO: fire events
-
         if (turtle == null) {
             // create new object
             turtle = this.getJsonBuilder().buildObject(type, content);
+            UpdateHelper.ofCreateTurtle(turtle);
         } else {
             // update object
             if (!(turtle instanceof TurtleImpl turtleImpl))
@@ -283,7 +286,7 @@ public class TurtleClientImpl implements TurtleClient {
         return turtle;
     }
 
-    public void updateCache(@NotNull Turtle turtle) throws IllegalArgumentException {
+    private void updateCache(@NotNull Turtle turtle) throws IllegalArgumentException {
         if (turtle instanceof GroupImpl group)
             groupCache.put(group);
         if (turtle instanceof TicketImpl ticket)

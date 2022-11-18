@@ -2,17 +2,13 @@ package de.turtle_exception.client.internal.event;
 
 import de.turtle_exception.client.api.entities.Group;
 import de.turtle_exception.client.api.entities.Ticket;
+import de.turtle_exception.client.api.entities.Turtle;
 import de.turtle_exception.client.api.entities.User;
+import de.turtle_exception.client.api.event.group.GroupCreateEvent;
 import de.turtle_exception.client.api.event.group.GroupMemberJoinEvent;
 import de.turtle_exception.client.api.event.group.GroupMemberLeaveEvent;
-import de.turtle_exception.client.api.event.ticket.TicketTagAddEvent;
-import de.turtle_exception.client.api.event.ticket.TicketTagRemoveEvent;
-import de.turtle_exception.client.api.event.ticket.TicketUserAddEvent;
-import de.turtle_exception.client.api.event.ticket.TicketUserRemoveEvent;
-import de.turtle_exception.client.api.event.user.UserDiscordAddEvent;
-import de.turtle_exception.client.api.event.user.UserDiscordRemoveEvent;
-import de.turtle_exception.client.api.event.user.UserMinecraftAddEvent;
-import de.turtle_exception.client.api.event.user.UserMinecraftRemoveEvent;
+import de.turtle_exception.client.api.event.ticket.*;
+import de.turtle_exception.client.api.event.user.*;
 import de.turtle_exception.client.internal.util.TurtleSet;
 import org.jetbrains.annotations.NotNull;
 
@@ -23,6 +19,17 @@ import java.util.UUID;
 // TODO: this can probably be simplified
 public class UpdateHelper {
     private UpdateHelper() { }
+
+    public static void ofCreateTurtle(@NotNull Turtle turtle) {
+        if (turtle instanceof Group group)
+            turtle.getClient().getEventManager().handleEvent(new GroupCreateEvent(group));
+        if (turtle instanceof Ticket ticket)
+            turtle.getClient().getEventManager().handleEvent(new TicketCreateEvent(ticket));
+        if (turtle instanceof User user)
+            turtle.getClient().getEventManager().handleEvent(new UserCreateEvent(user));
+    }
+
+    /* - GROUP - */
 
     public static void ofGroupMembers(@NotNull Group group, @NotNull TurtleSet<User> oldUsers, @NotNull TurtleSet<User> newUsers) {
         List<User> added   = newUsers.stream().filter(user -> !oldUsers.containsId(user.getId())).toList();
