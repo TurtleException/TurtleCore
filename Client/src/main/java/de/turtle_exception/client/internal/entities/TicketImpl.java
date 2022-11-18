@@ -15,10 +15,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-public class TicketImpl implements Ticket {
-    private final TurtleClient client;
-    private final long id;
-
+public class TicketImpl extends TurtleImpl implements Ticket {
     private TicketState state;
     private String title;
     private String category;
@@ -27,9 +24,8 @@ public class TicketImpl implements Ticket {
     private final Set<String> tags = Sets.newConcurrentHashSet();
     private final TurtleSet<User> users;
 
-    TicketImpl(TurtleClient client, long id, TicketState state, String title, String category, long discordChannel, Collection<String> tags, TurtleSet<User> users) {
-        this.client = client;
-        this.id = id;
+    TicketImpl(@NotNull TurtleClient client, long id, TicketState state, String title, String category, long discordChannel, Collection<String> tags, TurtleSet<User> users) {
+        super(client, id);
 
         this.state = state;
         this.title = title;
@@ -38,16 +34,6 @@ public class TicketImpl implements Ticket {
 
         this.tags.addAll(tags);
         this.users = users;
-    }
-
-    @Override
-    public long getId() {
-        return this.id;
-    }
-
-    @Override
-    public @NotNull TurtleClient getClient() {
-        return this.client;
     }
 
     @Override

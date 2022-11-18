@@ -10,32 +10,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class UserImpl implements User {
-    private final TurtleClient client;
-    private final long id;
-
+public class UserImpl extends TurtleImpl implements User {
     private String name;
 
     private final ArrayList<Long> discord;
     private final ArrayList<UUID> minecraft;
 
-    UserImpl(TurtleClient client, long id, String name, ArrayList<Long> discord, ArrayList<UUID> minecraft) {
-        this.client = client;
-        this.id = id;
+    UserImpl(@NotNull TurtleClient client, long id, String name, ArrayList<Long> discord, ArrayList<UUID> minecraft) {
+        super(client, id);
         this.name = name;
 
         this.discord   = discord;
         this.minecraft = minecraft;
-    }
-
-    @Override
-    public long getId() {
-        return this.id;
-    }
-
-    @Override
-    public @NotNull TurtleClient getClient() {
-        return this.client;
     }
 
     @Override

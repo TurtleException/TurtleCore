@@ -11,30 +11,16 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class GroupImpl implements Group {
-    private final TurtleClient client;
-    private final long id;
-
+public class GroupImpl extends TurtleImpl implements Group {
     private String name;
 
     private final TurtleSet<User> users;
 
-    GroupImpl(TurtleClient client, long id, String name, TurtleSet<User> users) {
-        this.client = client;
-        this.id = id;
+    GroupImpl(@NotNull TurtleClient client, long id, String name, TurtleSet<User> users) {
+        super(client, id);
         this.name = name;
 
         this.users = users;
-    }
-
-    @Override
-    public long getId() {
-        return this.id;
-    }
-
-    @Override
-    public @NotNull TurtleClient getClient() {
-        return this.client;
     }
 
     @Override
