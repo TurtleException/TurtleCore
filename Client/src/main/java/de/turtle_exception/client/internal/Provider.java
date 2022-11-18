@@ -70,6 +70,18 @@ public abstract class Provider {
         return this.patch(turtle.getClass(), json, turtle.getId());
     }
 
+    public abstract <T extends Turtle> @NotNull ActionImpl<JsonObject> patchEntryAdd(@NotNull Class<T> type, long id, @NotNull String key, @NotNull Object obj);
+
+    public <T extends Turtle> @NotNull ActionImpl<JsonObject> patchEntryAdd(@NotNull T turtle, @NotNull String key, @NotNull Object obj) {
+        return this.patchEntryAdd(turtle.getClass(), turtle.getId(), key, obj);
+    }
+
+    public abstract <T extends Turtle> @NotNull ActionImpl<JsonObject> patchEntryDel(@NotNull Class<T> type, long id, @NotNull String key, @NotNull Object obj);
+
+    public <T extends Turtle> @NotNull ActionImpl<JsonObject> patchEntryDel(@NotNull T turtle, @NotNull String key, @NotNull Object obj) {
+        return this.patchEntryDel(turtle.getClass(), turtle.getId(), key, obj);
+    }
+
     /* - - - */
 
     final void setClient(@NotNull TurtleClientImpl client) {

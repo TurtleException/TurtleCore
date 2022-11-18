@@ -47,7 +47,7 @@ public class NetClient extends NetworkAdapter {
     @Override
     public void handleDataRequest(@NotNull DataPacket packet) {
         switch (packet.getData().method()) {
-            case DELETE, GET, PUT, PATCH -> throw new UnsupportedOperationException();
+            case DELETE, GET, PUT, PATCH, PATCH_ENTRY_ADD, PATCH_ENTRY_DEL -> throw new UnsupportedOperationException();
             case UPDATE -> this.handleUpdate(packet);
             case REMOVE -> this.handleRemove(packet);
             default -> throw new AssertionError();

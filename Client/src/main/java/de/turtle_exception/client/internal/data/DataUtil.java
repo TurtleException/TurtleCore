@@ -1,8 +1,6 @@
 package de.turtle_exception.client.internal.data;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
 import de.turtle_exception.client.api.entities.Turtle;
 import de.turtle_exception.client.internal.data.annotations.Resource;
 import org.jetbrains.annotations.NotNull;
@@ -64,8 +62,21 @@ public class DataUtil {
         }
     }
 
+    public static void removeValue(@NotNull JsonArray json, @NotNull Object object) {
+        for (int i = 0; i < json.size(); i++) {
+            JsonElement element = json.get(i);
+
+            if (equals(element, object)) {
+                json.remove(i);
+                return;
+            }
+        }
+    }
+
     public static void addValue(@NotNull JsonObject json, @NotNull String key, Object object) {
-        if (object instanceof JsonElement objElement) {
+        if (object == null) {
+            json.add(key, JsonNull.INSTANCE);
+        } else if (object instanceof JsonElement objElement) {
             json.add(key, objElement);
         } else if (object instanceof Boolean objBoolean) {
             json.addProperty(key, objBoolean);

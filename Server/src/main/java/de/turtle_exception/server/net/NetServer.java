@@ -3,8 +3,10 @@ package de.turtle_exception.server.net;
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import de.turtle_exception.client.api.entities.Turtle;
+import de.turtle_exception.client.internal.ActionImpl;
 import de.turtle_exception.client.internal.NetworkAdapter;
 import de.turtle_exception.client.internal.data.Data;
 import de.turtle_exception.client.internal.net.Connection;
@@ -120,6 +122,8 @@ public class NetServer extends NetworkAdapter {
                 case GET -> this.handleGet(packet);
                 case PUT -> this.handlePut(packet);
                 case PATCH -> this.handlePatch(packet);
+                case PATCH_ENTRY_ADD -> this.handlePatchEntry(packet, true);
+                case PATCH_ENTRY_DEL -> this.handlePatchEntry(packet, false);
                 case UPDATE, REMOVE -> throw new UnsupportedOperationException();
                 default -> throw new AssertionError();
             }
@@ -219,6 +223,28 @@ public class NetServer extends NetworkAdapter {
 
         getClient().getProvider().patch(type, packet.getData().contentObject(), turtle.getId()).queue(result -> {
             Turtle resTurtle = getClientImpl().updateCache(turtle.getClass(), result);
+            notifyClients(packet, Data.buildUpdate(resTurtle.getClass(), getClientImpl().getJsonBuilder().buildJson(resTurtle)));
+        }, throwable -> {
+            respond(packet, "Internal error", throwable);
+        });
+    }
+
+    private void handlePatchEntry(@NotNull DataPacket packet, boolean add) {
+        Class<? extends Turtle> type = packet.getData().type();
+        long id = packet.getData().id();
+
+        getLogger().log(Level.FINER, (add ? "PATCH_ENTRY_ADD" : "PATCH_ENTRY_DEL") + " request for turtle " + id);
+
+        String      key = packet.getData().contentObject().get("key").getAsString();
+        // we don't need to parse this to an Object because it will be converted back to JSON later
+        JsonElement val = packet.getData().contentObject().get("val");
+
+        ActionImpl<JsonObject> action = add
+                ? getClient().getProvider().patchEntryAdd(type, id, key, val)
+                : getClient().getProvider().patchEntryDel(type, id, key, val);
+
+        action.queue(result -> {
+            Turtle resTurtle = getClientImpl().updateCache(type, result);
             notifyClients(packet, Data.buildUpdate(resTurtle.getClass(), getClientImpl().getJsonBuilder().buildJson(resTurtle)));
         }, throwable -> {
             respond(packet, "Internal error", throwable);

@@ -3,6 +3,7 @@ package de.turtle_exception.client.internal.net;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import de.turtle_exception.client.api.entities.Turtle;
+import de.turtle_exception.client.internal.ActionImpl;
 import de.turtle_exception.client.internal.Provider;
 import de.turtle_exception.client.internal.data.Data;
 import de.turtle_exception.client.internal.request.actions.NetAction;
@@ -60,7 +61,24 @@ public class NetworkProvider extends Provider {
     @Override
     public <T extends Turtle> @NotNull NetAction<JsonObject> patch(@NotNull Class<T> type, @NotNull JsonObject content, long id) throws AnnotationFormatError {
         this.logger.log(Level.FINER, "PATCH request for id " + id);
+        content.addProperty("id", id);
         return new NetAction<>(this, connection, Data.buildPatch(type, content), (request, response) -> {
+            return response.getData().contentObject();
+        });
+    }
+
+    @Override
+    public @NotNull <T extends Turtle> ActionImpl<JsonObject> patchEntryAdd(@NotNull Class<T> type, long id, @NotNull String key, @NotNull Object obj) {
+        this.logger.log(Level.FINER, "PATCH_ENTRY_ADD request for array \"" + key + "\" in id " + id);
+        return new NetAction<>(this, connection, Data.buildPatchEntryAdd(type, id, key, obj), (request, response) -> {
+            return response.getData().contentObject();
+        });
+    }
+
+    @Override
+    public @NotNull <T extends Turtle> ActionImpl<JsonObject> patchEntryDel(@NotNull Class<T> type, long id, @NotNull String key, @NotNull Object obj) {
+        this.logger.log(Level.FINER, "PATCH_ENTRY_DEL request for array \"" + key + "\" in id " + id);
+        return new NetAction<>(this, connection, Data.buildPatchEntryDel(type, id, key, obj), (request, response) -> {
             return response.getData().contentObject();
         });
     }

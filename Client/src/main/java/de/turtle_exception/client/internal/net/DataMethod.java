@@ -7,8 +7,10 @@ public enum DataMethod {
     GET(1),
     PUT(2),
     PATCH(3),
-    UPDATE(4),
-    REMOVE(5),
+    PATCH_ENTRY_ADD(4),
+    PATCH_ENTRY_DEL(5),
+    UPDATE(6),
+    REMOVE(7),
 
     ;
 
