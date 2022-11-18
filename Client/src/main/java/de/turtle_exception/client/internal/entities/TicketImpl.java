@@ -59,11 +59,6 @@ public class TicketImpl extends TurtleImpl implements Ticket {
         return this;
     }
 
-    @Override
-    public @NotNull Action<Ticket> update() {
-        return getClient().getProvider().get(this.getClass(), getId()).andThenParse(Ticket.class);
-    }
-
     /* - STATE - */
 
     @Override

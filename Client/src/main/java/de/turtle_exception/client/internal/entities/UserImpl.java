@@ -44,11 +44,6 @@ public class UserImpl extends TurtleImpl implements User {
         return this;
     }
 
-    @Override
-    public @NotNull Action<User> update() {
-        return getClient().getProvider().get(this.getClass(), getId()).andThenParse(User.class);
-    }
-
     /* - NAME - */
 
     @Override

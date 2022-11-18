@@ -37,11 +37,6 @@ public class GroupImpl extends TurtleImpl implements Group {
         return this;
     }
 
-    @Override
-    public @NotNull Action<Group> update() {
-        return getClient().getProvider().get(this.getClass(), getId()).andThenParse(Group.class);
-    }
-
     /* - NAME - */
 
     @Override

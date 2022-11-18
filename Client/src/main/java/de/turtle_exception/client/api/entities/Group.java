@@ -13,7 +13,9 @@ import java.util.List;
 @SuppressWarnings("unused")
 public interface Group extends Turtle, IUserContainer {
     @Override
-    @NotNull Action<Group> update();
+    default @NotNull Action<Group> update() {
+        return this.getClient().retrieveGroup(this.getId());
+    }
 
     /* - NAME - */
 
