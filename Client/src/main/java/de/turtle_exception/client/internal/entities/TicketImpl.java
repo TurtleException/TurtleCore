@@ -2,6 +2,8 @@ package de.turtle_exception.client.internal.entities;
 
 import com.google.common.collect.Sets;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import de.turtle_exception.client.api.TicketState;
 import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.api.entities.Ticket;
@@ -21,8 +23,8 @@ public class TicketImpl extends TurtleImpl implements Ticket {
     private String category;
     private long discordChannel;
 
-    private final Set<String> tags = Sets.newConcurrentHashSet();
-    private final TurtleSet<User> users;
+    private Set<String> tags = Sets.newConcurrentHashSet();
+    private TurtleSet<User> users;
 
     TicketImpl(@NotNull TurtleClient client, long id, TicketState state, String title, String category, long discordChannel, Collection<String> tags, TurtleSet<User> users) {
         super(client, id);
@@ -34,6 +36,27 @@ public class TicketImpl extends TurtleImpl implements Ticket {
 
         this.tags.addAll(tags);
         this.users = users;
+    }
+
+    @Override
+    public synchronized @NotNull TicketImpl handleUpdate(@NotNull JsonObject json) {
+        this.apply(json, "state", element -> { this.state = TicketState.of(element.getAsByte()); });
+        this.apply(json, "title", element -> { this.title = element.getAsString(); });
+        this.apply(json, "category", element -> { this.category = element.getAsString(); });
+        this.apply(json, "discord_channel", element -> { this.discordChannel = element.getAsLong(); });
+        this.apply(json, "discord", element -> {
+            Set<String> set = Sets.newConcurrentHashSet();
+            for (JsonElement entry : element.getAsJsonArray())
+                set.add(entry.getAsString());
+            this.tags = set;
+        });
+        this.apply(json, "users", element -> {
+            TurtleSet<User> set = new TurtleSet<>();
+            for (JsonElement entry : element.getAsJsonArray())
+                set.add(client.getUserById(entry.getAsLong()));
+            this.users = set;
+        });
+        return this;
     }
 
     @Override

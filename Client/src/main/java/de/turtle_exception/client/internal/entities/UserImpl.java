@@ -1,6 +1,8 @@
 package de.turtle_exception.client.internal.entities;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.api.entities.User;
 import de.turtle_exception.client.api.request.Action;
@@ -13,8 +15,8 @@ import java.util.UUID;
 public class UserImpl extends TurtleImpl implements User {
     private String name;
 
-    private final ArrayList<Long> discord;
-    private final ArrayList<UUID> minecraft;
+    private ArrayList<Long> discord;
+    private ArrayList<UUID> minecraft;
 
     UserImpl(@NotNull TurtleClient client, long id, String name, ArrayList<Long> discord, ArrayList<UUID> minecraft) {
         super(client, id);
@@ -22,6 +24,24 @@ public class UserImpl extends TurtleImpl implements User {
 
         this.discord   = discord;
         this.minecraft = minecraft;
+    }
+
+    @Override
+    public synchronized @NotNull UserImpl handleUpdate(@NotNull JsonObject json) {
+        this.apply(json, "name", element -> { this.name = element.getAsString(); });
+        this.apply(json, "discord", element -> {
+            ArrayList<Long> list = new ArrayList<>();
+            for (JsonElement entry : element.getAsJsonArray())
+                list.add(entry.getAsLong());
+            this.discord = list;
+        });
+        this.apply(json, "minecraft", element -> {
+            ArrayList<UUID> list = new ArrayList<>();
+            for (JsonElement entry : element.getAsJsonArray())
+                list.add(UUID.fromString(entry.getAsString()));
+            this.minecraft = list;
+        });
+        return this;
     }
 
     @Override
