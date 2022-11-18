@@ -1,6 +1,7 @@
 package de.turtle_exception.server.net;
 
 import com.google.common.collect.Sets;
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import de.turtle_exception.client.api.entities.Turtle;
@@ -21,6 +22,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.security.auth.login.LoginException;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -32,6 +35,8 @@ public class NetServer extends NetworkAdapter {
     private final TurtleServer server;
     private final int port;
 
+    private final File loginFile;
+
     private Set<Connection> clients;
     private ServerSocket socket;
     private Worker heartbeats;
@@ -40,6 +45,8 @@ public class NetServer extends NetworkAdapter {
     public NetServer(@NotNull TurtleServer server, int port) {
         this.server = server;
         this.port = port;
+
+        this.loginFile = new File(TurtleServer.DIR, "meta" + File.separator + "login.json");
     }
 
     @Override
@@ -248,5 +255,34 @@ public class NetServer extends NetworkAdapter {
 
     private long defaultDeadline() {
         return System.currentTimeMillis() + getClient().getDefaultTimeoutOutbound();
+    }
+
+    /* - - - */
+
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    synchronized @Nullable String checkLogin(@NotNull String login) throws LoginException {
+        try {
+            loginFile.getParentFile().mkdir();
+            loginFile.createNewFile();
+
+            JsonObject json = new Gson().fromJson(new FileReader(loginFile), JsonObject.class);
+
+            String pass = json.get(login).getAsString();
+
+            if (pass == null)
+                throw new LoginException("Unknown login or pass");
+
+            getLogger().log(Level.FINE, "Permitted check for login \"" + login + "\"");
+            return pass;
+        } catch (IOException e) {
+            getLogger().log(Level.WARNING, "Internal IO error for login request \"" + login + "\"", e);
+            throw new LoginException("Internal IO error");
+        } catch (ClassCastException | IllegalStateException e) {
+            getLogger().log(Level.FINE, "JSON error for login request \"" + login + "\"", e);
+            return null;
+        } catch (Throwable t) {
+            getLogger().log(Level.WARNING, "Unknown internal error for login request \"" + login + "\"", t);
+            throw new LoginException("Unknown internal error");
+        }
     }
 }

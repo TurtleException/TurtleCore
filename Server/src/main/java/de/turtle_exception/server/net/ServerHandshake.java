@@ -7,6 +7,7 @@ import de.turtle_exception.client.internal.util.version.Version;
 import kotlin.NotImplementedError;
 import org.jetbrains.annotations.NotNull;
 
+import javax.security.auth.login.LoginException;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 
@@ -63,7 +64,18 @@ class ServerHandshake extends Handshake {
 
         if (msg.startsWith("LOGIN")) {
             String login = msg.substring("LOGIN ".length());
-            // TODO: check login
+            String pass = null;
+
+            try {
+                pass = server.checkLogin(login);
+            } catch (LoginException e) {
+                this.sendError(packet, "Login error", e);
+            }
+
+            if (pass == null) {
+                this.sendError(packet, "Illegal login", null);
+                return;
+            }
 
             clientLogin.set(login);
 
