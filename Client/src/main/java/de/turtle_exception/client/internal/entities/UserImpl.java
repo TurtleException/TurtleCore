@@ -51,11 +51,6 @@ public class UserImpl extends TurtleImpl implements User {
         return this.name;
     }
 
-    // TODO: use this (route finalizer)
-    public void setName(@NotNull String name) {
-        this.name = name;
-    }
-
     @Override
     public @NotNull Action<User> modifyName(@NotNull String name) {
         return getClient().getProvider().patch(this, "name", name).andThenParse(User.class);

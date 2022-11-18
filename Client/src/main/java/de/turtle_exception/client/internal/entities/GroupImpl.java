@@ -44,10 +44,6 @@ public class GroupImpl extends TurtleImpl implements Group {
         return this.name;
     }
 
-    public void setName(@NotNull String name) {
-        this.name = name;
-    }
-
     @Override
     public @NotNull Action<Group> modifyName(@NotNull String name) {
         return getClient().getProvider().patch(this, "name", name).andThenParse(Group.class);
