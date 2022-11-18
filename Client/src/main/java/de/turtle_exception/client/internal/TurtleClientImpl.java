@@ -82,7 +82,7 @@ public class TurtleClientImpl implements TurtleClient {
         this.jsonBuilder = new JsonBuilder(this);
 
         this.logger.log(Level.FINE, "Initializing EventManager.");
-        this.eventManager = new EventManager(client);
+        this.eventManager = new EventManager(this);
 
         this.callbackExecutor = new ScheduledThreadPoolExecutor(4, (r, executor) -> logger.log(Level.WARNING, "A callback task was rejected by the executor: ", r));
 
