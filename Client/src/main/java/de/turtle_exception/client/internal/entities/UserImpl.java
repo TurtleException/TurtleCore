@@ -4,7 +4,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.api.entities.User;
+import de.turtle_exception.client.api.event.user.UserUpdateNameEvent;
 import de.turtle_exception.client.api.request.Action;
+import de.turtle_exception.client.internal.event.UpdateHelper;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -27,18 +29,26 @@ public class UserImpl extends TurtleImpl implements User {
 
     @Override
     public synchronized @NotNull UserImpl handleUpdate(@NotNull JsonObject json) {
-        this.apply(json, "name", element -> { this.name = element.getAsString(); });
+        this.apply(json, "name", element -> {
+            String old = this.name;
+            this.name = element.getAsString();
+            this.fireEvent(new UserUpdateNameEvent(this, old, this.name));
+        });
         this.apply(json, "discord", element -> {
+            ArrayList<Long> old = this.discord;
             ArrayList<Long> list = new ArrayList<>();
             for (JsonElement entry : element.getAsJsonArray())
                 list.add(entry.getAsLong());
             this.discord = list;
+            UpdateHelper.ofUserDiscord(this, old, list);
         });
         this.apply(json, "minecraft", element -> {
+            ArrayList<UUID> old = this.minecraft;
             ArrayList<UUID> list = new ArrayList<>();
             for (JsonElement entry : element.getAsJsonArray())
                 list.add(UUID.fromString(entry.getAsString()));
             this.minecraft = list;
+            UpdateHelper.ofUserMinecraft(this, old, list);
         });
         return this;
     }

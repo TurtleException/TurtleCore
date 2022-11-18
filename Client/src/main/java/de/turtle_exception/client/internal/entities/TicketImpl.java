@@ -7,7 +7,12 @@ import de.turtle_exception.client.api.TicketState;
 import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.api.entities.Ticket;
 import de.turtle_exception.client.api.entities.User;
+import de.turtle_exception.client.api.event.ticket.TicketUpdateCategoryEvent;
+import de.turtle_exception.client.api.event.ticket.TicketUpdateDiscordChannelEvent;
+import de.turtle_exception.client.api.event.ticket.TicketUpdateStateEvent;
+import de.turtle_exception.client.api.event.ticket.TicketUpdateTitleEvent;
 import de.turtle_exception.client.api.request.Action;
+import de.turtle_exception.client.internal.event.UpdateHelper;
 import de.turtle_exception.client.internal.util.TurtleSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -39,21 +44,41 @@ public class TicketImpl extends TurtleImpl implements Ticket {
 
     @Override
     public synchronized @NotNull TicketImpl handleUpdate(@NotNull JsonObject json) {
-        this.apply(json, "state", element -> { this.state = TicketState.of(element.getAsByte()); });
-        this.apply(json, "title", element -> { this.title = element.getAsString(); });
-        this.apply(json, "category", element -> { this.category = element.getAsString(); });
-        this.apply(json, "discord_channel", element -> { this.discordChannel = element.getAsLong(); });
-        this.apply(json, "discord", element -> {
+        this.apply(json, "state", element -> {
+            TicketState old = this.state;
+            this.state = TicketState.of(element.getAsByte());
+            this.fireEvent(new TicketUpdateStateEvent(this, old, this.state));
+        });
+        this.apply(json, "title", element -> {
+            String old = this.title;
+            this.title = element.getAsString();
+            this.fireEvent(new TicketUpdateTitleEvent(this, old, this.title));
+        });
+        this.apply(json, "category", element -> {
+            String old = this.category;
+            this.category = element.getAsString();
+            this.fireEvent(new TicketUpdateCategoryEvent(this, old, this.category));
+        });
+        this.apply(json, "discord_channel", element -> {
+            long old = this.discordChannel;
+            this.discordChannel = element.getAsLong();
+            this.fireEvent(new TicketUpdateDiscordChannelEvent(this, old, this.discordChannel));
+        });
+        this.apply(json, "tags", element -> {
+            Set<String> old = this.tags;
             Set<String> set = Sets.newConcurrentHashSet();
             for (JsonElement entry : element.getAsJsonArray())
                 set.add(entry.getAsString());
             this.tags = set;
+            UpdateHelper.ofTicketTags(this, old, set);
         });
         this.apply(json, "users", element -> {
+            TurtleSet<User> old = this.users;
             TurtleSet<User> set = new TurtleSet<>();
             for (JsonElement entry : element.getAsJsonArray())
                 set.add(client.getUserById(entry.getAsLong()));
             this.users = set;
+            UpdateHelper.ofTicketUsers(this, old, set);
         });
         return this;
     }

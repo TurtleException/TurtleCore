@@ -5,7 +5,9 @@ import com.google.gson.JsonObject;
 import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.api.entities.Group;
 import de.turtle_exception.client.api.entities.User;
+import de.turtle_exception.client.api.event.group.GroupUpdateNameEvent;
 import de.turtle_exception.client.api.request.Action;
+import de.turtle_exception.client.internal.event.UpdateHelper;
 import de.turtle_exception.client.internal.util.TurtleSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -26,12 +28,18 @@ public class GroupImpl extends TurtleImpl implements Group {
 
     @Override
     public synchronized @NotNull GroupImpl handleUpdate(@NotNull JsonObject json) {
-        this.apply(json, "name", element -> { this.name = element.getAsString(); });
+        this.apply(json, "name", element -> {
+            String old = this.name;
+            this.name = element.getAsString();
+            this.fireEvent(new GroupUpdateNameEvent(this, old, this.name));
+        });
         this.apply(json, "users", element -> {
+            TurtleSet<User> old = this.users;
             TurtleSet<User> set = new TurtleSet<>();
             for (JsonElement entry : element.getAsJsonArray())
                 set.add(client.getUserById(entry.getAsLong()));
             this.users = set;
+            UpdateHelper.ofGroupMembers(this, old, set);
         });
         return this;
     }
