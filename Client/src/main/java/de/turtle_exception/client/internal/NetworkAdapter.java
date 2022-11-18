@@ -24,22 +24,24 @@ public abstract class NetworkAdapter {
             throw new IllegalStateException("The NetworkAdapter is already running.");
         Checks.nonNull(this.client, "Client");
         this.logger = new NestedLogger("NetworkAdapter", client.getLogger());
+        this.logger.log(Level.INFO, "Starting...");
         this.status = Status.INIT;
         this.onStart();
+        this.logger.log(Level.INFO, "OK!");
     }
 
-    public final void stop() throws IOException {
-        logger.log(Level.INFO, "Stopping...");
+    public final void shutdown() throws IOException {
+        logger.log(Level.INFO, "Shutting down...");
         this.status = Status.DISCONNECTED;
-        this.onStop();
-        logger.log(Level.INFO, "Stopped");
+        this.onShutdown();
+        logger.log(Level.INFO, "OK bye.");
     }
 
     /** Called after the NetworkAdapter has been started. */
     public void onStart() throws IOException, LoginException { }
 
-    /** Called when the NetworkAdapter stops. */
-    public void onStop() throws IOException { }
+    /** Called when the NetworkAdapter shuts down. */
+    public void onShutdown() throws IOException { }
 
     final void setClient(TurtleClientImpl client) throws IllegalStateException {
         if (status != Status.PRE_INIT)

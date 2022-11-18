@@ -29,6 +29,8 @@ public abstract class Provider {
     private final Worker[] workers;
 
     protected Provider(@Range(from = 1, to = Integer.MAX_VALUE) int workerSize) {
+        this.logger.log(Level.INFO, "Allocating " + workerSize + " Workers.");
+
         this.workers = new Worker[workerSize];
 
         for (int i = 0; i < workerSize; i++) {
@@ -101,6 +103,8 @@ public abstract class Provider {
         else
             defaultCallbacks.add(task);
 
+        this.logger.log(Level.FINER, "Action submitted: " + action.getClass().getSimpleName());
+
         return future;
     }
 
@@ -129,7 +133,7 @@ public abstract class Provider {
         }
 
         this.status = Status.STOPPED;
-        logger.log(Level.INFO, "OK!");
+        logger.log(Level.INFO, "OK bye.");
     }
 
     public final void shutdownNow() {
@@ -142,7 +146,7 @@ public abstract class Provider {
             worker.interrupt();
 
         this.status = Status.STOPPED;
-        logger.log(Level.INFO, "OK!");
+        logger.log(Level.INFO, "OK bye.");
     }
 
     public final int getWorkerAmount() {

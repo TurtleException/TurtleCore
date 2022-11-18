@@ -5,6 +5,8 @@ import de.turtle_exception.client.internal.util.version.Version;
 import kotlin.NotImplementedError;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.logging.Level;
+
 class ClientHandshake extends Handshake {
     protected final String login;
 
@@ -16,6 +18,8 @@ class ClientHandshake extends Handshake {
     @Override
     public void handle(@NotNull HandshakePacket packet) {
         String msg = packet.getMessage();
+
+        this.logger.log(Level.FINER, "Received message: " + msg);
 
         switch (msg) {
             case "LOGIN OK" -> this.done();

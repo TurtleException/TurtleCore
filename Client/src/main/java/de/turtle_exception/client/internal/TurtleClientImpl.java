@@ -53,8 +53,10 @@ public class TurtleClientImpl implements TurtleClient {
     private final NetworkAdapter networkAdapter;
     private final Provider provider;
 
+    // TODO: this is not used
     private final ScheduledThreadPoolExecutor callbackExecutor;
 
+    // TODO: is this still relevant?
     private @NotNull Consumer<Object>            defaultOnSuccess = o -> { };
     private @NotNull Consumer<? super Throwable> defaultOnFailure = t -> {
         // TODO
@@ -74,17 +76,22 @@ public class TurtleClientImpl implements TurtleClient {
     public TurtleClientImpl(@Nullable String name, @NotNull Logger logger, @NotNull NetworkAdapter networkAdapter, @NotNull Provider provider) throws IOException, LoginException {
         this.name = name;
         this.logger = logger;
+        this.logger.log(Level.INFO, "Hello there  (Starting...)");
 
+        this.logger.log(Level.FINE, "Initializing JsonBuilder.");
         this.jsonBuilder = new JsonBuilder(this);
 
-        this.eventManager = new EventManager();
+        this.logger.log(Level.FINE, "Initializing EventManager.");
+        this.eventManager = new EventManager(client);
 
         this.callbackExecutor = new ScheduledThreadPoolExecutor(4, (r, executor) -> logger.log(Level.WARNING, "A callback task was rejected by the executor: ", r));
 
+        this.logger.log(Level.FINE, "Starting NetworkAdapter (" + networkAdapter.getClass().getSimpleName() + ")");
         this.networkAdapter = networkAdapter;
         this.networkAdapter.setClient(this);
         this.networkAdapter.start();
 
+        this.logger.log(Level.FINE, "Starting Provider (" + provider.getClass().getSimpleName() + ")");
         this.provider = provider;
         this.provider.setClient(this);
 
@@ -95,10 +102,16 @@ public class TurtleClientImpl implements TurtleClient {
                 throw new LoginException("NetworkProvider is not supported without NetClient");
         }
 
+        this.logger.log(Level.FINE, "Dispatching initial requests...");
+
         // initial requests
         this.retrieveUsers().complete();
         this.retrieveGroups().complete();
         this.retrieveTickets().complete();
+
+        this.logger.log(Level.FINE, "OK!");
+
+        this.logger.log(Level.INFO, "General Kenobi O_o  (Startup done)");
     }
 
     /**
@@ -297,6 +310,8 @@ public class TurtleClientImpl implements TurtleClient {
         if (obj instanceof User user)
             userCache.put(user);
 
+        this.logger.log(Level.FINER, "Updated cache for turtle " + obj.getId() + ".");
+
         return obj;
     }
 
@@ -307,6 +322,8 @@ public class TurtleClientImpl implements TurtleClient {
             ticketCache.removeById(id);
         if (User.class.isAssignableFrom(type))
             userCache.removeById(id);
+
+        this.logger.log(Level.FINER, "Removed turtle " + id + " from cache.");
     }
 
     /* - - - */
@@ -319,6 +336,7 @@ public class TurtleClientImpl implements TurtleClient {
     @Override
     public void setSpigotServer(@Nullable Server server) {
         this.spigotServer = server;
+        this.logger.log(Level.INFO, "Registered Spigot server instance: " + server + ".");
     }
 
     @Override
@@ -329,6 +347,7 @@ public class TurtleClientImpl implements TurtleClient {
     @Override
     public void setJDA(@Nullable JDA jda) {
         this.jda = jda;
+        this.logger.log(Level.INFO, "Registered JDA instance: " + jda + ".");
     }
 
     /* - - - */
@@ -358,6 +377,8 @@ public class TurtleClientImpl implements TurtleClient {
     @Override
     public void shutdown() throws IOException {
         logger.log(Level.INFO, "Shutting down...");
-        this.networkAdapter.stop();
+        this.networkAdapter.shutdown();
+        this.provider.shutdown();
+        logger.log(Level.INFO, "OK bye.");
     }
 }

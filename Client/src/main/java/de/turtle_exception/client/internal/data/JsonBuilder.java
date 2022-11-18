@@ -10,6 +10,7 @@ import de.turtle_exception.client.internal.data.annotations.Relation;
 import de.turtle_exception.client.internal.data.annotations.Resource;
 import de.turtle_exception.client.internal.entities.EntityBuilder;
 import de.turtle_exception.client.internal.util.Checks;
+import de.turtle_exception.client.internal.util.logging.NestedLogger;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.annotation.AnnotationFormatError;
@@ -19,13 +20,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.stream.Stream;
 
 public class JsonBuilder {
     private final TurtleClient client;
+    private final NestedLogger logger;
 
     public JsonBuilder(@NotNull TurtleClient client) {
         this.client = client;
+        this.logger = new NestedLogger("JsonBuilder", client.getLogger());
     }
 
     public <T extends Turtle> @NotNull T buildObject(@NotNull Class<T> type, JsonObject json) throws IllegalArgumentException, AnnotationFormatError {
@@ -33,6 +37,8 @@ public class JsonBuilder {
 
         // Make sure the @Resource annotation is present
         Resource annotation = DataUtil.getResourceAnnotation(type);
+
+        this.logger.log(Level.FINE, "Build call (JSON > obj) for object of type " + type.getSimpleName());
 
         try {
             Method buildMethod = EntityBuilder.class.getMethod(annotation.builder(), JsonObject.class, TurtleClient.class);
@@ -51,6 +57,8 @@ public class JsonBuilder {
     public <T extends Turtle> @NotNull List<T> buildObjects(@NotNull Class<T> type, JsonArray json) throws IllegalArgumentException, AnnotationFormatError {
         Checks.nonNull(json, "JSON data");
 
+        this.logger.log(Level.FINE, "Build call (JSON > obj) for " + json.size() + " objects of type " + type.getSimpleName());
+
         ArrayList<T> list = new ArrayList<>();
         for (JsonElement element : json)
             list.add(this.buildObject(type, (JsonObject) element));
@@ -59,6 +67,8 @@ public class JsonBuilder {
 
     public @NotNull JsonObject buildJson(@NotNull Turtle object) throws IllegalArgumentException, AnnotationFormatError {
         Resource resource = DataUtil.getResourceAnnotation(object.getClass());
+
+        this.logger.log(Level.FINE, "Build call (obj > JSON) for object of type " + object.getClass().getSimpleName());
 
         JsonObject json = new JsonObject();
 

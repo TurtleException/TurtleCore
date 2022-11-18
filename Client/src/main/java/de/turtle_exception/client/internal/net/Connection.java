@@ -44,11 +44,13 @@ public class Connection {
         this.adapter = adapter;
         this.logger = new NestedLogger("CON#" + socket.getInetAddress() + ":" + socket.getPort(), adapter.getLogger());
 
-        this.requestCallbacks = new RequestCallbackPool(adapter.getClient().getDefaultTimeoutOutbound());
+        this.requestCallbacks = new RequestCallbackPool(adapter.getClient().getDefaultTimeoutOutbound(), logger);
 
         this.socket = socket;
         this.out = new PrintWriter(socket.getOutputStream(), true);
         this.in  = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
+        this.logger.log(Level.INFO, "Initiating Handshake. (" + handshake.getClass().getSimpleName() + ")");
 
         this.status = Status.LOGIN;
         this.handshake = handshake;
@@ -57,6 +59,7 @@ public class Connection {
 
         this.pass = pass;
 
+        this.logger.log(Level.FINE, "Starting Receiver.");
         this.receiver = new Worker(() -> status != Status.DISCONNECTED, () -> {
             try {
                 this.receive(in.readLine());
@@ -67,13 +70,20 @@ public class Connection {
     }
 
     public boolean stop(boolean notify) {
-        if (notify)
+        this.logger.log(Level.INFO, "Stopping connection.");
+
+        if (notify) {
+            this.logger.log(Level.INFO, "Sending QUIT packet.");
             this.send(new HandshakePacket(Long.MAX_VALUE, this, "QUIT").compile());
+        }
 
         this.status = Status.DISCONNECTED;
+        this.logger.log(Level.FINE, "Interrupting Receiver.");
         this.receiver.interrupt();
         try {
+            this.logger.log(Level.FINE, "Closing Socket.");
             this.socket.close();
+            this.logger.log(Level.INFO, "Socket closed successfully.");
             return true;
         } catch (IOException e) {
             this.logger.log(Level.WARNING, "Could not close connection!", e);
@@ -84,8 +94,11 @@ public class Connection {
     /* - - - */
 
     public synchronized void send(@NotNull Packet packet, boolean encrypt) {
+        final String pckId = packet.getClass().getSimpleName() + ":" + packet.getResponseCode();
+
         if (encrypt) {
             try {
+                this.logger.log(Level.FINER, "Sending " + pckId + " encrypted.");
                 this.send(packet.compile(pass));
             } catch (Error e) {
                 logger.log(Level.SEVERE, "Encountered an Error when attempting to encrypt a packet", e);
@@ -93,6 +106,7 @@ public class Connection {
                 logger.log(Level.WARNING, "Encountered an Exception when attempting to encrypt a packet", t);
             }
         } else {
+            this.logger.log(Level.FINER, "Sending " + pckId + " as cleartext.");
             this.send(packet.compile());
         }
     }
@@ -109,7 +123,7 @@ public class Connection {
     }
 
     private void receive(@NotNull String msg) {
-        long deadline = System.currentTimeMillis() + adapter.getClient().getDefaultTimeoutInbound();
+        final long deadline = System.currentTimeMillis() + adapter.getClient().getDefaultTimeoutInbound();
 
         try {
             this.receive(new CompiledPacket(msg.getBytes(), Direction.INBOUND, this, deadline));
@@ -126,15 +140,19 @@ public class Connection {
         CompletableFuture<IResponse> future = new CompletableFuture<>();
         this.requestCallbacks.put(request.getPacket().getResponseCode(), future);
         try {
+            this.logger.log(Level.FINER, "Attempting to dispatch request " + request.getPacket().getId());
             this.send(request.getPacket().compile(pass));
         } catch (Exception e) {
             this.requestCallbacks.remove(request.getPacket().getResponseCode());
+            this.logger.log(Level.FINER, "Dispatch failed: " + request.getPacket().getId());
             return CompletableFuture.failedFuture(new IllegalArgumentException("Encryption error. Please check your pass!", e));
         }
         return future;
     }
 
     public void receive(@NotNull CompiledPacket packet) throws Exception {
+        this.logger.log(Level.FINER, "Receiving packet (type " + packet.getTypeId() + ") with id " + packet.getId());
+
         if (packet.getTypeId() == HeartbeatPacket.TYPE) {
             HeartbeatPacket pck = (HeartbeatPacket) packet.toPacket();
 

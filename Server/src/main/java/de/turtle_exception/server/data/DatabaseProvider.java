@@ -12,6 +12,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.*;
 import java.lang.annotation.AnnotationFormatError;
 import java.util.Map;
+import java.util.logging.Level;
 
 public class DatabaseProvider extends Provider {
     private final File dir;
@@ -21,32 +22,39 @@ public class DatabaseProvider extends Provider {
         super(1);
         this.dir = dir;
         this.dir.mkdirs();
+
+        this.logger.log(Level.INFO, "Assigned directory: " + dir.getPath());
     }
 
     /* - - - */
 
     @Override
     public <T extends Turtle> @NotNull SimpleAction<Boolean> delete(@NotNull Class<T> type, long id) throws AnnotationFormatError {
+        this.logger.log(Level.FINER, "DELETE request for id " + id);
         return new SimpleAction<>(this, () -> this.doDelete(type, id));
     }
 
     @Override
     public <T extends Turtle> @NotNull SimpleAction<JsonObject> get(@NotNull Class<T> type, long id) throws AnnotationFormatError {
+        this.logger.log(Level.FINER, "GET request for id " + id);
         return new SimpleAction<>(this, () -> this.doGet(type, id));
     }
 
     @Override
     public <T extends Turtle> @NotNull SimpleAction<JsonArray> get(@NotNull Class<T> type) throws AnnotationFormatError {
+        this.logger.log(Level.FINER, "GET request for type " + type.getSimpleName());
         return new SimpleAction<>(this, () -> this.doGet(type));
     }
 
     @Override
     public <T extends Turtle> @NotNull SimpleAction<JsonObject> put(@NotNull Class<T> type, @NotNull JsonObject content) throws AnnotationFormatError {
+        this.logger.log(Level.FINER, "PUT request for object of type " + type.getSimpleName());
         return new SimpleAction<>(this, () -> this.doPut(type, content));
     }
 
     @Override
     public <T extends Turtle> @NotNull SimpleAction<JsonObject> patch(@NotNull Class<T> type, @NotNull JsonObject content, long id) throws AnnotationFormatError {
+        this.logger.log(Level.FINER, "PATCH request for id " + id);
         return new SimpleAction<>(this, () -> this.doPatch(type, content, id));
     }
 
@@ -166,6 +174,8 @@ public class DatabaseProvider extends Provider {
         try (FileWriter writer = new FileWriter(file, false)) {
             writer.write(gson.toJson(json));
         }
+
+        this.logger.log(Level.FINER, "Resource written: " + file.getName());
     }
 
     /* - - - */

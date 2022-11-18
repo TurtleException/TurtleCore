@@ -9,6 +9,7 @@ import de.turtle_exception.client.internal.request.actions.NetAction;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.annotation.AnnotationFormatError;
+import java.util.logging.Level;
 
 @SuppressWarnings("CodeBlock2Expr")
 public class NetworkProvider extends Provider {
@@ -20,10 +21,12 @@ public class NetworkProvider extends Provider {
 
     public void setConnection(@NotNull Connection connection) {
         this.connection = connection;
+        this.logger.log(Level.FINE, "Connection set!");
     }
 
     @Override
     public <T extends Turtle> @NotNull NetAction<Boolean> delete(@NotNull Class<T> type, long id) throws AnnotationFormatError {
+        this.logger.log(Level.FINER, "DELETE request for id " + id);
         return new NetAction<>(this, connection, Data.buildDelete(type, id), (request, response) -> {
             // this point should not be reached unless the response is a successful REMOVE call
             return true;
@@ -32,6 +35,7 @@ public class NetworkProvider extends Provider {
 
     @Override
     public <T extends Turtle> @NotNull NetAction<JsonObject> get(@NotNull Class<T> type, long id) throws AnnotationFormatError {
+        this.logger.log(Level.FINER, "GET request for id " + id);
         return new NetAction<>(this, connection, Data.buildGet(type, id), (request, response) -> {
             return response.getData().contentObject();
         });
@@ -39,6 +43,7 @@ public class NetworkProvider extends Provider {
 
     @Override
     public <T extends Turtle> @NotNull NetAction<JsonArray> get(@NotNull Class<T> type) throws AnnotationFormatError {
+        this.logger.log(Level.FINER, "GET request for type " + type.getSimpleName());
         return new NetAction<>(this, connection, Data.buildGet(type), (request, response) -> {
             return response.getData().contentArray();
         });
@@ -46,6 +51,7 @@ public class NetworkProvider extends Provider {
 
     @Override
     public <T extends Turtle> @NotNull NetAction<JsonObject> put(@NotNull Class<T> type, @NotNull JsonObject content) throws AnnotationFormatError {
+        this.logger.log(Level.FINER, "PUT request for object of type " + type.getSimpleName());
         return new NetAction<>(this, connection, Data.buildPut(type, content.deepCopy()), (request, response) -> {
             return response.getData().contentObject();
         });
@@ -53,6 +59,7 @@ public class NetworkProvider extends Provider {
 
     @Override
     public <T extends Turtle> @NotNull NetAction<JsonObject> patch(@NotNull Class<T> type, @NotNull JsonObject content, long id) throws AnnotationFormatError {
+        this.logger.log(Level.FINER, "PATCH request for id " + id);
         return new NetAction<>(this, connection, Data.buildPatch(type, content), (request, response) -> {
             return response.getData().contentObject();
         });

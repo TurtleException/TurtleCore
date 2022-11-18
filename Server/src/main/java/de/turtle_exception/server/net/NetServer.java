@@ -45,9 +45,12 @@ public class NetServer extends NetworkAdapter {
     public void onStart() throws IOException {
         this.clients = Sets.newConcurrentHashSet();
 
+        getLogger().log(Level.INFO, "Starting server socket.");
         this.socket = new ServerSocket(port);
 
+        getLogger().log(Level.FINE, "Starting heartbeat-worker.");
         this.heartbeats = new Worker(() -> status == Status.CONNECTED, () -> {
+            getLogger().log(Level.FINEST, "Dispatching heartbeats for " + clients.size() + " clients.");
             this.clients.forEach(connection -> {
                 connection.send(
                         new HeartbeatPacket(server.getClient().getDefaultTimeoutOutbound(), connection).compile()
@@ -55,15 +58,18 @@ public class NetServer extends NetworkAdapter {
             });
         }, 10, TimeUnit.SECONDS);
 
+        getLogger().log(Level.FINE, "Starting listener.");
         this.listener = new Worker(() -> status == Status.CONNECTED, () -> {
             try {
                 Socket client = socket.accept();
+                getLogger().log(Level.FINE, "New socket connection: " + socket.getInetAddress().toString());
 
                 try {
                     Handshake handshake  = new ServerHandshake(this);
                     Connection connection = new Connection(this, client, handshake, null);
 
                     this.clients.add(connection);
+                    getLogger().log(Level.FINE, "Client added.");
                 } catch (IOException | LoginException e) {
                     getLogger().log(Level.WARNING, "Handshake failed.", e);
                 }
@@ -74,22 +80,28 @@ public class NetServer extends NetworkAdapter {
     }
 
     @Override
-    public void onStop() throws IOException {
+    public void onShutdown() throws IOException {
+        getLogger().log(Level.FINE, "Interrupting listener.");
         this.listener.interrupt();
         this.listener = null;
 
+        getLogger().log(Level.INFO, "Closing " + clients.size() + " connections.");
         for (Connection connection : this.clients)
             connection.stop(true);
         this.clients.clear();
 
+        getLogger().log(Level.FINE, "Interrupting heartbeat-worker.");
         this.heartbeats.interrupt();
         this.heartbeats = null;
 
+        getLogger().log(Level.FINE, "Closing socket.");
         this.socket.close();
     }
 
     @Override
     public void handleDataRequest(@NotNull DataPacket packet) {
+        getLogger().log(Level.FINER, "Incoming data request: " + packet.getId());
+
         // this would create a loop
         if (getClient().getProvider() instanceof NetworkProvider)
             throw new AssertionError("Unsupported provider");
@@ -115,6 +127,8 @@ public class NetServer extends NetworkAdapter {
         long id = packet.getData().id();
         Turtle turtle = getClientImpl().getTurtleById(id);
 
+        getLogger().log(Level.FINER, "DELETE request for turtle " + id);
+
         if (turtle == null) {
             respond(packet, "Turtle " + id + " does not exist", null);
             return;
@@ -136,6 +150,8 @@ public class NetServer extends NetworkAdapter {
         long id = packet.getData().id();
         Turtle turtle = getClientImpl().getTurtleById(id);
 
+        getLogger().log(Level.FINER, "GET request for turtle " + id);
+
         if (turtle == null) {
             respond(packet, "Turtle " + id + " does not exist", null);
             return;
@@ -149,6 +165,8 @@ public class NetServer extends NetworkAdapter {
         Class<? extends Turtle> type = packet.getData().type();
         JsonObject content = packet.getData().contentObject();
 
+        getLogger().log(Level.FINER, "PUT request for turtle of type " + type.getSimpleName());
+
         Turtle turtle = getClientImpl().getJsonBuilder().buildObject(type, content);
 
         // TODO: check for used discord / minecraft / ...
@@ -159,6 +177,8 @@ public class NetServer extends NetworkAdapter {
     private void handlePatch(@NotNull DataPacket packet) {
         Class<? extends Turtle> type = packet.getData().type();
         long id = packet.getData().id();
+
+        getLogger().log(Level.FINER, "PATCH request for turtle " + id);
 
         // TODO: should the data type be checked?
         Turtle turtle = getClientImpl().getTurtleById(id);

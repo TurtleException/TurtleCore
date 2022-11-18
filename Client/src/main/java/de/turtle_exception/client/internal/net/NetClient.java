@@ -40,7 +40,7 @@ public class NetClient extends NetworkAdapter {
     }
 
     @Override
-    public void onStop() throws IOException {
+    public void onShutdown() throws IOException {
         this.connection.stop(true);
     }
 

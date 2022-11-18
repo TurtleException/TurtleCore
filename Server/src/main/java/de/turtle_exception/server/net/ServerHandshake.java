@@ -8,6 +8,7 @@ import kotlin.NotImplementedError;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.logging.Level;
 
 class ServerHandshake extends Handshake {
     private final AtomicReference<Version> clientVersion = new AtomicReference<>(null);
@@ -35,6 +36,8 @@ class ServerHandshake extends Handshake {
     @Override
     public void handle(@NotNull HandshakePacket packet) {
         String msg = packet.getMessage();
+
+        this.logger.log(Level.FINE, "Received message: " + msg);
 
         if (msg.startsWith("VERSION")) {
             String raw = msg.substring("VERSION ".length());
