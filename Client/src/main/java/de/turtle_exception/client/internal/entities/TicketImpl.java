@@ -1,7 +1,6 @@
 package de.turtle_exception.client.internal.entities;
 
 import com.google.common.collect.Sets;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import de.turtle_exception.client.api.TicketState;
@@ -104,20 +103,12 @@ public class TicketImpl extends TurtleImpl implements Ticket {
 
     @Override
     public @NotNull Action<Ticket> addTag(@NotNull String tag) {
-        JsonArray arr = new JsonArray();
-        for (String aTag : tags)
-            arr.add(aTag);
-        arr.add(tag);
-        return getClient().getProvider().patch(this, "tags", arr).andThenParse(Ticket.class);
+        return getClient().getProvider().patchEntryAdd(this, "tags", tag).andThenParse(Ticket.class);
     }
 
     @Override
     public @NotNull Action<Ticket> removeTag(@NotNull String tag) {
-        JsonArray arr = new JsonArray();
-        for (String aTag : tags)
-            if (!aTag.equals(tag))
-                arr.add(aTag);
-        return getClient().getProvider().patch(this, "tags", arr).andThenParse(Ticket.class);
+        return getClient().getProvider().patchEntryDel(this, "tags", tag).andThenParse(Ticket.class);
     }
 
     /* - DISCORD - */
@@ -150,19 +141,11 @@ public class TicketImpl extends TurtleImpl implements Ticket {
 
     @Override
     public @NotNull Action<Ticket> addUser(long user) {
-        JsonArray arr = new JsonArray();
-        for (User aUser : users)
-            arr.add(aUser.getId());
-        arr.add(user);
-        return getClient().getProvider().patch(this, "users", arr).andThenParse(Ticket.class);
+        return getClient().getProvider().patchEntryAdd(this, "users", user).andThenParse(Ticket.class);
     }
 
     @Override
     public @NotNull Action<Ticket> removeUser(long user) {
-        JsonArray arr = new JsonArray();
-        for (User aUser : users)
-            if (aUser.getId() != user)
-                arr.add(aUser.getId());
-        return getClient().getProvider().patch(this, "users", arr).andThenParse(Ticket.class);
+        return getClient().getProvider().patchEntryDel(this, "users", user).andThenParse(Ticket.class);
     }
 }

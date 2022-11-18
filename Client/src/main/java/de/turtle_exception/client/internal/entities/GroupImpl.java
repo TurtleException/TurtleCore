@@ -1,6 +1,5 @@
 package de.turtle_exception.client.internal.entities;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import de.turtle_exception.client.api.TurtleClient;
@@ -67,19 +66,11 @@ public class GroupImpl extends TurtleImpl implements Group {
 
     @Override
     public @NotNull Action<Group> addUser(long user) {
-        JsonArray arr = new JsonArray();
-        for (User aUser : users)
-            arr.add(aUser.getId());
-        arr.add(user);
-        return getClient().getProvider().patch(this, "users", arr).andThenParse(Group.class);
+        return getClient().getProvider().patchEntryAdd(this, "users", user).andThenParse(Group.class);
     }
 
     @Override
     public @NotNull Action<Group> removeUser(long user) {
-        JsonArray arr = new JsonArray();
-        for (User aUser : users)
-            if (aUser.getId() != user)
-                arr.add(aUser.getId());
-        return getClient().getProvider().patch(this, "users", arr).andThenParse(Group.class);
+        return getClient().getProvider().patchEntryDel(this, "users", user).andThenParse(Group.class);
     }
 }

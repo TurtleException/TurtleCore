@@ -1,6 +1,5 @@
 package de.turtle_exception.client.internal.entities;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import de.turtle_exception.client.api.TurtleClient;
@@ -65,20 +64,12 @@ public class UserImpl extends TurtleImpl implements User {
 
     @Override
     public @NotNull Action<User> addDiscordId(long discordId) {
-        JsonArray arr = new JsonArray();
-        for (Long aDiscordId : discord)
-            arr.add(aDiscordId);
-        arr.add(discordId);
-        return getClient().getProvider().patch(this, "discord", arr).andThenParse(User.class);
+        return getClient().getProvider().patchEntryAdd(this, "discord", discordId).andThenParse(User.class);
     }
 
     @Override
     public @NotNull Action<User> removeDiscordId(long discordId) {
-        JsonArray arr = new JsonArray();
-        for (Long aDiscordId : discord)
-            if (!aDiscordId.equals(discordId))
-                arr.add(aDiscordId);
-        return getClient().getProvider().patch(this, "discord", arr).andThenParse(User.class);
+        return getClient().getProvider().patchEntryDel(this, "discord", discordId).andThenParse(User.class);
     }
 
     /* - MINECRAFT - */
@@ -90,19 +81,11 @@ public class UserImpl extends TurtleImpl implements User {
 
     @Override
     public @NotNull Action<User> addMinecraftId(@NotNull UUID minecraftId) {
-        JsonArray arr = new JsonArray();
-        for (UUID aMinecraftId : minecraft)
-            arr.add(String.valueOf(aMinecraftId));
-        arr.add(String.valueOf(minecraftId));
-        return getClient().getProvider().patch(this, "minecraft", arr).andThenParse(User.class);
+        return getClient().getProvider().patchEntryAdd(this, "minecraft", minecraftId.toString()).andThenParse(User.class);
     }
 
     @Override
     public @NotNull Action<User> removeMinecraftId(@NotNull UUID minecraftId) {
-        JsonArray arr = new JsonArray();
-        for (UUID aMinecraftId : minecraft)
-            if (!aMinecraftId.equals(minecraftId))
-                arr.add(String.valueOf(aMinecraftId));
-        return getClient().getProvider().patch(this, "minecraft", arr).andThenParse(User.class);
+        return getClient().getProvider().patchEntryDel(this, "minecraft", minecraftId.toString()).andThenParse(User.class);
     }
 }
