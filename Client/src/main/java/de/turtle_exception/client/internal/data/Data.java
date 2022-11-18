@@ -73,7 +73,7 @@ public record Data (
         return new Data(DataMethod.PATCH, type, content);
     }
 
-    public static @NotNull Data buildUpdate(@NotNull Class<? extends Turtle> type, @NotNull JsonObject content) {
+    public static @NotNull Data buildUpdate(@NotNull Class<? extends Turtle> type, @NotNull JsonElement content) {
         return new Data(DataMethod.UPDATE, type, content);
     }
 

@@ -1,6 +1,7 @@
 package de.turtle_exception.server.net;
 
 import com.google.common.collect.Sets;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import de.turtle_exception.client.api.entities.Turtle;
 import de.turtle_exception.client.internal.NetworkAdapter;
@@ -146,6 +147,11 @@ public class NetServer extends NetworkAdapter {
     }
 
     private void handleGet(@NotNull DataPacket packet) {
+        if (packet.getData().content().isJsonNull()) {
+            this.handleGetAll(packet);
+            return;
+        }
+
         // TODO: should the data type be checked?
         long id = packet.getData().id();
         Turtle turtle = getClientImpl().getTurtleById(id);
@@ -159,6 +165,23 @@ public class NetServer extends NetworkAdapter {
 
         JsonObject content = getClient().getJsonBuilder().buildJson(turtle);
         respond(packet, Data.buildUpdate(turtle.getClass(), content));
+    }
+
+    private void handleGetAll(@NotNull DataPacket packet) {
+        Class<? extends Turtle> type = packet.getData().type();
+
+        getLogger().log(Level.FINER, "GET request for type " + type);
+
+        JsonArray content = new JsonArray();
+        for (Turtle turtle : getClientImpl().getTurtles()) {
+            // filter types
+            if (!turtle.getClass().isAssignableFrom(type)) continue;
+
+            JsonObject turtleJson = getClientImpl().getJsonBuilder().buildJson(turtle);
+            content.add(turtleJson);
+        }
+
+        respond(packet, Data.buildUpdate(type, content));
     }
 
     private void handlePut(@NotNull DataPacket packet) {
