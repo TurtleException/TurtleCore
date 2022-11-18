@@ -1,10 +1,11 @@
 package de.turtle_exception.client.internal.entities;
 
+import com.google.gson.JsonObject;
 import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.api.entities.Turtle;
 import org.jetbrains.annotations.NotNull;
 
-abstract class TurtleImpl implements Turtle {
+public abstract class TurtleImpl implements Turtle {
     protected final @NotNull TurtleClient client;
     protected final long id;
 
@@ -23,4 +24,8 @@ abstract class TurtleImpl implements Turtle {
     public TurtleClient getClient() {
         return client;
     }
+
+    /* - - - */
+
+    public abstract @NotNull TurtleImpl handleUpdate(@NotNull JsonObject json);
 }

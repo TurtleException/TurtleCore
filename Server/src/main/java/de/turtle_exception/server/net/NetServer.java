@@ -222,7 +222,7 @@ public class NetServer extends NetworkAdapter {
         }
 
         getClient().getProvider().patch(type, packet.getData().contentObject(), turtle.getId()).queue(result -> {
-            Turtle resTurtle = getClientImpl().updateCache(turtle.getClass(), result);
+            Turtle resTurtle = getClientImpl().updateTurtle(turtle.getClass(), result);
             notifyClients(packet, Data.buildUpdate(resTurtle.getClass(), getClientImpl().getJsonBuilder().buildJson(resTurtle)));
         }, throwable -> {
             respond(packet, "Internal error", throwable);
@@ -244,7 +244,7 @@ public class NetServer extends NetworkAdapter {
                 : getClient().getProvider().patchEntryDel(type, id, key, val);
 
         action.queue(result -> {
-            Turtle resTurtle = getClientImpl().updateCache(type, result);
+            Turtle resTurtle = getClientImpl().updateTurtle(type, result);
             notifyClients(packet, Data.buildUpdate(resTurtle.getClass(), getClientImpl().getJsonBuilder().buildJson(resTurtle)));
         }, throwable -> {
             respond(packet, "Internal error", throwable);

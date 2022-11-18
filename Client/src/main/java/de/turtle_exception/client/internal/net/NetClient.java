@@ -57,10 +57,10 @@ public class NetClient extends NetworkAdapter {
     private void handleUpdate(@NotNull DataPacket packet) {
         JsonElement json = packet.getData().content();
         if (json instanceof JsonObject jsonObj)
-            getClientImpl().updateCache(packet.getData().type(), jsonObj);
+            getClientImpl().updateTurtle(packet.getData().type(), jsonObj);
         if (json instanceof JsonArray jsonArr)
             for (JsonElement element : jsonArr)
-                getClientImpl().updateCache(packet.getData().type(), (JsonObject) element);
+                getClientImpl().updateTurtle(packet.getData().type(), (JsonObject) element);
     }
 
     private void handleRemove(@NotNull DataPacket packet) {
