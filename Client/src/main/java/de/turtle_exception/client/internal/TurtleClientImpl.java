@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.lang.annotation.AnnotationFormatError;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.logging.Level;
@@ -52,9 +51,6 @@ public class TurtleClientImpl implements TurtleClient {
     /** The internal network part of the client */
     private final NetworkAdapter networkAdapter;
     private final Provider provider;
-
-    // TODO: this is not used
-    private final ScheduledThreadPoolExecutor callbackExecutor;
 
     // TODO: is this still relevant?
     private @NotNull Consumer<Object>            defaultOnSuccess = o -> { };
@@ -83,8 +79,6 @@ public class TurtleClientImpl implements TurtleClient {
 
         this.logger.log(Level.FINE, "Initializing EventManager.");
         this.eventManager = new EventManager(this);
-
-        this.callbackExecutor = new ScheduledThreadPoolExecutor(4, (r, executor) -> logger.log(Level.WARNING, "A callback task was rejected by the executor: ", r));
 
         this.logger.log(Level.FINE, "Starting NetworkAdapter (" + networkAdapter.getClass().getSimpleName() + ")");
         this.networkAdapter = networkAdapter;
@@ -239,10 +233,6 @@ public class TurtleClientImpl implements TurtleClient {
     @Override
     public void setDefaultActionFailure(@NotNull Consumer<? super Throwable> consumer) {
         this.defaultOnFailure = consumer;
-    }
-
-    public ScheduledThreadPoolExecutor getCallbackExecutor() {
-        return callbackExecutor;
     }
 
     /* - - - */
