@@ -201,7 +201,7 @@ public class NetServer extends NetworkAdapter {
 
         getLogger().log(Level.FINER, "PUT request for turtle of type " + type.getSimpleName());
 
-        Turtle turtle = getClientImpl().getJsonBuilder().buildObject(type, content);
+        Turtle turtle = getClientImpl().updateTurtle(type, content);
 
         // TODO: check for used discord / minecraft / ...
 
