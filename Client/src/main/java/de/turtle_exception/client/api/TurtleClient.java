@@ -21,7 +21,6 @@ import org.jetbrains.annotations.Range;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.function.Consumer;
 import java.util.logging.Logger;
 
 // TODO: docs
@@ -38,14 +37,6 @@ public interface TurtleClient extends IUserContainer, IGroupContainer, ITicketCo
     @NotNull NetworkAdapter getNetworkAdapter();
 
     @NotNull Provider getProvider();
-
-    @NotNull Consumer<Object> getDefaultActionSuccess();
-
-    @NotNull Consumer<? super Throwable> getDefaultActionFailure();
-
-    void setDefaultActionSuccess(@NotNull Consumer<Object> consumer);
-
-    void setDefaultActionFailure(@NotNull Consumer<? super Throwable> consumer);
 
     /* - - - */
 

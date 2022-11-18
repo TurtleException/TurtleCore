@@ -26,7 +26,6 @@ import java.lang.annotation.AnnotationFormatError;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -51,12 +50,6 @@ public class TurtleClientImpl implements TurtleClient {
     /** The internal network part of the client */
     private final NetworkAdapter networkAdapter;
     private final Provider provider;
-
-    // TODO: is this still relevant?
-    private @NotNull Consumer<Object>            defaultOnSuccess = o -> { };
-    private @NotNull Consumer<? super Throwable> defaultOnFailure = t -> {
-        // TODO
-    };
 
     private long defaultTimeoutInbound  = TimeUnit.SECONDS.toMillis( 8);
     private long defaultTimeoutOutbound = TimeUnit.SECONDS.toMillis(16);
@@ -211,28 +204,6 @@ public class TurtleClientImpl implements TurtleClient {
     @Override
     public @Nullable Ticket getTicketById(long id) {
         return ticketCache.get(id);
-    }
-
-    /* - - - */
-
-    @Override
-    public @NotNull Consumer<Object> getDefaultActionSuccess() {
-        return this.defaultOnSuccess;
-    }
-
-    @Override
-    public @NotNull Consumer<? super Throwable> getDefaultActionFailure() {
-        return this.defaultOnFailure;
-    }
-
-    @Override
-    public void setDefaultActionSuccess(@NotNull Consumer<Object> consumer) {
-        this.defaultOnSuccess = consumer;
-    }
-
-    @Override
-    public void setDefaultActionFailure(@NotNull Consumer<? super Throwable> consumer) {
-        this.defaultOnFailure = consumer;
     }
 
     /* - - - */
