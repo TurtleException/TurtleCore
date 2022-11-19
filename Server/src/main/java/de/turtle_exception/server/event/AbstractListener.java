@@ -1,4 +1,4 @@
-package de.turtle_exception.server.data;
+package de.turtle_exception.server.event;
 
 import de.turtle_exception.client.api.event.EventListener;
 import de.turtle_exception.client.internal.data.Data;

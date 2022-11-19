@@ -1,4 +1,4 @@
-package de.turtle_exception.server.data;
+package de.turtle_exception.server.event;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
