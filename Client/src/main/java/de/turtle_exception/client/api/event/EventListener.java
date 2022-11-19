@@ -3,8 +3,6 @@ package de.turtle_exception.client.api.event;
 import de.turtle_exception.client.api.event.entities.group.*;
 import de.turtle_exception.client.api.event.entities.ticket.*;
 import de.turtle_exception.client.api.event.entities.user.*;
-import de.turtle_exception.client.api.event.net.RequestEvent;
-import de.turtle_exception.client.api.event.net.ResponseEvent;
 import de.turtle_exception.client.internal.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 
@@ -45,10 +43,6 @@ public abstract class EventListener {
     public void onTicketTagRemove(@NotNull TicketTagRemoveEvent event) { }
     public void onTicketUserAdd(@NotNull TicketUserAddEvent event) { }
     public void onTicketUserRemove(@NotNull TicketUserRemoveEvent event) { }
-
-    // Network
-    public void onRequest(@NotNull RequestEvent event) { }
-    public void onResponse(@NotNull ResponseEvent event) { }
 
     /* - - - */
 

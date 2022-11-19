@@ -10,8 +10,6 @@ import de.turtle_exception.client.api.event.entities.group.GroupMemberJoinEvent;
 import de.turtle_exception.client.api.event.entities.group.GroupMemberLeaveEvent;
 import de.turtle_exception.client.api.event.entities.ticket.*;
 import de.turtle_exception.client.api.event.entities.user.*;
-import de.turtle_exception.client.api.event.ticket.*;
-import de.turtle_exception.client.api.event.user.*;
 import de.turtle_exception.client.internal.util.TurtleSet;
 import org.jetbrains.annotations.NotNull;
 
