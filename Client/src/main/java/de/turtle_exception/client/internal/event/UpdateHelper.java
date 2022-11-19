@@ -5,6 +5,7 @@ import de.turtle_exception.client.api.entities.Ticket;
 import de.turtle_exception.client.api.entities.Turtle;
 import de.turtle_exception.client.api.entities.User;
 import de.turtle_exception.client.api.event.group.GroupCreateEvent;
+import de.turtle_exception.client.api.event.group.GroupDeleteEvent;
 import de.turtle_exception.client.api.event.group.GroupMemberJoinEvent;
 import de.turtle_exception.client.api.event.group.GroupMemberLeaveEvent;
 import de.turtle_exception.client.api.event.ticket.*;
@@ -27,6 +28,15 @@ public class UpdateHelper {
             turtle.getClient().getEventManager().handleEvent(new TicketCreateEvent(ticket));
         if (turtle instanceof User user)
             turtle.getClient().getEventManager().handleEvent(new UserCreateEvent(user));
+    }
+
+    public static void ofDeleteTurtle(@NotNull Turtle turtle) {
+        if (turtle instanceof Group group)
+            turtle.getClient().getEventManager().handleEvent(new GroupDeleteEvent(group));
+        if (turtle instanceof Ticket ticket)
+            turtle.getClient().getEventManager().handleEvent(new TicketDeleteEvent(ticket));
+        if (turtle instanceof User user)
+            turtle.getClient().getEventManager().handleEvent(new UserDeleteEvent(user));
     }
 
     /* - GROUP - */

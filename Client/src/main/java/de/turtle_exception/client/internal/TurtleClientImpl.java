@@ -285,6 +285,11 @@ public class TurtleClientImpl implements TurtleClient {
         return turtle;
     }
 
+    public void removeTurtle(@NotNull Turtle turtle) {
+        this.removeCache(turtle.getClass(), turtle.getId());
+        UpdateHelper.ofDeleteTurtle(turtle);
+    }
+
     private void updateCache(@NotNull Turtle turtle) throws IllegalArgumentException {
         if (turtle instanceof GroupImpl group)
             groupCache.put(group);
