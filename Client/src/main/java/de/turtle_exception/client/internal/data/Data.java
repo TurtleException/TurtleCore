@@ -40,9 +40,11 @@ public record Data (
 
     public static @NotNull Data of(@NotNull JsonObject data) throws IllegalArgumentException {
         try {
-            DataMethod method  = DataMethod.of(data.get("method").getAsString());
-            Class<?>   type    = Class.forName(data.get("content-type").getAsString());
-            JsonObject content = ((JsonObject) data.get("content").deepCopy());
+            JsonElement c = data.get("content");
+
+            DataMethod  method  = DataMethod.of(data.get("method").getAsString());
+            Class<?>    type    = Class.forName(data.get("content-type").getAsString());
+            JsonElement content = c != null ? c.deepCopy() : JsonNull.INSTANCE;
 
             Checks.nonNull(method , "JSON field 'method'");
             Checks.nonNull(content, "JSON field 'content'");

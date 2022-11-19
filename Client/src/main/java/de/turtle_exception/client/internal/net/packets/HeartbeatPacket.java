@@ -59,9 +59,9 @@ public class HeartbeatPacket extends Packet {
     @Override
     public byte[] getBytes() {
         byte[] bytes = new byte[Long.BYTES * 3];
-        System.arraycopy(MathUtil.longToBytes(time1), 0, bytes, 0, Long.BYTES);
-        System.arraycopy(MathUtil.longToBytes(time2), 4, bytes, 0, Long.BYTES);
-        System.arraycopy(MathUtil.longToBytes(time3), 8, bytes, 0, Long.BYTES);
+        System.arraycopy(MathUtil.longToBytes(time1), 0, bytes,  0, 8);
+        System.arraycopy(MathUtil.longToBytes(time2), 0, bytes,  8, 8);
+        System.arraycopy(MathUtil.longToBytes(time3), 0, bytes, 16, 8);
         return bytes;
     }
 

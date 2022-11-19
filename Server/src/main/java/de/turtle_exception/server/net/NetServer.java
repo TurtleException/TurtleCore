@@ -300,7 +300,7 @@ public class NetServer extends NetworkAdapter {
             if (pass == null)
                 throw new LoginException("Unknown login or pass");
 
-            getLogger().log(Level.FINE, "Permitted check for login \"" + login + "\"");
+            getLogger().log(Level.INFO, "Permitted check for login \"" + login + "\"");
             return pass;
         } catch (IOException e) {
             getLogger().log(Level.WARNING, "Internal IO error for login request \"" + login + "\"", e);
@@ -308,6 +308,9 @@ public class NetServer extends NetworkAdapter {
         } catch (ClassCastException | IllegalStateException e) {
             getLogger().log(Level.FINE, "JSON error for login request \"" + login + "\"", e);
             return null;
+        } catch (LoginException e) {
+            // TODO: log
+            throw e;
         } catch (Throwable t) {
             getLogger().log(Level.WARNING, "Unknown internal error for login request \"" + login + "\"", t);
             throw new LoginException("Unknown internal error");

@@ -131,8 +131,10 @@ public class Connection {
         }
     }
 
-    private void receive(@NotNull String msg) {
+    private void receive(String msg) {
         final long deadline = System.currentTimeMillis() + adapter.getClient().getDefaultTimeoutInbound();
+
+        if (msg == null) return;
 
         try {
             this.receive(new CompiledPacket(msg.getBytes(StandardCharsets.ISO_8859_1), Direction.INBOUND, this, deadline));

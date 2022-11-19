@@ -78,9 +78,11 @@ class ServerHandshake extends Handshake {
             }
 
             clientLogin.set(login);
+            connection.setPass(pass);
 
             this.done();
             this.sendMsg(packet, "LOGIN OK");
+            return;
         }
 
         this.sendError(packet, "Unknown command", new NotImplementedError());
