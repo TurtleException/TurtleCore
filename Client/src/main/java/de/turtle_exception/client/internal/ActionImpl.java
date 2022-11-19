@@ -54,7 +54,7 @@ public abstract class ActionImpl<T> implements Action<T> {
     public <U extends Turtle> ProxyAction<T, U> andThenParse(@NotNull Class<U> type) {
         return this.andThen(t -> {
             if (t instanceof JsonObject json)
-                return getClient().getJsonBuilder().buildObject(type, json);
+                return ((TurtleClientImpl) getClient()).getJsonBuilder().buildObject(type, json);
             throw new ClassCastException("Expected return type JsonObject");
         });
     }
@@ -62,7 +62,7 @@ public abstract class ActionImpl<T> implements Action<T> {
     public <U extends Turtle> ProxyAction<T, List<U>> andThenParseList(@NotNull Class<U> type) {
         return this.andThen(t -> {
             if (t instanceof JsonArray json)
-                return getClient().getJsonBuilder().buildObjects(type, json);
+                return ((TurtleClientImpl) getClient()).getJsonBuilder().buildObjects(type, json);
             throw new ClassCastException("Expected return type JsonArray");
         });
     }

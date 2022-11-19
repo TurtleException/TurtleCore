@@ -170,7 +170,7 @@ public class NetServer extends NetworkAdapter {
             return;
         }
 
-        JsonObject content = getClient().getJsonBuilder().buildJson(turtle);
+        JsonObject content = getClientImpl().getJsonBuilder().buildJson(turtle);
         respond(packet, Data.buildUpdate(turtle.getClass(), content));
     }
 
