@@ -5,9 +5,7 @@ import de.turtle_exception.client.api.TurtleClientBuilder;
 import de.turtle_exception.client.internal.util.logging.NestedLogger;
 import de.turtle_exception.client.internal.util.logging.SimpleFormatter;
 import de.turtle_exception.server.data.DatabaseProvider;
-import de.turtle_exception.server.event.EntityGroupListener;
-import de.turtle_exception.server.event.EntityTicketListener;
-import de.turtle_exception.server.event.EntityUserListener;
+import de.turtle_exception.server.event.EntityUpdateListener;
 import de.turtle_exception.server.net.NetServer;
 import de.turtle_exception.server.util.LogUtil;
 import de.turtle_exception.server.util.Status;
@@ -59,11 +57,7 @@ public class TurtleServer {
                 .setNetworkAdapter(netServer)
                 .setProvider(new DatabaseProvider(new File(DIR, "data")))
                 .setLogger(new NestedLogger("TurtleClient", logger))
-                .addListeners(
-                        new EntityGroupListener(netServer),
-                        new EntityTicketListener(netServer),
-                        new EntityUserListener(netServer)
-                )
+                .addListeners(new EntityUpdateListener(netServer))
                 .build();
 
         /* RUNNING */

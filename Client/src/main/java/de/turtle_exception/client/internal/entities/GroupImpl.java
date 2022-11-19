@@ -5,7 +5,7 @@ import com.google.gson.JsonObject;
 import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.api.entities.Group;
 import de.turtle_exception.client.api.entities.User;
-import de.turtle_exception.client.api.event.group.GroupUpdateNameEvent;
+import de.turtle_exception.client.api.event.entities.group.GroupUpdateNameEvent;
 import de.turtle_exception.client.api.request.Action;
 import de.turtle_exception.client.internal.event.UpdateHelper;
 import de.turtle_exception.client.internal.util.TurtleSet;

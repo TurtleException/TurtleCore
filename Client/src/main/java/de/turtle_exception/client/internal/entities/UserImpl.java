@@ -4,7 +4,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.api.entities.User;
-import de.turtle_exception.client.api.event.user.UserUpdateNameEvent;
+import de.turtle_exception.client.api.event.entities.user.UserUpdateNameEvent;
 import de.turtle_exception.client.api.request.Action;
 import de.turtle_exception.client.internal.event.UpdateHelper;
 import org.jetbrains.annotations.NotNull;
