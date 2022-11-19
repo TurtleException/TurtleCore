@@ -5,6 +5,6 @@ import org.jetbrains.annotations.NotNull;
 
 public class TicketUpdateDiscordChannelEvent extends TicketUpdateEvent<Long> {
     public TicketUpdateDiscordChannelEvent(@NotNull Ticket ticket, long oldDiscordChannelId, long newDiscordChannelId) {
-        super(ticket, oldDiscordChannelId, newDiscordChannelId);
+        super(ticket, "discord_channel", oldDiscordChannelId, newDiscordChannelId);
     }
 }

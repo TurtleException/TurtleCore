@@ -7,14 +7,6 @@ import org.jetbrains.annotations.Nullable;
 @SuppressWarnings("unused")
 public class TicketUpdateTitleEvent extends TicketUpdateEvent<String> {
     public TicketUpdateTitleEvent(@NotNull Ticket ticket, @Nullable String oldName, @Nullable String newName) {
-        super(ticket, oldName, newName);
-    }
-
-    public @Nullable String getOldTitle() {
-        return super.getOldValue();
-    }
-
-    public @Nullable String getNewTitle() {
-        return super.getNewValue();
+        super(ticket, "title", oldName, newName);
     }
 }

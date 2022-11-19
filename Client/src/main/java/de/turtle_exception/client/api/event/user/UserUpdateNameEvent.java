@@ -6,6 +6,6 @@ import org.jetbrains.annotations.NotNull;
 @SuppressWarnings("unused")
 public class UserUpdateNameEvent extends UserUpdateEvent<String> {
     public UserUpdateNameEvent(@NotNull User user, @NotNull String oldName, @NotNull String newName) {
-        super(user, oldName, newName);
+        super(user, "name", oldName, newName);
     }
 }

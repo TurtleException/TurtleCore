@@ -59,7 +59,7 @@ public abstract class NetworkAdapter {
         return client;
     }
 
-    protected final @NotNull TurtleClientImpl getClientImpl() {
+    public final @NotNull TurtleClientImpl getClientImpl() {
         return client;
     }
 

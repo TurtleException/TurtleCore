@@ -6,6 +6,6 @@ import org.jetbrains.annotations.NotNull;
 
 public class TicketUpdateStateEvent extends TicketUpdateEvent<TicketState> {
     public TicketUpdateStateEvent(@NotNull Ticket ticket, @NotNull TicketState oldState, @NotNull TicketState newState) {
-        super(ticket, oldState, newState);
+        super(ticket, "state", oldState, newState);
     }
 }

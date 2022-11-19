@@ -311,4 +311,10 @@ public class NetServer extends NetworkAdapter {
             throw new LoginException("Unknown internal error");
         }
     }
+
+    /* - - - */
+
+    public @NotNull Set<Connection> getClients() {
+        return Set.copyOf(clients);
+    }
 }

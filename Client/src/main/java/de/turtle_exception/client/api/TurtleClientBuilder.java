@@ -1,5 +1,6 @@
 package de.turtle_exception.client.api;
 
+import de.turtle_exception.client.api.event.EventListener;
 import de.turtle_exception.client.internal.TurtleClientImpl;
 import de.turtle_exception.client.internal.Provider;
 import de.turtle_exception.client.internal.NetworkAdapter;
@@ -13,6 +14,8 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.security.auth.login.LoginException;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 
@@ -28,6 +31,8 @@ public class TurtleClientBuilder {
 
     private @Nullable NetworkAdapter networkAdapter;
     private @Nullable Provider provider;
+
+    private final ArrayList<EventListener> listeners = new ArrayList<>();
 
     private @Nullable Logger logger;
 
@@ -49,6 +54,9 @@ public class TurtleClientBuilder {
         Logger logger = this.logger != null ? this.logger : Logger.getLogger("CLIENT#" + name);
 
         TurtleClientImpl client = new TurtleClientImpl(name, logger, networkAdapter, provider);
+
+        for (EventListener listener : listeners)
+            client.getEventManager().register(listener);
 
         if (spigot != null)
             client.setSpigotServer(spigot);
@@ -74,6 +82,18 @@ public class TurtleClientBuilder {
 
     public TurtleClientBuilder setProvider(Provider provider) {
         this.provider = provider;
+        return this;
+    }
+
+    public TurtleClientBuilder addListeners(EventListener... listeners) {
+        if (listeners == null) return this;
+        this.listeners.addAll(Arrays.asList(listeners));
+        return this;
+    }
+
+    public TurtleClientBuilder removeListeners(EventListener... listeners) {
+        if (listeners == null) return this;
+        this.listeners.removeAll(Arrays.asList(listeners));
         return this;
     }
 

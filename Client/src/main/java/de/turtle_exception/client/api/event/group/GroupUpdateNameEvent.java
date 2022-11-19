@@ -5,6 +5,6 @@ import org.jetbrains.annotations.NotNull;
 
 public class GroupUpdateNameEvent extends GroupUpdateEvent<String> {
     public GroupUpdateNameEvent(@NotNull Group group, @NotNull String oldName, @NotNull String newName) {
-        super(group, oldName, newName);
+        super(group, "name", oldName, newName);
     }
 }
