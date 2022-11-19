@@ -1,45 +1,47 @@
 package de.turtle_exception.client.internal.entities;
 
-import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.api.entities.Group;
 import de.turtle_exception.client.api.entities.User;
+import de.turtle_exception.client.api.event.group.GroupUpdateNameEvent;
 import de.turtle_exception.client.api.request.Action;
+import de.turtle_exception.client.internal.event.UpdateHelper;
 import de.turtle_exception.client.internal.util.TurtleSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class GroupImpl implements Group {
-    private final TurtleClient client;
-    private final long id;
-
+public class GroupImpl extends TurtleImpl implements Group {
     private String name;
 
-    private final TurtleSet<User> users;
+    private TurtleSet<User> users;
 
-    GroupImpl(TurtleClient client, long id, String name, TurtleSet<User> users) {
-        this.client = client;
-        this.id = id;
+    GroupImpl(@NotNull TurtleClient client, long id, String name, TurtleSet<User> users) {
+        super(client, id);
         this.name = name;
 
         this.users = users;
     }
 
     @Override
-    public long getId() {
-        return this.id;
-    }
-
-    @Override
-    public @NotNull TurtleClient getClient() {
-        return this.client;
-    }
-
-    @Override
-    public @NotNull Action<Group> update() {
-        return getClient().getProvider().get(this.getClass(), getId()).andThenParse(Group.class);
+    public synchronized @NotNull GroupImpl handleUpdate(@NotNull JsonObject json) {
+        this.apply(json, "name", element -> {
+            String old = this.name;
+            this.name = element.getAsString();
+            this.fireEvent(new GroupUpdateNameEvent(this, old, this.name));
+        });
+        this.apply(json, "users", element -> {
+            TurtleSet<User> old = this.users;
+            TurtleSet<User> set = new TurtleSet<>();
+            for (JsonElement entry : element.getAsJsonArray())
+                set.add(client.getUserById(entry.getAsLong()));
+            this.users = set;
+            UpdateHelper.ofGroupMembers(this, old, set);
+        });
+        return this;
     }
 
     /* - NAME - */
@@ -47,10 +49,6 @@ public class GroupImpl implements Group {
     @Override
     public @NotNull String getName() {
         return this.name;
-    }
-
-    public void setName(@NotNull String name) {
-        this.name = name;
     }
 
     @Override
@@ -76,19 +74,11 @@ public class GroupImpl implements Group {
 
     @Override
     public @NotNull Action<Group> addUser(long user) {
-        JsonArray arr = new JsonArray();
-        for (User aUser : users)
-            arr.add(aUser.getId());
-        arr.add(user);
-        return getClient().getProvider().patch(this, "users", arr).andThenParse(Group.class);
+        return getClient().getProvider().patchEntryAdd(this, "users", user).andThenParse(Group.class);
     }
 
     @Override
     public @NotNull Action<Group> removeUser(long user) {
-        JsonArray arr = new JsonArray();
-        for (User aUser : users)
-            if (aUser.getId() != user)
-                arr.add(aUser.getId());
-        return getClient().getProvider().patch(this, "users", arr).andThenParse(Group.class);
+        return getClient().getProvider().patchEntryDel(this, "users", user).andThenParse(Group.class);
     }
 }

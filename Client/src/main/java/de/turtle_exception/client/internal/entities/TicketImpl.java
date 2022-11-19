@@ -1,12 +1,18 @@
 package de.turtle_exception.client.internal.entities;
 
 import com.google.common.collect.Sets;
-import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import de.turtle_exception.client.api.TicketState;
 import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.api.entities.Ticket;
 import de.turtle_exception.client.api.entities.User;
+import de.turtle_exception.client.api.event.ticket.TicketUpdateCategoryEvent;
+import de.turtle_exception.client.api.event.ticket.TicketUpdateDiscordChannelEvent;
+import de.turtle_exception.client.api.event.ticket.TicketUpdateStateEvent;
+import de.turtle_exception.client.api.event.ticket.TicketUpdateTitleEvent;
 import de.turtle_exception.client.api.request.Action;
+import de.turtle_exception.client.internal.event.UpdateHelper;
 import de.turtle_exception.client.internal.util.TurtleSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -15,21 +21,17 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-public class TicketImpl implements Ticket {
-    private final TurtleClient client;
-    private final long id;
-
+public class TicketImpl extends TurtleImpl implements Ticket {
     private TicketState state;
     private String title;
     private String category;
     private long discordChannel;
 
-    private final Set<String> tags = Sets.newConcurrentHashSet();
-    private final TurtleSet<User> users;
+    private Set<String> tags = Sets.newConcurrentHashSet();
+    private TurtleSet<User> users;
 
-    TicketImpl(TurtleClient client, long id, TicketState state, String title, String category, long discordChannel, Collection<String> tags, TurtleSet<User> users) {
-        this.client = client;
-        this.id = id;
+    TicketImpl(@NotNull TurtleClient client, long id, TicketState state, String title, String category, long discordChannel, Collection<String> tags, TurtleSet<User> users) {
+        super(client, id);
 
         this.state = state;
         this.title = title;
@@ -41,18 +43,44 @@ public class TicketImpl implements Ticket {
     }
 
     @Override
-    public long getId() {
-        return this.id;
-    }
-
-    @Override
-    public @NotNull TurtleClient getClient() {
-        return this.client;
-    }
-
-    @Override
-    public @NotNull Action<Ticket> update() {
-        return getClient().getProvider().get(this.getClass(), getId()).andThenParse(Ticket.class);
+    public synchronized @NotNull TicketImpl handleUpdate(@NotNull JsonObject json) {
+        this.apply(json, "state", element -> {
+            TicketState old = this.state;
+            this.state = TicketState.of(element.getAsByte());
+            this.fireEvent(new TicketUpdateStateEvent(this, old, this.state));
+        });
+        this.apply(json, "title", element -> {
+            String old = this.title;
+            this.title = element.getAsString();
+            this.fireEvent(new TicketUpdateTitleEvent(this, old, this.title));
+        });
+        this.apply(json, "category", element -> {
+            String old = this.category;
+            this.category = element.getAsString();
+            this.fireEvent(new TicketUpdateCategoryEvent(this, old, this.category));
+        });
+        this.apply(json, "discord_channel", element -> {
+            long old = this.discordChannel;
+            this.discordChannel = element.getAsLong();
+            this.fireEvent(new TicketUpdateDiscordChannelEvent(this, old, this.discordChannel));
+        });
+        this.apply(json, "tags", element -> {
+            Set<String> old = this.tags;
+            Set<String> set = Sets.newConcurrentHashSet();
+            for (JsonElement entry : element.getAsJsonArray())
+                set.add(entry.getAsString());
+            this.tags = set;
+            UpdateHelper.ofTicketTags(this, old, set);
+        });
+        this.apply(json, "users", element -> {
+            TurtleSet<User> old = this.users;
+            TurtleSet<User> set = new TurtleSet<>();
+            for (JsonElement entry : element.getAsJsonArray())
+                set.add(client.getUserById(entry.getAsLong()));
+            this.users = set;
+            UpdateHelper.ofTicketUsers(this, old, set);
+        });
+        return this;
     }
 
     /* - STATE - */
@@ -100,20 +128,12 @@ public class TicketImpl implements Ticket {
 
     @Override
     public @NotNull Action<Ticket> addTag(@NotNull String tag) {
-        JsonArray arr = new JsonArray();
-        for (String aTag : tags)
-            arr.add(aTag);
-        arr.add(tag);
-        return getClient().getProvider().patch(this, "tags", arr).andThenParse(Ticket.class);
+        return getClient().getProvider().patchEntryAdd(this, "tags", tag).andThenParse(Ticket.class);
     }
 
     @Override
     public @NotNull Action<Ticket> removeTag(@NotNull String tag) {
-        JsonArray arr = new JsonArray();
-        for (String aTag : tags)
-            if (!aTag.equals(tag))
-                arr.add(aTag);
-        return getClient().getProvider().patch(this, "tags", arr).andThenParse(Ticket.class);
+        return getClient().getProvider().patchEntryDel(this, "tags", tag).andThenParse(Ticket.class);
     }
 
     /* - DISCORD - */
@@ -146,19 +166,11 @@ public class TicketImpl implements Ticket {
 
     @Override
     public @NotNull Action<Ticket> addUser(long user) {
-        JsonArray arr = new JsonArray();
-        for (User aUser : users)
-            arr.add(aUser.getId());
-        arr.add(user);
-        return getClient().getProvider().patch(this, "users", arr).andThenParse(Ticket.class);
+        return getClient().getProvider().patchEntryAdd(this, "users", user).andThenParse(Ticket.class);
     }
 
     @Override
     public @NotNull Action<Ticket> removeUser(long user) {
-        JsonArray arr = new JsonArray();
-        for (User aUser : users)
-            if (aUser.getId() != user)
-                arr.add(aUser.getId());
-        return getClient().getProvider().patch(this, "users", arr).andThenParse(Ticket.class);
+        return getClient().getProvider().patchEntryDel(this, "users", user).andThenParse(Ticket.class);
     }
 }

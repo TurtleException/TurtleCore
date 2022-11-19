@@ -16,7 +16,9 @@ import java.util.List;
 @Resource(path = "tickets", builder = "buildTicket")
 public interface Ticket extends Turtle, IUserContainer {
     @Override
-    @NotNull Action<Ticket> update();
+    default @NotNull Action<Ticket> update() {
+        return this.getClient().retrieveTicket(this.getId());
+    }
 
     /* - STATE - */
 

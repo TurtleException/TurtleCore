@@ -17,7 +17,9 @@ import java.util.UUID;
 @SuppressWarnings("unused")
 public interface User extends Turtle {
     @Override
-    @NotNull Action<User> update();
+    default @NotNull Action<User> update() {
+        return this.getClient().retrieveUser(this.getId());
+    }
 
     /* - NAME - */
 

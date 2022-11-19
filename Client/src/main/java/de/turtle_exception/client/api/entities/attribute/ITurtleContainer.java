@@ -10,4 +10,9 @@ public interface ITurtleContainer {
     @NotNull List<Turtle> getTurtles();
 
     @Nullable Turtle getTurtleById(long id);
+
+    default <T extends Turtle> @Nullable T getTurtleById(long id, @NotNull Class<T> type) {
+        Turtle turtle = this.getTurtleById(id);
+        return type.isInstance(turtle) ? type.cast(turtle) : null;
+    }
 }

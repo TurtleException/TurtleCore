@@ -1,27 +1,26 @@
 package de.turtle_exception.client.internal.entities;
 
-import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.api.entities.User;
+import de.turtle_exception.client.api.event.user.UserUpdateNameEvent;
 import de.turtle_exception.client.api.request.Action;
+import de.turtle_exception.client.internal.event.UpdateHelper;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class UserImpl implements User {
-    private final TurtleClient client;
-    private final long id;
-
+public class UserImpl extends TurtleImpl implements User {
     private String name;
 
-    private final ArrayList<Long> discord;
-    private final ArrayList<UUID> minecraft;
+    private ArrayList<Long> discord;
+    private ArrayList<UUID> minecraft;
 
-    UserImpl(TurtleClient client, long id, String name, ArrayList<Long> discord, ArrayList<UUID> minecraft) {
-        this.client = client;
-        this.id = id;
+    UserImpl(@NotNull TurtleClient client, long id, String name, ArrayList<Long> discord, ArrayList<UUID> minecraft) {
+        super(client, id);
         this.name = name;
 
         this.discord   = discord;
@@ -29,18 +28,29 @@ public class UserImpl implements User {
     }
 
     @Override
-    public long getId() {
-        return this.id;
-    }
-
-    @Override
-    public @NotNull TurtleClient getClient() {
-        return this.client;
-    }
-
-    @Override
-    public @NotNull Action<User> update() {
-        return getClient().getProvider().get(this.getClass(), getId()).andThenParse(User.class);
+    public synchronized @NotNull UserImpl handleUpdate(@NotNull JsonObject json) {
+        this.apply(json, "name", element -> {
+            String old = this.name;
+            this.name = element.getAsString();
+            this.fireEvent(new UserUpdateNameEvent(this, old, this.name));
+        });
+        this.apply(json, "discord", element -> {
+            ArrayList<Long> old = this.discord;
+            ArrayList<Long> list = new ArrayList<>();
+            for (JsonElement entry : element.getAsJsonArray())
+                list.add(entry.getAsLong());
+            this.discord = list;
+            UpdateHelper.ofUserDiscord(this, old, list);
+        });
+        this.apply(json, "minecraft", element -> {
+            ArrayList<UUID> old = this.minecraft;
+            ArrayList<UUID> list = new ArrayList<>();
+            for (JsonElement entry : element.getAsJsonArray())
+                list.add(UUID.fromString(entry.getAsString()));
+            this.minecraft = list;
+            UpdateHelper.ofUserMinecraft(this, old, list);
+        });
+        return this;
     }
 
     /* - NAME - */
@@ -48,11 +58,6 @@ public class UserImpl implements User {
     @Override
     public @NotNull String getName() {
         return this.name;
-    }
-
-    // TODO: use this (route finalizer)
-    public void setName(@NotNull String name) {
-        this.name = name;
     }
 
     @Override
@@ -69,20 +74,12 @@ public class UserImpl implements User {
 
     @Override
     public @NotNull Action<User> addDiscordId(long discordId) {
-        JsonArray arr = new JsonArray();
-        for (Long aDiscordId : discord)
-            arr.add(aDiscordId);
-        arr.add(discordId);
-        return getClient().getProvider().patch(this, "discord", arr).andThenParse(User.class);
+        return getClient().getProvider().patchEntryAdd(this, "discord", discordId).andThenParse(User.class);
     }
 
     @Override
     public @NotNull Action<User> removeDiscordId(long discordId) {
-        JsonArray arr = new JsonArray();
-        for (Long aDiscordId : discord)
-            if (!aDiscordId.equals(discordId))
-                arr.add(aDiscordId);
-        return getClient().getProvider().patch(this, "discord", arr).andThenParse(User.class);
+        return getClient().getProvider().patchEntryDel(this, "discord", discordId).andThenParse(User.class);
     }
 
     /* - MINECRAFT - */
@@ -94,19 +91,11 @@ public class UserImpl implements User {
 
     @Override
     public @NotNull Action<User> addMinecraftId(@NotNull UUID minecraftId) {
-        JsonArray arr = new JsonArray();
-        for (UUID aMinecraftId : minecraft)
-            arr.add(String.valueOf(aMinecraftId));
-        arr.add(String.valueOf(minecraftId));
-        return getClient().getProvider().patch(this, "minecraft", arr).andThenParse(User.class);
+        return getClient().getProvider().patchEntryAdd(this, "minecraft", minecraftId.toString()).andThenParse(User.class);
     }
 
     @Override
     public @NotNull Action<User> removeMinecraftId(@NotNull UUID minecraftId) {
-        JsonArray arr = new JsonArray();
-        for (UUID aMinecraftId : minecraft)
-            if (!aMinecraftId.equals(minecraftId))
-                arr.add(String.valueOf(aMinecraftId));
-        return getClient().getProvider().patch(this, "minecraft", arr).andThenParse(User.class);
+        return getClient().getProvider().patchEntryDel(this, "minecraft", minecraftId.toString()).andThenParse(User.class);
     }
 }

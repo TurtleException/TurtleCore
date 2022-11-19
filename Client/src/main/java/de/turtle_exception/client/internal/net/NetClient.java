@@ -47,7 +47,7 @@ public class NetClient extends NetworkAdapter {
     @Override
     public void handleDataRequest(@NotNull DataPacket packet) {
         switch (packet.getData().method()) {
-            case DELETE, GET, PUT, PATCH -> throw new UnsupportedOperationException();
+            case DELETE, GET, PUT, PATCH, PATCH_ENTRY_ADD, PATCH_ENTRY_DEL -> throw new UnsupportedOperationException();
             case UPDATE -> this.handleUpdate(packet);
             case REMOVE -> this.handleRemove(packet);
             default -> throw new AssertionError();
@@ -57,10 +57,10 @@ public class NetClient extends NetworkAdapter {
     private void handleUpdate(@NotNull DataPacket packet) {
         JsonElement json = packet.getData().content();
         if (json instanceof JsonObject jsonObj)
-            getClientImpl().updateCache(packet.getData().type(), jsonObj);
+            getClientImpl().updateTurtle(packet.getData().type(), jsonObj);
         if (json instanceof JsonArray jsonArr)
             for (JsonElement element : jsonArr)
-                getClientImpl().updateCache(packet.getData().type(), (JsonObject) element);
+                getClientImpl().updateTurtle(packet.getData().type(), (JsonObject) element);
     }
 
     private void handleRemove(@NotNull DataPacket packet) {

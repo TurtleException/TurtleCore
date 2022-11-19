@@ -2,6 +2,7 @@ package de.turtle_exception.server.data;
 
 import com.google.gson.*;
 import de.turtle_exception.client.api.entities.Turtle;
+import de.turtle_exception.client.internal.ActionImpl;
 import de.turtle_exception.client.internal.Provider;
 import de.turtle_exception.client.internal.data.DataUtil;
 import de.turtle_exception.client.internal.data.annotations.Resource;
@@ -56,6 +57,18 @@ public class DatabaseProvider extends Provider {
     public <T extends Turtle> @NotNull SimpleAction<JsonObject> patch(@NotNull Class<T> type, @NotNull JsonObject content, long id) throws AnnotationFormatError {
         this.logger.log(Level.FINER, "PATCH request for id " + id);
         return new SimpleAction<>(this, () -> this.doPatch(type, content, id));
+    }
+
+    @Override
+    public @NotNull <T extends Turtle> ActionImpl<JsonObject> patchEntryAdd(@NotNull Class<T> type, long id, @NotNull String key, @NotNull Object obj) {
+        this.logger.log(Level.FINER, "PATCH_ENTRY_ADD request for id " + id);
+        return new SimpleAction<>(this, () -> this.doPatchEntry(type, id, key, obj, true));
+    }
+
+    @Override
+    public @NotNull <T extends Turtle> ActionImpl<JsonObject> patchEntryDel(@NotNull Class<T> type, long id, @NotNull String key, @NotNull Object obj) {
+        this.logger.log(Level.FINER, "PATCH_ENTRY_DEL request for id " + id);
+        return new SimpleAction<>(this, () -> this.doPatchEntry(type, id, key, obj, false));
     }
 
     /* - - - */
@@ -149,6 +162,24 @@ public class DatabaseProvider extends Provider {
         } catch (FileNotFoundException e) {
             throw new AssertionError("File should exist and not be a directory.");
         }
+    }
+
+    private @NotNull JsonObject doPatchEntry(@NotNull Class<? extends Turtle> type, long id, @NotNull String key, @NotNull Object obj, boolean add) {
+        JsonObject json = this.doGet(type, id);
+
+        if (json == null)
+            throw new NullPointerException("Entry does not exist!");
+
+        JsonObject patch = new JsonObject();
+        JsonArray  arr   = json.get(key).getAsJsonArray();
+
+        if (add)
+            DataUtil.addValue(arr, obj);
+        else
+            DataUtil.removeValue(arr, obj);
+
+        patch.add(key, arr);
+        return this.doPatch(type, patch, id);
     }
 
     /* - - - */

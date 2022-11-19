@@ -9,6 +9,11 @@ import de.turtle_exception.client.api.entities.User;
 import de.turtle_exception.client.api.event.EventManager;
 import de.turtle_exception.client.api.request.Action;
 import de.turtle_exception.client.internal.data.JsonBuilder;
+import de.turtle_exception.client.internal.entities.GroupImpl;
+import de.turtle_exception.client.internal.entities.TicketImpl;
+import de.turtle_exception.client.internal.entities.TurtleImpl;
+import de.turtle_exception.client.internal.entities.UserImpl;
+import de.turtle_exception.client.internal.event.UpdateHelper;
 import de.turtle_exception.client.internal.net.NetClient;
 import de.turtle_exception.client.internal.net.NetworkProvider;
 import de.turtle_exception.client.internal.util.TurtleSet;
@@ -22,7 +27,6 @@ import org.jetbrains.annotations.Range;
 
 import javax.security.auth.login.LoginException;
 import java.io.IOException;
-import java.lang.annotation.AnnotationFormatError;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -255,24 +259,41 @@ public class TurtleClientImpl implements TurtleClient {
         });
     }
 
-    public <T extends Turtle> @NotNull T updateCache(@NotNull Class<T> type, @NotNull JsonObject contentJson) throws IllegalArgumentException {
-        T obj;
-        try {
-            obj = jsonBuilder.buildObject(type, contentJson);
-        } catch (IllegalArgumentException | AnnotationFormatError e) {
-            throw new IllegalArgumentException("Failed to build object", e);
+    /* - - - */
+
+    public <T extends Turtle> Turtle updateTurtle(@NotNull Class<T> type, @NotNull JsonObject content) {
+        long id = content.get("id").getAsLong();
+        T turtle = this.getTurtleById(id, type);
+
+        if (turtle == null) {
+            // create new object
+            turtle = this.getJsonBuilder().buildObject(type, content);
+            UpdateHelper.ofCreateTurtle(turtle);
+        } else {
+            // update object
+            if (!(turtle instanceof TurtleImpl turtleImpl))
+                throw new AssertionError("Turtle implementation must extend TurtleImpl");
+
+            try {
+                turtle = type.cast(turtleImpl.handleUpdate(content));
+            } catch (Exception e) {
+                throw new AssertionError("Turtle implementation error", e);
+            }
         }
 
-        if (obj instanceof Group group)
+        this.updateCache(turtle);
+        return turtle;
+    }
+
+    private void updateCache(@NotNull Turtle turtle) throws IllegalArgumentException {
+        if (turtle instanceof GroupImpl group)
             groupCache.put(group);
-        if (obj instanceof Ticket ticket)
+        if (turtle instanceof TicketImpl ticket)
             ticketCache.put(ticket);
-        if (obj instanceof User user)
+        if (turtle instanceof UserImpl user)
             userCache.put(user);
 
-        this.logger.log(Level.FINER, "Updated cache for turtle " + obj.getId() + ".");
-
-        return obj;
+        this.logger.log(Level.FINER, "Updated cache for turtle " + turtle.getId() + ".");
     }
 
     public void removeCache(@NotNull Class<? extends Turtle> type, long id) throws IllegalArgumentException, ClassCastException {

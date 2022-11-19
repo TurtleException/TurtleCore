@@ -39,6 +39,10 @@ public class TurtleSet<T extends Turtle> implements Set<T> {
         return false;
     }
 
+    public boolean containsId(long id) {
+        return content.get(id) != null;
+    }
+
     @Override
     public @NotNull Iterator<T> iterator() {
         return content.values().iterator();

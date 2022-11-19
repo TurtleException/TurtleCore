@@ -54,11 +54,11 @@ public record Data (
     }
 
     public static @NotNull Data buildDelete(@NotNull Class<? extends Turtle> type, long id) {
-        return ofIdentifierMethod(DataMethod.DELETE, type, id);
+        return new Data(DataMethod.DELETE, type, buildJson("id", id));
     }
 
     public static @NotNull Data buildGet(@NotNull Class<? extends Turtle> type, long id) {
-        return ofIdentifierMethod(DataMethod.GET, type, id);
+        return new Data(DataMethod.GET, type, buildJson("id", id));
     }
 
     public static @NotNull Data buildGet(@NotNull Class<? extends Turtle> type) {
@@ -73,18 +73,29 @@ public record Data (
         return new Data(DataMethod.PATCH, type, content);
     }
 
+    public static @NotNull Data buildPatchEntryAdd(@NotNull Class<? extends Turtle> type, long id, @NotNull String key, @NotNull Object obj) {
+        return new Data(DataMethod.PATCH_ENTRY_ADD, type, buildJson("id", id, "key", key, "val", obj));
+    }
+
+    public static @NotNull Data buildPatchEntryDel(@NotNull Class<? extends Turtle> type, long id, @NotNull String key, @NotNull Object obj) {
+        return new Data(DataMethod.PATCH_ENTRY_DEL, type, buildJson("id", id, "key", key, "val", obj));
+    }
+
     public static @NotNull Data buildUpdate(@NotNull Class<? extends Turtle> type, @NotNull JsonElement content) {
         return new Data(DataMethod.UPDATE, type, content);
     }
 
     public static @NotNull Data buildRemove(@NotNull Class<? extends Turtle> type, long id) {
-        return ofIdentifierMethod(DataMethod.REMOVE, type, id);
+        return new Data(DataMethod.REMOVE, type, buildJson("id", id));
     }
 
-    private static @NotNull Data ofIdentifierMethod(@NotNull DataMethod method, @NotNull Class<? extends Turtle> type, long id) {
-        JsonObject content = new JsonObject();
-        content.addProperty("id", id);
+    private static @NotNull JsonObject buildJson(@NotNull Object... args) throws IllegalArgumentException {
+        if (args.length % 2 == 1)
+            throw new IllegalArgumentException("Must provide an even amount of arguments");
 
-        return new Data(method, type, content);
+        JsonObject json = new JsonObject();
+        for (int i = 0; i < args.length; i = i + 2)
+            DataUtil.addValue(json, String.valueOf(args[i]), args[i + 1]);
+        return json;
     }
 }
