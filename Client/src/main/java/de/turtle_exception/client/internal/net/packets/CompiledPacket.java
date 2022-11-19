@@ -16,9 +16,10 @@ import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 
 public final class CompiledPacket {
-    public static final int META_BYTES = 9;
+    public static final int META_BYTES = 17;
 
     private final byte[] bytes;
+    private final byte[] content;
 
     /* - META INFO - */
     private final long turtle;
@@ -43,6 +44,9 @@ public final class CompiledPacket {
         this.turtle       = MathUtil.bytesToLong(bytes, 0);
         this.responseCode = MathUtil.bytesToLong(bytes, Long.BYTES);
         this.type         = bytes[Long.BYTES * 2];
+
+        this.content = new byte[bytes.length - META_BYTES];
+        System.arraycopy(bytes, META_BYTES, content, 0, content.length);
     }
 
     public CompiledPacket(final byte[] content, @NotNull Direction direction, @NotNull Connection connection, final long deadline, final long id, final long responseCode, final byte type) {
@@ -61,12 +65,12 @@ public final class CompiledPacket {
     /* - - - */
 
     public @NotNull Packet toPacket() throws IllegalStateException {
-        return this.doToPacket(this.bytes);
+        return this.doToPacket(this.content);
     }
 
     public @NotNull Packet toPacket(@NotNull String pass)
             throws IllegalStateException, InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, InvalidKeySpecException, BadPaddingException, InvalidKeyException {
-        byte[] decrypted = Encryption.decrypt(this.bytes, pass);
+        byte[] decrypted = Encryption.decrypt(this.content, pass);
         return this.doToPacket(decrypted);
     }
 
@@ -90,6 +94,11 @@ public final class CompiledPacket {
 
     public byte[] getBytes() {
         return bytes;
+    }
+
+    /** Returns the bytes of this message without meta information */
+    public byte[] getContent() {
+        return content;
     }
 
     public long getId() {

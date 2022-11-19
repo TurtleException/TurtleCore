@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -67,7 +68,7 @@ public class TurtleClientImpl implements TurtleClient {
     private Server spigotServer = null;
     private JDA    jda          = null;
 
-    public TurtleClientImpl(@Nullable String name, @NotNull Logger logger, @NotNull NetworkAdapter networkAdapter, @NotNull Provider provider) throws IOException, LoginException {
+    public TurtleClientImpl(@Nullable String name, @NotNull Logger logger, @NotNull NetworkAdapter networkAdapter, @NotNull Provider provider) throws IOException, LoginException, TimeoutException {
         this.name = name;
         this.logger = logger;
         this.logger.log(Level.INFO, "Hello there  (Starting...)");

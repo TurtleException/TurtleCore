@@ -23,7 +23,10 @@ public class DatabaseProvider extends Provider {
         super(1);
         this.dir = dir;
         this.dir.mkdirs();
+    }
 
+    @Override
+    protected void onInit() {
         this.logger.log(Level.INFO, "Assigned directory: " + dir.getPath());
     }
 

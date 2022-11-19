@@ -31,6 +31,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 
 public class NetServer extends NetworkAdapter {
@@ -59,18 +60,19 @@ public class NetServer extends NetworkAdapter {
         this.socket = new ServerSocket(port);
 
         getLogger().log(Level.FINE, "Starting heartbeat-worker.");
-        this.heartbeats = new Worker(() -> status == Status.CONNECTED, () -> {
-            getLogger().log(Level.FINEST, "Dispatching heartbeats for " + clients.size() + " clients.");
+        this.heartbeats = new Worker(() -> status == Status.INIT || status == Status.CONNECTED, () -> {
+            getLogger().log(Level.FINEST, "Dispatching heartbeats for " + clients.size() + " client(s).");
             this.clients.forEach(connection -> {
                 connection.send(
-                        new HeartbeatPacket(server.getClient().getDefaultTimeoutOutbound(), connection).compile()
+                        new HeartbeatPacket(server.getClient().getDefaultTimeoutOutbound(), connection), false
                 );
             });
         }, 10, TimeUnit.SECONDS);
 
         getLogger().log(Level.FINE, "Starting listener.");
-        this.listener = new Worker(() -> status == Status.CONNECTED, () -> {
+        this.listener = new Worker(() -> status == Status.INIT || status == Status.CONNECTED, () -> {
             try {
+                getLogger().log(Level.FINE, "Listening for new connection...");
                 Socket client = socket.accept();
                 getLogger().log(Level.FINE, "New socket connection: " + socket.getInetAddress().toString());
 
@@ -80,7 +82,7 @@ public class NetServer extends NetworkAdapter {
 
                     this.clients.add(connection);
                     getLogger().log(Level.FINE, "Client added.");
-                } catch (IOException | LoginException e) {
+                } catch (IOException | LoginException | TimeoutException e) {
                     getLogger().log(Level.WARNING, "Handshake failed.", e);
                 }
             } catch (IOException e) {

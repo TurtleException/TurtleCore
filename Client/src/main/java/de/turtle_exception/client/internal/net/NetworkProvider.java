@@ -22,7 +22,6 @@ public class NetworkProvider extends Provider {
 
     public void setConnection(@NotNull Connection connection) {
         this.connection = connection;
-        this.logger.log(Level.FINE, "Connection set!");
     }
 
     @Override

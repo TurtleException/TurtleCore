@@ -10,7 +10,7 @@ import de.turtle_exception.client.internal.util.version.Version;
  */
 public class Main {
     static {
-        System.out.println("Starting TurtleServer");
+        System.out.print("Starting TurtleServer");
     }
 
     public static TurtleServer singleton;

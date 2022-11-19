@@ -30,7 +30,7 @@ class ServerHandshake extends Handshake {
                         server.getClient().getDefaultTimeoutOutbound(),
                         connection,
                         "VERSION"
-                ).compile()
+                ), false
         );
     }
 

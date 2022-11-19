@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.security.auth.login.LoginException;
 import java.io.IOException;
+import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 
 public abstract class NetworkAdapter {
@@ -19,7 +20,7 @@ public abstract class NetworkAdapter {
 
     protected NetworkAdapter() { }
 
-    public final void start() throws IllegalStateException, NullPointerException, IOException, LoginException {
+    public final void start() throws IllegalStateException, NullPointerException, IOException, LoginException, TimeoutException {
         if (status != Status.PRE_INIT)
             throw new IllegalStateException("The NetworkAdapter is already running.");
         Checks.nonNull(this.client, "Client");
@@ -38,7 +39,7 @@ public abstract class NetworkAdapter {
     }
 
     /** Called after the NetworkAdapter has been started. */
-    public void onStart() throws IOException, LoginException { }
+    public void onStart() throws IOException, LoginException, TimeoutException { }
 
     /** Called when the NetworkAdapter shuts down. */
     public void onShutdown() throws IOException { }

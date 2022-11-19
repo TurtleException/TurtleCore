@@ -1,9 +1,9 @@
 package de.turtle_exception.client.api;
 
 import de.turtle_exception.client.api.event.EventListener;
-import de.turtle_exception.client.internal.TurtleClientImpl;
-import de.turtle_exception.client.internal.Provider;
 import de.turtle_exception.client.internal.NetworkAdapter;
+import de.turtle_exception.client.internal.Provider;
+import de.turtle_exception.client.internal.TurtleClientImpl;
 import de.turtle_exception.client.internal.net.NetClient;
 import de.turtle_exception.client.internal.net.NetworkProvider;
 import de.turtle_exception.client.internal.util.Checks;
@@ -16,6 +16,7 @@ import javax.security.auth.login.LoginException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 
@@ -42,7 +43,7 @@ public class TurtleClientBuilder {
 
     public TurtleClientBuilder() { }
 
-    public @NotNull TurtleClient build() throws IllegalArgumentException, IOException, LoginException {
+    public @NotNull TurtleClient build() throws IllegalArgumentException, IOException, LoginException, TimeoutException {
         try {
             Checks.nonNull(networkAdapter, "NetworkAdapter" );
             Checks.nonNull(provider, "Provider");

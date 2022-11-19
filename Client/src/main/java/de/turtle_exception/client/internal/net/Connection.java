@@ -17,7 +17,11 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.net.SocketException;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 
 public class Connection {
@@ -38,7 +42,7 @@ public class Connection {
 
     private final RequestCallbackPool requestCallbacks;
 
-    public Connection(@NotNull NetworkAdapter adapter, @NotNull Socket socket, @NotNull Handshake handshake, String pass) throws IOException, LoginException {
+    public Connection(@NotNull NetworkAdapter adapter, @NotNull Socket socket, @NotNull Handshake handshake, String pass) throws IOException, LoginException, TimeoutException {
         this.status = Status.INIT;
 
         this.adapter = adapter;
@@ -50,6 +54,8 @@ public class Connection {
         this.out = new PrintWriter(socket.getOutputStream(), true);
         this.in  = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
+        this.pass = pass;
+
         this.logger.log(Level.INFO, "Initiating Handshake. (" + handshake.getClass().getSimpleName() + ")");
 
         this.status = Status.LOGIN;
@@ -57,16 +63,19 @@ public class Connection {
         this.handshake.setConnection(this);
         this.handshake.init();
 
-        this.pass = pass;
-
         this.logger.log(Level.FINE, "Starting Receiver.");
         this.receiver = new Worker(() -> status != Status.DISCONNECTED, () -> {
             try {
                 this.receive(in.readLine());
+            } catch (SocketException e) {
+                logger.log(Level.WARNING, "Unexpected SocketException", e);
+                this.stop(true);
             } catch (IOException e) {
                 logger.log(Level.WARNING, "Could not read input", e);
             }
         });
+
+        this.handshake.await(10, TimeUnit.SECONDS);
     }
 
     public boolean stop(boolean notify) {
@@ -111,10 +120,10 @@ public class Connection {
         }
     }
 
-    public synchronized void send(@NotNull CompiledPacket packet) {
+    private synchronized void send(@NotNull CompiledPacket packet) {
         try {
             // this can't be the most efficient way to do this, right? right...?
-            this.out.println(new String(packet.getBytes()));
+            this.out.println(new String(packet.getBytes(), StandardCharsets.ISO_8859_1));
         } catch (Error e) {
             logger.log(Level.SEVERE, "Encountered an Error when attempting to send a packet", e);
         } catch (Throwable t) {
@@ -126,7 +135,7 @@ public class Connection {
         final long deadline = System.currentTimeMillis() + adapter.getClient().getDefaultTimeoutInbound();
 
         try {
-            this.receive(new CompiledPacket(msg.getBytes(), Direction.INBOUND, this, deadline));
+            this.receive(new CompiledPacket(msg.getBytes(StandardCharsets.ISO_8859_1), Direction.INBOUND, this, deadline));
         } catch (Error e) {
             logger.log(Level.SEVERE, "Encountered an Error when attempting to receive a packet", e);
         } catch (Throwable t) {

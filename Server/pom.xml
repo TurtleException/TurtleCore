@@ -70,7 +70,7 @@
                 <directory>src/main/resources</directory>
                 <filtering>true</filtering>
                 <includes>
-                    <include>version.properties</include>
+                    <include>server.properties</include>
                 </includes>
             </resource>
         </resources>

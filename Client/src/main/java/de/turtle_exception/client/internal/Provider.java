@@ -29,11 +29,15 @@ public abstract class Provider {
     private final Worker[] workers;
 
     protected Provider(@Range(from = 1, to = Integer.MAX_VALUE) int workerSize) {
-        this.logger.log(Level.INFO, "Allocating " + workerSize + " Workers.");
-
         this.workers = new Worker[workerSize];
+    }
 
-        for (int i = 0; i < workerSize; i++) {
+    private void init() {
+        this.onInit();
+
+        this.logger.log(Level.INFO, "Allocating " + workers.length + " Worker(s).");
+
+        for (int i = 0; i < workers.length; i++) {
             workers[i] = new Worker(() -> status != Status.STOPPED, () -> {
                 Runnable task = priorityCallbacks.poll();
 
@@ -47,6 +51,8 @@ public abstract class Provider {
 
         this.status = Status.RUNNING;
     }
+
+    protected void onInit() { }
 
     /* - - - */
 
@@ -87,6 +93,8 @@ public abstract class Provider {
     final void setClient(@NotNull TurtleClientImpl client) {
         this.client = client;
         this.logger = new NestedLogger("Provider", client.getLogger());
+
+        this.init();
     }
 
     public @NotNull TurtleClient getClient() {

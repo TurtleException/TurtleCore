@@ -11,6 +11,7 @@ import org.jetbrains.annotations.Range;
 import javax.security.auth.login.LoginException;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 
 public class NetClient extends NetworkAdapter {
@@ -33,10 +34,9 @@ public class NetClient extends NetworkAdapter {
     }
 
     @Override
-    public void onStart() throws IOException, LoginException {
+    public void onStart() throws IOException, LoginException, TimeoutException {
         getLogger().log(Level.FINE, "Establishing connection...");
         this.connection = new Connection(this, new Socket(host, port), new ClientHandshake(getClient().getVersion(), login), pass);
-        getLogger().log(Level.FINE, "Connection established. Login successful");
     }
 
     @Override

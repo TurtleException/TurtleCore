@@ -2,6 +2,7 @@ package de.turtle_exception.server;
 
 import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.api.TurtleClientBuilder;
+import de.turtle_exception.client.internal.util.logging.ConsoleHandler;
 import de.turtle_exception.client.internal.util.logging.NestedLogger;
 import de.turtle_exception.client.internal.util.logging.SimpleFormatter;
 import de.turtle_exception.server.data.DatabaseProvider;
@@ -12,8 +13,11 @@ import de.turtle_exception.server.util.Status;
 
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Properties;
+import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -36,15 +40,25 @@ public class TurtleServer {
         DIR = f;
     }
 
+    private final File configFile = new File(DIR, "server.properties");
     private final Properties config = new Properties();
 
     private TurtleClient turtleClient;
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     public TurtleServer() throws Exception {
         this.logger = Logger.getLogger("SERVER");
+        this.logger.setUseParentHandlers(false);
+        this.logger.addHandler(new ConsoleHandler(new SimpleFormatter()));
         this.logger.addHandler(LogUtil.getFileHandler(new SimpleFormatter()));
 
-        this.config.load(new FileReader(new File(DIR, "server.properties")));
+        // TODO: remove
+        this.logger.setLevel(Level.ALL);
+        for (Handler handler : this.logger.getHandlers())
+            handler.setLevel(Level.ALL);
+
+        configFile.createNewFile();
+        this.config.load(new FileReader(configFile));
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
@@ -93,6 +107,15 @@ public class TurtleServer {
 
     private int getPort() throws IllegalArgumentException {
         String str = config.getProperty("port");
+
+        if (str == null) {
+            config.setProperty("port", "null");
+            try {
+                config.store(new FileWriter(configFile, true), null);
+            } catch (IOException ignored) { }
+            throw new IllegalArgumentException("Invalid port: null. Please change the server port in server.properties.");
+        }
+
         try {
             return Integer.parseInt(str);
         } catch (NumberFormatException e) {

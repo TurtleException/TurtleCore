@@ -10,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 public class ErrorPacket extends Packet {
@@ -44,12 +45,12 @@ public class ErrorPacket extends Packet {
     }
 
     public ErrorPacket(long id, long deadline, @NotNull Connection connection, long responseCode, byte[] bytes) {
-        this(id, deadline, connection, responseCode, new Gson().fromJson(new String(bytes), JsonObject.class));
+        this(id, deadline, connection, responseCode, new Gson().fromJson(new String(bytes, StandardCharsets.ISO_8859_1), JsonObject.class));
     }
 
     @Override
     public byte[] getBytes() {
-        return new Gson().toJson(this.json).getBytes();
+        return new Gson().toJson(this.json).getBytes(StandardCharsets.ISO_8859_1);
     }
 
     public @NotNull String getMessage() {

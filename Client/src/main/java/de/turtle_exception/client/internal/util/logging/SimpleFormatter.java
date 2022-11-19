@@ -15,19 +15,19 @@ public class SimpleFormatter extends Formatter {
 
         StringBuilder str = new StringBuilder();
 
-        if (record.getThrown() == null) {
-            str.append("[")
-                    .append(time)
-                    .append(" ")
-                    .append(level)
-                    .append("]: ")
-                    .append("[")
-                    .append(record.getLoggerName())
-                    .append("] ")
-                    .append(record.getMessage())
-                    .append("\n");
-        } else {
-            str.append(" ".repeat(time.length() + 2)).append(record.getLevel().getName()).append(" ").append(record.getThrown().toString()).append("\n");
+        str.append("[")
+                .append(time)
+                .append(" ")
+                .append(level)
+                .append("]: ")
+                .append("[")
+                .append(record.getLoggerName())
+                .append("] ")
+                .append(record.getMessage())
+                .append("\n");
+
+        if (record.getThrown() != null) {
+            str.append(" ".repeat(time.length() + 2)).append(record.getLevel().getName()).append("   ").append(record.getThrown().toString()).append("\n");
 
             StackTraceElement[] stackTrace = record.getThrown().getStackTrace();
             for (StackTraceElement stackTraceElement : stackTrace) {

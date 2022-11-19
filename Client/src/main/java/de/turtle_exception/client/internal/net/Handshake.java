@@ -8,6 +8,8 @@ import de.turtle_exception.client.internal.util.version.Version;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 
 public abstract class Handshake {
@@ -47,7 +49,7 @@ public abstract class Handshake {
                         respondingTo.getResponseCode(),
                         msg,
                         t
-                ).compile()
+                ), false
         );
     }
 
@@ -59,12 +61,20 @@ public abstract class Handshake {
                         connection,
                         respondingTo.getResponseCode(),
                         msg
-                ).compile()
+                ), false
         );
     }
 
     protected final void done() {
         this.connection.status = Connection.Status.CONNECTED;
         this.logger.log(Level.INFO, "Handshake done!");
+    }
+
+    public final void await(long timeout, @NotNull TimeUnit unit) throws TimeoutException {
+        final long deadline = System.currentTimeMillis() + unit.toMillis(timeout);
+        while (System.currentTimeMillis() < deadline)
+            if (this.connection.status == Connection.Status.CONNECTED)
+                return;
+        throw new TimeoutException("Timed out");
     }
 }

@@ -14,6 +14,8 @@ public class NestedLogger extends Logger {
     public NestedLogger(String name, @NotNull Logger parent) {
         super(name, null);
         super.setUseParentHandlers(false);
+        // use parent level as default
+        this.setLevel(parent.getLevel());
         this.parentLogger = parent;
     }
 
@@ -42,7 +44,7 @@ public class NestedLogger extends Logger {
 
     @Override
     public void log(LogRecord record) {
-        record.setLoggerName(parentLogger.getName() + " / " + record.getLoggerName());
+        record.setLoggerName(parentLogger.getName() + "/" + record.getLoggerName());
         parentLogger.log(record);
     }
 }

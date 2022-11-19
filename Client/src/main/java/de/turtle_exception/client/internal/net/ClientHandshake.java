@@ -25,7 +25,7 @@ class ClientHandshake extends Handshake {
             case "LOGIN OK" -> this.done();
             case "VERSION"  -> this.sendMsg(packet, "VERSION " + version);
             case "LOGIN"    -> this.sendMsg(packet, "LOGIN " + login);
-            default -> this.sendError(packet, "Unknown command", new NotImplementedError());
+            default -> this.sendError(packet, "Unknown command: " + msg, new NotImplementedError());
         }
     }
 }

@@ -30,13 +30,14 @@ public class Worker extends Thread {
         this.start();
     }
 
+    @SuppressWarnings("BusyWait")
     @Override
     public void run() {
         while (this.condition.getAsBoolean() && !this.isInterrupted()) {
             this.task.run();
 
             try {
-                this.wait(delay);
+                Thread.sleep(delay);
             } catch (InterruptedException ignored) { /* TODO: this should probably be handled */ }
         }
     }

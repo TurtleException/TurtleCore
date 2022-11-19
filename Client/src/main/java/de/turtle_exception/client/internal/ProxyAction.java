@@ -1,7 +1,6 @@
-package de.turtle_exception.client.internal.request.actions;
+package de.turtle_exception.client.internal;
 
 import de.turtle_exception.client.api.request.Action;
-import de.turtle_exception.client.internal.ActionImpl;
 import de.turtle_exception.client.internal.util.function.ExceptionalFunction;
 import org.jetbrains.annotations.NotNull;
 
@@ -13,9 +12,6 @@ public class ProxyAction<F, T> extends ActionImpl<T> {
 
     public ProxyAction(@NotNull ActionImpl<F> initialAction, @NotNull ExceptionalFunction<F, T> function) {
         super(initialAction.getProvider());
-
-        if (getChainLength() > getProvider().getWorkerAmount())
-            throw new IllegalArgumentException("Cannot chain more than Actions than available Provider Workers");
 
         this.initialAction = initialAction;
         this.function = function;
@@ -40,18 +36,9 @@ public class ProxyAction<F, T> extends ActionImpl<T> {
     /* - - - */
 
     @Override
-    public ProxyAction<F, T> priority() {
-        this.initialAction.priority();
-        super.priority();
-        return this;
-    }
-
-    /* - - - */
-
-    @Override
     protected @NotNull Callable<T> asCallable() throws IllegalStateException {
         return () -> {
-            F result = initialAction.complete();
+            F result = initialAction.asCallable().call();
             return function.apply(result);
         };
     }
