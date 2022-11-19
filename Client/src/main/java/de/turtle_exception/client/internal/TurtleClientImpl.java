@@ -16,6 +16,7 @@ import de.turtle_exception.client.internal.entities.UserImpl;
 import de.turtle_exception.client.internal.event.UpdateHelper;
 import de.turtle_exception.client.internal.net.NetClient;
 import de.turtle_exception.client.internal.net.NetworkProvider;
+import de.turtle_exception.client.internal.request.actions.SimpleAction;
 import de.turtle_exception.client.internal.util.TurtleSet;
 import de.turtle_exception.client.internal.util.version.IllegalVersionException;
 import de.turtle_exception.client.internal.util.version.Version;
@@ -136,6 +137,23 @@ public class TurtleClientImpl implements TurtleClient {
     @Override
     public @NotNull Provider getProvider() {
         return this.provider;
+    }
+
+    // note: this will create a deadlock when using a DatabaseProvider
+    @Override
+    public @NotNull Action<Void> invalidateCaches(boolean retrieve) {
+        return new SimpleAction<>(provider, () -> {
+            this.groupCache.clear();
+            this.ticketCache.clear();
+            this.userCache.clear();
+
+            if (retrieve) {
+                this.retrieveGroups().complete();
+                this.retrieveTickets().complete();
+                this.retrieveUsers().complete();
+            }
+            return null;
+        });
     }
 
     /**

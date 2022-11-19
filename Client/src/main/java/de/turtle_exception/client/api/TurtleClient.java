@@ -35,6 +35,8 @@ public interface TurtleClient extends IUserContainer, IGroupContainer, ITicketCo
 
     @NotNull Provider getProvider();
 
+    @NotNull Action<Void> invalidateCaches(boolean retrieve);
+
     /* - - - */
 
     @Override
