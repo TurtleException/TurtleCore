@@ -22,33 +22,6 @@ public class EntityBuilder {
     private EntityBuilder() { }
 
     /**
-     * Builds a {@link User} object from the provided JSON data.
-     * @param data The JSON-formatted user data.
-     * @return A User with the provided attributes from the JSON data.
-     * @throws IllegalArgumentException if the JSON String does not represent a valid User or is not a properly
-     *                                  formatted JSON object.
-     */
-    public static @NotNull User buildUser(@NotNull JsonObject data, @NotNull TurtleClient client) throws NullPointerException, IllegalArgumentException, IllegalJsonException {
-        Checks.nonNull(data, "JSON");
-        JsonChecks.validateUser(data);
-
-        long id = data.get("id").getAsLong();
-        String name = data.get("name").getAsString();
-
-        JsonArray discordArr = data.getAsJsonArray("discord");
-        ArrayList<Long> discordList = new ArrayList<>();
-        for (JsonElement element : discordArr)
-            discordList.add(element.getAsLong());
-
-        JsonArray minecraftArr = data.getAsJsonArray("discord");
-        ArrayList<UUID> minecraftList = new ArrayList<>();
-        for (JsonElement element : minecraftArr)
-            minecraftList.add(UUID.fromString(element.getAsString()));
-
-        return new UserImpl(client, id, name, discordList, minecraftList);
-    }
-
-    /**
      * Builds a {@link Group} object from the provided JSON data.
      * @param data The JSON-formatted group data.
      * @return A Group with the provided attributes from the JSON data.
@@ -96,5 +69,32 @@ public class EntityBuilder {
             users.add(client.getUserById(element.getAsLong()));
 
         return new TicketImpl(client, id, state, title, category, discordChannel, tags, users);
+    }
+
+    /**
+     * Builds a {@link User} object from the provided JSON data.
+     * @param data The JSON-formatted user data.
+     * @return A User with the provided attributes from the JSON data.
+     * @throws IllegalArgumentException if the JSON String does not represent a valid User or is not a properly
+     *                                  formatted JSON object.
+     */
+    public static @NotNull User buildUser(@NotNull JsonObject data, @NotNull TurtleClient client) throws NullPointerException, IllegalArgumentException, IllegalJsonException {
+        Checks.nonNull(data, "JSON");
+        JsonChecks.validateUser(data);
+
+        long id = data.get("id").getAsLong();
+        String name = data.get("name").getAsString();
+
+        JsonArray discordArr = data.getAsJsonArray("discord");
+        ArrayList<Long> discordList = new ArrayList<>();
+        for (JsonElement element : discordArr)
+            discordList.add(element.getAsLong());
+
+        JsonArray minecraftArr = data.getAsJsonArray("discord");
+        ArrayList<UUID> minecraftList = new ArrayList<>();
+        for (JsonElement element : minecraftArr)
+            minecraftList.add(UUID.fromString(element.getAsString()));
+
+        return new UserImpl(client, id, name, discordList, minecraftList);
     }
 }

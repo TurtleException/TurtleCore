@@ -59,9 +59,9 @@ public class TurtleClientImpl implements TurtleClient {
     private long defaultTimeoutInbound  = TimeUnit.SECONDS.toMillis( 8);
     private long defaultTimeoutOutbound = TimeUnit.SECONDS.toMillis(16);
 
-    private final TurtleSet<User> userCache = new TurtleSet<>();
     private final TurtleSet<Group> groupCache = new TurtleSet<>();
     private final TurtleSet<Ticket> ticketCache = new TurtleSet<>();
+    private final TurtleSet<User> userCache = new TurtleSet<>();
 
     /* THIRD PARTY SERVICES */
     private Server spigotServer = null;
@@ -96,6 +96,10 @@ public class TurtleClientImpl implements TurtleClient {
 
         this.logger.log(Level.FINE, "Dispatching initial requests...");
 
+        /*
+        * While entities are normally ordered alphabetically, the initial requests have to be ordered like this because
+        * the existence of User objects is essential to parsing other objects, that reference users, later.
+        */
         // initial requests
         this.retrieveUsers().complete();
         this.retrieveGroups().complete();
@@ -148,9 +152,10 @@ public class TurtleClientImpl implements TurtleClient {
             this.userCache.clear();
 
             if (retrieve) {
+                // dependency order
+                this.retrieveUsers().complete();
                 this.retrieveGroups().complete();
                 this.retrieveTickets().complete();
-                this.retrieveUsers().complete();
             }
             return null;
         });
@@ -168,12 +173,12 @@ public class TurtleClientImpl implements TurtleClient {
         return groupCache;
     }
 
-    public @NotNull TurtleSet<User> getUserCache() {
-        return userCache;
-    }
-
     public @NotNull TurtleSet<Ticket> getTicketCache() {
         return ticketCache;
+    }
+
+    public @NotNull TurtleSet<User> getUserCache() {
+        return userCache;
     }
 
     @Override
@@ -191,13 +196,13 @@ public class TurtleClientImpl implements TurtleClient {
     }
 
     @Override
-    public @NotNull List<User> getUsers() {
-        return List.copyOf(userCache);
+    public @NotNull List<Ticket> getTickets() {
+        return List.copyOf(ticketCache);
     }
 
     @Override
-    public @NotNull List<Ticket> getTickets() {
-        return List.copyOf(ticketCache);
+    public @NotNull List<User> getUsers() {
+        return List.copyOf(userCache);
     }
 
     @SuppressWarnings("RedundantIfStatement")
@@ -218,32 +223,16 @@ public class TurtleClientImpl implements TurtleClient {
     }
 
     @Override
-    public @Nullable User getUserById(long id) {
-        return userCache.get(id);
-    }
-
-    @Override
     public @Nullable Ticket getTicketById(long id) {
         return ticketCache.get(id);
     }
 
+    @Override
+    public @Nullable User getUserById(long id) {
+        return userCache.get(id);
+    }
+
     /* - - - */
-
-    @Override
-    public @NotNull Action<User> retrieveUser(long id) {
-        return provider.get(User.class, id).andThenParse(User.class).onSuccess(user -> {
-            userCache.removeById(id);
-            userCache.add(user);
-        });
-    }
-
-    @Override
-    public @NotNull Action<List<User>> retrieveUsers() {
-        return provider.get(User.class).andThenParseList(User.class).onSuccess(l -> {
-            userCache.clear();
-            userCache.addAll(l);
-        });
-    }
 
     @Override
     public @NotNull Action<Group> retrieveGroup(long id) {
@@ -274,6 +263,22 @@ public class TurtleClientImpl implements TurtleClient {
         return provider.get(Ticket.class).andThenParseList(Ticket.class).onSuccess(l -> {
             ticketCache.clear();
             ticketCache.addAll(l);
+        });
+    }
+
+    @Override
+    public @NotNull Action<User> retrieveUser(long id) {
+        return provider.get(User.class, id).andThenParse(User.class).onSuccess(user -> {
+            userCache.removeById(id);
+            userCache.add(user);
+        });
+    }
+
+    @Override
+    public @NotNull Action<List<User>> retrieveUsers() {
+        return provider.get(User.class).andThenParseList(User.class).onSuccess(l -> {
+            userCache.clear();
+            userCache.addAll(l);
         });
     }
 
