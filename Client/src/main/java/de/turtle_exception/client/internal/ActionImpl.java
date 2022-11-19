@@ -5,7 +5,7 @@ import com.google.gson.JsonObject;
 import de.turtle_exception.client.api.entities.Turtle;
 import de.turtle_exception.client.api.request.Action;
 import de.turtle_exception.client.internal.request.actions.ProxyAction;
-import de.turtle_exception.client.internal.util.ExceptionalFunction;
+import de.turtle_exception.client.internal.util.function.ExceptionalFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

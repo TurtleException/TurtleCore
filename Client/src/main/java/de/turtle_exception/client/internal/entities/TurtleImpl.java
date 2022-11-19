@@ -5,7 +5,7 @@ import com.google.gson.JsonObject;
 import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.api.entities.Turtle;
 import de.turtle_exception.client.api.event.Event;
-import de.turtle_exception.client.internal.util.ExceptionalConsumer;
+import de.turtle_exception.client.internal.util.function.ExceptionalConsumer;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class TurtleImpl implements Turtle {

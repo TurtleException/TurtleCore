@@ -2,7 +2,7 @@ package de.turtle_exception.client.internal.request.actions;
 
 import de.turtle_exception.client.api.request.Action;
 import de.turtle_exception.client.internal.ActionImpl;
-import de.turtle_exception.client.internal.util.ExceptionalFunction;
+import de.turtle_exception.client.internal.util.function.ExceptionalFunction;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.Callable;
