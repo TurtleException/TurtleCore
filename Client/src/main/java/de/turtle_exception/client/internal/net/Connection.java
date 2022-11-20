@@ -96,6 +96,9 @@ public class Connection {
             this.send(new HandshakePacket(Long.MAX_VALUE, this, "QUIT").compile());
         }
 
+        this.logger.log(Level.FINE, "Notifying NetworkAdapter");
+        this.adapter.handleQuit(this);
+
         this.status = Status.DISCONNECTED;
         this.logger.log(Level.FINE, "Interrupting Receiver.");
         this.receiver.interrupt();
