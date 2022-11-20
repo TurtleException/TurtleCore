@@ -96,8 +96,12 @@ public class Connection {
             this.send(new HandshakePacket(Long.MAX_VALUE, this, "QUIT").compile());
         }
 
-        this.logger.log(Level.FINE, "Notifying NetworkAdapter");
-        this.adapter.handleQuit(this);
+        if (this.adapter.getStatus() != NetworkAdapter.Status.DISCONNECTED) {
+            this.logger.log(Level.FINE, "Notifying NetworkAdapter.");
+            this.adapter.handleQuit(this);
+        } else {
+            this.logger.log(Level.FINE, "NetworkAdapter is already disconnected.");
+        }
 
         this.status = Status.DISCONNECTED;
         this.logger.log(Level.FINE, "Interrupting Receiver.");
