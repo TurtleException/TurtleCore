@@ -71,6 +71,10 @@ public class Connection {
                     in.readFully(msg, 0, length);
                     this.receive(msg);
                 }
+            } catch (EOFException e) {
+                // TODO: could this be fired for a different reason?
+                // TODO: logging
+                this.stop(false);
             } catch (SocketException e) {
                 if (status == Status.DISCONNECTED) {
                     // in.readInt() threw an exception because the socked closed as intended by stop().

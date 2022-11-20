@@ -9,6 +9,7 @@ import de.turtle_exception.client.internal.data.annotations.Key;
 import de.turtle_exception.client.internal.data.annotations.Relation;
 import de.turtle_exception.client.internal.data.annotations.Resource;
 import de.turtle_exception.client.internal.entities.EntityBuilder;
+import de.turtle_exception.client.internal.util.AnnotationUtil;
 import de.turtle_exception.client.internal.util.Checks;
 import de.turtle_exception.client.internal.util.logging.NestedLogger;
 import org.jetbrains.annotations.NotNull;
@@ -79,7 +80,7 @@ public class JsonBuilder {
 
         for (Iterator<AccessibleObject> it = stream.iterator(); it.hasNext(); ) {
             AccessibleObject accObj = it.next();
-            Key atKey = accObj.getAnnotation(Key.class);
+            Key atKey = AnnotationUtil.getAnnotation(object.getClass(), accObj, Key.class);
 
             // value should be ignored
             if (atKey == null) continue;
