@@ -38,6 +38,8 @@ public class Connection {
     public enum Status { INIT, LOGIN, CONNECTED, DISCONNECTED }
     volatile Status status;
 
+    volatile long ping;
+
     private final RequestCallbackPool requestCallbacks;
 
     public Connection(@NotNull NetworkAdapter adapter, @NotNull Socket socket, @NotNull Handshake handshake, String pass) throws IOException, LoginException, TimeoutException {
@@ -197,14 +199,15 @@ public class Connection {
             HeartbeatPacket pck = (HeartbeatPacket) packet.toPacket();
 
             if (pck.getStage() != HeartbeatPacket.Stage.RECEIVE) {
-                if (pck.getStage() == HeartbeatPacket.Stage.ACK_SERVER)
-                    logger.log(FINER, "Heartbeat successful: " + pck.getServerPing() + "ms");
+                if (pck.getStage() == HeartbeatPacket.Stage.ACK_SERVER) {
+                    this.handlePing(pck, false);
+                }
 
                 this.send(pck.buildResponse().compile());
                 return;
             }
 
-            logger.log(FINER, "Heartbeat successful: " + pck.getClientPing() + "ms");
+            this.handlePing(pck, true);
             return;
         }
 
@@ -258,7 +261,18 @@ public class Connection {
         throw new NotImplementedError("Unknown packet type: " + packet.getTypeId());
     }
 
+    private void handlePing(@NotNull HeartbeatPacket packet, boolean client) {
+        this.ping = client
+                ? packet.getClientPing()
+                : packet.getServerPing();
+        logger.log(FINER, "Heartbeat successful: " + this.ping + "ms");
+    }
+
     /* - - - */
+
+    public long getPing() {
+        return ping;
+    }
 
     public NetworkAdapter getAdapter() {
         return adapter;

@@ -11,6 +11,7 @@ import de.turtle_exception.client.api.event.EventManager;
 import de.turtle_exception.client.api.request.Action;
 import de.turtle_exception.client.internal.NetworkAdapter;
 import de.turtle_exception.client.internal.Provider;
+import de.turtle_exception.client.internal.net.NetClient;
 import de.turtle_exception.client.internal.util.version.Version;
 import net.dv8tion.jda.api.JDA;
 import org.bukkit.Server;
@@ -80,6 +81,12 @@ public interface TurtleClient extends IUserContainer, IGroupContainer, ITicketCo
     void setDefaultTimeoutOutbound(@Range(from = 0, to = Long.MAX_VALUE) long defaultTimeoutOutbound);
 
     /* - - - */
+
+    default long getPing() throws UnsupportedOperationException {
+        if (!(getNetworkAdapter() instanceof NetClient netClient))
+            throw new UnsupportedOperationException("Only supported with NetClients");
+        return netClient.getConnection().getPing();
+    }
 
     void shutdown() throws IOException;
 
