@@ -119,6 +119,7 @@ public class Connection {
     private synchronized void send(@NotNull CompiledPacket packet) {
         try {
             this.out.write(packet.getBytes());
+            this.out.flush();
         } catch (Error e) {
             logger.log(Level.SEVERE, "Encountered an Error when attempting to send a packet", e);
         } catch (Throwable t) {
