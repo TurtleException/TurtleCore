@@ -69,6 +69,12 @@ public class Connection {
                     this.receive(msg);
                 }
             } catch (SocketException e) {
+                if (status == Status.DISCONNECTED) {
+                    // in.readInt() threw an exception because the socked closed as intended by stop().
+                    // Meaning everything is working as intended, and we can safely ignore the exception.
+                    return;
+                }
+
                 logger.log(Level.WARNING, "Unexpected SocketException", e);
                 this.stop(true);
             } catch (IOException e) {
@@ -80,6 +86,9 @@ public class Connection {
     }
 
     public boolean stop(boolean notify) {
+        // ignore call if the connection is already stopped
+        if (status == Status.DISCONNECTED) return true;
+
         this.logger.log(Level.INFO, "Stopping connection.");
 
         if (notify) {
@@ -184,6 +193,7 @@ public class Connection {
             HandshakePacket pck = (HandshakePacket) packet.toPacket();
 
             if (pck.getMessage().equals("QUIT")) {
+                this.logger.log(Level.INFO, "Received QUIT packet.");
                 this.stop(false);
                 return;
             }
