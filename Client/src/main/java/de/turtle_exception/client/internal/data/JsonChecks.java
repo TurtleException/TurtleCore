@@ -18,7 +18,7 @@ public class JsonChecks {
 
             Checks.nonNull(name, "Name");
 
-            validateLongArray(json.getAsJsonArray("members"));
+            validateLongArray(json.getAsJsonArray("users"));
         } catch (Exception e) {
             if (e instanceof IllegalJsonException)
                 throw e;

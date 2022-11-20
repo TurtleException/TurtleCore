@@ -35,7 +35,7 @@ public class EntityBuilder {
         long   id   = data.get("id").getAsLong();
         String name = data.get("name").getAsString();
 
-        JsonArray       userArr  = data.getAsJsonArray("members");
+        JsonArray       userArr  = data.getAsJsonArray("users");
         TurtleSet<User> users    = new TurtleSet<>();
         for (JsonElement element : userArr)
             users.add(client.getUserById(element.getAsLong()));
@@ -90,7 +90,7 @@ public class EntityBuilder {
         for (JsonElement element : discordArr)
             discordList.add(element.getAsLong());
 
-        JsonArray minecraftArr = data.getAsJsonArray("discord");
+        JsonArray minecraftArr = data.getAsJsonArray("minecraft");
         ArrayList<UUID> minecraftList = new ArrayList<>();
         for (JsonElement element : minecraftArr)
             minecraftList.add(UUID.fromString(element.getAsString()));
