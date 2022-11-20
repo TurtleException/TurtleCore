@@ -20,6 +20,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 
+import static java.util.logging.Level.FINER;
+
 public class Connection {
     private final NetworkAdapter adapter;
     private final NestedLogger logger;
@@ -131,7 +133,7 @@ public class Connection {
 
         if (encrypt) {
             try {
-                this.logger.log(Level.FINER, "Sending " + pckId + " encrypted.");
+                this.logger.log(FINER, "Sending " + pckId + " encrypted.");
                 this.send(packet.compile(pass));
             } catch (Error e) {
                 logger.log(Level.SEVERE, "Encountered an Error when attempting to encrypt a packet", e);
@@ -139,7 +141,7 @@ public class Connection {
                 logger.log(Level.WARNING, "Encountered an Exception when attempting to encrypt a packet", t);
             }
         } else {
-            this.logger.log(Level.FINER, "Sending " + pckId + " as cleartext.");
+            this.logger.log(FINER, "Sending " + pckId + " as cleartext.");
             this.send(packet.compile());
         }
     }
@@ -178,28 +180,31 @@ public class Connection {
         CompletableFuture<IResponse> future = new CompletableFuture<>();
         this.requestCallbacks.put(request.getPacket().getResponseCode(), future);
         try {
-            this.logger.log(Level.FINER, "Attempting to dispatch request " + request.getPacket().getId());
+            this.logger.log(FINER, "Attempting to dispatch request " + request.getPacket().getId());
             this.send(request.getPacket().compile(pass));
         } catch (Exception e) {
             this.requestCallbacks.remove(request.getPacket().getResponseCode());
-            this.logger.log(Level.FINER, "Dispatch failed: " + request.getPacket().getId());
+            this.logger.log(FINER, "Dispatch failed: " + request.getPacket().getId());
             return CompletableFuture.failedFuture(new IllegalArgumentException("Encryption error. Please check your pass!", e));
         }
         return future;
     }
 
     public void receive(@NotNull CompiledPacket packet) throws Exception {
-        this.logger.log(Level.FINER, "Receiving packet (type " + packet.getTypeId() + ") with id " + packet.getId());
+        this.logger.log(FINER, "Receiving packet (type " + packet.getTypeId() + ") with id " + packet.getId());
 
         if (packet.getTypeId() == HeartbeatPacket.TYPE) {
             HeartbeatPacket pck = (HeartbeatPacket) packet.toPacket();
 
             if (pck.getStage() != HeartbeatPacket.Stage.RECEIVE) {
+                if (pck.getStage() == HeartbeatPacket.Stage.ACK_SERVER)
+                    logger.log(FINER, "Heartbeat successful: " + pck.getServerPing() + "ms");
+
                 this.send(pck.buildResponse().compile());
                 return;
             }
 
-            logger.log(Level.FINER, "Heartbeat successful: " + pck.getPing() + "ms");
+            logger.log(FINER, "Heartbeat successful: " + pck.getClientPing() + "ms");
             return;
         }
 
