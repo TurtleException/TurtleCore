@@ -25,8 +25,8 @@ public class Connection {
     private final NestedLogger logger;
 
     private final Socket socket;
-    private final OutputStream out;
-    private final InputStream in;
+    private final DataOutputStream out;
+    private final DataInputStream in;
 
     private final Handshake handshake;
     private String pass;
@@ -47,8 +47,8 @@ public class Connection {
         this.requestCallbacks = new RequestCallbackPool(adapter.getClient().getDefaultTimeoutOutbound(), logger);
 
         this.socket = socket;
-        this.out = socket.getOutputStream();
-        this.in  = socket.getInputStream();
+        this.out = new DataOutputStream(socket.getOutputStream());
+        this.in  = new DataInputStream(socket.getInputStream());
 
         this.pass = pass;
 
@@ -62,7 +62,12 @@ public class Connection {
         this.logger.log(Level.FINE, "Starting Receiver.");
         this.receiver = new Worker(() -> status != Status.DISCONNECTED, () -> {
             try {
-                this.receive(in.readAllBytes());
+                int length = in.readInt();
+                if (length > 0) {
+                    byte[] msg = new byte[length];
+                    in.readFully(msg, 0, length);
+                    this.receive(msg);
+                }
             } catch (SocketException e) {
                 logger.log(Level.WARNING, "Unexpected SocketException", e);
                 this.stop(true);
@@ -118,8 +123,10 @@ public class Connection {
 
     private synchronized void send(@NotNull CompiledPacket packet) {
         try {
-            this.out.write(packet.getBytes());
-            this.out.flush();
+            byte[] msg = packet.getBytes();
+
+            this.out.writeInt(msg.length);
+            this.out.write(msg);
         } catch (Error e) {
             logger.log(Level.SEVERE, "Encountered an Error when attempting to send a packet", e);
         } catch (Throwable t) {
