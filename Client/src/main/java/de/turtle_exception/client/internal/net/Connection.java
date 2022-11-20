@@ -12,10 +12,7 @@ import kotlin.NotImplementedError;
 import org.jetbrains.annotations.NotNull;
 
 import javax.security.auth.login.LoginException;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.concurrent.CompletableFuture;
@@ -28,8 +25,8 @@ public class Connection {
     private final NestedLogger logger;
 
     private final Socket socket;
-    private final PrintWriter out;
-    private final BufferedReader in;
+    private final OutputStream out;
+    private final InputStream in;
 
     private final Handshake handshake;
     private String pass;
@@ -50,8 +47,8 @@ public class Connection {
         this.requestCallbacks = new RequestCallbackPool(adapter.getClient().getDefaultTimeoutOutbound(), logger);
 
         this.socket = socket;
-        this.out = new PrintWriter(socket.getOutputStream(), true);
-        this.in  = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        this.out = socket.getOutputStream();
+        this.in  = socket.getInputStream();
 
         this.pass = pass;
 
@@ -65,7 +62,7 @@ public class Connection {
         this.logger.log(Level.FINE, "Starting Receiver.");
         this.receiver = new Worker(() -> status != Status.DISCONNECTED, () -> {
             try {
-                this.receive(in.readLine());
+                this.receive(in.readAllBytes());
             } catch (SocketException e) {
                 logger.log(Level.WARNING, "Unexpected SocketException", e);
                 this.stop(true);
@@ -74,7 +71,7 @@ public class Connection {
             }
         });
 
-        this.handshake.await(10, TimeUnit.SECONDS);
+        this.handshake.await(10, TimeUnit.HOURS);
     }
 
     public boolean stop(boolean notify) {
@@ -121,8 +118,7 @@ public class Connection {
 
     private synchronized void send(@NotNull CompiledPacket packet) {
         try {
-            // this can't be the most efficient way to do this, right? right...?
-            this.out.println(new String(packet.getBytes()));
+            this.out.write(packet.getBytes());
         } catch (Error e) {
             logger.log(Level.SEVERE, "Encountered an Error when attempting to send a packet", e);
         } catch (Throwable t) {
@@ -130,13 +126,14 @@ public class Connection {
         }
     }
 
-    private void receive(String msg) {
+    private void receive(byte[] msg) {
+        if (msg == null)    return;
+        if (msg.length < 1) return;
+
         final long deadline = System.currentTimeMillis() + adapter.getClient().getDefaultTimeoutInbound();
 
-        if (msg == null) return;
-
         try {
-            this.receive(new CompiledPacket(msg.getBytes(), Direction.INBOUND, this, deadline));
+            this.receive(new CompiledPacket(msg, Direction.INBOUND, this, deadline));
         } catch (Error e) {
             logger.log(Level.SEVERE, "Encountered an Error when attempting to receive a packet", e);
         } catch (Throwable t) {
