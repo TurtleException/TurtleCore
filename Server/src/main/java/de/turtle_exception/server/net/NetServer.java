@@ -193,7 +193,7 @@ public class NetServer extends NetworkAdapter {
         JsonArray content = new JsonArray();
         for (Turtle turtle : getClientImpl().getTurtles()) {
             // filter types
-            if (!turtle.getClass().isAssignableFrom(type)) continue;
+            if (!type.isInstance(turtle)) continue;
 
             JsonObject turtleJson = getClientImpl().getJsonBuilder().buildJson(turtle);
             content.add(turtleJson);

@@ -3,6 +3,7 @@ package de.turtle_exception.client.internal.data;
 import com.google.gson.*;
 import de.turtle_exception.client.api.entities.Turtle;
 import de.turtle_exception.client.internal.data.annotations.Resource;
+import de.turtle_exception.client.internal.util.AnnotationUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -16,7 +17,7 @@ public class DataUtil {
 
     // TODO: should this really throw an Error? Maybe an IllegalArgumentException would be better
     public static @NotNull Resource getResourceAnnotation(@NotNull Class<? extends Turtle> clazz) throws AnnotationFormatError {
-        Resource annotation = clazz.getAnnotation(Resource.class);
+        Resource annotation = AnnotationUtil.getAnnotation(clazz, Resource.class);
         if (annotation == null)
             throw new AnnotationFormatError("Missing annotation @Resource on class " + clazz.getName());
         return annotation;
