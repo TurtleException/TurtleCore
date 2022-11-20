@@ -9,8 +9,6 @@ import de.turtle_exception.client.internal.util.time.TurtleType;
 import de.turtle_exception.client.internal.util.time.TurtleUtil;
 import org.jetbrains.annotations.NotNull;
 
-import java.nio.charset.StandardCharsets;
-
 public class DataPacket extends Packet {
     public static final byte TYPE = 1;
 
@@ -27,7 +25,7 @@ public class DataPacket extends Packet {
 
     public DataPacket(long id, long deadline, @NotNull Connection connection, long responseCode, @NotNull Direction direction, byte[] bytes) {
         super(id, deadline, connection, responseCode, direction, TYPE);
-        this.data = Data.of(new Gson().fromJson(new String(bytes, StandardCharsets.ISO_8859_1), JsonObject.class));
+        this.data = Data.of(new Gson().fromJson(new String(bytes), JsonObject.class));
     }
 
     public @NotNull Data getData() {
@@ -36,6 +34,6 @@ public class DataPacket extends Packet {
 
     @Override
     public byte[] getBytes() {
-        return new Gson().toJson(data.asJson()).getBytes(StandardCharsets.ISO_8859_1);
+        return new Gson().toJson(data.asJson()).getBytes();
     }
 }

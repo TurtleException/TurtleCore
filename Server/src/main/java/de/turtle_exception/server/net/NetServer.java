@@ -111,6 +111,11 @@ public class NetServer extends NetworkAdapter {
     }
 
     @Override
+    public void handleQuit(@NotNull Connection connection) {
+        this.clients.remove(connection);
+    }
+
+    @Override
     public void handleDataRequest(@NotNull DataPacket packet) {
         getLogger().log(Level.FINER, "Incoming data request: " + packet.getId());
 

@@ -6,15 +6,13 @@ import de.turtle_exception.client.internal.util.time.TurtleType;
 import de.turtle_exception.client.internal.util.time.TurtleUtil;
 import org.jetbrains.annotations.NotNull;
 
-import java.nio.charset.StandardCharsets;
-
 public class HandshakePacket extends Packet {
     public static final byte TYPE = 0;
 
     protected final @NotNull String msg;
 
     public HandshakePacket(long id, long deadline, @NotNull Connection connection, long responseCode, @NotNull Direction direction, byte[] bytes) {
-        this(id, deadline, connection, responseCode, direction, new String(bytes, StandardCharsets.ISO_8859_1));
+        this(id, deadline, connection, responseCode, direction, new String(bytes));
     }
 
     public HandshakePacket(long id, long deadline, @NotNull Connection connection, long responseCode, @NotNull Direction direction, @NotNull String msg) {
@@ -34,7 +32,7 @@ public class HandshakePacket extends Packet {
 
     @Override
     public byte[] getBytes() {
-        return msg.getBytes(StandardCharsets.ISO_8859_1);
+        return msg.getBytes();
     }
 
     public @NotNull String getMessage() {

@@ -45,6 +45,15 @@ public class NetClient extends NetworkAdapter {
     }
 
     @Override
+    public void handleQuit(@NotNull Connection connection) {
+        try {
+            this.shutdown();
+        } catch (IOException e) {
+            getLogger().log(Level.WARNING, "Could not shut down.", e);
+        }
+    }
+
+    @Override
     public void handleDataRequest(@NotNull DataPacket packet) {
         switch (packet.getData().method()) {
             case DELETE, GET, PUT, PATCH, PATCH_ENTRY_ADD, PATCH_ENTRY_DEL -> throw new UnsupportedOperationException();

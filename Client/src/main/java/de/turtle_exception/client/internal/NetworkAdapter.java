@@ -1,6 +1,7 @@
 package de.turtle_exception.client.internal;
 
 import de.turtle_exception.client.api.TurtleClient;
+import de.turtle_exception.client.internal.net.Connection;
 import de.turtle_exception.client.internal.net.packets.DataPacket;
 import de.turtle_exception.client.internal.util.Checks;
 import de.turtle_exception.client.internal.util.logging.NestedLogger;
@@ -51,6 +52,8 @@ public abstract class NetworkAdapter {
     }
 
     /* - - -*/
+
+    public abstract void handleQuit(@NotNull Connection connection);
 
     public abstract void handleDataRequest(@NotNull DataPacket packet);
 

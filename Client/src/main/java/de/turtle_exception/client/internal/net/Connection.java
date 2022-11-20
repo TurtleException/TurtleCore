@@ -18,7 +18,6 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.SocketException;
-import java.nio.charset.StandardCharsets;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -123,7 +122,7 @@ public class Connection {
     private synchronized void send(@NotNull CompiledPacket packet) {
         try {
             // this can't be the most efficient way to do this, right? right...?
-            this.out.println(new String(packet.getBytes(), StandardCharsets.ISO_8859_1));
+            this.out.println(new String(packet.getBytes()));
         } catch (Error e) {
             logger.log(Level.SEVERE, "Encountered an Error when attempting to send a packet", e);
         } catch (Throwable t) {
@@ -137,7 +136,7 @@ public class Connection {
         if (msg == null) return;
 
         try {
-            this.receive(new CompiledPacket(msg.getBytes(StandardCharsets.ISO_8859_1), Direction.INBOUND, this, deadline));
+            this.receive(new CompiledPacket(msg.getBytes(), Direction.INBOUND, this, deadline));
         } catch (Error e) {
             logger.log(Level.SEVERE, "Encountered an Error when attempting to receive a packet", e);
         } catch (Throwable t) {
