@@ -37,6 +37,8 @@ public class TurtleClientBuilder {
 
     private @Nullable Logger logger;
 
+    private boolean autoFillCache;
+
     /* THIRD PARTY SERVICES */
     private @Nullable Server spigot;
     private @Nullable JDA    jda;
@@ -54,7 +56,7 @@ public class TurtleClientBuilder {
         String name   = String.valueOf(increment.getAndIncrement());
         Logger logger = this.logger != null ? this.logger : Logger.getLogger("CLIENT#" + name);
 
-        TurtleClientImpl client = new TurtleClientImpl(name, logger, networkAdapter, provider);
+        TurtleClientImpl client = new TurtleClientImpl(name, logger, networkAdapter, provider, autoFillCache);
 
         for (EventListener listener : listeners)
             client.getEventManager().register(listener);
@@ -71,7 +73,8 @@ public class TurtleClientBuilder {
     public static @NotNull TurtleClientBuilder createDefault(@NotNull String host, int port, @NotNull String login, @NotNull String pass) {
         return new TurtleClientBuilder()
                 .setNetworkAdapter(new NetClient(host, port, login, pass))
-                .setProvider(new NetworkProvider(4));
+                .setProvider(new NetworkProvider(4))
+                .setAutoFillCache(true);
     }
 
     /* - - - */
@@ -103,6 +106,11 @@ public class TurtleClientBuilder {
         return this;
     }
 
+    public TurtleClientBuilder setAutoFillCache(boolean b) {
+        this.autoFillCache = b;
+        return this;
+    }
+
     public TurtleClientBuilder setSpigot(Server spigot) {
         this.spigot = spigot;
         return this;
@@ -125,6 +133,10 @@ public class TurtleClientBuilder {
 
     public @Nullable Logger getLogger() {
         return logger;
+    }
+
+    public boolean getAutoFillCache() {
+        return autoFillCache;
     }
 
     public @Nullable Server getSpigot() {

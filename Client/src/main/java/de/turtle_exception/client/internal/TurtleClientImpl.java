@@ -68,7 +68,7 @@ public class TurtleClientImpl implements TurtleClient {
     private Server spigotServer = null;
     private JDA    jda          = null;
 
-    public TurtleClientImpl(@Nullable String name, @NotNull Logger logger, @NotNull NetworkAdapter networkAdapter, @NotNull Provider provider) throws IOException, LoginException, TimeoutException {
+    public TurtleClientImpl(@Nullable String name, @NotNull Logger logger, @NotNull NetworkAdapter networkAdapter, @NotNull Provider provider, boolean autoFillCache) throws IOException, LoginException, TimeoutException {
         this.name = name;
         this.logger = logger;
         this.logger.log(Level.INFO, "Hello there  (Starting...)");
@@ -95,18 +95,20 @@ public class TurtleClientImpl implements TurtleClient {
                 throw new LoginException("NetworkProvider is not supported without NetClient");
         }
 
-        this.logger.log(Level.FINE, "Dispatching initial requests...");
+        if (autoFillCache) {
+            this.logger.log(Level.FINE, "Dispatching initial requests...");
 
-        /*
-        * While entities are normally ordered alphabetically, the initial requests have to be ordered like this because
-        * the existence of User objects is essential to parsing other objects, that reference users, later.
-        */
-        // initial requests
-        this.retrieveUsers().complete();
-        this.retrieveGroups().complete();
-        this.retrieveTickets().complete();
+            /*
+            * While entities are normally ordered alphabetically, the initial requests have to be ordered like this because
+            * the existence of User objects is essential to parsing other objects, that reference users, later.
+            */
+            // initial requests
+            this.retrieveUsers().complete();
+            this.retrieveGroups().complete();
+            this.retrieveTickets().complete();
 
-        this.logger.log(Level.FINE, "OK!");
+            this.logger.log(Level.FINE, "OK!");
+        }
 
         this.logger.log(Level.INFO, "General Kenobi O_o  (Startup done)");
     }
