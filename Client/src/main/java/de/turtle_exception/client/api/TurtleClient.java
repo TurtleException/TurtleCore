@@ -82,4 +82,6 @@ public interface TurtleClient extends IUserContainer, IGroupContainer, ITicketCo
     /* - - - */
 
     void shutdown() throws IOException;
+
+    void shutdownNow() throws IOException;
 }

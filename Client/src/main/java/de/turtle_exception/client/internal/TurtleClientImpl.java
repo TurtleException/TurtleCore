@@ -391,4 +391,12 @@ public class TurtleClientImpl implements TurtleClient {
         this.provider.shutdown();
         logger.log(Level.INFO, "OK bye.");
     }
+
+    @Override
+    public void shutdownNow() throws IOException {
+        logger.log(Level.WARNING, "Forcing shutdown...");
+        this.networkAdapter.shutdown();
+        this.provider.shutdownNow();
+        logger.log(Level.INFO, "OK bye.");
+    }
 }

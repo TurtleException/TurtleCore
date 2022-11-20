@@ -41,6 +41,8 @@ public class JsonBuilder {
 
         this.logger.log(Level.FINE, "Build call (JSON > obj) for object of type " + type.getSimpleName());
 
+        System.out.println(json);
+
         try {
             Method buildMethod = EntityBuilder.class.getMethod(annotation.builder(), JsonObject.class, TurtleClient.class);
             return type.cast(buildMethod.invoke(null, json, client));
@@ -59,6 +61,8 @@ public class JsonBuilder {
         Checks.nonNull(json, "JSON data");
 
         this.logger.log(Level.FINE, "Build call (JSON > obj) for " + json.size() + " objects of type " + type.getSimpleName());
+
+        System.out.println(json);
 
         ArrayList<T> list = new ArrayList<>();
         for (JsonElement element : json)
