@@ -66,12 +66,12 @@ public class HeartbeatPacket extends Packet {
     }
 
     private static @NotNull Stage getState(long time1, long time2, long time3) throws IllegalStateException {
-        if (time3 == 0)
-            return Stage.RECEIVE;
+        if (time1 == 0)
+            return Stage.SEND;
         else if (time2 == 0)
             return Stage.ACKNOWLEDGE;
-        else if (time1 == 0)
-            return Stage.SEND;
+        else if (time3 == 0)
+            return Stage.RECEIVE;
         else
             throw new IllegalStateException("Heartbeat may not go past state RECEIVE");
     }

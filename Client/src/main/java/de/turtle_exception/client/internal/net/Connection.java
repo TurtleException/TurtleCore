@@ -61,6 +61,9 @@ public class Connection {
 
         this.logger.log(Level.FINE, "Starting Receiver.");
         this.receiver = new Worker(() -> status != Status.DISCONNECTED, () -> {
+            if (socket.isClosed())
+                this.stop(false);
+
             try {
                 int length = in.readInt();
                 if (length > 0) {
