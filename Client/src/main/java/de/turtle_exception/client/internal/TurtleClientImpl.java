@@ -8,6 +8,9 @@ import de.turtle_exception.client.api.entities.Turtle;
 import de.turtle_exception.client.api.entities.User;
 import de.turtle_exception.client.api.event.EventManager;
 import de.turtle_exception.client.api.request.Action;
+import de.turtle_exception.client.api.request.GroupAction;
+import de.turtle_exception.client.api.request.TicketAction;
+import de.turtle_exception.client.api.request.UserAction;
 import de.turtle_exception.client.internal.data.JsonBuilder;
 import de.turtle_exception.client.internal.entities.GroupImpl;
 import de.turtle_exception.client.internal.entities.TicketImpl;
@@ -16,7 +19,10 @@ import de.turtle_exception.client.internal.entities.UserImpl;
 import de.turtle_exception.client.internal.event.UpdateHelper;
 import de.turtle_exception.client.internal.net.NetClient;
 import de.turtle_exception.client.internal.net.NetworkProvider;
+import de.turtle_exception.client.internal.request.actions.GroupActionImpl;
 import de.turtle_exception.client.internal.request.actions.SimpleAction;
+import de.turtle_exception.client.internal.request.actions.TicketActionImpl;
+import de.turtle_exception.client.internal.request.actions.UserActionImpl;
 import de.turtle_exception.client.internal.util.TurtleSet;
 import de.turtle_exception.client.internal.util.version.IllegalVersionException;
 import de.turtle_exception.client.internal.util.version.Version;
@@ -283,6 +289,23 @@ public class TurtleClientImpl implements TurtleClient {
             userCache.clear();
             userCache.addAll(l);
         });
+    }
+
+    /* - - - */
+
+    @Override
+    public @NotNull GroupAction createGroup() {
+        return new GroupActionImpl(this.provider);
+    }
+
+    @Override
+    public @NotNull TicketAction createTicket() {
+        return new TicketActionImpl(this.provider);
+    }
+
+    @Override
+    public @NotNull UserAction createUser() {
+        return new UserActionImpl(this.provider);
     }
 
     /* - - - */
