@@ -70,11 +70,16 @@ public class Connection {
 
             try {
                 int length = in.readInt();
-                if (length > 0) {
-                    byte[] msg = new byte[length];
-                    in.readFully(msg, 0, length);
-                    this.receive(msg);
-                }
+                if (length < CompiledPacket.META_BYTES) return;
+
+                final long turtle       = in.readLong();
+                final long responseCode = in.readLong();
+                final byte type         = in.readByte();
+
+                final byte[] content = new byte[length - CompiledPacket.META_BYTES];
+                in.readFully(content);
+
+                this.receive(turtle, responseCode, type, content);
             } catch (EOFException e) {
                 // TODO: could this be fired for a different reason?
                 // TODO: logging
@@ -150,10 +155,11 @@ public class Connection {
 
     private synchronized void send(@NotNull CompiledPacket packet) {
         try {
-            byte[] msg = packet.getBytes();
-
-            this.out.writeInt(msg.length);
-            this.out.write(msg);
+            this.out.writeInt(packet.getLength());
+            this.out.writeLong(packet.getId());
+            this.out.writeLong(packet.getResponseCode());
+            this.out.writeByte(packet.getTypeId());
+            this.out.write(packet.getContent());
         } catch (Error e) {
             logger.log(Level.SEVERE, "Encountered an Error when attempting to send a packet", e);
         } catch (Throwable t) {
@@ -161,14 +167,14 @@ public class Connection {
         }
     }
 
-    private void receive(byte[] msg) {
-        if (msg == null)    return;
-        if (msg.length < 1) return;
+    private void receive(long turtle, long responseCode, byte type, byte[] content) {
+        if (content == null)    return;
+        if (content.length < 1) return;
 
         final long deadline = System.currentTimeMillis() + adapter.getClient().getDefaultTimeoutInbound();
 
         try {
-            this.receive(new CompiledPacket(msg, Direction.INBOUND, this, deadline));
+            this.receive(new CompiledPacket(turtle, responseCode, type, content, Direction.INBOUND, this, deadline));
         } catch (Error e) {
             logger.log(Level.SEVERE, "Encountered an Error when attempting to receive a packet", e);
         } catch (Throwable t) {

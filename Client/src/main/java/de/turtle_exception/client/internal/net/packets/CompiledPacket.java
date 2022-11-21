@@ -2,7 +2,6 @@ package de.turtle_exception.client.internal.net.packets;
 
 import de.turtle_exception.client.internal.net.Connection;
 import de.turtle_exception.client.internal.net.Direction;
-import de.turtle_exception.client.internal.util.MathUtil;
 import de.turtle_exception.client.internal.util.crypto.Encryption;
 import de.turtle_exception.client.internal.util.time.TurtleUtil;
 import org.jetbrains.annotations.NotNull;
@@ -18,7 +17,6 @@ import java.security.spec.InvalidKeySpecException;
 public final class CompiledPacket {
     public static final int META_BYTES = 17;
 
-    private final byte[] bytes;
     private final byte[] content;
 
     /* - META INFO - */
@@ -32,34 +30,14 @@ public final class CompiledPacket {
 
     private final long deadline;
 
-    public CompiledPacket(final byte[] bytes, @NotNull Direction direction, @NotNull Connection connection, long deadline) throws IllegalArgumentException {
-        if (bytes.length < META_BYTES)
-            throw new IllegalArgumentException("Missing packet information: " + bytes.length + " of " + META_BYTES + " bytes present.");
-
-        this.bytes      = bytes;
-        this.direction  = direction;
-        this.connection = connection;
-        this.deadline   = deadline;
-
-        this.turtle       = MathUtil.bytesToLong(bytes, 0);
-        this.responseCode = MathUtil.bytesToLong(bytes, Long.BYTES);
-        this.type         = bytes[Long.BYTES * 2];
-
-        this.content = new byte[bytes.length - META_BYTES];
-        System.arraycopy(bytes, META_BYTES, content, 0, content.length);
-    }
-
-    public CompiledPacket(final byte[] content, @NotNull Direction direction, @NotNull Connection connection, final long deadline, final long id, final long responseCode, final byte type) {
-        this(buildBytes(content, id, responseCode, type), direction, connection, deadline);
-    }
-
-    private static byte[] buildBytes(byte[] content, long id, long conversation, byte type) {
-        byte[] bytes = new byte[content.length + META_BYTES];
-        System.arraycopy(content, 0, bytes, META_BYTES, content.length);
-        System.arraycopy(MathUtil.longToBytes(id), 0, bytes, 0, Long.BYTES);
-        System.arraycopy(MathUtil.longToBytes(conversation), 0, bytes, Long.BYTES, Long.BYTES);
-        bytes[Long.BYTES * 2] = type;
-        return bytes;
+    public CompiledPacket(long turtle, long responseCode, byte type, final byte[] content, @NotNull Direction direction, @NotNull Connection connection, long deadline) throws IllegalArgumentException {
+        this.turtle       = turtle;
+        this.responseCode = responseCode;
+        this.type         = type;
+        this.content      = content;
+        this.direction    = direction;
+        this.connection   = connection;
+        this.deadline     = deadline;
     }
 
     /* - - - */
@@ -92,13 +70,12 @@ public final class CompiledPacket {
 
     /* - - - */
 
-    public byte[] getBytes() {
-        return bytes;
-    }
-
-    /** Returns the bytes of this message without meta information */
     public byte[] getContent() {
         return content;
+    }
+
+    public int getLength() {
+        return META_BYTES + content.length;
     }
 
     public long getId() {
