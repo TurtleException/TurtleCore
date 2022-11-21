@@ -1,6 +1,6 @@
 package de.turtle_exception.client.api.entities;
 
-import de.turtle_exception.client.api.entities.attribute.IUserContainer;
+import de.turtle_exception.client.api.entities.containers.IUserContainer;
 import de.turtle_exception.client.api.request.Action;
 import de.turtle_exception.client.internal.data.annotations.Key;
 import de.turtle_exception.client.internal.data.annotations.Relation;

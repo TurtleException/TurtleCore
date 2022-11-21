@@ -1,4 +1,4 @@
-package de.turtle_exception.client.api.entities.attribute;
+package de.turtle_exception.client.api.entities.containers;
 
 import de.turtle_exception.client.api.entities.Turtle;
 import org.jetbrains.annotations.NotNull;

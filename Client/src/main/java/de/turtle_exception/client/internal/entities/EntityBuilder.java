@@ -3,7 +3,7 @@ package de.turtle_exception.client.internal.entities;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import de.turtle_exception.client.api.TicketState;
+import de.turtle_exception.client.api.entities.attributes.TicketState;
 import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.api.entities.Group;
 import de.turtle_exception.client.api.entities.Ticket;
