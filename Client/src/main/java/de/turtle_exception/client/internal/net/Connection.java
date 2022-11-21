@@ -155,11 +155,11 @@ public class Connection {
 
     private synchronized void send(@NotNull CompiledPacket packet) {
         try {
-            this.out.writeInt(packet.getLength());
-            this.out.writeLong(packet.getId());
-            this.out.writeLong(packet.getResponseCode());
-            this.out.writeByte(packet.getTypeId());
-            this.out.write(packet.getContent());
+            this.out.writeInt(packet.length());
+            this.out.writeLong(packet.turtle());
+            this.out.writeLong(packet.responseCode());
+            this.out.writeByte(packet.type());
+            this.out.write(packet.content());
         } catch (Error e) {
             logger.log(Level.SEVERE, "Encountered an Error when attempting to send a packet", e);
         } catch (Throwable t) {
@@ -199,9 +199,9 @@ public class Connection {
     }
 
     public void receive(@NotNull CompiledPacket packet) throws Exception {
-        this.logger.log(FINER, "Receiving packet (type " + packet.getTypeId() + ") with id " + packet.getId());
+        this.logger.log(FINER, "Receiving packet (type " + packet.type() + ") with id " + packet.turtle());
 
-        if (packet.getTypeId() == HeartbeatPacket.TYPE) {
+        if (packet.type() == HeartbeatPacket.TYPE) {
             HeartbeatPacket pck = (HeartbeatPacket) packet.toPacket();
 
             if (pck.getStage() != HeartbeatPacket.Stage.RECEIVE) {
@@ -217,7 +217,7 @@ public class Connection {
             return;
         }
 
-        if (packet.getTypeId() == HandshakePacket.TYPE) {
+        if (packet.type() == HandshakePacket.TYPE) {
             HandshakePacket pck = (HandshakePacket) packet.toPacket();
 
             if (pck.getMessage().equals("QUIT")) {
@@ -233,9 +233,9 @@ public class Connection {
             return;
         }
 
-        CompletableFuture<IResponse> future = requestCallbacks.get(packet.getResponseCode());
+        CompletableFuture<IResponse> future = requestCallbacks.get(packet.responseCode());
 
-        if (packet.getTypeId() == ErrorPacket.TYPE) {
+        if (packet.type() == ErrorPacket.TYPE) {
             if (status == Status.LOGIN) {
                 // during LOGIN errors are not encrypted
                 handshake.handle((ErrorPacket) packet.toPacket());
@@ -252,9 +252,9 @@ public class Connection {
         }
 
         if (status != Status.CONNECTED)
-            throw new IllegalStateException("Unable to process packet (type " + packet.getTypeId() + ").");
+            throw new IllegalStateException("Unable to process packet (type " + packet.type() + ").");
 
-        if (packet.getTypeId() == DataPacket.TYPE) {
+        if (packet.type() == DataPacket.TYPE) {
             DataPacket pck = (DataPacket) packet.toPacket(pass);
             if (future != null) {
                 future.complete(new Response(pck));
@@ -264,7 +264,7 @@ public class Connection {
             return;
         }
 
-        throw new NotImplementedError("Unknown packet type: " + packet.getTypeId());
+        throw new NotImplementedError("Unknown packet type: " + packet.type());
     }
 
     private void handlePing(@NotNull HeartbeatPacket packet, boolean client) {
