@@ -13,27 +13,23 @@ public class AnnotationUtil {
 
     // TODO: docs
     public static <T extends Annotation> @Nullable T getAnnotation(@NotNull Class<?> clazz, @NotNull Class<T> type) {
-        T annotation = clazz.getAnnotation(type);
-        if (annotation != null) return annotation;
+        LinkedList<Class<?>> buffer = new LinkedList<>();
+        buffer.add(clazz);
 
-        // TODO: this would return interface implementations of the superclass before interface implementations of the class itself
-        // check parents
-        Class<?> superclass = clazz.getSuperclass();
-        if (superclass != null) {
-            annotation = getAnnotation(superclass, type);
-            if (annotation != null) return annotation;
-        }
+        while (!buffer.isEmpty()) {
+            Class<?> i = buffer.poll();
 
-        // check interfaces
-        LinkedList<Class<?>> interfaces = new LinkedList<>(List.of(clazz.getInterfaces()));
-        while (!interfaces.isEmpty()) {
-            Class<?> i = interfaces.poll();
+            T annotation = i.getDeclaredAnnotation(type);
+            if (annotation != null)
+                return annotation;
 
-            T interfaceAnnotation = i.getAnnotation(type);
-            if (interfaceAnnotation != null)
-                return interfaceAnnotation;
+            // add superclass (or skip if null)
+            Class<?> superclass = i.getSuperclass();
+            if (superclass != null)
+                buffer.add(superclass);
 
-            interfaces.addAll(List.of(i.getInterfaces()));
+            // add interfaces
+            buffer.addAll(List.of(i.getInterfaces()));
         }
 
         return null;
