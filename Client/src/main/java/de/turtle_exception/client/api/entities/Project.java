@@ -5,6 +5,7 @@ import de.turtle_exception.client.internal.data.annotations.Key;
 import de.turtle_exception.client.internal.data.annotations.Relation;
 import de.turtle_exception.client.internal.data.annotations.Resource;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -12,7 +13,7 @@ import java.util.List;
 @SuppressWarnings("unused")
 public interface Project extends Turtle {
     @Key(name = "title")
-    @NotNull String getTitle();
+    @Nullable String getTitle();
 
     @Key(name = "code")
     @NotNull String getCode();
