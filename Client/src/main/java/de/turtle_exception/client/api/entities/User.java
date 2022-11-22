@@ -7,6 +7,8 @@ import de.turtle_exception.client.internal.data.annotations.Key;
 import de.turtle_exception.client.internal.data.annotations.Relation;
 import de.turtle_exception.client.internal.data.annotations.Resource;
 import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Server;
 import org.jetbrains.annotations.NotNull;
@@ -123,8 +125,28 @@ public interface User extends Turtle {
         if (jda == null)
             throw new IllegalStateException("No JDA instance registered");
 
-        for (Long discordId : this.getDiscordIds())
-            list.add(jda.getUserById(discordId));
+        for (Long discordId : this.getDiscordIds()) {
+            net.dv8tion.jda.api.entities.User user = jda.getUserById(discordId);
+            if (user == null) continue;
+            list.add(user);
+        }
+
+        return List.copyOf(list);
+    }
+
+    /**
+     * Provides a List of {@link Member JDA Member objects} from the specified {@link Guild} this User is linked to (exclusively).
+     * @param guild A Discord Guild.
+     * @return List of Discord Members.
+     */
+    default @NotNull List<Member> getDiscord(@NotNull Guild guild) {
+        ArrayList<Member> list = new ArrayList<>();
+
+        for (Long discordId : this.getDiscordIds()) {
+            Member member = guild.getMemberById(discordId);
+            if (member == null) continue;
+            list.add(member);
+        }
 
         return List.copyOf(list);
     }
