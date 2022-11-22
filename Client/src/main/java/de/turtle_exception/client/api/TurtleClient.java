@@ -9,6 +9,9 @@ import de.turtle_exception.client.api.entities.attribute.ITicketContainer;
 import de.turtle_exception.client.api.entities.attribute.IUserContainer;
 import de.turtle_exception.client.api.event.EventManager;
 import de.turtle_exception.client.api.request.Action;
+import de.turtle_exception.client.api.request.GroupAction;
+import de.turtle_exception.client.api.request.TicketAction;
+import de.turtle_exception.client.api.request.UserAction;
 import de.turtle_exception.client.internal.NetworkAdapter;
 import de.turtle_exception.client.internal.Provider;
 import de.turtle_exception.client.internal.net.NetClient;
@@ -59,6 +62,14 @@ public interface TurtleClient extends IUserContainer, IGroupContainer, ITicketCo
     @NotNull Action<User> retrieveUser(long id);
 
     @NotNull Action<List<User>> retrieveUsers();
+
+    /* - - - */
+
+    @NotNull GroupAction createGroup();
+
+    @NotNull TicketAction createTicket();
+
+    @NotNull UserAction createUser();
 
     /* - - - */
 
