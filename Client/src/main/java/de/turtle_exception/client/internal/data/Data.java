@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
+import de.turtle_exception.client.internal.data.annotations.Keys;
 import de.turtle_exception.client.api.entities.Turtle;
 import de.turtle_exception.client.internal.net.DataMethod;
 import de.turtle_exception.client.internal.util.Checks;
@@ -56,11 +57,11 @@ public record Data (
     }
 
     public static @NotNull Data buildDelete(@NotNull Class<? extends Turtle> type, long id) {
-        return new Data(DataMethod.DELETE, type, buildJson("id", id));
+        return new Data(DataMethod.DELETE, type, buildJson(Keys.Turtle.ID, id));
     }
 
     public static @NotNull Data buildGet(@NotNull Class<? extends Turtle> type, long id) {
-        return new Data(DataMethod.GET, type, buildJson("id", id));
+        return new Data(DataMethod.GET, type, buildJson(Keys.Turtle.ID, id));
     }
 
     public static @NotNull Data buildGet(@NotNull Class<? extends Turtle> type) {
@@ -76,11 +77,11 @@ public record Data (
     }
 
     public static @NotNull Data buildPatchEntryAdd(@NotNull Class<? extends Turtle> type, long id, @NotNull String key, @NotNull Object obj) {
-        return new Data(DataMethod.PATCH_ENTRY_ADD, type, buildJson("id", id, "key", key, "val", obj));
+        return new Data(DataMethod.PATCH_ENTRY_ADD, type, buildJson(Keys.Turtle.ID, id, "key", key, "val", obj));
     }
 
     public static @NotNull Data buildPatchEntryDel(@NotNull Class<? extends Turtle> type, long id, @NotNull String key, @NotNull Object obj) {
-        return new Data(DataMethod.PATCH_ENTRY_DEL, type, buildJson("id", id, "key", key, "val", obj));
+        return new Data(DataMethod.PATCH_ENTRY_DEL, type, buildJson(Keys.Turtle.ID, id, "key", key, "val", obj));
     }
 
     public static @NotNull Data buildUpdate(@NotNull Class<? extends Turtle> type, @NotNull JsonElement content) {
@@ -88,7 +89,7 @@ public record Data (
     }
 
     public static @NotNull Data buildRemove(@NotNull Class<? extends Turtle> type, long id) {
-        return new Data(DataMethod.REMOVE, type, buildJson("id", id));
+        return new Data(DataMethod.REMOVE, type, buildJson(Keys.Turtle.ID, id));
     }
 
     private static @NotNull JsonObject buildJson(@NotNull Object... args) throws IllegalArgumentException {

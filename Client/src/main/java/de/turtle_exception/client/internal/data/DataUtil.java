@@ -1,6 +1,7 @@
 package de.turtle_exception.client.internal.data;
 
 import com.google.gson.*;
+import de.turtle_exception.client.internal.data.annotations.Keys;
 import de.turtle_exception.client.api.entities.Turtle;
 import de.turtle_exception.client.internal.data.annotations.Resource;
 import de.turtle_exception.client.internal.util.AnnotationUtil;
@@ -25,7 +26,7 @@ public class DataUtil {
 
     public static long getTurtleId(@NotNull JsonObject content) throws IllegalArgumentException {
         try {
-            return content.get("id").getAsLong();
+            return content.get(Keys.Turtle.ID).getAsLong();
         } catch (ClassCastException | IllegalStateException e) {
             throw new IllegalArgumentException("Not a valid turtle");
         }

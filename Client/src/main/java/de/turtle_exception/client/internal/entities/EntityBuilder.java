@@ -3,6 +3,7 @@ package de.turtle_exception.client.internal.entities;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import de.turtle_exception.client.internal.data.annotations.Keys;
 import de.turtle_exception.client.api.TicketState;
 import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.api.entities.Group;
@@ -32,10 +33,10 @@ public class EntityBuilder {
         Checks.nonNull(data, "JSON");
         JsonChecks.validateGroup(data);
 
-        long   id   = data.get("id").getAsLong();
-        String name = data.get("name").getAsString();
+        long   id   = data.get(Keys.Turtle.ID).getAsLong();
+        String name = data.get(Keys.Group.NAME).getAsString();
 
-        JsonArray       userArr  = data.getAsJsonArray("users");
+        JsonArray       userArr  = data.getAsJsonArray(Keys.Group.MEMBERS);
         TurtleSet<User> users    = new TurtleSet<>();
         for (JsonElement element : userArr)
             users.add(client.getUserById(element.getAsLong()));
@@ -47,23 +48,23 @@ public class EntityBuilder {
         Checks.nonNull(data, "JSON");
         JsonChecks.validateTicket(data);
 
-        long   id             = data.get("id").getAsLong();
-        byte   stateCode      = data.get("state").getAsByte();
-        String title          = data.get("title").getAsString();
-        String category       = data.get("category").getAsString();
-        long   discordChannel = data.get("discord_channel").getAsLong();
+        long   id             = data.get(Keys.Turtle.ID).getAsLong();
+        byte   stateCode      = data.get(Keys.Ticket.STATE).getAsByte();
+        String title          = data.get(Keys.Ticket.TITLE).getAsString();
+        String category       = data.get(Keys.Ticket.CATEGORY).getAsString();
+        long   discordChannel = data.get(Keys.Ticket.DISCORD_CHANNEL).getAsLong();
 
         if (title == null)
             title = "null";
 
         TicketState state = TicketState.of(stateCode);
 
-        JsonArray         tagArr = data.getAsJsonArray("tags");
+        JsonArray         tagArr = data.getAsJsonArray(Keys.Ticket.TAGS);
         ArrayList<String> tags   = new ArrayList<>();
         for (JsonElement element : tagArr)
             tags.add(element.getAsString());
 
-        JsonArray       userArr  = data.getAsJsonArray("users");
+        JsonArray       userArr  = data.getAsJsonArray(Keys.Ticket.USERS);
         TurtleSet<User> users    = new TurtleSet<>();
         for (JsonElement element : userArr)
             users.add(client.getUserById(element.getAsLong()));
@@ -82,15 +83,15 @@ public class EntityBuilder {
         Checks.nonNull(data, "JSON");
         JsonChecks.validateUser(data);
 
-        long id = data.get("id").getAsLong();
-        String name = data.get("name").getAsString();
+        long id = data.get(Keys.Turtle.ID).getAsLong();
+        String name = data.get(Keys.User.NAME).getAsString();
 
-        JsonArray discordArr = data.getAsJsonArray("discord");
+        JsonArray discordArr = data.getAsJsonArray(Keys.User.DISCORD);
         ArrayList<Long> discordList = new ArrayList<>();
         for (JsonElement element : discordArr)
             discordList.add(element.getAsLong());
 
-        JsonArray minecraftArr = data.getAsJsonArray("minecraft");
+        JsonArray minecraftArr = data.getAsJsonArray(Keys.User.MINECRAFT);
         ArrayList<UUID> minecraftList = new ArrayList<>();
         for (JsonElement element : minecraftArr)
             minecraftList.add(UUID.fromString(element.getAsString()));

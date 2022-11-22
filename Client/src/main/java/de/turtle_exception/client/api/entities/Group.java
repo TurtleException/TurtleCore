@@ -1,5 +1,6 @@
 package de.turtle_exception.client.api.entities;
 
+import de.turtle_exception.client.internal.data.annotations.Keys;
 import de.turtle_exception.client.api.entities.attribute.IUserContainer;
 import de.turtle_exception.client.api.request.Action;
 import de.turtle_exception.client.internal.data.annotations.Key;
@@ -19,14 +20,14 @@ public interface Group extends Turtle, IUserContainer {
 
     /* - NAME - */
 
-    @Key(name = "name")
+    @Key(name = Keys.Group.NAME)
     @NotNull String getName();
 
     @NotNull Action<Group> modifyName(@NotNull String name);
 
     /* - USERS - */
 
-    @Key(name = "users", relation = Relation.MANY_TO_MANY)
+    @Key(name = Keys.Group.MEMBERS, relation = Relation.MANY_TO_MANY)
     @NotNull List<User> getUsers();
 
     @NotNull Action<Group> addUser(long user);

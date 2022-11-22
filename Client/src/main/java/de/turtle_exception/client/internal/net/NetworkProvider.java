@@ -6,6 +6,7 @@ import de.turtle_exception.client.api.entities.Turtle;
 import de.turtle_exception.client.internal.ActionImpl;
 import de.turtle_exception.client.internal.Provider;
 import de.turtle_exception.client.internal.data.Data;
+import de.turtle_exception.client.internal.data.annotations.Keys;
 import de.turtle_exception.client.internal.request.actions.NetAction;
 import org.jetbrains.annotations.NotNull;
 
@@ -60,7 +61,7 @@ public class NetworkProvider extends Provider {
     @Override
     public <T extends Turtle> @NotNull NetAction<JsonObject> patch(@NotNull Class<T> type, @NotNull JsonObject content, long id) throws AnnotationFormatError {
         this.logger.log(Level.FINER, "PATCH request for id " + id);
-        content.addProperty("id", id);
+        content.addProperty(Keys.Turtle.ID, id);
         return new NetAction<>(this, connection, Data.buildPatch(type, content), (request, response) -> {
             return response.getData().contentObject();
         });

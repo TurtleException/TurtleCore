@@ -2,6 +2,7 @@ package de.turtle_exception.client.internal.entities;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import de.turtle_exception.client.internal.data.annotations.Keys;
 import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.api.entities.Group;
 import de.turtle_exception.client.api.entities.User;
@@ -28,12 +29,12 @@ public class GroupImpl extends TurtleImpl implements Group {
 
     @Override
     public synchronized @NotNull GroupImpl handleUpdate(@NotNull JsonObject json) {
-        this.apply(json, "name", element -> {
+        this.apply(json, Keys.Group.NAME, element -> {
             String old = this.name;
             this.name = element.getAsString();
             this.fireEvent(new GroupUpdateNameEvent(this, old, this.name));
         });
-        this.apply(json, "users", element -> {
+        this.apply(json, Keys.Group.MEMBERS, element -> {
             TurtleSet<User> old = this.users;
             TurtleSet<User> set = new TurtleSet<>();
             for (JsonElement entry : element.getAsJsonArray())
@@ -53,7 +54,7 @@ public class GroupImpl extends TurtleImpl implements Group {
 
     @Override
     public @NotNull Action<Group> modifyName(@NotNull String name) {
-        return getClient().getProvider().patch(this, "name", name).andThenParse(Group.class);
+        return getClient().getProvider().patch(this, Keys.Group.NAME, name).andThenParse(Group.class);
     }
 
     /* - MEMBERS - */
@@ -74,11 +75,11 @@ public class GroupImpl extends TurtleImpl implements Group {
 
     @Override
     public @NotNull Action<Group> addUser(long user) {
-        return getClient().getProvider().patchEntryAdd(this, "users", user).andThenParse(Group.class);
+        return getClient().getProvider().patchEntryAdd(this, Keys.Group.MEMBERS, user).andThenParse(Group.class);
     }
 
     @Override
     public @NotNull Action<Group> removeUser(long user) {
-        return getClient().getProvider().patchEntryDel(this, "users", user).andThenParse(Group.class);
+        return getClient().getProvider().patchEntryDel(this, Keys.Group.MEMBERS, user).andThenParse(Group.class);
     }
 }

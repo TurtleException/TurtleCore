@@ -1,5 +1,6 @@
 package de.turtle_exception.client.api.entities;
 
+import de.turtle_exception.client.internal.data.annotations.Keys;
 import de.turtle_exception.client.api.TicketState;
 import de.turtle_exception.client.api.entities.attribute.IUserContainer;
 import de.turtle_exception.client.api.request.Action;
@@ -24,7 +25,7 @@ public interface Ticket extends Turtle, IUserContainer {
 
     @NotNull TicketState getState();
 
-    @Key(name = "state")
+    @Key(name = Keys.Ticket.STATE)
     default byte getStateCode() {
         return this.getState().getCode();
     }
@@ -33,21 +34,21 @@ public interface Ticket extends Turtle, IUserContainer {
 
     /* - TITLE - */
 
-    @Key(name = "title")
+    @Key(name = Keys.Ticket.TITLE)
     @Nullable String getTitle();
 
     @NotNull Action<Ticket> modifyTitle(@Nullable String title);
 
     /* - CATEGORY - */
 
-    @Key(name = "category")
+    @Key(name = Keys.Ticket.CATEGORY)
     @NotNull String getCategory();
 
     @NotNull Action<Ticket> modifyCategory(@NotNull String category);
 
     /* - TAGS - */
 
-    @Key(name = "tags", relation = Relation.MANY_TO_MANY)
+    @Key(name = Keys.Ticket.TAGS, relation = Relation.MANY_TO_MANY)
     @NotNull List<String> getTags();
 
     @NotNull Action<Ticket> addTag(@NotNull String tag);
@@ -56,7 +57,7 @@ public interface Ticket extends Turtle, IUserContainer {
 
     /* - DISCORD - */
 
-    @Key(name = "discord_channel")
+    @Key(name = Keys.Ticket.DISCORD_CHANNEL)
     long getDiscordChannelId();
 
     @NotNull Action<Ticket> modifyDiscordChannel(long channel);
@@ -72,7 +73,7 @@ public interface Ticket extends Turtle, IUserContainer {
 
     /* - USERS - */
 
-    @Key(name = "users", relation = Relation.MANY_TO_MANY)
+    @Key(name = Keys.Ticket.USERS, relation = Relation.MANY_TO_MANY)
     @NotNull List<User> getUsers();
 
     @NotNull Action<Ticket> addUser(long user);

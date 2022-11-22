@@ -9,6 +9,7 @@ import de.turtle_exception.client.api.entities.User;
 import de.turtle_exception.client.api.event.EventManager;
 import de.turtle_exception.client.api.request.Action;
 import de.turtle_exception.client.internal.data.JsonBuilder;
+import de.turtle_exception.client.internal.data.annotations.Keys;
 import de.turtle_exception.client.internal.entities.GroupImpl;
 import de.turtle_exception.client.internal.entities.TicketImpl;
 import de.turtle_exception.client.internal.entities.TurtleImpl;
@@ -288,7 +289,7 @@ public class TurtleClientImpl implements TurtleClient {
     /* - - - */
 
     public <T extends Turtle> Turtle updateTurtle(@NotNull Class<T> type, @NotNull JsonObject content) {
-        long id = content.get("id").getAsLong();
+        long id = content.get(Keys.Turtle.ID).getAsLong();
         T turtle = this.getTurtleById(id, type);
 
         if (turtle == null) {

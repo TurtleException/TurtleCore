@@ -12,6 +12,7 @@ import de.turtle_exception.client.api.event.entities.ticket.*;
 import de.turtle_exception.client.api.event.entities.user.*;
 import de.turtle_exception.client.internal.data.Data;
 import de.turtle_exception.client.internal.data.DataUtil;
+import de.turtle_exception.client.internal.data.annotations.Keys;
 import de.turtle_exception.client.internal.net.Connection;
 import de.turtle_exception.client.internal.net.packets.DataPacket;
 import de.turtle_exception.client.internal.util.time.TurtleType;
@@ -65,25 +66,25 @@ public class EntityUpdateListener extends EventListener {
             onUpdate(e.getKey(), e.getNewValue(), e.getEntity());
 
         if (event instanceof GroupMemberJoinEvent e)
-            onUpdateCollection(e.getEntity(), "users", e.getEntity().getUsers(), (arr, user) -> arr.add(user.getId()));
+            onUpdateCollection(e.getEntity(), Keys.Group.MEMBERS, e.getEntity().getUsers(), (arr, user) -> arr.add(user.getId()));
         if (event instanceof GroupMemberLeaveEvent e)
-            onUpdateCollection(e.getEntity(), "users", e.getEntity().getUsers(), (arr, user) -> arr.add(user.getId()));
+            onUpdateCollection(e.getEntity(), Keys.Group.MEMBERS, e.getEntity().getUsers(), (arr, user) -> arr.add(user.getId()));
         if (event instanceof TicketTagAddEvent e)
-            onUpdateCollection(e.getEntity(), "tags", e.getEntity().getTags(), JsonArray::add);
+            onUpdateCollection(e.getEntity(), Keys.Ticket.TAGS, e.getEntity().getTags(), JsonArray::add);
         if (event instanceof TicketTagRemoveEvent e)
-            onUpdateCollection(e.getEntity(), "tags", e.getEntity().getTags(), JsonArray::add);
+            onUpdateCollection(e.getEntity(), Keys.Ticket.TAGS, e.getEntity().getTags(), JsonArray::add);
         if (event instanceof TicketUserAddEvent e)
-            onUpdateCollection(e.getEntity(), "users", e.getEntity().getUsers(), (arr, user) -> arr.add(user.getId()));
+            onUpdateCollection(e.getEntity(), Keys.Ticket.USERS, e.getEntity().getUsers(), (arr, user) -> arr.add(user.getId()));
         if (event instanceof TicketUserRemoveEvent e)
-            onUpdateCollection(e.getEntity(), "users", e.getEntity().getUsers(), (arr, user) -> arr.add(user.getId()));
+            onUpdateCollection(e.getEntity(), Keys.Ticket.USERS, e.getEntity().getUsers(), (arr, user) -> arr.add(user.getId()));
         if (event instanceof UserDiscordAddEvent e)
-            onUpdateCollection(e.getEntity(), "discord", e.getEntity().getDiscordIds(), JsonArray::add);
+            onUpdateCollection(e.getEntity(), Keys.User.DISCORD, e.getEntity().getDiscordIds(), JsonArray::add);
         if (event instanceof UserDiscordRemoveEvent e)
-            onUpdateCollection(e.getEntity(), "discord", e.getEntity().getDiscordIds(), JsonArray::add);
+            onUpdateCollection(e.getEntity(), Keys.User.DISCORD, e.getEntity().getDiscordIds(), JsonArray::add);
         if (event instanceof UserMinecraftAddEvent e)
-            onUpdateCollection(e.getEntity(), "minecraft", e.getEntity().getMinecraftIds(), (arr, id) -> arr.add(id.toString()));
+            onUpdateCollection(e.getEntity(), Keys.User.MINECRAFT, e.getEntity().getMinecraftIds(), (arr, id) -> arr.add(id.toString()));
         if (event instanceof UserMinecraftRemoveEvent e)
-            onUpdateCollection(e.getEntity(), "minecraft", e.getEntity().getMinecraftIds(), (arr, id) -> arr.add(id.toString()));
+            onUpdateCollection(e.getEntity(), Keys.User.MINECRAFT, e.getEntity().getMinecraftIds(), (arr, id) -> arr.add(id.toString()));
     }
 
     private void onCreate(@NotNull Turtle turtle) {
@@ -97,7 +98,7 @@ public class EntityUpdateListener extends EventListener {
 
     private void onUpdate(@NotNull String key, @NotNull Object value, @NotNull Turtle turtle) {
         JsonObject json = new JsonObject();
-        DataUtil.addValue(json, "id", turtle.getId());
+        DataUtil.addValue(json, Keys.Turtle.ID, turtle.getId());
         DataUtil.addValue(json, key, value);
         this.sendPacket(Data.buildUpdate(turtle.getClass(), json));
     }
@@ -105,7 +106,7 @@ public class EntityUpdateListener extends EventListener {
     private <T extends Turtle, U> void onUpdateCollection(@NotNull Turtle turtle, @NotNull String key, @NotNull Collection<U> c, @NotNull BiConsumer<JsonArray, U> consumer) {
         JsonObject json = new JsonObject();
         JsonArray  arr  = new JsonArray();
-        DataUtil.addValue(json, "id", turtle.getId());
+        DataUtil.addValue(json, Keys.Turtle.ID, turtle.getId());
         for (U obj : c)
             consumer.accept(arr, obj);
         json.add(key, arr);

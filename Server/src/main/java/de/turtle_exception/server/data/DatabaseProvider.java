@@ -5,6 +5,7 @@ import de.turtle_exception.client.api.entities.Turtle;
 import de.turtle_exception.client.internal.ActionImpl;
 import de.turtle_exception.client.internal.Provider;
 import de.turtle_exception.client.internal.data.DataUtil;
+import de.turtle_exception.client.internal.data.annotations.Keys;
 import de.turtle_exception.client.internal.data.annotations.Resource;
 import de.turtle_exception.client.internal.request.actions.SimpleAction;
 import org.jetbrains.annotations.NotNull;
@@ -148,7 +149,7 @@ public class DatabaseProvider extends Provider {
 
             for (Map.Entry<String, JsonElement> entry : data.entrySet()) {
                 // don't overwrite the id
-                if (entry.getKey().equals("id")) continue;
+                if (entry.getKey().equals(Keys.Turtle.ID)) continue;
 
                 json.add(entry.getKey(), entry.getValue());
             }

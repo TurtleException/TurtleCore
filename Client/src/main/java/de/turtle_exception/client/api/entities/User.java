@@ -1,5 +1,6 @@
 package de.turtle_exception.client.api.entities;
 
+import de.turtle_exception.client.internal.data.annotations.Keys;
 import de.turtle_exception.client.api.request.Action;
 import de.turtle_exception.client.internal.data.annotations.Key;
 import de.turtle_exception.client.internal.data.annotations.Relation;
@@ -23,7 +24,7 @@ public interface User extends Turtle {
 
     /* - NAME - */
 
-    @Key(name = "name")
+    @Key(name = Keys.User.NAME)
     @NotNull String getName();
 
     @NotNull Action<User> modifyName(@NotNull String name);
@@ -48,7 +49,7 @@ public interface User extends Turtle {
 
     /* - DISCORD - */
 
-    @Key(name = "discord", relation = Relation.ONE_TO_MANY)
+    @Key(name = Keys.User.DISCORD, relation = Relation.ONE_TO_MANY)
     @NotNull List<Long> getDiscordIds();
 
     @NotNull Action<User> addDiscordId(long discordId);
@@ -70,7 +71,7 @@ public interface User extends Turtle {
 
     /* - MINECRAFT - */
 
-    @Key(name = "minecraft", relation = Relation.ONE_TO_MANY)
+    @Key(name = Keys.User.MINECRAFT, relation = Relation.ONE_TO_MANY)
     @NotNull List<UUID> getMinecraftIds();
 
     @NotNull Action<User> addMinecraftId(@NotNull UUID minecraftId);
