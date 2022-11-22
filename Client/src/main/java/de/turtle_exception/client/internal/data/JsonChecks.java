@@ -6,8 +6,10 @@ import com.google.gson.JsonObject;
 import de.turtle_exception.client.internal.data.annotations.Keys;
 import de.turtle_exception.client.internal.util.Checks;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
+import java.util.concurrent.Callable;
 
 public class JsonChecks {
     private JsonChecks() { }
@@ -47,8 +49,7 @@ public class JsonChecks {
         try {
             long   id             = json.get(Keys.Turtle.ID).getAsLong();
             byte   state          = json.get(Keys.Ticket.STATE).getAsByte();
-            // nullable
-            String title          = json.get(Keys.Ticket.TITLE).getAsString();
+            String title          = getOptional(() -> json.get(Keys.Ticket.TITLE).getAsString());
             String category       = json.get(Keys.Ticket.CATEGORY).getAsString();
             long   discordChannel = json.get(Keys.Ticket.DISCORD_CHANNEL).getAsLong();
 
@@ -60,6 +61,14 @@ public class JsonChecks {
             if (e instanceof IllegalJsonException)
                 throw e;
             throw new IllegalJsonException(e);
+        }
+    }
+
+    private static <T> @Nullable T getOptional(@NotNull Callable<T> callable) {
+        try {
+            return callable.call();
+        } catch (Exception e) {
+            return null;
         }
     }
 
