@@ -27,9 +27,8 @@ public class AnnotationUtil {
         LinkedList<Class<?>> buffer = new LinkedList<>();
         buffer.add(clazz);
 
-        while (!buffer.isEmpty()) {
-            Class<?> i = buffer.poll();
-
+        Class<?> i;
+        while ((i = buffer.poll()) != null) {
             T annotation = i.getDeclaredAnnotation(type);
             if (annotation != null)
                 return annotation;
@@ -60,9 +59,8 @@ public class AnnotationUtil {
         LinkedList<Field> buffer = new LinkedList<>();
         buffer.add(field);
 
-        while (!buffer.isEmpty()) {
-            Field i = buffer.poll();
-
+        Field i;
+        while ((i = buffer.poll()) != null) {
             T annotation = i.getDeclaredAnnotation(type);
             if (annotation != null)
                 return annotation;
@@ -91,9 +89,8 @@ public class AnnotationUtil {
         LinkedList<Method> buffer = new LinkedList<>();
         buffer.add(method);
 
-        while (!buffer.isEmpty()) {
-            Method i = buffer.poll();
-
+        Method i;
+        while ((i = buffer.poll()) != null) {
             T annotation = i.getDeclaredAnnotation(type);
             if (annotation != null)
                 return annotation;
