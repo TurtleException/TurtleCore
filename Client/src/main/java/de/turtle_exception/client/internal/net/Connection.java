@@ -12,7 +12,10 @@ import kotlin.NotImplementedError;
 import org.jetbrains.annotations.NotNull;
 
 import javax.security.auth.login.LoginException;
-import java.io.*;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.EOFException;
+import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.concurrent.CompletableFuture;
@@ -81,8 +84,7 @@ public class Connection {
 
                 this.receive(turtle, responseCode, type, content);
             } catch (EOFException e) {
-                // TODO: could this be fired for a different reason?
-                // TODO: logging
+                logger.log(Level.WARNING, "Unexpected EOFException. This usually happens when a connection is abruptly closed.", e);
                 this.stop(false);
             } catch (SocketException e) {
                 if (status == Status.DISCONNECTED) {
