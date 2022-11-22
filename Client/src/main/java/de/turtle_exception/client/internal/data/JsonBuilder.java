@@ -84,7 +84,7 @@ public class JsonBuilder {
 
         for (Iterator<AccessibleObject> it = stream.iterator(); it.hasNext(); ) {
             AccessibleObject accObj = it.next();
-            Key atKey = AnnotationUtil.getAnnotation(object.getClass(), accObj, Key.class);
+            Key atKey = AnnotationUtil.getAnnotation(accObj, Key.class);
 
             // value should be ignored
             if (atKey == null) continue;

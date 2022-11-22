@@ -5,6 +5,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -45,7 +47,73 @@ public class AnnotationUtil {
     }
 
     // TODO: docs
-    public static <T extends Annotation> @Nullable T getAnnotation(@NotNull Class<?> clazz, @NotNull AccessibleObject accObj, @NotNull Class<T> type) {
-        // TODO
+    public static <T extends Annotation> @Nullable T getAnnotation(@NotNull AccessibleObject accObj, @NotNull Class<T> type) {
+        if (accObj instanceof Field field)
+            return getAnnotation(field, type);
+        if (accObj instanceof Method method)
+            return getAnnotation(method, type);
+        throw new IllegalArgumentException("Unsupported AccessibleObject: " + accObj.getClass().getName());
+    }
+
+    // TODO: docs
+    public static <T extends Annotation> @Nullable T getAnnotation(@NotNull Field field, @NotNull Class<T> type) {
+        LinkedList<Field> buffer = new LinkedList<>();
+        buffer.add(field);
+
+        while (!buffer.isEmpty()) {
+            Field i = buffer.poll();
+
+            T annotation = i.getDeclaredAnnotation(type);
+            if (annotation != null)
+                return annotation;
+
+            // add superclass (or skip if null)
+            Class<?> superclass = i.getDeclaringClass().getSuperclass();
+            if (superclass != null) {
+                try {
+                    buffer.add(superclass.getField(i.getName()));
+                } catch (NoSuchFieldException ignored) { }
+            }
+
+            // add interfaces
+            for (Class<?> anInterface : i.getDeclaringClass().getInterfaces()) {
+                try {
+                    buffer.add(anInterface.getField(i.getName()));
+                } catch (NoSuchFieldException ignored) { }
+            }
+        }
+
+        return null;
+    }
+
+    // TODO: docs
+    public static <T extends Annotation> @Nullable T getAnnotation(@NotNull Method method, @NotNull Class<T> type) {
+        LinkedList<Method> buffer = new LinkedList<>();
+        buffer.add(method);
+
+        while (!buffer.isEmpty()) {
+            Method i = buffer.poll();
+
+            T annotation = i.getDeclaredAnnotation(type);
+            if (annotation != null)
+                return annotation;
+
+            // add superclass (or skip if null)
+            Class<?> superclass = i.getDeclaringClass().getSuperclass();
+            if (superclass != null) {
+                try {
+                    buffer.add(superclass.getMethod(i.getName(), i.getParameterTypes()));
+                } catch (NoSuchMethodException ignored) { }
+            }
+
+            // add interfaces
+            for (Class<?> anInterface : i.getDeclaringClass().getInterfaces()) {
+                try {
+                    buffer.add(anInterface.getMethod(i.getName(), i.getParameterTypes()));
+                } catch (NoSuchMethodException ignored) { }
+            }
+        }
+
+        return null;
     }
 }
