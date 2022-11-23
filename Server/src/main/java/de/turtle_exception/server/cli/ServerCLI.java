@@ -3,7 +3,7 @@ package de.turtle_exception.server.cli;
 import com.google.common.io.Resources;
 import de.turtle_exception.client.internal.util.StringUtil;
 import de.turtle_exception.server.TurtleServer;
-import de.turtle_exception.server.util.Status;
+import de.turtle_exception.server.util.StatusView;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -30,7 +30,7 @@ public class ServerCLI {
 
 
         if (StringUtil.startsWith(low, "exit", "shutdown", "stop", "quit"))
-            this.execute(input, args -> server.getStatus().set(Status.STOPPING));
+            this.execute(input, args -> server.getStatus().set(StatusView.STOPPING));
         else if (StringUtil.startsWith(low, "verbose"))
             this.execute(input, args -> verboseMode = !verboseMode);
         else if (StringUtil.startsWith(low, "help", "commands"))

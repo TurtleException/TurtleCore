@@ -9,7 +9,7 @@ import de.turtle_exception.server.data.DatabaseProvider;
 import de.turtle_exception.server.event.EntityUpdateListener;
 import de.turtle_exception.server.net.NetServer;
 import de.turtle_exception.server.util.LogUtil;
-import de.turtle_exception.server.util.Status;
+import de.turtle_exception.server.util.StatusView;
 
 import java.io.File;
 import java.io.FileReader;
@@ -22,7 +22,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class TurtleServer {
-    private final Status status = new Status();
+    private final StatusView statusView = new StatusView();
 
     /** The root logger of this server */
     private final Logger logger;
@@ -63,7 +63,7 @@ public class TurtleServer {
 
     @SuppressWarnings("StatementWithEmptyBody")
     public void run() throws Exception {
-        status.set(Status.INIT);
+        statusView.set(StatusView.INIT);
 
         logger.log(Level.INFO, "Initializing TurtleClient...");
         NetServer netServer = new NetServer(this, getPort());
@@ -76,10 +76,10 @@ public class TurtleServer {
 
         /* RUNNING */
 
-        status.set(Status.RUNNING);
+        statusView.set(StatusView.RUNNING);
         logger.log(Level.INFO, "Startup done.");
 
-        while (status.get() == Status.RUNNING) {
+        while (statusView.get() == StatusView.RUNNING) {
             // TODO: CLI
         }
 
@@ -92,7 +92,7 @@ public class TurtleServer {
      * Await execution of final tasks, proper shutdown of all active tasks and suspend all active threads.
      */
     private void shutdown() throws Exception {
-        if (status.get() <= Status.RUNNING)
+        if (statusView.get() <= StatusView.RUNNING)
             throw new IllegalStateException("Cannot shutdown while main loop is still running. Call exit() first!");
 
         logger.log(Level.INFO, "Shutting down...");
@@ -125,8 +125,8 @@ public class TurtleServer {
 
     /* - - - */
 
-    public Status getStatus() {
-        return status;
+    public StatusView getStatus() {
+        return statusView;
     }
 
     public Logger getLogger() {
