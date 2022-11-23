@@ -8,12 +8,16 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Level;
 
 public class ServerCLI {
+    private static final URL ALIAS_URL = Resources.getResource("help" + File.separator + ".aliases");
+
     private final @NotNull TurtleServer server;
 
     private boolean verboseMode = false;
@@ -35,16 +39,16 @@ public class ServerCLI {
             this.execute(input, args -> verboseMode = !verboseMode);
         else if (StringUtil.startsWith(low, "help", "commands"))
             this.execute(input, args -> {
-                URL url;
+                List<String> lines;
                 if (args.length == 0)
-                    url = Resources.getResource("help.txt");
+                    lines = Resources.readLines(Resources.getResource("help.txt"), Charset.defaultCharset());
                 else if (args.length == 1)
-                    url = Resources.getResource("help" + File.separator + args[0] + ".txt");
+                    lines = retrieveHelp(args[0]);
                 else {
                     logError("Too many arguments!", null);
                     return;
                 }
-                for (String line : Resources.readLines(url, Charset.defaultCharset()))
+                for (String line : lines)
                     this.server.getLogger().log(Level.ALL, line);
             });
         else if (StringUtil.startsWith(low, "level", "log-level"))
@@ -84,5 +88,26 @@ public class ServerCLI {
             this.server.getLogger().log(Level.WARNING, msg, e);
         else
             this.server.getLogger().log(Level.WARNING, msg + " Use command 'verbose' to enable exception logging.");
+    }
+
+    private List<String> retrieveHelp(@NotNull String command) throws IOException {
+        String low     = command.toLowerCase();
+        String pointer = "";
+
+        for (String alias : Resources.readLines(ALIAS_URL, Charset.defaultCharset())) {
+            if (alias.startsWith(low)) {
+                pointer = alias.substring(alias.indexOf('@') + 1);
+                break;
+            }
+        }
+
+        if (pointer.equals(".aliases"))
+            throw new AssertionError();
+
+        if (pointer.isEmpty())
+            return List.of("Unknown command. Use 'help' for a list of commands");
+
+        URL url = Resources.getResource("help" + File.separator + pointer + ".txt");
+        return Resources.readLines(url, Charset.defaultCharset());
     }
 }

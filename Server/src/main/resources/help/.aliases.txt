@@ -1,0 +1,9 @@
+exit@exit
+shutdown@exit
+stop@exit
+quit@exit
+verbose@verbose
+help@help
+commands@help
+level@level
+log-level@level
