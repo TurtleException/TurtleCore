@@ -1,1 +1,13 @@
-TODO: list of commands + description
+
+# GENERAL HELP SCREEN
+
+Type 'help name' to find out more about the function 'name'.
+
+exit            Closes all connections and shuts down the server.
+verbose         Toggles the CLI verbose-mode. In verbose-mode exceptions are printed on errors. Some commands may
+                provide more detailed output in verbose-mode.
+help [command]  Shows a list of available commands with descriptions (this list).
+                If an argument is provided, the command-specific help page will be shown.
+level [level]   Prints the current level of the internal logger.
+                If an argument is provided, the level of the internal logger is adjusted. The level may be the name of a
+                standard level defined by java.util.logging.Level or an integer for a custom level.
