@@ -9,6 +9,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.Arrays;
@@ -19,11 +20,13 @@ public class ServerCLI {
     private static final URL ALIAS_URL = Resources.getResource("help" + File.separator + ".aliases");
 
     private final @NotNull TurtleServer server;
+    private final @NotNull PrintStream  out;
 
     private boolean verboseMode = false;
 
     public ServerCLI(@NotNull TurtleServer server) {
         this.server = server;
+        this.out = new PrintStream(System.out);
     }
 
     public void handle(final String input) {
@@ -49,22 +52,22 @@ public class ServerCLI {
                     return;
                 }
                 for (String line : lines)
-                    this.server.getLogger().log(Level.ALL, line);
+                    out.println(line);
             });
         else if (StringUtil.startsWith(low, "level", "log-level"))
             this.execute(input, args -> {
                 if (args.length == 0) {
-                    server.getLogger().log(Level.ALL, "Current log-level is " + server.getLogger().getLevel().toString());
+                    out.println("Current log-level is " + server.getLogger().getLevel().toString());
                 } else if (args.length == 1) {
                     Level level = Level.parse(args[0]);
                     server.getLogger().setLevel(level);
-                    server.getLogger().log(Level.ALL, "Leg-level set to " + level.toString() + ".");
+                    out.println("Leg-level set to " + level.toString() + ".");
                 } else {
                     logError("Too many arguments!", null);
                 }
             });
         else
-            server.getLogger().log(Level.ALL, "Unknown command. Use 'help' for a list of commands.");
+            out.println("Unknown command. Use 'help' for a list of commands.");
     }
 
     private void execute(@NotNull String input, @NotNull Command cmd) {
@@ -74,7 +77,7 @@ public class ServerCLI {
         if (args.length < 1)
             System.arraycopy(tokens, 1, args, 0, args.length);
 
-        this.server.getLogger().log(Level.FINER, "Executing command \"" + tokens[0] + "\" with args " + Arrays.toString(args));
+        this.out.println("Executing command \"" + tokens[0] + "\" with args " + Arrays.toString(args));
 
         try {
             cmd.execute(args);
@@ -84,10 +87,11 @@ public class ServerCLI {
     }
 
     private void logError(@NotNull String msg, @Nullable Exception e) {
-        if (verboseMode || e == null)
-            this.server.getLogger().log(Level.WARNING, msg, e);
-        else
-            this.server.getLogger().log(Level.WARNING, msg + " Use command 'verbose' to enable exception logging.");
+        this.out.println(msg);
+        if (verboseMode && e != null)
+            e.printStackTrace(this.out);
+        if (!verboseMode && e != null)
+            this.out.println("Use command 'verbose' to enable exception logging.");
     }
 
     private List<String> retrieveHelp(@NotNull String command) throws IOException {
