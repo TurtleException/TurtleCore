@@ -125,6 +125,10 @@ public class TurtleServer {
 
     /* - - - */
 
+    public Status getStatus() {
+        return status;
+    }
+
     public Logger getLogger() {
         return logger;
     }
