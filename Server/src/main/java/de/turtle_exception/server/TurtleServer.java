@@ -5,6 +5,7 @@ import de.turtle_exception.client.api.TurtleClientBuilder;
 import de.turtle_exception.client.internal.util.logging.ConsoleHandler;
 import de.turtle_exception.client.internal.util.logging.NestedLogger;
 import de.turtle_exception.client.internal.util.logging.SimpleFormatter;
+import de.turtle_exception.server.cli.ServerCLI;
 import de.turtle_exception.server.data.DatabaseProvider;
 import de.turtle_exception.server.event.EntityUpdateListener;
 import de.turtle_exception.server.net.NetServer;
@@ -17,6 +18,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Properties;
+import java.util.Scanner;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -43,6 +45,8 @@ public class TurtleServer {
     private final File configFile = new File(DIR, "server.properties");
     private final Properties config = new Properties();
 
+    private final ServerCLI cli;
+
     private TurtleClient turtleClient;
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
@@ -59,9 +63,10 @@ public class TurtleServer {
 
         configFile.createNewFile();
         this.config.load(new FileReader(configFile));
+
+        this.cli = new ServerCLI(this);
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
     public void run() throws Exception {
         statusView.set(StatusView.INIT);
 
@@ -79,9 +84,11 @@ public class TurtleServer {
         statusView.set(StatusView.RUNNING);
         logger.log(Level.INFO, "Startup done.");
 
-        while (statusView.get() == StatusView.RUNNING) {
-            // TODO: CLI
-        }
+        Scanner scanner = new Scanner(System.in);
+        while (statusView.get() == StatusView.RUNNING)
+            if (scanner.hasNextLine())
+                cli.handle(scanner.nextLine());
+        scanner.close();
 
         logger.log(Level.WARNING, "Main loop has been interrupted.");
 
