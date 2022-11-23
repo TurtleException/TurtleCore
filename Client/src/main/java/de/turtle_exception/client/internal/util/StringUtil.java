@@ -63,4 +63,11 @@ public class StringUtil {
     public static @NotNull String cutEnd(@NotNull String str, int i) throws IndexOutOfBoundsException {
         return str.substring(str.length() - i);
     }
+
+    public static boolean startsWith(@NotNull String str, @NotNull String... start) {
+        for (String compare : start)
+            if (str.startsWith(compare))
+                return true;
+        return false;
+    }
 }
