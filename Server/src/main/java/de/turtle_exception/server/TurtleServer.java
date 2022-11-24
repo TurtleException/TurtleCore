@@ -7,6 +7,7 @@ import de.turtle_exception.client.internal.util.logging.NestedLogger;
 import de.turtle_exception.client.internal.util.logging.SimpleFormatter;
 import de.turtle_exception.server.cli.ServerCLI;
 import de.turtle_exception.server.data.DatabaseProvider;
+import de.turtle_exception.server.data.LoginHandler;
 import de.turtle_exception.server.event.EntityUpdateListener;
 import de.turtle_exception.server.net.NetServer;
 import de.turtle_exception.server.util.LogUtil;
@@ -45,6 +46,8 @@ public class TurtleServer {
     private final File configFile = new File(DIR, "server.properties");
     private final Properties config = new Properties();
 
+    private final LoginHandler loginHandler;
+
     private final ServerCLI cli;
 
     private TurtleClient turtleClient;
@@ -63,6 +66,8 @@ public class TurtleServer {
 
         configFile.createNewFile();
         this.config.load(new FileReader(configFile));
+
+        this.loginHandler = new LoginHandler(this);
 
         this.cli = new ServerCLI(this);
     }
@@ -146,5 +151,9 @@ public class TurtleServer {
 
     public TurtleClient getClient() {
         return turtleClient;
+    }
+
+    public LoginHandler getLoginHandler() {
+        return loginHandler;
     }
 }

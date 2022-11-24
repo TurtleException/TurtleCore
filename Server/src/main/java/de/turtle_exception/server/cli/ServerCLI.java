@@ -77,11 +77,19 @@ public class ServerCLI {
             });
         else if (StringUtil.startsWith(low, "adduser", "addlogin"))
             this.execute(input, args -> {
-                // TODO
+                if (args.length < 2) {
+                    out.println("Too few arguments! Please provide <login> and <pass>");
+                    return;
+                }
+                out.println(server.getLoginHandler().addLogin(args[0], args[1]));
             });
         else if (StringUtil.startsWith(low, "deluser", "dellogin"))
             this.execute(input, args -> {
-                // TODO
+                if (args.length < 1) {
+                    out.println("Too few arguments! Please provide <login>");
+                    return;
+                }
+                out.println(server.getLoginHandler().addLogin(args[0], args[1]));
             });
         else
             out.println("Unknown command. Use 'help' for a list of commands.");
