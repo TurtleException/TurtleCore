@@ -8,6 +8,8 @@ import de.turtle_exception.client.internal.data.ResourceUtil;
 import de.turtle_exception.client.internal.data.annotations.Keys;
 import de.turtle_exception.client.internal.data.annotations.Resource;
 import de.turtle_exception.client.internal.request.actions.SimpleAction;
+import de.turtle_exception.client.internal.util.time.TurtleType;
+import de.turtle_exception.client.internal.util.time.TurtleUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -123,10 +125,11 @@ public class DatabaseProvider extends Provider {
 
     private @Nullable JsonObject doPut(@NotNull Class<? extends Turtle> type, @NotNull JsonObject data) throws AnnotationFormatError {
         Resource annotation = ResourceUtil.getResourceAnnotation(type);
-        long id = ResourceUtil.getTurtleId(data);
-        File file = getFile(annotation, id);
 
-        // TODO: make sure the id is created by the server
+        long id = TurtleUtil.newId(TurtleType.ofResource(type));
+        data.addProperty("id", id);
+
+        File file = getFile(annotation, id);
 
         try {
             this.setJson(data, file);
@@ -137,7 +140,7 @@ public class DatabaseProvider extends Provider {
         }
     }
 
-    private @NotNull JsonObject doPatch(@NotNull Class<? extends Turtle> type, @NotNull JsonObject data, long id) throws AnnotationFormatError {
+    private @NotNull JsonObject doPatch(@NotNull Class<? extends Turtle> type, @NotNull JsonObject data, long id) throws AnnotationFormatError, IOException {
         Resource annotation = ResourceUtil.getResourceAnnotation(type);
         File file = getFile(annotation, id);
 
@@ -157,8 +160,6 @@ public class DatabaseProvider extends Provider {
             this.setJson(json, file);
         } catch (FileNotFoundException e) {
             throw new AssertionError("File should exist and not be a directory.");
-        } catch (IOException ignored) {
-            // TODO ?
         }
 
         try {
@@ -168,7 +169,7 @@ public class DatabaseProvider extends Provider {
         }
     }
 
-    private @NotNull JsonObject doPatchEntry(@NotNull Class<? extends Turtle> type, long id, @NotNull String key, @NotNull Object obj, boolean add) {
+    private @NotNull JsonObject doPatchEntry(@NotNull Class<? extends Turtle> type, long id, @NotNull String key, @NotNull Object obj, boolean add) throws IOException {
         JsonObject json = this.doGet(type, id);
 
         if (json == null)
