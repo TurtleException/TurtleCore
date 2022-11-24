@@ -11,7 +11,7 @@ import de.turtle_exception.client.api.request.Action;
 import de.turtle_exception.client.api.request.GroupAction;
 import de.turtle_exception.client.api.request.TicketAction;
 import de.turtle_exception.client.api.request.UserAction;
-import de.turtle_exception.client.internal.data.JsonBuilder;
+import de.turtle_exception.client.internal.data.ResourceBuilder;
 import de.turtle_exception.client.internal.data.annotations.Keys;
 import de.turtle_exception.client.internal.entities.GroupImpl;
 import de.turtle_exception.client.internal.entities.TicketImpl;
@@ -58,7 +58,7 @@ public class TurtleClientImpl implements TurtleClient {
     /** Name of this instance. Naming is not required, but it may be helpful when using multiple instances. */
     private final @Nullable String name;
 
-    private final JsonBuilder jsonBuilder;
+    private final ResourceBuilder resourceBuilder;
     private final EventManager eventManager;
     /** The internal network part of the client */
     private final NetworkAdapter networkAdapter;
@@ -80,8 +80,8 @@ public class TurtleClientImpl implements TurtleClient {
         this.logger = logger;
         this.logger.log(Level.INFO, "Hello there  (Starting...)");
 
-        this.logger.log(Level.FINE, "Initializing JsonBuilder.");
-        this.jsonBuilder = new JsonBuilder(this);
+        this.logger.log(Level.FINE, "Initializing ResourceBuilder.");
+        this.resourceBuilder = new ResourceBuilder(this);
 
         this.logger.log(Level.FINE, "Initializing EventManager.");
         this.eventManager = new EventManager(this);
@@ -134,8 +134,8 @@ public class TurtleClientImpl implements TurtleClient {
         return VERSION;
     }
 
-    public @NotNull JsonBuilder getJsonBuilder() {
-        return jsonBuilder;
+    public @NotNull ResourceBuilder getResourceBuilder() {
+        return resourceBuilder;
     }
 
     @Override
@@ -317,7 +317,7 @@ public class TurtleClientImpl implements TurtleClient {
 
         if (turtle == null) {
             // create new object
-            turtle = this.getJsonBuilder().buildObject(type, content);
+            turtle = this.getResourceBuilder().buildObject(type, content);
             UpdateHelper.ofCreateTurtle(turtle);
         } else {
             // update object

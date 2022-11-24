@@ -13,8 +13,8 @@ import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-public class DataUtil {
-    private DataUtil() { }
+public class ResourceUtil {
+    private ResourceUtil() { }
 
     // TODO: should this really throw an Error? Maybe an IllegalArgumentException would be better
     public static @NotNull Resource getResourceAnnotation(@NotNull Class<? extends Turtle> clazz) throws AnnotationFormatError {

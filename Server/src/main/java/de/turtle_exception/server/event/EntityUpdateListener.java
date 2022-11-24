@@ -11,7 +11,7 @@ import de.turtle_exception.client.api.event.entities.group.*;
 import de.turtle_exception.client.api.event.entities.ticket.*;
 import de.turtle_exception.client.api.event.entities.user.*;
 import de.turtle_exception.client.internal.data.Data;
-import de.turtle_exception.client.internal.data.DataUtil;
+import de.turtle_exception.client.internal.data.ResourceUtil;
 import de.turtle_exception.client.internal.data.annotations.Keys;
 import de.turtle_exception.client.internal.net.Connection;
 import de.turtle_exception.client.internal.net.packets.DataPacket;
@@ -88,7 +88,7 @@ public class EntityUpdateListener extends EventListener {
     }
 
     private void onCreate(@NotNull Turtle turtle) {
-        JsonObject json = server.getClientImpl().getJsonBuilder().buildJson(turtle);
+        JsonObject json = server.getClientImpl().getResourceBuilder().buildJson(turtle);
         this.sendPacket(Data.buildUpdate(turtle.getClass(), json));
     }
 
@@ -98,15 +98,15 @@ public class EntityUpdateListener extends EventListener {
 
     private void onUpdate(@NotNull String key, @NotNull Object value, @NotNull Turtle turtle) {
         JsonObject json = new JsonObject();
-        DataUtil.addValue(json, Keys.Turtle.ID, turtle.getId());
-        DataUtil.addValue(json, key, value);
+        ResourceUtil.addValue(json, Keys.Turtle.ID, turtle.getId());
+        ResourceUtil.addValue(json, key, value);
         this.sendPacket(Data.buildUpdate(turtle.getClass(), json));
     }
 
     private <T extends Turtle, U> void onUpdateCollection(@NotNull Turtle turtle, @NotNull String key, @NotNull Collection<U> c, @NotNull BiConsumer<JsonArray, U> consumer) {
         JsonObject json = new JsonObject();
         JsonArray  arr  = new JsonArray();
-        DataUtil.addValue(json, Keys.Turtle.ID, turtle.getId());
+        ResourceUtil.addValue(json, Keys.Turtle.ID, turtle.getId());
         for (U obj : c)
             consumer.accept(arr, obj);
         json.add(key, arr);

@@ -34,7 +34,7 @@ public record Data (
     }
 
     public long id() {
-        return DataUtil.getTurtleId(contentObject());
+        return ResourceUtil.getTurtleId(contentObject());
     }
 
     /* - - - */
@@ -98,7 +98,7 @@ public record Data (
 
         JsonObject json = new JsonObject();
         for (int i = 0; i < args.length; i = i + 2)
-            DataUtil.addValue(json, String.valueOf(args[i]), args[i + 1]);
+            ResourceUtil.addValue(json, String.valueOf(args[i]), args[i + 1]);
         return json;
     }
 }

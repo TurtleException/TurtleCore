@@ -24,20 +24,20 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.stream.Stream;
 
-public class JsonBuilder {
+public class ResourceBuilder {
     private final TurtleClient client;
     private final NestedLogger logger;
 
-    public JsonBuilder(@NotNull TurtleClient client) {
+    public ResourceBuilder(@NotNull TurtleClient client) {
         this.client = client;
-        this.logger = new NestedLogger("JsonBuilder", client.getLogger());
+        this.logger = new NestedLogger("ResourceBuilder", client.getLogger());
     }
 
     public <T extends Turtle> @NotNull T buildObject(@NotNull Class<T> type, JsonObject json) throws IllegalArgumentException, AnnotationFormatError {
         Checks.nonNull(json, "JSON data");
 
         // Make sure the @Resource annotation is present
-        Resource annotation = DataUtil.getResourceAnnotation(type);
+        Resource annotation = ResourceUtil.getResourceAnnotation(type);
 
         this.logger.log(Level.FINE, "Build call (JSON > obj) for object of type " + type.getSimpleName());
 
@@ -71,7 +71,7 @@ public class JsonBuilder {
     }
 
     public @NotNull JsonObject buildJson(@NotNull Turtle object) throws IllegalArgumentException, AnnotationFormatError {
-        Resource resource = DataUtil.getResourceAnnotation(object.getClass());
+        Resource resource = ResourceUtil.getResourceAnnotation(object.getClass());
 
         this.logger.log(Level.FINE, "Build call (obj > JSON) for object of type " + object.getClass().getSimpleName());
 
@@ -89,10 +89,10 @@ public class JsonBuilder {
             // value should be ignored
             if (atKey == null) continue;
 
-            Object value = DataUtil.getValue(accObj, object);
+            Object value = ResourceUtil.getValue(accObj, object);
 
             if (atKey.relation() == Relation.ONE_TO_ONE)
-                DataUtil.addValue(json, atKey.name(), value);
+                ResourceUtil.addValue(json, atKey.name(), value);
             else
                 json.add(atKey.name(), handleReference(atKey, value));
         }
@@ -122,7 +122,7 @@ public class JsonBuilder {
 
         // reference to a primitive type
         for (Object o : iterable)
-            DataUtil.addValue(arr, o);
+            ResourceUtil.addValue(arr, o);
 
         return arr;
     }

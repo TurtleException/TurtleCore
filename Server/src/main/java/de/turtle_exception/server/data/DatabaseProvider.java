@@ -4,7 +4,7 @@ import com.google.gson.*;
 import de.turtle_exception.client.api.entities.Turtle;
 import de.turtle_exception.client.internal.ActionImpl;
 import de.turtle_exception.client.internal.Provider;
-import de.turtle_exception.client.internal.data.DataUtil;
+import de.turtle_exception.client.internal.data.ResourceUtil;
 import de.turtle_exception.client.internal.data.annotations.Keys;
 import de.turtle_exception.client.internal.data.annotations.Resource;
 import de.turtle_exception.client.internal.request.actions.SimpleAction;
@@ -78,7 +78,7 @@ public class DatabaseProvider extends Provider {
     /* - - - */
 
     private boolean doDelete(@NotNull Class<? extends Turtle> type, long id) throws AnnotationFormatError {
-        Resource annotation = DataUtil.getResourceAnnotation(type);
+        Resource annotation = ResourceUtil.getResourceAnnotation(type);
         File file = this.getFile(annotation, id);
 
         // TODO: associations?
@@ -87,7 +87,7 @@ public class DatabaseProvider extends Provider {
     }
 
     private @Nullable JsonObject doGet(@NotNull Class<? extends Turtle> type, long id) throws AnnotationFormatError {
-        Resource annotation = DataUtil.getResourceAnnotation(type);
+        Resource annotation = ResourceUtil.getResourceAnnotation(type);
         File file = this.getFile(annotation, id);
 
         if (!file.exists()) return null;
@@ -100,7 +100,7 @@ public class DatabaseProvider extends Provider {
     }
 
     private @NotNull JsonArray doGet(@NotNull Class<? extends Turtle> type) throws AnnotationFormatError {
-        Resource annotation = DataUtil.getResourceAnnotation(type);
+        Resource annotation = ResourceUtil.getResourceAnnotation(type);
         File file = this.getFile(annotation);
 
         JsonArray arr = new JsonArray();
@@ -122,8 +122,8 @@ public class DatabaseProvider extends Provider {
     }
 
     private @Nullable JsonObject doPut(@NotNull Class<? extends Turtle> type, @NotNull JsonObject data) throws AnnotationFormatError {
-        Resource annotation = DataUtil.getResourceAnnotation(type);
-        long id = DataUtil.getTurtleId(data);
+        Resource annotation = ResourceUtil.getResourceAnnotation(type);
+        long id = ResourceUtil.getTurtleId(data);
         File file = getFile(annotation, id);
 
         // TODO: make sure the id is created by the server
@@ -138,7 +138,7 @@ public class DatabaseProvider extends Provider {
     }
 
     private @NotNull JsonObject doPatch(@NotNull Class<? extends Turtle> type, @NotNull JsonObject data, long id) throws AnnotationFormatError {
-        Resource annotation = DataUtil.getResourceAnnotation(type);
+        Resource annotation = ResourceUtil.getResourceAnnotation(type);
         File file = getFile(annotation, id);
 
         if (!file.exists())
@@ -178,9 +178,9 @@ public class DatabaseProvider extends Provider {
         JsonArray  arr   = json.get(key).getAsJsonArray();
 
         if (add)
-            DataUtil.addValue(arr, obj);
+            ResourceUtil.addValue(arr, obj);
         else
-            DataUtil.removeValue(arr, obj);
+            ResourceUtil.removeValue(arr, obj);
 
         patch.add(key, arr);
         return this.doPatch(type, patch, id);

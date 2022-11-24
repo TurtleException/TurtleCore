@@ -1,7 +1,6 @@
 package de.turtle_exception.server.net;
 
 import com.google.common.collect.Sets;
-import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -24,8 +23,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.security.auth.login.LoginException;
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -177,7 +174,7 @@ public class NetServer extends NetworkAdapter {
             return;
         }
 
-        JsonObject content = getClientImpl().getJsonBuilder().buildJson(turtle);
+        JsonObject content = getClientImpl().getResourceBuilder().buildJson(turtle);
         respond(packet, Data.buildUpdate(turtle.getClass(), content));
     }
 
@@ -191,7 +188,7 @@ public class NetServer extends NetworkAdapter {
             // filter types
             if (!type.isInstance(turtle)) continue;
 
-            JsonObject turtleJson = getClientImpl().getJsonBuilder().buildJson(turtle);
+            JsonObject turtleJson = getClientImpl().getResourceBuilder().buildJson(turtle);
             content.add(turtleJson);
         }
 
@@ -208,7 +205,7 @@ public class NetServer extends NetworkAdapter {
 
         // TODO: check for used discord / minecraft / ...
 
-        notifyClients(packet, Data.buildUpdate(type, getClientImpl().getJsonBuilder().buildJson(turtle)));
+        notifyClients(packet, Data.buildUpdate(type, getClientImpl().getResourceBuilder().buildJson(turtle)));
     }
 
     private void handlePatch(@NotNull DataPacket packet) {
@@ -226,7 +223,7 @@ public class NetServer extends NetworkAdapter {
 
         getClient().getProvider().patch(type, packet.getData().contentObject(), turtle.getId()).queue(result -> {
             Turtle resTurtle = getClientImpl().updateTurtle(turtle.getClass(), result);
-            notifyClients(packet, Data.buildUpdate(resTurtle.getClass(), getClientImpl().getJsonBuilder().buildJson(resTurtle)));
+            notifyClients(packet, Data.buildUpdate(resTurtle.getClass(), getClientImpl().getResourceBuilder().buildJson(resTurtle)));
         }, throwable -> {
             respond(packet, "Internal error", throwable);
         });
@@ -248,7 +245,7 @@ public class NetServer extends NetworkAdapter {
 
         action.queue(result -> {
             Turtle resTurtle = getClientImpl().updateTurtle(type, result);
-            notifyClients(packet, Data.buildUpdate(resTurtle.getClass(), getClientImpl().getJsonBuilder().buildJson(resTurtle)));
+            notifyClients(packet, Data.buildUpdate(resTurtle.getClass(), getClientImpl().getResourceBuilder().buildJson(resTurtle)));
         }, throwable -> {
             respond(packet, "Internal error", throwable);
         });
