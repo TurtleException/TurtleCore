@@ -12,3 +12,5 @@ level [level]                   Prints the current level of the internal logger.
                                 If an argument is provided, the level of the internal logger is adjusted. The level may be the name of a
                                 standard level defined by java.util.logging.Level or an integer for a custom level.
 invalidate-caches [true|false]  Invalidates all caches the internal TurtleClient manages.
+adduser <login> <pass>          Creates a new client login.
+deluser <login>                 Deletes a client login.

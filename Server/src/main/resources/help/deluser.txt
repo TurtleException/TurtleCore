@@ -1,0 +1,11 @@
+
+# HELP SCREEN - COMMAND 'adduser'
+
+Deletes a client login. Both login and pass cannot be restored afterwards.
+This command will NOT ask for confirmation.
+
+Arguments:
+    login   (optional)  The login string.
+
+Aliases:
+    dellogin

@@ -8,3 +8,7 @@ commands@help
 level@level
 log-level@level
 invalidate-caches@invalidate-caches
+adduser@adduser
+addlogin@adduser
+deluser@deluser
+dellogin@dellogin

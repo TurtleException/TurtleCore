@@ -75,6 +75,14 @@ public class ServerCLI {
                 server.getClient().invalidateCaches(Boolean.parseBoolean(args[0]));
                 out.println("Caches invalidated!");
             });
+        else if (StringUtil.startsWith(low, "adduser", "addlogin"))
+            this.execute(input, args -> {
+                // TODO
+            });
+        else if (StringUtil.startsWith(low, "deluser", "dellogin"))
+            this.execute(input, args -> {
+                // TODO
+            });
         else
             out.println("Unknown command. Use 'help' for a list of commands.");
     }
