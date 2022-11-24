@@ -66,6 +66,15 @@ public class ServerCLI {
                     logError("Too many arguments!", null);
                 }
             });
+        else if (StringUtil.startsWith(low, "invalidate-caches"))
+            this.execute(input, args -> {
+                if (args.length == 0) {
+                    out.println("Too few arguments! Append [true|false] to indicate refill.");
+                    return;
+                }
+                server.getClient().invalidateCaches(Boolean.parseBoolean(args[0]));
+                out.println("Caches invalidated!");
+            });
         else
             out.println("Unknown command. Use 'help' for a list of commands.");
     }

@@ -7,3 +7,4 @@ help@help
 commands@help
 level@level
 log-level@level
+invalidate-caches@invalidate-caches
