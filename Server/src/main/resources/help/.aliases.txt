@@ -1,0 +1,14 @@
+exit@exit
+shutdown@exit
+stop@exit
+quit@exit
+verbose@verbose
+help@help
+commands@help
+level@level
+log-level@level
+invalidate-caches@invalidate-caches
+adduser@adduser
+addlogin@adduser
+deluser@deluser
+dellogin@dellogin

@@ -1,0 +1,14 @@
+
+# HELP SCREEN - COMMAND 'invalidate-caches'
+
+Invalidates all caches the internal TurtleClient manages and (if instructed via the first parameter) retrieves all
+information from the database to re-fill them.
+Note that doing so may cause temporary performance issues for the server and to most connected clients as this is an
+expensive call that will also fire a lot of remove- / update-events.
+
+Arguments:
+    retrieve    (optional)  May be either 'true' or 'false'.
+                            Indicates whether the database should be queried after caches have been emptied.
+
+Aliases:
+    <none>

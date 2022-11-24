@@ -67,7 +67,7 @@ class ServerHandshake extends Handshake {
             String pass = null;
 
             try {
-                pass = server.checkLogin(login);
+                pass = server.getServer().getLoginHandler().checkLogin(login);
             } catch (LoginException e) {
                 this.sendError(packet, "Login error", e);
             }

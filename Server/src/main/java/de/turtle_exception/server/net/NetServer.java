@@ -35,10 +35,8 @@ import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 
 public class NetServer extends NetworkAdapter {
-    private final TurtleServer server;
+    private final @NotNull TurtleServer server;
     private final int port;
-
-    private final File loginFile;
 
     private Set<Connection> clients;
     private ServerSocket socket;
@@ -48,8 +46,6 @@ public class NetServer extends NetworkAdapter {
     public NetServer(@NotNull TurtleServer server, int port) {
         this.server = server;
         this.port = port;
-
-        this.loginFile = new File(TurtleServer.DIR, "meta" + File.separator + "login.json");
     }
 
     @Override
@@ -292,37 +288,9 @@ public class NetServer extends NetworkAdapter {
 
     /* - - - */
 
-    @SuppressWarnings("ResultOfMethodCallIgnored")
-    synchronized @Nullable String checkLogin(@NotNull String login) throws LoginException {
-        try {
-            loginFile.getParentFile().mkdir();
-            loginFile.createNewFile();
-
-            JsonObject json = new Gson().fromJson(new FileReader(loginFile), JsonObject.class);
-
-            String pass = json.get(login).getAsString();
-
-            if (pass == null)
-                throw new LoginException("Unknown login or pass");
-
-            getLogger().log(Level.INFO, "Permitted check for login \"" + login + "\"");
-            return pass;
-        } catch (IOException e) {
-            getLogger().log(Level.WARNING, "Internal IO error for login request \"" + login + "\"", e);
-            throw new LoginException("Internal IO error");
-        } catch (ClassCastException | IllegalStateException e) {
-            getLogger().log(Level.FINE, "JSON error for login request \"" + login + "\"", e);
-            return null;
-        } catch (LoginException e) {
-            // TODO: log
-            throw e;
-        } catch (Throwable t) {
-            getLogger().log(Level.WARNING, "Unknown internal error for login request \"" + login + "\"", t);
-            throw new LoginException("Unknown internal error");
-        }
+    public @NotNull TurtleServer getServer() {
+        return this.server;
     }
-
-    /* - - - */
 
     public @NotNull Set<Connection> getClients() {
         return Set.copyOf(clients);

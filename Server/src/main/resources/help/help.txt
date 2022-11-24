@@ -1,0 +1,11 @@
+
+# HELP SCREEN - COMMAND 'help'
+
+Shows a list of available commands with descriptions.
+If an argument is provided, the command-specific help page will be shown.
+
+Arguments:
+    command     (optional)  A specific command.
+
+Aliases:
+    commands
