@@ -81,7 +81,10 @@ public class ServerCLI {
                     out.println("Too few arguments! Please provide <login> and <pass>");
                     return;
                 }
-                out.println(server.getLoginHandler().addLogin(args[0], args[1]));
+                String login = args[1];
+                out.print("\b".repeat(login.length() + 1));
+                out.println("*".repeat(login.length()));
+                out.println(server.getLoginHandler().addLogin(args[0], login));
             });
         else if (StringUtil.startsWith(low, "deluser", "dellogin"))
             this.execute(input, args -> {
@@ -89,7 +92,7 @@ public class ServerCLI {
                     out.println("Too few arguments! Please provide <login>");
                     return;
                 }
-                out.println(server.getLoginHandler().addLogin(args[0], args[1]));
+                out.println(server.getLoginHandler().delLogin(args[0]));
             });
         else
             out.println("Unknown command. Use 'help' for a list of commands.");
