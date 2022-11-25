@@ -23,8 +23,8 @@ import java.util.logging.Logger;
 /**
  * The TurtleClientBuilder is used to instantiate the {@link TurtleClient} interface, while avoiding an explicit
  * interaction with the {@code client.internal} package.
- * <p>A TurtleClientBuilder can be re-used to instantiate multiple instances of a {@link TurtleClient}. This might be
- * useful to connect to the server with multiple users to clearly distinct between different features of an application.
+ * <p> A TurtleClientBuilder can be re-used to instantiate multiple instances of a {@link TurtleClient}. This might be
+ * useful to connect to the server with multiple logins to clearly distinct between different features of an application.
  */
 @SuppressWarnings("unused")
 public class TurtleClientBuilder {

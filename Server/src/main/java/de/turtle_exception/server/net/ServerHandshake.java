@@ -27,7 +27,7 @@ class ServerHandshake extends Handshake {
         // initial request (version)
         this.connection.send(
                 new HandshakePacket(
-                        server.getClient().getDefaultTimeoutOutbound(),
+                        server.getClient().getTimeoutOutbound(),
                         connection,
                         "VERSION"
                 ), false

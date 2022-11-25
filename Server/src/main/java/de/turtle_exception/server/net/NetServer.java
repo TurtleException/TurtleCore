@@ -57,7 +57,7 @@ public class NetServer extends NetworkAdapter {
             getLogger().log(Level.FINEST, "Dispatching heartbeats for " + clients.size() + " client(s).");
             this.clients.forEach(connection -> {
                 connection.send(
-                        new HeartbeatPacket(server.getClient().getDefaultTimeoutOutbound(), connection), false
+                        new HeartbeatPacket(server.getClient().getTimeoutOutbound(), connection), false
                 );
             });
         }, 10, TimeUnit.SECONDS);
@@ -280,7 +280,7 @@ public class NetServer extends NetworkAdapter {
     }
 
     private long defaultDeadline() {
-        return System.currentTimeMillis() + getClient().getDefaultTimeoutOutbound();
+        return System.currentTimeMillis() + getClient().getTimeoutOutbound();
     }
 
     /* - - - */

@@ -389,23 +389,23 @@ public class TurtleClientImpl implements TurtleClient {
     /* - - - */
 
     @Override
-    public @Range(from = 0, to = Long.MAX_VALUE) long getDefaultTimeoutInbound() {
+    public @Range(from = 0, to = Long.MAX_VALUE) long getTimeoutInbound() {
         return defaultTimeoutInbound;
     }
 
     @Override
-    public void setDefaultTimeoutInbound(@Range(from = 0, to = Long.MAX_VALUE) long defaultTimeoutInbound) {
-        this.defaultTimeoutInbound = defaultTimeoutInbound;
+    public void setTimeoutInbound(@Range(from = 0, to = Long.MAX_VALUE) long ms) {
+        this.defaultTimeoutInbound = ms;
     }
 
     @Override
-    public @Range(from = 0, to = Long.MAX_VALUE) long getDefaultTimeoutOutbound() {
+    public @Range(from = 0, to = Long.MAX_VALUE) long getTimeoutOutbound() {
         return defaultTimeoutOutbound;
     }
 
     @Override
-    public void setDefaultTimeoutOutbound(@Range(from = 0, to = Long.MAX_VALUE) long defaultTimeoutOutbound) {
-        this.defaultTimeoutOutbound = defaultTimeoutOutbound;
+    public void setTimeoutOutbound(@Range(from = 0, to = Long.MAX_VALUE) long ms) {
+        this.defaultTimeoutOutbound = ms;
     }
 
     /* - - - */

@@ -31,7 +31,7 @@ public class EntityUpdateListener extends EventListener {
     }
 
     private final void sendPacket(@NotNull Data data) {
-        final long deadline = System.currentTimeMillis() + server.getClient().getDefaultTimeoutOutbound();
+        final long deadline = System.currentTimeMillis() + server.getClient().getTimeoutOutbound();
         final long responseCode = TurtleUtil.newId(TurtleType.RESPONSE_CODE);
 
         for (Connection client : server.getClients())

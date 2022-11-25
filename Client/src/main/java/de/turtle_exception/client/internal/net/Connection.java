@@ -51,7 +51,7 @@ public class Connection {
         this.adapter = adapter;
         this.logger = new NestedLogger("CON#" + socket.getInetAddress() + ":" + socket.getPort(), adapter.getLogger());
 
-        this.requestCallbacks = new RequestCallbackPool(adapter.getClient().getDefaultTimeoutOutbound(), logger);
+        this.requestCallbacks = new RequestCallbackPool(adapter.getClient().getTimeoutOutbound(), logger);
 
         this.socket = socket;
         this.out = new DataOutputStream(socket.getOutputStream());
@@ -173,7 +173,7 @@ public class Connection {
         if (content == null)    return;
         if (content.length < 1) return;
 
-        final long deadline = System.currentTimeMillis() + adapter.getClient().getDefaultTimeoutInbound();
+        final long deadline = System.currentTimeMillis() + adapter.getClient().getTimeoutInbound();
 
         try {
             this.receive(new CompiledPacket(turtle, responseCode, type, content, Direction.INBOUND, this, deadline));
