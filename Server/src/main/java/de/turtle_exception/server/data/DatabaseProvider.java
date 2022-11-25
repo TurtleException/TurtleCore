@@ -83,7 +83,16 @@ public class DatabaseProvider extends Provider {
         Resource annotation = ResourceUtil.getResourceAnnotation(type);
         File file = this.getFile(annotation, id);
 
-        // TODO: associations?
+        /*
+         * This would normally be the point where all associations to this resource (i.e. Group membership when deleting
+         * a User) should be deleted. Doing so would either require a two-way reference (which isn't ideal when working
+         * with a local filesystem) or a complete sweep of the entire database to filter for occurrences of the resource
+         * id. This would of course be a pretty costly operation, especially with a growing database.
+         * So for now the approach will be this: Resources that have references to other resources should filter the
+         * reference ids on instantiation and log any id that could not be linked to an instance of that referenced
+         * resource. After that, the id will be ignored.
+         * This might be revisited if / when the database will be moved to SQL.
+         */
 
         return file.delete();
     }

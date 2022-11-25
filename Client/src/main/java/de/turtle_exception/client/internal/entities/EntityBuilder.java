@@ -13,14 +13,23 @@ import de.turtle_exception.client.internal.data.IllegalJsonException;
 import de.turtle_exception.client.internal.data.JsonChecks;
 import de.turtle_exception.client.internal.util.Checks;
 import de.turtle_exception.client.internal.util.TurtleSet;
+import de.turtle_exception.client.internal.util.logging.NestedLogger;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.UUID;
+import java.util.logging.Level;
 
 @SuppressWarnings("unused")
 public class EntityBuilder {
     private EntityBuilder() { }
+
+    @SuppressWarnings("SameParameterValue")
+    private static void log(@NotNull TurtleClient client, @NotNull Level level, @NotNull String type, Long id, @NotNull String msg) {
+        client.getLogger().log(Level.FINE, MessageFormat.format("[EntityBuilder] [{0}:{1}]  " + msg, type, id));
+    }
 
     /**
      * Builds a {@link Group} object from the provided JSON data.
@@ -38,8 +47,13 @@ public class EntityBuilder {
 
         JsonArray       userArr  = data.getAsJsonArray(Keys.Group.MEMBERS);
         TurtleSet<User> users    = new TurtleSet<>();
-        for (JsonElement element : userArr)
-            users.add(client.getUserById(element.getAsLong()));
+        for (JsonElement element : userArr) {
+            User userElement = client.getUserById(element.getAsLong());
+            if (userElement == null)
+                log(client, Level.FINE, "Group", id, "Could not link User:" + element.getAsLong() + ". Has it been deleted?");
+            else
+                users.add(userElement);
+        }
 
         return new GroupImpl(client, id, name, users);
     }
@@ -66,8 +80,13 @@ public class EntityBuilder {
 
         JsonArray       userArr  = data.getAsJsonArray(Keys.Ticket.USERS);
         TurtleSet<User> users    = new TurtleSet<>();
-        for (JsonElement element : userArr)
-            users.add(client.getUserById(element.getAsLong()));
+        for (JsonElement element : userArr) {
+            User userElement = client.getUserById(element.getAsLong());
+            if (userElement == null)
+                log(client, Level.FINE, "Ticket", id, "Could not link User:" + element.getAsLong() + ". Has it been deleted?");
+            else
+                users.add(userElement);
+        }
 
         return new TicketImpl(client, id, state, title, category, discordChannel, tags, users);
     }
