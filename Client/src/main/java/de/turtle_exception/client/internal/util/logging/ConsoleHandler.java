@@ -8,8 +8,7 @@ import java.util.logging.StreamHandler;
 
 public class ConsoleHandler extends StreamHandler {
     public ConsoleHandler(@NotNull Formatter formatter) {
-        // TODO: Should System.err be used here?
-        super(System.out, formatter);
+        super(System.err, formatter);
     }
 
     @Override

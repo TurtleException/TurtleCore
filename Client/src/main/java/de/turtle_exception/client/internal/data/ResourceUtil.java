@@ -16,7 +16,7 @@ import java.lang.reflect.Method;
 public class ResourceUtil {
     private ResourceUtil() { }
 
-    // TODO: should this really throw an Error? Maybe an IllegalArgumentException would be better
+    // this throws an Error instead of an Exception because every Class extending Turtle should hava a @Resource annotation
     public static @NotNull Resource getResourceAnnotation(@NotNull Class<? extends Turtle> clazz) throws AnnotationFormatError {
         Resource annotation = AnnotationUtil.getAnnotation(clazz, Resource.class);
         if (annotation == null)

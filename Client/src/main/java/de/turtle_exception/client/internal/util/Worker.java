@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.TimeUnit;
 import java.util.function.BooleanSupplier;
+import java.util.function.Consumer;
 
 /**
  * A simple Thread that continuously repeats executing a {@link Runnable} until it is interrupted by a provided
@@ -14,31 +15,42 @@ public class Worker extends Thread {
     private final Runnable task;
     private final long delay;
 
+    private final Consumer<InterruptedException> exceptionHandler;
+
     public Worker(@NotNull BooleanSupplier condition, @NotNull Runnable task) {
-        this(condition, task, 0);
+        this(condition, task, 0, (Consumer<InterruptedException>) null);
     }
 
     public Worker(@NotNull BooleanSupplier condition, @NotNull Runnable task, long duration, @NotNull TimeUnit unit) {
-        this(condition, task, unit.toMillis(duration));
+        this(condition, task, duration, unit, null);
     }
 
-    public Worker(@NotNull BooleanSupplier condition, @NotNull Runnable task, long delayMillis) {
+    public Worker(@NotNull BooleanSupplier condition, @NotNull Runnable task, long duration, @NotNull TimeUnit unit, Consumer<InterruptedException> exceptionHandler) {
+        this(condition, task, unit.toMillis(duration), exceptionHandler);
+    }
+
+    public Worker(@NotNull BooleanSupplier condition, @NotNull Runnable task, long delayMillis, Consumer<InterruptedException> exceptionHandler) {
         this.condition = condition;
         this.task = task;
         this.delay = delayMillis;
+
+        this.exceptionHandler = exceptionHandler != null ? exceptionHandler : t -> { };
+
         this.setDaemon(true);
         this.start();
     }
 
-    @SuppressWarnings("BusyWait")
     @Override
     public void run() {
         while (this.condition.getAsBoolean() && !this.isInterrupted()) {
             this.task.run();
 
             try {
+                // TODO: don't busy-wait
                 Thread.sleep(delay);
-            } catch (InterruptedException ignored) { /* TODO: this should probably be handled */ }
+            } catch (InterruptedException e) {
+                this.exceptionHandler.accept(e);
+            }
         }
     }
 }

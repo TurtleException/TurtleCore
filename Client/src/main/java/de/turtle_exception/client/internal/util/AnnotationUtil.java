@@ -45,8 +45,24 @@ public class AnnotationUtil {
         return null;
     }
 
-    // TODO: docs
-    public static <T extends Annotation> @Nullable T getAnnotation(@NotNull AccessibleObject accObj, @NotNull Class<T> type) {
+    /**
+     * This provides a specific {@link Annotation} of type {@code T} from an {@link AccessibleObject} that must either
+     * be a {@link Field} or a {@link Method}, if present. If the AccessibleObject does not have the requested
+     * annotation anywhere in its hierarchy, {@code null} is returned.
+     * <p> This method includes inherited annotations. While this is not technically a thing the idea behind it is that
+     * an interface may have an annotated method, which is implemented by a class, from which the {@link Method} is
+     * retrieved reflectively. This util then checks the hierarchy layer for layer, prioritizing superclasses over
+     * interfaces and ordering interfaces as specified by {@link Class#getInterfaces()}. The first occurrence of the
+     * requested annotation will be returned.
+     * <p> Note that this approach only makes sense in very specific scenarios. The hierarchy of the provided Field or
+     * Method should be taken into account to prevent confusing results.
+     * @param accObj A Field or Method that should have the annotation.
+     * @param type The annotation class.
+     * @return The requested annotation (may be {@code null}).
+     * @param <T> Type of the annotation.
+     * @throws IllegalArgumentException if the first argument is not a Field or Method
+     */
+    public static <T extends Annotation> @Nullable T getAnnotation(@NotNull AccessibleObject accObj, @NotNull Class<T> type) throws IllegalArgumentException {
         if (accObj instanceof Field field)
             return getAnnotation(field, type);
         if (accObj instanceof Method method)
@@ -54,7 +70,7 @@ public class AnnotationUtil {
         throw new IllegalArgumentException("Unsupported AccessibleObject: " + accObj.getClass().getName());
     }
 
-    // TODO: docs
+    // TODO: does this make sense? Fields don't have a hierarchy, do they?
     public static <T extends Annotation> @Nullable T getAnnotation(@NotNull Field field, @NotNull Class<T> type) {
         LinkedList<Field> buffer = new LinkedList<>();
         buffer.add(field);
@@ -84,7 +100,21 @@ public class AnnotationUtil {
         return null;
     }
 
-    // TODO: docs
+    /**
+     * This provides a specific {@link Annotation} of type {@code T} from a {@link Method}, if present. If the Field
+     * does not have the requested annotation anywhere in its hierarchy, {@code null} is returned.
+     * <p> This method includes inherited annotations. While this is not technically a thing the idea behind it is that
+     * an interface may have an annotated method, which is implemented by a class, from which the {@link Method} is
+     * retrieved reflectively. This util then checks the hierarchy layer for layer, prioritizing superclasses over
+     * interfaces and ordering interfaces as specified by {@link Class#getInterfaces()}. The first occurrence of the
+     * requested annotation will be returned.
+     * <p> Note that this approach only makes sense in very specific scenarios. The hierarchy of the provided Field or
+     * Method should be taken into account to prevent confusing results.
+     * @param method A Method that should have the annotation in its hierarchy.
+     * @param type The annotation class.
+     * @return The requested annotation (may be {@code null}).
+     * @param <T> Type of the annotation.
+     */
     public static <T extends Annotation> @Nullable T getAnnotation(@NotNull Method method, @NotNull Class<T> type) {
         LinkedList<Method> buffer = new LinkedList<>();
         buffer.add(method);

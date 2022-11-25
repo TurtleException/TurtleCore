@@ -54,7 +54,8 @@ public class LoginHandler {
                 this.logger.log(Level.FINE, "JSON error for checkLogin request '" + login + "'", e);
                 return null;
             } catch (LoginException e) {
-                // TODO: log
+                // we don't need the stacktrace in the log
+                this.logger.log(Level.INFO, "Failed check for login '" + login + "': " + e);
                 throw e;
             } catch (Throwable t) {
                 this.logger.log(Level.WARNING, "Unknown internal error for login request '" + login + "'", t);

@@ -40,6 +40,9 @@ public class NetServer extends NetworkAdapter {
     private Worker heartbeats;
     private Worker listener;
 
+    // pragmatic solution (works for now...)
+    private boolean heartbeatExceptionLogged = false;
+
     public NetServer(@NotNull TurtleServer server, int port) {
         this.server = server;
         this.port = port;
@@ -60,7 +63,11 @@ public class NetServer extends NetworkAdapter {
                         new HeartbeatPacket(server.getClient().getTimeoutOutbound(), connection), false
                 );
             });
-        }, 10, TimeUnit.SECONDS);
+        }, 10, TimeUnit.SECONDS, e -> {
+            if (heartbeatExceptionLogged) return;
+            getLogger().log(Level.WARNING, "Exception in heartbeat-worker.", e);
+            heartbeatExceptionLogged = true;
+        });
 
         getLogger().log(Level.FINE, "Starting listener.");
         this.listener = new Worker(() -> status == Status.INIT || status == Status.CONNECTED, () -> {
