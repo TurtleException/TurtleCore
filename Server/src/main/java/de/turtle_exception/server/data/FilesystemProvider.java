@@ -29,7 +29,7 @@ public class FilesystemProvider extends Provider {
     }
 
     @Override
-    protected void onInit() {
+    protected void onStart() {
         this.logger.log(Level.INFO, "Assigned directory: " + dir.getPath());
     }
 

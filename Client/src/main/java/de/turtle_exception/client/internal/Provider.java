@@ -32,8 +32,12 @@ public abstract class Provider {
         this.workers = new Worker[workerSize];
     }
 
-    private void init() {
-        this.onInit();
+    public final void start() throws ProviderException {
+        try {
+            this.onStart();
+        } catch (Exception e) {
+            throw new ProviderException(e);
+        }
 
         this.logger.log(Level.INFO, "Allocating " + workers.length + " Worker(s).");
 
@@ -52,7 +56,7 @@ public abstract class Provider {
         this.status = Status.RUNNING;
     }
 
-    protected void onInit() { }
+    protected void onStart() throws Exception { }
 
     /* - - - */
 
@@ -93,11 +97,9 @@ public abstract class Provider {
     final void setClient(@NotNull TurtleClientImpl client) {
         this.client = client;
         this.logger = new NestedLogger("Provider", client.getLogger());
-
-        this.init();
     }
 
-    public @NotNull TurtleClient getClient() {
+    public TurtleClient getClient() {
         return this.client;
     }
 
