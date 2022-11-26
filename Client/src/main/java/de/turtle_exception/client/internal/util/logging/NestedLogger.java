@@ -2,6 +2,7 @@ package de.turtle_exception.client.internal.util.logging;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
@@ -14,8 +15,8 @@ public class NestedLogger extends Logger {
     public NestedLogger(String name, @NotNull Logger parent) {
         super(name, null);
         super.setUseParentHandlers(false);
-        // use parent level as default
-        this.setLevel(parent.getLevel());
+        // pass on all logs to the parent (level should be filtered there)
+        this.setLevel(Level.ALL);
         this.parentLogger = parent;
     }
 

@@ -40,8 +40,7 @@ public class ResourceBuilder {
         Resource annotation = ResourceUtil.getResourceAnnotation(type);
 
         this.logger.log(Level.FINE, "Build call (JSON > obj) for object of type " + type.getSimpleName());
-
-        System.out.println(json);
+        this.logger.log(Level.FINEST, "\tJSON:  " + json);
 
         try {
             Method buildMethod = EntityBuilder.class.getMethod(annotation.builder(), JsonObject.class, TurtleClient.class);
@@ -61,8 +60,7 @@ public class ResourceBuilder {
         Checks.nonNull(json, "JSON data");
 
         this.logger.log(Level.FINE, "Build call (JSON > obj) for " + json.size() + " objects of type " + type.getSimpleName());
-
-        System.out.println(json);
+        this.logger.log(Level.FINEST, "\tJSON:  " + json);
 
         ArrayList<T> list = new ArrayList<>();
         for (JsonElement element : json)
@@ -74,6 +72,7 @@ public class ResourceBuilder {
         Resource resource = ResourceUtil.getResourceAnnotation(object.getClass());
 
         this.logger.log(Level.FINE, "Build call (obj > JSON) for object of type " + object.getClass().getSimpleName());
+        this.logger.log(Level.FINEST, "\tObject:  " + object);
 
         JsonObject json = new JsonObject();
 
@@ -110,7 +109,7 @@ public class ResourceBuilder {
         JsonArray arr = new JsonArray();
 
         // reference to another resource
-        if (annotation.type().getAnnotation(Resource.class) != null) {
+        if (AnnotationUtil.getAnnotation(annotation.type(), Resource.class) != null) {
             try {
                 for (Object o : iterable)
                     arr.add(((Turtle) o).getId());

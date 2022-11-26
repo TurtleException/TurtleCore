@@ -38,7 +38,7 @@ public abstract class Provider {
         this.logger.log(Level.INFO, "Allocating " + workers.length + " Worker(s).");
 
         for (int i = 0; i < workers.length; i++) {
-            workers[i] = new Worker(() -> status != Status.STOPPED, () -> {
+            workers[i] = new Worker(() -> status != Status.STOPPING && status != Status.STOPPED, () -> {
                 Runnable task = priorityCallbacks.poll();
 
                 if (task == null)

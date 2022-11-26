@@ -1,13 +1,14 @@
 package de.turtle_exception.server.cli;
 
 import com.google.common.io.Resources;
+import de.turtle_exception.client.internal.util.Checks;
 import de.turtle_exception.client.internal.util.StringUtil;
+import de.turtle_exception.server.Main;
 import de.turtle_exception.server.TurtleServer;
 import de.turtle_exception.server.util.StatusView;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.URL;
@@ -17,7 +18,11 @@ import java.util.List;
 import java.util.logging.Level;
 
 public class ServerCLI {
-    private static final URL ALIAS_URL = Resources.getResource("help" + File.separator + ".aliases");
+    @SuppressWarnings("ConstantConditions")
+    private static final @NotNull URL ALIAS_URL = Main.class.getClassLoader().getResource("help/.aliases.txt");
+    static {
+        Checks.nonNull(ALIAS_URL, "ALIAS_URL");
+    }
 
     private final @NotNull TurtleServer server;
     private final @NotNull PrintStream  out;
@@ -27,6 +32,8 @@ public class ServerCLI {
     public ServerCLI(@NotNull TurtleServer server) {
         this.server = server;
         this.out = new PrintStream(System.out);
+
+        this.verboseMode = Boolean.parseBoolean(server.getConfig().getProperty("verboseMode", "false"));
     }
 
     public void handle(final String input) {
@@ -53,6 +60,7 @@ public class ServerCLI {
                 }
                 for (String line : lines)
                     out.println(line);
+                out.println();
             });
         else if (StringUtil.startsWith(low, "level", "log-level"))
             this.execute(input, args -> {
@@ -102,10 +110,10 @@ public class ServerCLI {
         final String[] tokens = input.split(" ");
         final String[] args   = new String[tokens.length - 1];
 
-        if (args.length < 1)
+        if (args.length > 0)
             System.arraycopy(tokens, 1, args, 0, args.length);
 
-        this.out.println("Executing command \"" + tokens[0] + "\" with args " + Arrays.toString(args));
+        server.getLogger().log(Level.FINE, "Executing command \"" + tokens[0] + "\" with args " + Arrays.toString(args));
 
         try {
             cmd.execute(args);
@@ -139,7 +147,7 @@ public class ServerCLI {
         if (pointer.isEmpty())
             return List.of("Unknown command. Use 'help' for a list of commands");
 
-        URL url = Resources.getResource("help" + File.separator + pointer + ".txt");
+        URL url = Resources.getResource("help/" + pointer + ".txt");
         return Resources.readLines(url, Charset.defaultCharset());
     }
 }

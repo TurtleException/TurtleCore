@@ -26,6 +26,7 @@ import javax.security.auth.login.LoginException;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -64,7 +65,9 @@ public class NetServer extends NetworkAdapter {
                 );
             });
         }, 10, TimeUnit.SECONDS, e -> {
-            if (heartbeatExceptionLogged) return;
+            if (heartbeatExceptionLogged)      return;
+            if (status == Status.DISCONNECTED) return;
+
             getLogger().log(Level.WARNING, "Exception in heartbeat-worker.", e);
             heartbeatExceptionLogged = true;
         });
@@ -73,8 +76,16 @@ public class NetServer extends NetworkAdapter {
         this.listener = new Worker(() -> status == Status.INIT || status == Status.CONNECTED, () -> {
             try {
                 getLogger().log(Level.FINE, "Listening for new connection...");
-                Socket client = socket.accept();
-                getLogger().log(Level.FINE, "New socket connection: " + socket.getInetAddress().toString());
+                Socket client;
+                try {
+                    client = socket.accept();
+                } catch (SocketException e) {
+                    // botched fix to prevent exception on shutdown
+                    if (status != Status.DISCONNECTED)
+                        throw e;
+                    return;
+                }
+                getLogger().log(Level.FINE, "New socket connection: " + client.getInetAddress().toString());
 
                 try {
                     Handshake handshake  = new ServerHandshake(this);

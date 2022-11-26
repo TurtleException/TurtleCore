@@ -40,7 +40,10 @@ public class LoginHandler {
 
                 JsonObject json = gson.fromJson(new FileReader(loginFile), JsonObject.class);
 
-                String pass = json.get(login).getAsString();
+                String pass = null;
+                try {
+                    pass = json.get(login).getAsString();
+                } catch (ClassCastException | NullPointerException ignored) { }
 
                 if (pass == null)
                     throw new LoginException("Unknown login or pass");
@@ -75,6 +78,11 @@ public class LoginHandler {
                 } catch (LoginException ignored) { }
 
                 JsonObject json = gson.fromJson(new FileReader(loginFile), JsonObject.class);
+
+                // create new JSON in case the file does not exist
+                if (json == null)
+                    json = new JsonObject();
+
                 json.addProperty(login, pass);
 
                 try (FileWriter writer = new FileWriter(loginFile, false)) {

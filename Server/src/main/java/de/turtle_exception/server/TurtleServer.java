@@ -59,13 +59,14 @@ public class TurtleServer {
         this.logger.addHandler(new ConsoleHandler(new SimpleFormatter()));
         this.logger.addHandler(LogUtil.getFileHandler(new SimpleFormatter()));
 
-        // TODO: remove
-        this.logger.setLevel(Level.ALL);
         for (Handler handler : this.logger.getHandlers())
             handler.setLevel(Level.ALL);
 
         configFile.createNewFile();
         this.config.load(new FileReader(configFile));
+
+        // get log level from config or use INFO as default
+        this.logger.setLevel(Level.parse(config.getProperty("logLevel", "INFO")));
 
         this.loginHandler = new LoginHandler(this);
 
@@ -82,7 +83,10 @@ public class TurtleServer {
                 .setProvider(new DatabaseProvider(new File(DIR, "data")))
                 .setLogger(new NestedLogger("TurtleClient", logger))
                 .addListeners(new EntityUpdateListener(netServer))
+                .setAutoFillCache(true)
                 .build();
+
+        logger.log(Level.INFO, "Cached " + turtleClient.getTurtles().size() + " turtles.");
 
         /* RUNNING */
 
