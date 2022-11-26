@@ -18,11 +18,11 @@ import java.lang.annotation.AnnotationFormatError;
 import java.util.Map;
 import java.util.logging.Level;
 
-public class DatabaseProvider extends Provider {
+public class FilesystemProvider extends Provider {
     private final File dir;
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
-    public DatabaseProvider(@NotNull File dir) {
+    public FilesystemProvider(@NotNull File dir) {
         super(1);
         this.dir = dir;
         this.dir.mkdirs();
