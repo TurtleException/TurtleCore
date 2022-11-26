@@ -3,6 +3,7 @@ package de.turtle_exception.client.internal.util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
 import java.util.UUID;
 
 public class StringUtil {
@@ -14,6 +15,17 @@ public class StringUtil {
             builder.append(arr[i]);
             if (i < arr.length - 1)
                 builder.append(".");
+        }
+        return builder.toString();
+    }
+
+    public static String join(String delimiter, @NotNull Collection<?> c) {
+        StringBuilder builder = new StringBuilder();
+        int i = c.size();
+        for (Object obj : c) {
+            builder.append(obj);
+            if (--i > 0)
+                builder.append(delimiter);
         }
         return builder.toString();
     }

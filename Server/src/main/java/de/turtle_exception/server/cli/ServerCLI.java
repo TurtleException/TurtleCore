@@ -102,6 +102,11 @@ public class ServerCLI {
                 }
                 out.println(server.getLoginHandler().delLogin(args[0]));
             });
+        else if (StringUtil.startsWith(low, "listuser", "listlogin", "listusers", "listlogins"))
+            this.execute(input, args -> {
+                List<String> lines = server.getLoginHandler().getLogins();
+                out.println("All users:  " + StringUtil.join(",  ", lines));
+            });
         else
             out.println("Unknown command. Use 'help' for a list of commands.");
     }

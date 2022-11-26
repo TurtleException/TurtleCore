@@ -12,3 +12,7 @@ adduser@adduser
 addlogin@adduser
 deluser@deluser
 dellogin@dellogin
+listuser@listuser
+listlogin@listuser
+listusers@listuser
+listlogins@listuser

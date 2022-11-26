@@ -14,3 +14,4 @@ level [level]                   Prints the current level of the internal logger.
 invalidate-caches [true|false]  Invalidates all caches the internal TurtleClient manages.
 adduser <login> <pass>          Creates a new client login.
 deluser <login>                 Deletes a client login.
+listuser                        Lists all client logins.

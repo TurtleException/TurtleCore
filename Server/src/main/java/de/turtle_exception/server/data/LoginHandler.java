@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.List;
 import java.util.logging.Level;
 
 public class LoginHandler {
@@ -106,6 +107,10 @@ public class LoginHandler {
 
                 JsonObject json = gson.fromJson(new FileReader(loginFile), JsonObject.class);
 
+                // create new JSON in case the file does not exist
+                if (json == null)
+                    json = new JsonObject();
+
                 if (!json.has(login))
                     return "Login '" + login + "' does not exist.";
 
@@ -121,6 +126,25 @@ public class LoginHandler {
             } catch (IOException e) {
                 this.logger.log(Level.WARNING, "Internal IO error for delLogin request '" + login + "'", e);
                 return "Internal error. Check logs for more info.";
+            }
+        }
+    }
+
+    public @NotNull List<String> getLogins() {
+        synchronized (lock) {
+            try {
+                this.makefile();
+
+                JsonObject json = gson.fromJson(new FileReader(loginFile), JsonObject.class);
+
+                // create new JSON in case the file does not exist
+                if (json == null)
+                    json = new JsonObject();
+
+                return List.copyOf(json.keySet());
+            } catch (IOException e) {
+                this.logger.log(Level.WARNING, "Internal IO error for getLogins request", e);
+                return List.of();
             }
         }
     }
