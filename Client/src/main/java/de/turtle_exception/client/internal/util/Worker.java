@@ -40,13 +40,17 @@ public class Worker extends Thread {
         this.start();
     }
 
+    @SuppressWarnings("BusyWait")
     @Override
     public void run() {
         while (this.condition.getAsBoolean() && !this.isInterrupted()) {
             this.task.run();
 
             try {
-                // TODO: don't busy-wait
+                /*
+                 * For now busy-waiting is the only way to do this,
+                 * as every alternative would sacrifice some feature.
+                 */
                 Thread.sleep(delay);
             } catch (InterruptedException e) {
                 this.exceptionHandler.accept(e);
