@@ -2,12 +2,9 @@ package de.turtle_exception.server.data;
 
 import com.google.gson.*;
 import de.turtle_exception.client.api.entities.Turtle;
-import de.turtle_exception.client.internal.ActionImpl;
-import de.turtle_exception.client.internal.Provider;
 import de.turtle_exception.client.internal.data.ResourceUtil;
 import de.turtle_exception.client.internal.data.annotations.Keys;
 import de.turtle_exception.client.internal.data.annotations.Resource;
-import de.turtle_exception.client.internal.request.actions.SimpleAction;
 import de.turtle_exception.client.internal.util.time.TurtleType;
 import de.turtle_exception.client.internal.util.time.TurtleUtil;
 import org.jetbrains.annotations.NotNull;
@@ -18,12 +15,11 @@ import java.lang.annotation.AnnotationFormatError;
 import java.util.Map;
 import java.util.logging.Level;
 
-public class FilesystemProvider extends Provider {
+public class FilesystemProvider extends DatabaseProvider {
     private final File dir;
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public FilesystemProvider(@NotNull File dir) {
-        super(1);
         this.dir = dir;
         this.dir.mkdirs();
     }
@@ -36,50 +32,7 @@ public class FilesystemProvider extends Provider {
     /* - - - */
 
     @Override
-    public <T extends Turtle> @NotNull SimpleAction<Boolean> delete(@NotNull Class<T> type, long id) throws AnnotationFormatError {
-        this.logger.log(Level.FINER, "DELETE request for id " + id);
-        return new SimpleAction<>(this, () -> this.doDelete(type, id));
-    }
-
-    @Override
-    public <T extends Turtle> @NotNull SimpleAction<JsonObject> get(@NotNull Class<T> type, long id) throws AnnotationFormatError {
-        this.logger.log(Level.FINER, "GET request for id " + id);
-        return new SimpleAction<>(this, () -> this.doGet(type, id));
-    }
-
-    @Override
-    public <T extends Turtle> @NotNull SimpleAction<JsonArray> get(@NotNull Class<T> type) throws AnnotationFormatError {
-        this.logger.log(Level.FINER, "GET request for type " + type.getSimpleName());
-        return new SimpleAction<>(this, () -> this.doGet(type));
-    }
-
-    @Override
-    public <T extends Turtle> @NotNull SimpleAction<JsonObject> put(@NotNull Class<T> type, @NotNull JsonObject content) throws AnnotationFormatError {
-        this.logger.log(Level.FINER, "PUT request for object of type " + type.getSimpleName());
-        return new SimpleAction<>(this, () -> this.doPut(type, content));
-    }
-
-    @Override
-    public <T extends Turtle> @NotNull SimpleAction<JsonObject> patch(@NotNull Class<T> type, @NotNull JsonObject content, long id) throws AnnotationFormatError {
-        this.logger.log(Level.FINER, "PATCH request for id " + id);
-        return new SimpleAction<>(this, () -> this.doPatch(type, content, id));
-    }
-
-    @Override
-    public @NotNull <T extends Turtle> ActionImpl<JsonObject> patchEntryAdd(@NotNull Class<T> type, long id, @NotNull String key, @NotNull Object obj) {
-        this.logger.log(Level.FINER, "PATCH_ENTRY_ADD request for id " + id);
-        return new SimpleAction<>(this, () -> this.doPatchEntry(type, id, key, obj, true));
-    }
-
-    @Override
-    public @NotNull <T extends Turtle> ActionImpl<JsonObject> patchEntryDel(@NotNull Class<T> type, long id, @NotNull String key, @NotNull Object obj) {
-        this.logger.log(Level.FINER, "PATCH_ENTRY_DEL request for id " + id);
-        return new SimpleAction<>(this, () -> this.doPatchEntry(type, id, key, obj, false));
-    }
-
-    /* - - - */
-
-    private boolean doDelete(@NotNull Class<? extends Turtle> type, long id) throws AnnotationFormatError {
+    protected boolean doDelete(@NotNull Class<? extends Turtle> type, long id) throws AnnotationFormatError {
         Resource annotation = ResourceUtil.getResourceAnnotation(type);
         File file = this.getFile(annotation, id);
 
@@ -97,7 +50,8 @@ public class FilesystemProvider extends Provider {
         return file.delete();
     }
 
-    private @Nullable JsonObject doGet(@NotNull Class<? extends Turtle> type, long id) throws AnnotationFormatError {
+    @Override
+    protected @Nullable JsonObject doGet(@NotNull Class<? extends Turtle> type, long id) throws AnnotationFormatError {
         Resource annotation = ResourceUtil.getResourceAnnotation(type);
         File file = this.getFile(annotation, id);
 
@@ -110,7 +64,8 @@ public class FilesystemProvider extends Provider {
         }
     }
 
-    private @NotNull JsonArray doGet(@NotNull Class<? extends Turtle> type) throws AnnotationFormatError {
+    @Override
+    protected @NotNull JsonArray doGet(@NotNull Class<? extends Turtle> type) throws AnnotationFormatError {
         Resource annotation = ResourceUtil.getResourceAnnotation(type);
         File file = this.getFile(annotation);
 
@@ -132,7 +87,8 @@ public class FilesystemProvider extends Provider {
         return arr;
     }
 
-    private @Nullable JsonObject doPut(@NotNull Class<? extends Turtle> type, @NotNull JsonObject data) throws AnnotationFormatError {
+    @Override
+    protected @Nullable JsonObject doPut(@NotNull Class<? extends Turtle> type, @NotNull JsonObject data) throws AnnotationFormatError {
         Resource annotation = ResourceUtil.getResourceAnnotation(type);
 
         long id = TurtleUtil.newId(TurtleType.ofResource(type));
@@ -149,7 +105,8 @@ public class FilesystemProvider extends Provider {
         }
     }
 
-    private @NotNull JsonObject doPatch(@NotNull Class<? extends Turtle> type, @NotNull JsonObject data, long id) throws AnnotationFormatError, IOException {
+    @Override
+    protected @NotNull JsonObject doPatch(@NotNull Class<? extends Turtle> type, @NotNull JsonObject data, long id) throws AnnotationFormatError, IOException {
         Resource annotation = ResourceUtil.getResourceAnnotation(type);
         File file = getFile(annotation, id);
 
@@ -178,7 +135,8 @@ public class FilesystemProvider extends Provider {
         }
     }
 
-    private @NotNull JsonObject doPatchEntry(@NotNull Class<? extends Turtle> type, long id, @NotNull String key, @NotNull Object obj, boolean add) throws IOException {
+    @Override
+    protected @NotNull JsonObject doPatchEntry(@NotNull Class<? extends Turtle> type, long id, @NotNull String key, @NotNull Object obj, boolean add) throws IOException {
         JsonObject json = this.doGet(type, id);
 
         if (json == null)
