@@ -64,8 +64,8 @@ public class TurtleClientImpl implements TurtleClient {
     private final NetworkAdapter networkAdapter;
     private final Provider provider;
 
-    private long defaultTimeoutInbound  = TimeUnit.HOURS.toMillis( 8);
-    private long defaultTimeoutOutbound = TimeUnit.HOURS.toMillis(16);
+    private long defaultTimeoutInbound  = TimeUnit.SECONDS.toMillis( 8);
+    private long defaultTimeoutOutbound = TimeUnit.SECONDS.toMillis(16);
 
     private final TurtleSet<Group> groupCache = new TurtleSet<>();
     private final TurtleSet<Ticket> ticketCache = new TurtleSet<>();

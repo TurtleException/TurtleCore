@@ -100,7 +100,7 @@ public class Connection {
             }
         });
 
-        this.handshake.await(10, TimeUnit.HOURS);
+        this.handshake.await(10, TimeUnit.SECONDS);
     }
 
     public boolean stop(boolean notify) {
