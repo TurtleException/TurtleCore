@@ -51,6 +51,8 @@ public class UpdateHelper {
             group.getClient().getEventManager().handleEvent(new GroupMemberLeaveEvent(group, oldUser));
     }
 
+    /* - TICKET - */
+
     public static void ofTicketTags(@NotNull Ticket ticket, @NotNull Set<String> oldTags, @NotNull Set<String> newTags) {
         List<String> added   = newTags.stream().filter(tag -> !oldTags.contains(tag)).toList();
         List<String> removed = oldTags.stream().filter(tag -> !newTags.contains(tag)).toList();
@@ -70,6 +72,8 @@ public class UpdateHelper {
         for (User oldUser : removed)
             ticket.getClient().getEventManager().handleEvent(new TicketUserRemoveEvent(ticket, oldUser));
     }
+
+    /* - USER - */
 
     public static void ofUserDiscord(@NotNull User user, @NotNull List<Long> oldDiscordSet, @NotNull List<Long> newDiscordSet) {
         List<Long> added   = newDiscordSet.stream().filter(l -> !oldDiscordSet.contains(l)).toList();

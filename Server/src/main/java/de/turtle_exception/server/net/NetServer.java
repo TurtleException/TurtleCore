@@ -153,9 +153,10 @@ public class NetServer extends NetworkAdapter {
     /* - - - */
 
     private void handleDelete(@NotNull DataPacket packet) {
-        // TODO: should the data type be checked?
+        Class<? extends Turtle> type = packet.getData().type();
         long id = packet.getData().id();
-        Turtle turtle = getClientImpl().getTurtleById(id);
+
+        Turtle turtle = getClientImpl().getTurtleById(id, type);
 
         getLogger().log(Level.FINER, "DELETE request for turtle " + id);
 
@@ -181,9 +182,10 @@ public class NetServer extends NetworkAdapter {
             return;
         }
 
-        // TODO: should the data type be checked?
         long id = packet.getData().id();
-        Turtle turtle = getClientImpl().getTurtleById(id);
+        Class<? extends Turtle> type = packet.getData().type();
+
+        Turtle turtle = getClientImpl().getTurtleById(id, type);
 
         getLogger().log(Level.FINER, "GET request for turtle " + id);
 
@@ -232,8 +234,7 @@ public class NetServer extends NetworkAdapter {
 
         getLogger().log(Level.FINER, "PATCH request for turtle " + id);
 
-        // TODO: should the data type be checked?
-        Turtle turtle = getClientImpl().getTurtleById(id);
+        Turtle turtle = getClientImpl().getTurtleById(id, type);
         if (turtle == null) {
             respond(packet, "Turtle " + id + " does not exist", null);
             return;
