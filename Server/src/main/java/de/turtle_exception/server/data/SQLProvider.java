@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.util.Properties;
 import java.util.logging.Level;
 
 public class SQLProvider extends DatabaseProvider {
@@ -24,6 +25,16 @@ public class SQLProvider extends DatabaseProvider {
         this.database = database;
         this.user = user;
         this.pass = pass;
+    }
+
+    public SQLProvider(@NotNull Properties properties) {
+        this(
+                properties.getProperty("sql.host"),
+                Integer.parseInt(properties.getProperty("sql.port")),
+                properties.getProperty("sql.database"),
+                properties.getProperty("sql.user"),
+                properties.getProperty("sql.pass")
+        );
     }
 
     @Override
