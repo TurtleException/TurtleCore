@@ -48,56 +48,20 @@ public class AnnotationUtil {
     /**
      * This provides a specific {@link Annotation} of type {@code T} from an {@link AccessibleObject} that must either
      * be a {@link Field} or a {@link Method}, if present. If the AccessibleObject does not have the requested
-     * annotation anywhere in its hierarchy, {@code null} is returned.
-     * <p> This method includes inherited annotations. While this is not technically a thing the idea behind it is that
-     * an interface may have an annotated method, which is implemented by a class, from which the {@link Method} is
-     * retrieved reflectively. This util then checks the hierarchy layer for layer, prioritizing superclasses over
-     * interfaces and ordering interfaces as specified by {@link Class#getInterfaces()}. The first occurrence of the
-     * requested annotation will be returned.
-     * <p> Note that this approach only makes sense in very specific scenarios. The hierarchy of the provided Field or
-     * Method should be taken into account to prevent confusing results.
+     * annotation anywhere in its hierarchy (in case of a method), {@code null} is returned.
      * @param accObj A Field or Method that should have the annotation.
      * @param type The annotation class.
      * @return The requested annotation (may be {@code null}).
      * @param <T> Type of the annotation.
      * @throws IllegalArgumentException if the first argument is not a Field or Method
+     * @see AnnotationUtil#getAnnotation(Method, Class)
      */
     public static <T extends Annotation> @Nullable T getAnnotation(@NotNull AccessibleObject accObj, @NotNull Class<T> type) throws IllegalArgumentException {
-        if (accObj instanceof Field field)
-            return getAnnotation(field, type);
         if (accObj instanceof Method method)
             return getAnnotation(method, type);
+        if (accObj instanceof Field field)
+            return field.getAnnotation(type);
         throw new IllegalArgumentException("Unsupported AccessibleObject: " + accObj.getClass().getName());
-    }
-
-    // TODO: does this make sense? Fields don't have a hierarchy, do they?
-    public static <T extends Annotation> @Nullable T getAnnotation(@NotNull Field field, @NotNull Class<T> type) {
-        LinkedList<Field> buffer = new LinkedList<>();
-        buffer.add(field);
-
-        Field i;
-        while ((i = buffer.poll()) != null) {
-            T annotation = i.getDeclaredAnnotation(type);
-            if (annotation != null)
-                return annotation;
-
-            // add superclass (or skip if null)
-            Class<?> superclass = i.getDeclaringClass().getSuperclass();
-            if (superclass != null) {
-                try {
-                    buffer.add(superclass.getField(i.getName()));
-                } catch (NoSuchFieldException ignored) { }
-            }
-
-            // add interfaces
-            for (Class<?> anInterface : i.getDeclaringClass().getInterfaces()) {
-                try {
-                    buffer.add(anInterface.getField(i.getName()));
-                } catch (NoSuchFieldException ignored) { }
-            }
-        }
-
-        return null;
     }
 
     /**
