@@ -34,7 +34,7 @@ public interface User extends Turtle {
      * Provides the name of this User. Usernames are not guaranteed to be unique and can be set by the User themselves.
      * @return The username.
      */
-    @Key(name = Keys.User.NAME, sqlType = "TINYTEXT")
+    @Key(name = Keys.User.NAME, sqlType = Types.User.NAME)
     @NotNull String getName();
 
     /**
@@ -89,7 +89,7 @@ public interface User extends Turtle {
      * Provides a List of snowflake ids that each represent a Discord user this User is linked to (exclusively).
      * @return List of snowflake ids.
      */
-    @Key(name = Keys.User.DISCORD, relation = Relation.ONE_TO_MANY, type = Long.class, sqlType = "BIGINT(20)")
+    @Key(name = Keys.User.DISCORD, relation = Relation.ONE_TO_MANY, type = Long.class, sqlType = Types.User.DISCORD)
     @Relational(table = "user_discord", self = "user", foreign = "discord")
     @NotNull List<Long> getDiscordIds();
 
@@ -155,7 +155,7 @@ public interface User extends Turtle {
      * Provides a List of {@link UUID UUIDs} that each represent a Minecraft account this User is linked to (exclusively).
      * @return List of {@link UUID UUIDs}.
      */
-    @Key(name = Keys.User.MINECRAFT, relation = Relation.ONE_TO_MANY, type = UUID.class, sqlType = "VARCHAR(36)")
+    @Key(name = Keys.User.MINECRAFT, relation = Relation.ONE_TO_MANY, type = UUID.class, sqlType = Types.User.MINECRAFT)
     @Relational(table = "user_minecraft", self = "user", foreign = "minecraft")
     @NotNull List<UUID> getMinecraftIds();
 

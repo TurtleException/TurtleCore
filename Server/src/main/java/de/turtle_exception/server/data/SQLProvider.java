@@ -10,6 +10,7 @@ import de.turtle_exception.client.internal.data.annotations.Key;
 import de.turtle_exception.client.internal.data.annotations.Relation;
 import de.turtle_exception.client.internal.data.annotations.Relational;
 import de.turtle_exception.client.internal.data.annotations.Resource;
+import de.turtle_exception.client.internal.data.annotations.Types;
 import de.turtle_exception.client.internal.util.AnnotationUtil;
 import de.turtle_exception.client.internal.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
@@ -317,9 +318,9 @@ public class SQLProvider extends DatabaseProvider {
         String foreignType = key.sqlType();
 
         if (foreignType.equalsIgnoreCase("TURTLE"))
-            foreignType = "BIGINT(20)";
+            foreignType = Types.Turtle.ID;
 
-        keys.add("`" + relAnnotation.self() + "` BIGINT(20)");
+        keys.add("`" + relAnnotation.self() + "` " + Types.Turtle.ID);
         keys.add("`" + relAnnotation.foreign() + "` " + foreignType);
 
         if (key.relation() == Relation.ONE_TO_MANY)
