@@ -8,6 +8,7 @@ import de.turtle_exception.client.api.entities.Turtle;
 import de.turtle_exception.client.internal.data.ResourceUtil;
 import de.turtle_exception.client.internal.data.annotations.Key;
 import de.turtle_exception.client.internal.data.annotations.Relation;
+import de.turtle_exception.client.internal.data.annotations.Relational;
 import de.turtle_exception.client.internal.data.annotations.Resource;
 import de.turtle_exception.client.internal.util.AnnotationUtil;
 import de.turtle_exception.client.internal.util.StringUtil;
@@ -21,6 +22,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 
+// TODO: simplify (reduce duplicate code)
 // TODO: sanitize statements!!!
 // TODO: reverse applied changes if an operation fails
 public class SQLProvider extends DatabaseProvider {
@@ -78,8 +80,13 @@ public class SQLProvider extends DatabaseProvider {
         for (Key key : keys) {
             if (key.relation() == Relation.ONE_TO_ONE) continue;
 
-            String rTable = key.relationTable();
-            String rName1 = key.relationName1();
+            Relational relAnnotation = ResourceUtil.getRelationalAnnotation(type, key.name());
+
+            if (relAnnotation == null)
+                throw new IllegalArgumentException("Illegal key: " + key);
+
+            String rTable = relAnnotation.table();
+            String rName1 = relAnnotation.self();
 
             try (Statement statement = connection.createStatement()) {
                 statement.executeUpdate("DELETE FROM `" + rTable + "` WHERE `" + rName1 + "` = '" + id + "';");
@@ -122,11 +129,16 @@ public class SQLProvider extends DatabaseProvider {
         for (Key key : keys) {
             if (key.relation() == Relation.ONE_TO_ONE) continue;
 
+            Relational relAnnotation = ResourceUtil.getRelationalAnnotation(type, key.name());
+
+            if (relAnnotation == null)
+                throw new IllegalArgumentException("Illegal key: " + key);
+
             JsonArray arr = new JsonArray();
 
-            String rTable = key.relationTable();
-            String rName1 = key.relationName1();
-            String rName2 = key.relationName2();
+            String rTable = relAnnotation.table();
+            String rName1 = relAnnotation.self();
+            String rName2 = relAnnotation.foreign();
 
             try (Statement statement = connection.createStatement()) {
                 ResultSet result = statement.executeQuery("SELECT * FROM `" + rTable + "` WHERE `" + rName1 + "` = '" + id + "';");
@@ -191,16 +203,21 @@ public class SQLProvider extends DatabaseProvider {
         List<Key> refKeys = keys.stream().filter(key -> key.relation() != Relation.ONE_TO_ONE).toList();
 
         for (Key refKey : refKeys) {
+            Relational relAnnotation = ResourceUtil.getRelationalAnnotation(type, refKey.name());
+
+            if (relAnnotation == null)
+                throw new IllegalArgumentException("Illegal key: " + refKey);
+
             JsonArray arr = content.getAsJsonArray(refKey.name());
 
             for (JsonElement entry : arr) {
                 Object entryObj = ResourceUtil.getValue((JsonPrimitive) entry);
 
-                String refSqlKeys = refKey.relationName1() + "`, `" + refKey.relationName2();
+                String refSqlKeys = relAnnotation.self() + "`, `" + relAnnotation.foreign();
                 String refSqlVals = id + "', '" + entryObj;
 
                 try (Statement statement = connection.createStatement()) {
-                    statement.executeUpdate("INSERT INTO `" + refKey.relationTable() + "` (`" + refSqlKeys + "`) VALUES ('" + refSqlVals + "');");
+                    statement.executeUpdate("INSERT INTO `" + relAnnotation.table() + "` (`" + refSqlKeys + "`) VALUES ('" + refSqlVals + "');");
                 }
             }
         }
@@ -235,18 +252,18 @@ public class SQLProvider extends DatabaseProvider {
     protected JsonObject doPatchEntry(Class<? extends Turtle> type, long id, String key, Object obj, boolean add) throws SQLException {
         this.checkTables(type);
 
-        Key keyAnnotation = ResourceUtil.getKeyAnnotation(type, key);
+        Relational relAnnotation = ResourceUtil.getRelationalAnnotation(type, key);
 
-        if (keyAnnotation == null)
+        if (relAnnotation == null)
             throw new IllegalArgumentException("Illegal key: " + key);
 
-        String table = keyAnnotation.relationTable();
+        String table = relAnnotation.table();
 
         try (Statement statement = connection.createStatement()) {
             if (add)
-                statement.executeUpdate("INSERT INTO `" + table + "` (" + keyAnnotation.relationName1() + ", " + keyAnnotation.relationName2() + ") VALUES (" + id + ", " + obj + ");");
+                statement.executeUpdate("INSERT INTO `" + table + "` (" + relAnnotation.self() + ", " + relAnnotation.foreign() + ") VALUES (" + id + ", " + obj + ");");
             else
-                statement.executeUpdate("DELETE FROM `" + table + "` WHERE `" + keyAnnotation.relationName1() + "` = '" + id + "' AND `" + keyAnnotation.relationName2() + "` = '" + obj + "';");
+                statement.executeUpdate("DELETE FROM `" + table + "` WHERE `" + relAnnotation.self() + "` = '" + id + "' AND `" + relAnnotation.foreign() + "` = '" + obj + "';");
         }
 
         return null;
@@ -289,21 +306,26 @@ public class SQLProvider extends DatabaseProvider {
     }
 
     private void createReferenceTable(@NotNull Class<? extends Turtle> resource, @NotNull Key key) throws SQLException {
-        String table = key.relationTable();
+        Relational relAnnotation = ResourceUtil.getRelationalAnnotation(resource, key.name());
+
+        if (relAnnotation == null)
+            throw new IllegalArgumentException("Illegal key: " + key);
+
+        String table = relAnnotation.table();
         List<String> keys = new ArrayList<>();
 
         // TODO: how to determine foreign type (as SQL type)?
         String foreignType = "";
 
-        keys.add("`" + key.relationName1() + "` " + key.sqlType());
-        keys.add("`" + key.relationName2() + "` " + foreignType);
+        keys.add("`" + relAnnotation.self() + "` " + key.sqlType());
+        keys.add("`" + relAnnotation.foreign() + "` " + foreignType);
 
         if (key.relation() == Relation.ONE_TO_MANY)
-            keys.add("PRIMARY KEY (`" + key.relationName2() + "`)");
+            keys.add("PRIMARY KEY (`" + relAnnotation.foreign() + "`)");
         if (key.relation() == Relation.MANY_TO_MANY)
-            keys.add("PRIMARY KEY (`" + key.relationName1() + "`, `" + key.relationName2() + "`)");
+            keys.add("PRIMARY KEY (`" + relAnnotation.self() + "`, `" + relAnnotation.foreign() + "`)");
         if (key.relation() == Relation.MANY_TO_ONE)
-            keys.add("PRIMARY KEY (`" + key.relationName1() + "`)");
+            keys.add("PRIMARY KEY (`" + relAnnotation.self() + "`)");
 
         try (Statement statement = connection.createStatement()) {
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS `" + table + "` (" + StringUtil.join(", ", keys) + ");");

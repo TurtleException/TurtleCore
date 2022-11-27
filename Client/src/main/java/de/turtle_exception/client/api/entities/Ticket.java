@@ -1,13 +1,10 @@
 package de.turtle_exception.client.api.entities;
 
 import de.turtle_exception.client.api.TurtleClient;
-import de.turtle_exception.client.internal.data.annotations.Keys;
+import de.turtle_exception.client.internal.data.annotations.*;
 import de.turtle_exception.client.api.TicketState;
 import de.turtle_exception.client.api.entities.attribute.IUserContainer;
 import de.turtle_exception.client.api.request.Action;
-import de.turtle_exception.client.internal.data.annotations.Key;
-import de.turtle_exception.client.internal.data.annotations.Relation;
-import de.turtle_exception.client.internal.data.annotations.Resource;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import org.jetbrains.annotations.NotNull;
@@ -95,7 +92,8 @@ public interface Ticket extends Turtle, IUserContainer {
      * <p> Tags are custom Strings that can be assigned by the Ticket author(s) or by team, moderation and bots.
      * @return List of Ticket tags.
      */
-    @Key(name = Keys.Ticket.TAGS, relation = Relation.MANY_TO_MANY, type = String.class, sqlType = "TINYTEXT", relationTable = "ticket_tags", relationName1 = "ticket", relationName2 = "tag")
+    @Key(name = Keys.Ticket.TAGS, relation = Relation.MANY_TO_MANY, type = String.class, sqlType = "TINYTEXT")
+    @Relational(table = "ticket_tags", self = "ticket", foreign = "tag")
     @NotNull List<String> getTags();
 
     /**
@@ -151,7 +149,8 @@ public interface Ticket extends Turtle, IUserContainer {
      * <p> Team members, moderation and bots are not included in this list unless they have explicitly been added.
      * @return List of Users.
      */
-    @Key(name = Keys.Ticket.USERS, relation = Relation.MANY_TO_MANY, type = User.class, sqlType = "TURTLE", relationTable = "ticket_users", relationName1 = "ticket", relationName2 = "user")
+    @Key(name = Keys.Ticket.USERS, relation = Relation.MANY_TO_MANY, type = User.class, sqlType = "TURTLE")
+    @Relational(table = "ticket_users", self = "ticket", foreign = "user")
     @NotNull List<User> getUsers();
 
     /**

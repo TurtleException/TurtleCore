@@ -4,6 +4,7 @@ import com.google.gson.*;
 import de.turtle_exception.client.api.entities.Turtle;
 import de.turtle_exception.client.internal.data.annotations.Key;
 import de.turtle_exception.client.internal.data.annotations.Keys;
+import de.turtle_exception.client.internal.data.annotations.Relational;
 import de.turtle_exception.client.internal.data.annotations.Resource;
 import de.turtle_exception.client.internal.util.AnnotationUtil;
 import org.jetbrains.annotations.NotNull;
@@ -35,6 +36,18 @@ public class ResourceUtil {
 
     public static @Nullable Key getKeyAnnotation(@NotNull Class<? extends Turtle> clazz, @NotNull String name) {
         return getKeyAnnotations(clazz).stream().filter(key -> key.name().equals(name)).findFirst().orElse(null);
+    }
+
+    public static @Nullable Relational getRelationalAnnotation(@NotNull Class<? extends Turtle> clazz, @NotNull String name) {
+        for (Method method : clazz.getMethods()) {
+            Key key = AnnotationUtil.getAnnotation(method, Key.class);
+
+            if (key == null) continue;
+            if (!key.name().equals(name)) continue;
+
+            return AnnotationUtil.getAnnotation(method, Relational.class);
+        }
+        return null;
     }
 
     public static long getTurtleId(@NotNull JsonObject content) throws IllegalArgumentException {

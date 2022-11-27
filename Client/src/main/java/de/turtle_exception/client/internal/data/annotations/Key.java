@@ -13,19 +13,11 @@ import java.lang.annotation.Target;
 public @interface Key {
     @NotNull String name();
 
+    /** If this is not {@link Relation#ONE_TO_ONE} the annotation must be combined with a {@link Relational}. */
     @NotNull Relation relation() default Relation.ONE_TO_ONE;
 
     Class<?> type() default Object.class;
 
     /** String representation of the SQL data type. */
     String sqlType();
-
-    /** Name of a relational table */
-    String relationTable() default "";
-
-    /** Self-referencing name in a relational table */
-    String relationName1() default "";
-
-    /** Foreign name in a relational table */
-    String relationName2() default "";
 }
