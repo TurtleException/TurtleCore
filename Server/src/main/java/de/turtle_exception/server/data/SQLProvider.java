@@ -246,8 +246,7 @@ public class SQLProvider extends DatabaseProvider {
             }
         }
 
-        // TODO
-        return null;
+        return this.doGet(type, id);
     }
 
     @Override
@@ -277,8 +276,7 @@ public class SQLProvider extends DatabaseProvider {
             statement.executeUpdate();
         }
 
-        // TODO
-        return null;
+        return this.doGet(type, id);
     }
 
     @Override
@@ -295,8 +293,7 @@ public class SQLProvider extends DatabaseProvider {
         else
             this.doPatchEntryDelete(relAnnotation, id, obj);
 
-        // TODO (what should this be?)
-        return null;
+        return this.doGet(type, id);
     }
 
     private void doPatchEntryInsert(Relational annotation, long id, Object val) throws SQLException {
