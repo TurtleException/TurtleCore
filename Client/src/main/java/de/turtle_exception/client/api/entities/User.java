@@ -1,11 +1,8 @@
 package de.turtle_exception.client.api.entities;
 
 import de.turtle_exception.client.api.TurtleClient;
-import de.turtle_exception.client.internal.data.annotations.Keys;
+import de.turtle_exception.client.internal.data.annotations.*;
 import de.turtle_exception.client.api.request.Action;
-import de.turtle_exception.client.internal.data.annotations.Key;
-import de.turtle_exception.client.internal.data.annotations.Relation;
-import de.turtle_exception.client.internal.data.annotations.Resource;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -37,7 +34,7 @@ public interface User extends Turtle {
      * Provides the name of this User. Usernames are not guaranteed to be unique and can be set by the User themselves.
      * @return The username.
      */
-    @Key(name = Keys.User.NAME)
+    @Key(name = Keys.User.NAME, sqlType = Types.User.NAME)
     @NotNull String getName();
 
     /**
@@ -92,7 +89,8 @@ public interface User extends Turtle {
      * Provides a List of snowflake ids that each represent a Discord user this User is linked to (exclusively).
      * @return List of snowflake ids.
      */
-    @Key(name = Keys.User.DISCORD, relation = Relation.MANY_TO_ONE)
+    @Key(name = Keys.User.DISCORD, relation = Relation.ONE_TO_MANY, type = Long.class, sqlType = Types.User.DISCORD)
+    @Relational(table = "user_discord", self = "user", foreign = "discord")
     @NotNull List<Long> getDiscordIds();
 
     /**
@@ -157,7 +155,8 @@ public interface User extends Turtle {
      * Provides a List of {@link UUID UUIDs} that each represent a Minecraft account this User is linked to (exclusively).
      * @return List of {@link UUID UUIDs}.
      */
-    @Key(name = Keys.User.MINECRAFT, relation = Relation.MANY_TO_ONE)
+    @Key(name = Keys.User.MINECRAFT, relation = Relation.ONE_TO_MANY, type = UUID.class, sqlType = Types.User.MINECRAFT)
+    @Relational(table = "user_minecraft", self = "user", foreign = "minecraft")
     @NotNull List<UUID> getMinecraftIds();
 
     /**

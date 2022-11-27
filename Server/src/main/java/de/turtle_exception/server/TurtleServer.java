@@ -6,8 +6,8 @@ import de.turtle_exception.client.internal.util.logging.ConsoleHandler;
 import de.turtle_exception.client.internal.util.logging.NestedLogger;
 import de.turtle_exception.client.internal.util.logging.SimpleFormatter;
 import de.turtle_exception.server.cli.ServerCLI;
-import de.turtle_exception.server.data.DatabaseProvider;
 import de.turtle_exception.server.data.LoginHandler;
+import de.turtle_exception.server.data.SQLProvider;
 import de.turtle_exception.server.event.EntityUpdateListener;
 import de.turtle_exception.server.net.NetServer;
 import de.turtle_exception.server.util.LogUtil;
@@ -80,7 +80,7 @@ public class TurtleServer {
         NetServer netServer = new NetServer(this, getPort());
         this.turtleClient = new TurtleClientBuilder()
                 .setNetworkAdapter(netServer)
-                .setProvider(new DatabaseProvider(new File(DIR, "data")))
+                .setProvider(new SQLProvider(config))
                 .setLogger(new NestedLogger("TurtleClient", logger))
                 .addListeners(new EntityUpdateListener(netServer))
                 .setAutoFillCache(true)

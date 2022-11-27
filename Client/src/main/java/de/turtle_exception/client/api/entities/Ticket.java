@@ -1,13 +1,10 @@
 package de.turtle_exception.client.api.entities;
 
 import de.turtle_exception.client.api.TurtleClient;
-import de.turtle_exception.client.internal.data.annotations.Keys;
+import de.turtle_exception.client.internal.data.annotations.*;
 import de.turtle_exception.client.api.TicketState;
 import de.turtle_exception.client.api.entities.attribute.IUserContainer;
 import de.turtle_exception.client.api.request.Action;
-import de.turtle_exception.client.internal.data.annotations.Key;
-import de.turtle_exception.client.internal.data.annotations.Relation;
-import de.turtle_exception.client.internal.data.annotations.Resource;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import org.jetbrains.annotations.NotNull;
@@ -42,7 +39,7 @@ public interface Ticket extends Turtle, IUserContainer {
      * purposes, as it is a rather inefficient shortcut for {@code Ticket.getState().getCode()}.
      * @return The Ticket state as a {@code byte}.
      */
-    @Key(name = Keys.Ticket.STATE)
+    @Key(name = Keys.Ticket.STATE, sqlType = Types.Ticket.STATE)
     default byte getStateCode() {
         return this.getState().getCode();
     }
@@ -62,7 +59,7 @@ public interface Ticket extends Turtle, IUserContainer {
      * <p> Titles also may be {@code null}, if they have not been set.
      * @return The Ticket title (possibly {@code null}).
      */
-    @Key(name = Keys.Ticket.TITLE)
+    @Key(name = Keys.Ticket.TITLE, sqlType = Types.Ticket.TITLE)
     @Nullable String getTitle();
 
     /**
@@ -78,7 +75,7 @@ public interface Ticket extends Turtle, IUserContainer {
      * Provides the category of this Ticket.
      * @return The Ticket category.
      */
-    @Key(name = Keys.Ticket.CATEGORY)
+    @Key(name = Keys.Ticket.CATEGORY, relation = Relation.MANY_TO_ONE, sqlType = Types.Ticket.CATEGORY)
     @NotNull String getCategory();
 
     /**
@@ -95,7 +92,8 @@ public interface Ticket extends Turtle, IUserContainer {
      * <p> Tags are custom Strings that can be assigned by the Ticket author(s) or by team, moderation and bots.
      * @return List of Ticket tags.
      */
-    @Key(name = Keys.Ticket.TAGS, relation = Relation.MANY_TO_MANY)
+    @Key(name = Keys.Ticket.TAGS, relation = Relation.MANY_TO_MANY, type = String.class, sqlType = Types.Ticket.TAGS)
+    @Relational(table = "ticket_tags", self = "ticket", foreign = "tag")
     @NotNull List<String> getTags();
 
     /**
@@ -118,7 +116,7 @@ public interface Ticket extends Turtle, IUserContainer {
      * Provides the Discord channel if of this Ticket.
      * @return Snowflake channel id.
      */
-    @Key(name = Keys.Ticket.DISCORD_CHANNEL)
+    @Key(name = Keys.Ticket.DISCORD_CHANNEL, sqlType = Types.Ticket.DISCORD_CHANNEL)
     long getDiscordChannelId();
 
     /**
@@ -151,7 +149,8 @@ public interface Ticket extends Turtle, IUserContainer {
      * <p> Team members, moderation and bots are not included in this list unless they have explicitly been added.
      * @return List of Users.
      */
-    @Key(name = Keys.Ticket.USERS, relation = Relation.MANY_TO_MANY, type = User.class)
+    @Key(name = Keys.Ticket.USERS, relation = Relation.MANY_TO_MANY, type = User.class, sqlType = Types.Ticket.USERS)
+    @Relational(table = "ticket_users", self = "ticket", foreign = "user")
     @NotNull List<User> getUsers();
 
     /**

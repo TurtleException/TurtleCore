@@ -75,7 +75,7 @@ public class TurtleClientImpl implements TurtleClient {
     private Server spigotServer = null;
     private JDA    jda          = null;
 
-    public TurtleClientImpl(@Nullable String name, @NotNull Logger logger, @NotNull NetworkAdapter networkAdapter, @NotNull Provider provider, boolean autoFillCache) throws IOException, LoginException, TimeoutException {
+    public TurtleClientImpl(@Nullable String name, @NotNull Logger logger, @NotNull NetworkAdapter networkAdapter, @NotNull Provider provider, boolean autoFillCache) throws IOException, LoginException, TimeoutException, ProviderException {
         this.name = name;
         this.logger = logger;
         this.logger.log(Level.INFO, "Hello there  (Starting...)");
@@ -94,6 +94,7 @@ public class TurtleClientImpl implements TurtleClient {
         this.logger.log(Level.FINE, "Starting Provider (" + provider.getClass().getSimpleName() + ")");
         this.provider = provider;
         this.provider.setClient(this);
+        this.provider.start();
 
         if (this.provider instanceof NetworkProvider netProvider) {
             if (networkAdapter instanceof NetClient netClient)

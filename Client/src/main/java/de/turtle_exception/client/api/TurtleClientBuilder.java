@@ -3,6 +3,7 @@ package de.turtle_exception.client.api;
 import de.turtle_exception.client.api.event.EventListener;
 import de.turtle_exception.client.internal.NetworkAdapter;
 import de.turtle_exception.client.internal.Provider;
+import de.turtle_exception.client.internal.ProviderException;
 import de.turtle_exception.client.internal.TurtleClientImpl;
 import de.turtle_exception.client.internal.net.NetClient;
 import de.turtle_exception.client.internal.net.NetworkProvider;
@@ -45,7 +46,7 @@ public class TurtleClientBuilder {
 
     public TurtleClientBuilder() { }
 
-    public @NotNull TurtleClient build() throws IllegalArgumentException, IOException, LoginException, TimeoutException {
+    public @NotNull TurtleClient build() throws IllegalArgumentException, IOException, LoginException, TimeoutException, ProviderException {
         try {
             Checks.nonNull(networkAdapter, "NetworkAdapter" );
             Checks.nonNull(provider, "Provider");

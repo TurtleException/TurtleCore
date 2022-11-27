@@ -6,6 +6,7 @@ import de.turtle_exception.client.api.request.Action;
 import de.turtle_exception.client.internal.TurtleClientImpl;
 import de.turtle_exception.client.internal.data.annotations.Key;
 import de.turtle_exception.client.internal.data.annotations.Resource;
+import de.turtle_exception.client.internal.data.annotations.Types;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -18,7 +19,7 @@ public interface Turtle {
      * Provides the unique turtle id of this entity. This id should never change and always only reference this entity.
      * @return Long representation of the id.
      */
-    @Key(name = Keys.Turtle.ID)
+    @Key(name = Keys.Turtle.ID, sqlType = Types.Turtle.ID)
     long getId();
 
     /**
