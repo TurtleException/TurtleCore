@@ -15,6 +15,8 @@ import java.lang.annotation.AnnotationFormatError;
 import java.util.Map;
 import java.util.logging.Level;
 
+@Deprecated
+@SuppressWarnings("unused")
 public class FilesystemProvider extends DatabaseProvider {
     private final File dir;
 
