@@ -6,10 +6,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import de.turtle_exception.client.api.entities.Turtle;
 import de.turtle_exception.client.internal.data.ResourceUtil;
-import de.turtle_exception.client.internal.data.annotations.Key;
-import de.turtle_exception.client.internal.data.annotations.Relation;
-import de.turtle_exception.client.internal.data.annotations.Relational;
-import de.turtle_exception.client.internal.data.annotations.Resource;
+import de.turtle_exception.client.internal.data.annotations.*;
 import de.turtle_exception.client.internal.data.annotations.Types;
 import de.turtle_exception.client.internal.util.AnnotationUtil;
 import de.turtle_exception.client.internal.util.StringUtil;
@@ -95,7 +92,7 @@ public class SQLProvider extends DatabaseProvider {
         }
 
         try (Statement statement = connection.createStatement()) {
-            statement.executeUpdate("DELETE FROM `" + table + "` WHERE `id` = '" + id + "';");
+            statement.executeUpdate("DELETE FROM `" + table + "` WHERE `" + Keys.Turtle.ID + "` = '" + id + "';");
         }
 
         return true;
@@ -113,7 +110,7 @@ public class SQLProvider extends DatabaseProvider {
         JsonObject json = new JsonObject();
 
         try (Statement statement = connection.createStatement()) {
-            ResultSet result = statement.executeQuery("SELECT * FROM `" + table + "` WHERE `id` = '" + id + "';");
+            ResultSet result = statement.executeQuery("SELECT * FROM `" + table + "` WHERE `" + Keys.Turtle.ID + "` = '" + id + "';");
 
             if (!result.next())
                 throw new NullPointerException("Entry does not exist!");
@@ -164,10 +161,10 @@ public class SQLProvider extends DatabaseProvider {
         JsonArray arr = new JsonArray();
 
         try (Statement statement = connection.createStatement()) {
-            ResultSet result = statement.executeQuery("SELECT `id` FROM " + table + ";");
+            ResultSet result = statement.executeQuery("SELECT `" + Keys.Turtle.ID + "` FROM " + table + ";");
 
             while (result.next())
-                arr.add(this.doGet(type, result.getLong("id")));
+                arr.add(this.doGet(type, result.getLong(Keys.Turtle.ID)));
         }
 
         return arr;
@@ -180,7 +177,7 @@ public class SQLProvider extends DatabaseProvider {
         Resource resourceAnnotation = ResourceUtil.getResourceAnnotation(type);
         String table = resourceAnnotation.path();
 
-        long id = content.get("id").getAsLong();
+        long id = content.get(Keys.Turtle.ID).getAsLong();
 
         List<Key> keys = ResourceUtil.getKeyAnnotations(type);
 
@@ -243,7 +240,7 @@ public class SQLProvider extends DatabaseProvider {
         }
 
         try (Statement statement = connection.createStatement()) {
-            statement.executeUpdate("UPDATE `" + table + "` SET " + StringUtil.join(", ", patches) + " WHERE `id` = '" + id + "';");
+            statement.executeUpdate("UPDATE `" + table + "` SET " + StringUtil.join(", ", patches) + " WHERE `" + Keys.Turtle.ID + "` = '" + id + "';");
         }
 
         return null;
@@ -299,7 +296,7 @@ public class SQLProvider extends DatabaseProvider {
             keys.add("`" + atKey.name() +  "` " + atKey.sqlType());
         }
 
-        keys.add("PRIMARY KEY (`id`)");
+        keys.add("PRIMARY KEY (`" + Keys.Turtle.ID + "`)");
 
         try (Statement statement = connection.createStatement()) {
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS `" + table + "` (" + StringUtil.join(", ", keys) + ");");
