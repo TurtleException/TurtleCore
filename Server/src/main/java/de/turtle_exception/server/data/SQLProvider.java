@@ -314,10 +314,12 @@ public class SQLProvider extends DatabaseProvider {
         String table = relAnnotation.table();
         List<String> keys = new ArrayList<>();
 
-        // TODO: how to determine foreign type (as SQL type)?
-        String foreignType = "";
+        String foreignType = key.sqlType();
 
-        keys.add("`" + relAnnotation.self() + "` " + key.sqlType());
+        if (foreignType.equalsIgnoreCase("TURTLE"))
+            foreignType = "BIGINT(20)";
+
+        keys.add("`" + relAnnotation.self() + "` BIGINT(20)");
         keys.add("`" + relAnnotation.foreign() + "` " + foreignType);
 
         if (key.relation() == Relation.ONE_TO_MANY)
