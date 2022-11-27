@@ -1,5 +1,6 @@
 package de.turtle_exception.client.api;
 
+import de.turtle_exception.client.TurtleException;
 import de.turtle_exception.client.api.event.EventListener;
 import de.turtle_exception.client.internal.NetworkAdapter;
 import de.turtle_exception.client.internal.Provider;
@@ -46,7 +47,7 @@ public class TurtleClientBuilder {
 
     public TurtleClientBuilder() { }
 
-    public @NotNull TurtleClient build() throws IllegalArgumentException, IOException, LoginException, TimeoutException, ProviderException {
+    public @NotNull TurtleClient build() throws IllegalArgumentException, TurtleException {
         try {
             Checks.nonNull(networkAdapter, "NetworkAdapter" );
             Checks.nonNull(provider, "Provider");
@@ -57,7 +58,12 @@ public class TurtleClientBuilder {
         String name   = String.valueOf(increment.getAndIncrement());
         Logger logger = this.logger != null ? this.logger : Logger.getLogger("CLIENT#" + name);
 
-        TurtleClientImpl client = new TurtleClientImpl(name, logger, networkAdapter, provider, autoFillCache);
+        TurtleClientImpl client;
+        try {
+            client = new TurtleClientImpl(name, logger, networkAdapter, provider, autoFillCache);
+        } catch (ProviderException | IOException | TimeoutException | LoginException e) {
+            throw new TurtleException(e);
+        }
 
         for (EventListener listener : listeners)
             client.getEventManager().register(listener);
