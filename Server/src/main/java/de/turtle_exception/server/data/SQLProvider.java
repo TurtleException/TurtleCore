@@ -340,6 +340,8 @@ public class SQLProvider extends DatabaseProvider {
             if (key.relation() != Relation.ONE_TO_ONE) continue;
             this.createReferenceTable(type, key);
         }
+
+        safeTypes.add(type);
     }
 
     private void createResourceTable(@NotNull Class<? extends Turtle> type) throws SQLException {
