@@ -14,16 +14,22 @@ import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Method;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Properties;
+import java.text.MessageFormat;
+import java.util.*;
 import java.util.logging.Level;
 
 // TODO: simplify (reduce duplicate code)
-// TODO: sanitize statements!!!
 // TODO: reverse applied changes if an operation fails
 public class SQLProvider extends DatabaseProvider {
+    private static final String STMT_DELETE_RESOURCE  = "DELETE FROM `?` WHERE `?` = '?';";
+    private static final String STMT_DELETE_REFERENCE = "DELETE FROM `?` WHERE `" + Keys.Turtle.ID + "` = '?';";
+    private static final String STMT_GET_RESOURCE  = "SELECT * FROM `?` WHERE `" + Keys.Turtle.ID + "` = '?';";
+    private static final String STMT_GET_REFERENCE = "SELECT * FROM `?` WHERE `?` = '?';";
+    private static final String STMT_GET_ALL = "SELECT `" + Keys.Turtle.ID + "` FROM `?`;";
+    private static final String TEMPLATE_INSERT = "INSERT INTO `?` ({0}) VALUES ({1});";
+    private static final String TEMPLATE_UPDATE = "UPDATE `?` SET {0} WHERE `" + Keys.Turtle.ID + "` = '?';";
+    private static final String STMT_DELETE_ENTRY = "DELETE FROM `?` WHERE `?` = '?' AND `?` = '?';";
+
     private final String host;
     private final int    port;
     private final String database;
@@ -86,13 +92,18 @@ public class SQLProvider extends DatabaseProvider {
             String rTable = relAnnotation.table();
             String rName1 = relAnnotation.self();
 
-            try (Statement statement = connection.createStatement()) {
-                statement.executeUpdate("DELETE FROM `" + rTable + "` WHERE `" + rName1 + "` = '" + id + "';");
+            try (PreparedStatement statement = connection.prepareStatement(STMT_DELETE_REFERENCE)) {
+                statement.setString(1, rTable);
+                statement.setString(2, rName1);
+                statement.setLong(3, id);
+                statement.executeUpdate();
             }
         }
 
-        try (Statement statement = connection.createStatement()) {
-            statement.executeUpdate("DELETE FROM `" + table + "` WHERE `" + Keys.Turtle.ID + "` = '" + id + "';");
+        try (PreparedStatement statement = connection.prepareStatement(STMT_DELETE_RESOURCE)) {
+            statement.setString(1, table);
+            statement.setLong(2, id);
+            statement.executeUpdate();
         }
 
         return true;
@@ -109,8 +120,11 @@ public class SQLProvider extends DatabaseProvider {
 
         JsonObject json = new JsonObject();
 
-        try (Statement statement = connection.createStatement()) {
-            ResultSet result = statement.executeQuery("SELECT * FROM `" + table + "` WHERE `" + Keys.Turtle.ID + "` = '" + id + "';");
+        try (PreparedStatement statement = connection.prepareStatement(STMT_GET_RESOURCE)) {
+            statement.setString(1, table);
+            statement.setLong(2, id);
+
+            ResultSet result = statement.executeQuery();
 
             if (!result.next())
                 throw new NullPointerException("Entry does not exist!");
@@ -138,8 +152,12 @@ public class SQLProvider extends DatabaseProvider {
             String rName1 = relAnnotation.self();
             String rName2 = relAnnotation.foreign();
 
-            try (Statement statement = connection.createStatement()) {
-                ResultSet result = statement.executeQuery("SELECT * FROM `" + rTable + "` WHERE `" + rName1 + "` = '" + id + "';");
+            try (PreparedStatement statement = connection.prepareStatement(STMT_GET_REFERENCE)) {
+                statement.setString(1, rTable);
+                statement.setString(2, rName1);
+                statement.setLong(3, id);
+
+                ResultSet result = statement.executeQuery();
 
                 while (result.next())
                     ResourceUtil.addValue(arr, result.getObject(rName2));
@@ -160,8 +178,10 @@ public class SQLProvider extends DatabaseProvider {
 
         JsonArray arr = new JsonArray();
 
-        try (Statement statement = connection.createStatement()) {
-            ResultSet result = statement.executeQuery("SELECT `" + Keys.Turtle.ID + "` FROM " + table + ";");
+        try (PreparedStatement statement = connection.prepareStatement(STMT_GET_ALL)) {
+            statement.setString(1, table);
+
+            ResultSet result = statement.executeQuery();
 
             while (result.next())
                 arr.add(this.doGet(type, result.getLong(Keys.Turtle.ID)));
@@ -193,8 +213,11 @@ public class SQLProvider extends DatabaseProvider {
         String sqlKeys = StringUtil.join(", ", keyStrings);
         String sqlVals = StringUtil.join(", ", valStrings);
 
-        try (Statement statement = connection.createStatement()) {
-            statement.executeUpdate("INSERT INTO `" + table + "` (" + sqlKeys + ") VALUES (" + sqlVals + ");");
+        String stmt = MessageFormat.format(TEMPLATE_INSERT, sqlKeys, sqlVals);
+
+        try (PreparedStatement statement = connection.prepareStatement(stmt)) {
+            statement.setString(1, table);
+            statement.executeUpdate();
         }
 
 
@@ -214,12 +237,16 @@ public class SQLProvider extends DatabaseProvider {
                 String refSqlKeys = relAnnotation.self() + "`, `" + relAnnotation.foreign();
                 String refSqlVals = id + "', '" + entryObj;
 
-                try (Statement statement = connection.createStatement()) {
-                    statement.executeUpdate("INSERT INTO `" + relAnnotation.table() + "` (`" + refSqlKeys + "`) VALUES ('" + refSqlVals + "');");
+                String refStmt = MessageFormat.format(TEMPLATE_INSERT, refSqlKeys, refSqlVals);
+
+                try (PreparedStatement statement = connection.prepareStatement(refStmt)) {
+                    statement.setString(1, relAnnotation.table());
+                    statement.executeUpdate();
                 }
             }
         }
 
+        // TODO
         return null;
     }
 
@@ -232,17 +259,25 @@ public class SQLProvider extends DatabaseProvider {
 
         // note: this will only work with ONE_TO_ONE relations
 
-        List<String> patches = new ArrayList<>();
+        Set<String> keys = content.keySet();
+        String stmt = MessageFormat.format(TEMPLATE_UPDATE, StringUtil.repeat("`?` = '?'", ", ", keys.size()));
 
-        for (String key : content.keySet()) {
-            Object val = ResourceUtil.getValue((JsonPrimitive) content.get(key));
-            patches.add("`" + key + "` = '" + val + "'");
+        try (PreparedStatement statement = connection.prepareStatement(stmt)) {
+            statement.setString(1, table);
+
+            int i = 2;
+            for (String key : keys) {
+                Object val = ResourceUtil.getValue((JsonPrimitive) content.get(key));
+
+                statement.setString(i++, key);
+                statement.setObject(i++, val);
+            }
+
+            statement.setLong(i, id);
+            statement.executeUpdate();
         }
 
-        try (Statement statement = connection.createStatement()) {
-            statement.executeUpdate("UPDATE `" + table + "` SET " + StringUtil.join(", ", patches) + " WHERE `" + Keys.Turtle.ID + "` = '" + id + "';");
-        }
-
+        // TODO
         return null;
     }
 
@@ -255,19 +290,46 @@ public class SQLProvider extends DatabaseProvider {
         if (relAnnotation == null)
             throw new IllegalArgumentException("Illegal key: " + key);
 
-        String table = relAnnotation.table();
+        if (add)
+            this.doPatchEntryInsert(relAnnotation, id, obj);
+        else
+            this.doPatchEntryDelete(relAnnotation, id, obj);
 
-        try (Statement statement = connection.createStatement()) {
-            if (add)
-                statement.executeUpdate("INSERT INTO `" + table + "` (" + relAnnotation.self() + ", " + relAnnotation.foreign() + ") VALUES (" + id + ", " + obj + ");");
-            else
-                statement.executeUpdate("DELETE FROM `" + table + "` WHERE `" + relAnnotation.self() + "` = '" + id + "' AND `" + relAnnotation.foreign() + "` = '" + obj + "';");
-        }
-
+        // TODO (what should this be?)
         return null;
     }
 
+    private void doPatchEntryInsert(Relational annotation, long id, Object val) throws SQLException {
+        String keys = "`" + annotation.self() + ", `" + annotation.foreign() + "`";
+        String stmt = MessageFormat.format(TEMPLATE_INSERT, keys, "`?`, `?`");
+
+        try (PreparedStatement statement = connection.prepareStatement(stmt)) {
+            statement.setString(1, annotation.table());
+            statement.setLong(2, id);
+            statement.setObject(3, val);
+
+            statement.executeUpdate();
+        }
+    }
+
+    private void doPatchEntryDelete(Relational annotation, long id, Object val) throws SQLException {
+        try (PreparedStatement statement = connection.prepareStatement(STMT_DELETE_ENTRY)) {
+            statement.setString(1, annotation.table());
+            statement.setString(2, annotation.self());
+            statement.setLong(3, id);
+            statement.setString(4, annotation.foreign());
+            statement.setObject(5, val);
+
+            statement.executeUpdate();
+        }
+    }
+
     /* - - - */
+
+    /*
+     * The following methods use Statements instead of PreparedStatements because they don't need to sanitize their
+     * input data, as it is provided by the source-code. No user input can manipulate any parameters below this comment.
+     */
 
     private void checkTables(@NotNull Class<? extends Turtle> type) throws SQLException {
         if (safeTypes.contains(type)) return;

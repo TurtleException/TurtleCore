@@ -3,8 +3,11 @@ package de.turtle_exception.client.internal.util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 public class StringUtil {
     private StringUtil() { }
@@ -28,6 +31,13 @@ public class StringUtil {
                 builder.append(delimiter);
         }
         return builder.toString();
+    }
+
+    public static String repeat(String str, String delimiter, int count) {
+        List<String> list = new ArrayList<>();
+        for (int i = 0; i < count; i++)
+            list.add(str);
+        return join(delimiter, list);
     }
 
     // note: this will not work with overlapping results
