@@ -299,11 +299,11 @@ public class SQLProvider extends DatabaseProvider {
         keys.add("`" + key.relationName2() + "` " + foreignType);
 
         if (key.relation() == Relation.ONE_TO_MANY)
-            keys.add("PRIMARY KEY (`" + key.relationName1() + "`)");
+            keys.add("PRIMARY KEY (`" + key.relationName2() + "`)");
         if (key.relation() == Relation.MANY_TO_MANY)
             keys.add("PRIMARY KEY (`" + key.relationName1() + "`, `" + key.relationName2() + "`)");
         if (key.relation() == Relation.MANY_TO_ONE)
-            keys.add("PRIMARY KEY (`" + key.relationName2() + "`)");
+            keys.add("PRIMARY KEY (`" + key.relationName1() + "`)");
 
         try (Statement statement = connection.createStatement()) {
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS `" + table + "` (" + StringUtil.join(", ", keys) + ");");
