@@ -104,7 +104,7 @@ public class ResourceBuilder {
             throw new IllegalArgumentException("Key may not mark a 1:1 relation");
 
         if (!(value instanceof Iterable<?> iterable))
-            throw new AnnotationFormatError("Unexpected type " + value.getClass().getName() + "on reference: " + annotation.name());
+            throw new AnnotationFormatError("Unexpected type " + value.getClass().getName() + " on reference: " + annotation.name());
 
         JsonArray arr = new JsonArray();
 

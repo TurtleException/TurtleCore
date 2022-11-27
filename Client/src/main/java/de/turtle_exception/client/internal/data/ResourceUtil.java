@@ -1,8 +1,9 @@
 package de.turtle_exception.client.internal.data;
 
 import com.google.gson.*;
-import de.turtle_exception.client.internal.data.annotations.Keys;
 import de.turtle_exception.client.api.entities.Turtle;
+import de.turtle_exception.client.internal.data.annotations.Key;
+import de.turtle_exception.client.internal.data.annotations.Keys;
 import de.turtle_exception.client.internal.data.annotations.Resource;
 import de.turtle_exception.client.internal.util.AnnotationUtil;
 import org.jetbrains.annotations.NotNull;
@@ -12,6 +13,10 @@ import java.lang.annotation.AnnotationFormatError;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Stream;
 
 public class ResourceUtil {
     private ResourceUtil() { }
@@ -22,6 +27,20 @@ public class ResourceUtil {
         if (annotation == null)
             throw new AnnotationFormatError("Missing annotation @Resource on class " + clazz.getName());
         return annotation;
+    }
+
+    public static @NotNull List<Key> getKeyAnnotations(@NotNull Class<? extends Turtle> clazz) throws AnnotationFormatError {
+        return Stream.concat(
+                Arrays.stream(clazz.getMethods()),
+                Arrays.stream(clazz.getFields())
+        )
+                .map(accObj -> AnnotationUtil.getAnnotation(accObj, Key.class))
+                .filter(Objects::nonNull)
+                .toList();
+    }
+
+    public static @Nullable Key getKeyAnnotation(@NotNull Class<? extends Turtle> clazz, @NotNull String name) {
+        return getKeyAnnotations(clazz).stream().filter(key -> key.name().equals(name)).findFirst().orElse(null);
     }
 
     public static long getTurtleId(@NotNull JsonObject content) throws IllegalArgumentException {
@@ -48,6 +67,19 @@ public class ResourceUtil {
         } else {
             throw new AssertionError("Unexpected type: " + accObj.getClass().getName());
         }
+    }
+
+    public static Object getValue(@NotNull JsonPrimitive json) {
+        if (json.isJsonNull()) {
+            return null;
+        } else if (json.isBoolean()) {
+            return json.getAsBoolean();
+        } else if (json.isNumber()) {
+            return json.getAsNumber();
+        } else if (json.isString()) {
+            return json.getAsString();
+        }
+        return json;
     }
 
     public static void addValue(@NotNull JsonArray json, Object object) {
