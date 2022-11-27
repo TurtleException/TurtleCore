@@ -15,14 +15,10 @@ import de.turtle_exception.client.internal.util.logging.NestedLogger;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.annotation.AnnotationFormatError;
-import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
-import java.util.stream.Stream;
 
 public class ResourceBuilder {
     private final TurtleClient client;
@@ -76,19 +72,13 @@ public class ResourceBuilder {
 
         JsonObject json = new JsonObject();
 
-        Stream<AccessibleObject> stream = Stream.concat(
-                Arrays.stream(object.getClass().getMethods()),
-                Arrays.stream(object.getClass().getFields())
-        );
-
-        for (Iterator<AccessibleObject> it = stream.iterator(); it.hasNext(); ) {
-            AccessibleObject accObj = it.next();
-            Key atKey = AnnotationUtil.getAnnotation(accObj, Key.class);
+        for (Method method : object.getClass().getMethods()) {
+            Key atKey = AnnotationUtil.getAnnotation(method, Key.class);
 
             // value should be ignored
             if (atKey == null) continue;
 
-            Object value = ResourceUtil.getValue(accObj, object);
+            Object value = ResourceUtil.getValue(method, object);
 
             if (atKey.relation() == Relation.ONE_TO_ONE)
                 ResourceUtil.addValue(json, atKey.name(), value);
@@ -102,6 +92,8 @@ public class ResourceBuilder {
     private static JsonArray handleReference(@NotNull Key annotation, @NotNull Object value) {
         if (annotation.relation() == Relation.ONE_TO_ONE)
             throw new IllegalArgumentException("Key may not mark a 1:1 relation");
+
+        // TODO: Handle Relation.ONE_TO_MANY
 
         if (!(value instanceof Iterable<?> iterable))
             throw new AnnotationFormatError("Unexpected type " + value.getClass().getName() + " on reference: " + annotation.name());

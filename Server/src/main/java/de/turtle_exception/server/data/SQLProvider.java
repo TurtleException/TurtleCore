@@ -13,11 +13,13 @@ import de.turtle_exception.client.internal.util.AnnotationUtil;
 import de.turtle_exception.client.internal.util.StringUtil;
 import org.jetbrains.annotations.NotNull;
 
-import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.Method;
 import java.sql.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Properties;
 import java.util.logging.Level;
-import java.util.stream.Stream;
 
 // TODO: sanitize statements!!!
 // TODO: reverse applied changes if an operation fails
@@ -269,14 +271,8 @@ public class SQLProvider extends DatabaseProvider {
         String table = resourceAnnotation.path();
         List<String> keys = new ArrayList<>();
 
-        Stream<AccessibleObject> stream = Stream.concat(
-                Arrays.stream(type.getMethods()),
-                Arrays.stream(type.getFields())
-        );
-
-        for (Iterator<AccessibleObject> it = stream.iterator(); it.hasNext(); ) {
-            AccessibleObject accObj = it.next();
-            Key atKey = AnnotationUtil.getAnnotation(accObj, Key.class);
+        for (Method method : type.getMethods()) {
+            Key atKey = AnnotationUtil.getAnnotation(method, Key.class);
 
             // value should be ignored
             if (atKey == null) continue;

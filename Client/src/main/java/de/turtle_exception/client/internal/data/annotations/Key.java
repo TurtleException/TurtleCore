@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
 
 // TODO: docs
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.FIELD, ElementType.METHOD})
+@Target(ElementType.METHOD)
 public @interface Key {
     @NotNull String name();
 

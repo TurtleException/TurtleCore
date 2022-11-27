@@ -4,8 +4,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.LinkedList;
 import java.util.List;
@@ -43,25 +41,6 @@ public class AnnotationUtil {
         }
 
         return null;
-    }
-
-    /**
-     * This provides a specific {@link Annotation} of type {@code T} from an {@link AccessibleObject} that must either
-     * be a {@link Field} or a {@link Method}, if present. If the AccessibleObject does not have the requested
-     * annotation anywhere in its hierarchy (in case of a method), {@code null} is returned.
-     * @param accObj A Field or Method that should have the annotation.
-     * @param type The annotation class.
-     * @return The requested annotation (may be {@code null}).
-     * @param <T> Type of the annotation.
-     * @throws IllegalArgumentException if the first argument is not a Field or Method
-     * @see AnnotationUtil#getAnnotation(Method, Class)
-     */
-    public static <T extends Annotation> @Nullable T getAnnotation(@NotNull AccessibleObject accObj, @NotNull Class<T> type) throws IllegalArgumentException {
-        if (accObj instanceof Method method)
-            return getAnnotation(method, type);
-        if (accObj instanceof Field field)
-            return field.getAnnotation(type);
-        throw new IllegalArgumentException("Unsupported AccessibleObject: " + accObj.getClass().getName());
     }
 
     /**

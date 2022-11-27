@@ -10,13 +10,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.annotation.AnnotationFormatError;
-import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Stream;
 
 public class ResourceUtil {
     private ResourceUtil() { }
@@ -30,11 +27,8 @@ public class ResourceUtil {
     }
 
     public static @NotNull List<Key> getKeyAnnotations(@NotNull Class<? extends Turtle> clazz) throws AnnotationFormatError {
-        return Stream.concat(
-                Arrays.stream(clazz.getMethods()),
-                Arrays.stream(clazz.getFields())
-        )
-                .map(accObj -> AnnotationUtil.getAnnotation(accObj, Key.class))
+        return Arrays.stream(clazz.getMethods())
+                .map(method -> AnnotationUtil.getAnnotation(method, Key.class))
                 .filter(Objects::nonNull)
                 .toList();
     }
@@ -51,21 +45,11 @@ public class ResourceUtil {
         }
     }
 
-    public static @NotNull Object getValue(@NotNull AccessibleObject accObj, @NotNull Object instance) {
-        if (accObj instanceof Method method) {
-            try {
-                return method.invoke(instance);
-            } catch (Throwable t) {
-                throw new AnnotationFormatError("Unable to invoke key method: " + method.getName(), t);
-            }
-        } else if (accObj instanceof Field field) {
-            try {
-                return field.get(instance);
-            } catch (Throwable t) {
-                throw new AnnotationFormatError("Unable to access key field: " + field.getName(), t);
-            }
-        } else {
-            throw new AssertionError("Unexpected type: " + accObj.getClass().getName());
+    public static @NotNull Object getValue(@NotNull Method method, @NotNull Object instance) throws AnnotationFormatError {
+        try {
+            return method.invoke(instance);
+        } catch (Throwable t) {
+            throw new AnnotationFormatError("Unable to invoke key method: " + method.getName(), t);
         }
     }
 
