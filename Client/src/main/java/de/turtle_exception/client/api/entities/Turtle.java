@@ -18,7 +18,7 @@ public interface Turtle {
      * Provides the unique turtle id of this entity. This id should never change and always only reference this entity.
      * @return Long representation of the id.
      */
-    @Key(name = Keys.Turtle.ID)
+    @Key(name = Keys.Turtle.ID, sqlType = "BIGINT(20)")
     long getId();
 
     /**

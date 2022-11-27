@@ -29,7 +29,7 @@ public interface Group extends Turtle, IUserContainer {
      * Uniqueness can only be checked by {@link Group#getId()}.
      * @return The Group name.
      */
-    @Key(name = Keys.Group.NAME)
+    @Key(name = Keys.Group.NAME, sqlType = "TINYTEXT")
     @NotNull String getName();
 
     /**
@@ -46,7 +46,7 @@ public interface Group extends Turtle, IUserContainer {
      * <p> A Group can have multiple Users; A User can also be part of multiple Groups.
      * @return List of members.
      */
-    @Key(name = Keys.Group.MEMBERS, relation = Relation.MANY_TO_MANY, type = User.class)
+    @Key(name = Keys.Group.MEMBERS, relation = Relation.MANY_TO_MANY, type = User.class, sqlType = "TURTLE")
     @NotNull List<User> getUsers();
 
     /**

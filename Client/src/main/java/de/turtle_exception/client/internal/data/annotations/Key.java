@@ -15,17 +15,17 @@ public @interface Key {
 
     @NotNull Relation relation() default Relation.ONE_TO_ONE;
 
-    @NotNull Class<?> type() default Object.class;
+    Class<?> type() default Object.class;
 
     /** String representation of the SQL data type. */
-    @NotNull String sqlType() default "VARCHAR(255)";
+    String sqlType();
 
     /** Name of a relational table */
-    @NotNull String relationTable() default "";
+    String relationTable() default "";
 
     /** Self-referencing name in a relational table */
-    @NotNull String relationName1() default "";
+    String relationName1() default "";
 
     /** Foreign name in a relational table */
-    @NotNull String relationName2() default "";
+    String relationName2() default "";
 }
