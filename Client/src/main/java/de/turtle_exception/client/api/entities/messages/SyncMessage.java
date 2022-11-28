@@ -10,13 +10,17 @@ import org.jetbrains.annotations.NotNull;
 @Resource(path = "messages", builder = "buildMessage")
 @SuppressWarnings("unused")
 public interface SyncMessage extends Turtle {
-    @Key(name = "format")
     @NotNull MessageFormat getMessageFormat();
 
-    @Key(name = "author")
+    @Key(name = "format", sqlType = "TINYINT")
+    default byte getMessageFormatCode() {
+        return this.getMessageFormat().getCode();
+    }
+
+    @Key(name = "author", type = User.class, sqlType = "TURTLE")
     @NotNull User getAuthor();
 
-    @Key(name = "content")
+    @Key(name = "content", sqlType = "TEXT")
     @NotNull String getContent();
 
     @NotNull String getContent(@NotNull MessageFormat format);

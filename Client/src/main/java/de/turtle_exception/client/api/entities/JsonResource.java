@@ -21,7 +21,7 @@ public interface JsonResource extends Turtle {
      * parsing this JsonResource should be prepared for possible identifier collisions by properly handling exceptions.
      * @return String identifying the nature of this JsonResource.
      */
-    @Key(name = "identifier")
+    @Key(name = "identifier", sqlType = "TEXT")
     @NotNull String getIdentifier();
 
     /**
@@ -29,7 +29,7 @@ public interface JsonResource extends Turtle {
      * {@link JsonArray} for most use-cases of this resource.
      * @return The underlying JSON data.
      */
-    @Key(name = "content")
+    @Key(name = "content", sqlType = "LONGTEXT")
     @NotNull JsonElement getContent();
 
     // TODO: update this when the event-thing is implemented
@@ -41,6 +41,6 @@ public interface JsonResource extends Turtle {
      * would amount to great sums of unnecessarily complex data.
      * @return {@code true} if this resource is ephemeral.
      */
-    @Key(name = "ephemeral")
+    @Key(name = "ephemeral", sqlType = "BOOLEAN")
     boolean isEphemeral();
 }
