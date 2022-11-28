@@ -21,7 +21,7 @@ public class EventManager {
     }
 
     public void handleEvent(@NotNull Event event) {
-        this.logger.log(Level.FINE, "Passing " + event.getClass().getSimpleName() + " to " + listeners.size() + " listeners.");
+        this.logger.log(Level.FINE, "Passing " + event.getClass().getSimpleName() + " to " + listeners.size() + " listener(s).");
         for (EventListener listener : listeners)
             listener.onGenericEvent(event);
     }

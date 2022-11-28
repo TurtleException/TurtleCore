@@ -5,11 +5,13 @@ import de.turtle_exception.client.api.TurtleClientBuilder;
 import de.turtle_exception.client.internal.util.logging.ConsoleHandler;
 import de.turtle_exception.client.internal.util.logging.NestedLogger;
 import de.turtle_exception.client.internal.util.logging.SimpleFormatter;
-import de.turtle_exception.server.data.DatabaseProvider;
+import de.turtle_exception.server.cli.ServerCLI;
+import de.turtle_exception.server.data.LoginHandler;
+import de.turtle_exception.server.data.SQLProvider;
 import de.turtle_exception.server.event.EntityUpdateListener;
 import de.turtle_exception.server.net.NetServer;
 import de.turtle_exception.server.util.LogUtil;
-import de.turtle_exception.server.util.Status;
+import de.turtle_exception.server.util.StatusView;
 
 import java.io.File;
 import java.io.FileReader;
@@ -17,12 +19,13 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Properties;
+import java.util.Scanner;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class TurtleServer {
-    private final Status status = new Status();
+    private final StatusView statusView = new StatusView();
 
     /** The root logger of this server */
     private final Logger logger;
@@ -43,6 +46,10 @@ public class TurtleServer {
     private final File configFile = new File(DIR, "server.properties");
     private final Properties config = new Properties();
 
+    private final LoginHandler loginHandler;
+
+    private final ServerCLI cli;
+
     private TurtleClient turtleClient;
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
@@ -52,36 +59,45 @@ public class TurtleServer {
         this.logger.addHandler(new ConsoleHandler(new SimpleFormatter()));
         this.logger.addHandler(LogUtil.getFileHandler(new SimpleFormatter()));
 
-        // TODO: remove
-        this.logger.setLevel(Level.ALL);
         for (Handler handler : this.logger.getHandlers())
             handler.setLevel(Level.ALL);
 
         configFile.createNewFile();
         this.config.load(new FileReader(configFile));
+
+        // get log level from config or use INFO as default
+        this.logger.setLevel(Level.parse(config.getProperty("logLevel", "INFO")));
+
+        this.loginHandler = new LoginHandler(this);
+
+        this.cli = new ServerCLI(this);
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
     public void run() throws Exception {
-        status.set(Status.INIT);
+        statusView.set(StatusView.INIT);
 
         logger.log(Level.INFO, "Initializing TurtleClient...");
         NetServer netServer = new NetServer(this, getPort());
         this.turtleClient = new TurtleClientBuilder()
                 .setNetworkAdapter(netServer)
-                .setProvider(new DatabaseProvider(new File(DIR, "data")))
+                .setProvider(new SQLProvider(config))
                 .setLogger(new NestedLogger("TurtleClient", logger))
                 .addListeners(new EntityUpdateListener(netServer))
+                .setAutoFillCache(true)
                 .build();
+
+        logger.log(Level.INFO, "Cached " + turtleClient.getTurtles().size() + " turtles.");
 
         /* RUNNING */
 
-        status.set(Status.RUNNING);
+        statusView.set(StatusView.RUNNING);
         logger.log(Level.INFO, "Startup done.");
 
-        while (status.get() == Status.RUNNING) {
-            // TODO: CLI
-        }
+        Scanner scanner = new Scanner(System.in);
+        while (statusView.get() == StatusView.RUNNING)
+            if (scanner.hasNextLine())
+                cli.handle(scanner.nextLine());
+        scanner.close();
 
         logger.log(Level.WARNING, "Main loop has been interrupted.");
 
@@ -92,7 +108,7 @@ public class TurtleServer {
      * Await execution of final tasks, proper shutdown of all active tasks and suspend all active threads.
      */
     private void shutdown() throws Exception {
-        if (status.get() <= Status.RUNNING)
+        if (statusView.get() <= StatusView.RUNNING)
             throw new IllegalStateException("Cannot shutdown while main loop is still running. Call exit() first!");
 
         logger.log(Level.INFO, "Shutting down...");
@@ -125,6 +141,10 @@ public class TurtleServer {
 
     /* - - - */
 
+    public StatusView getStatus() {
+        return statusView;
+    }
+
     public Logger getLogger() {
         return logger;
     }
@@ -135,5 +155,9 @@ public class TurtleServer {
 
     public TurtleClient getClient() {
         return turtleClient;
+    }
+
+    public LoginHandler getLoginHandler() {
+        return loginHandler;
     }
 }

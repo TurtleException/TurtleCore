@@ -4,6 +4,7 @@ import com.google.common.collect.Sets;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import de.turtle_exception.client.api.entities.attributes.TicketState;
+import de.turtle_exception.client.internal.data.annotations.Keys;
 import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.api.entities.Ticket;
 import de.turtle_exception.client.api.entities.User;
@@ -44,27 +45,27 @@ public class TicketImpl extends TurtleImpl implements Ticket {
 
     @Override
     public synchronized @NotNull TicketImpl handleUpdate(@NotNull JsonObject json) {
-        this.apply(json, "state", element -> {
+        this.apply(json, Keys.Ticket.STATE, element -> {
             TicketState old = this.state;
             this.state = TicketState.of(element.getAsByte());
             this.fireEvent(new TicketUpdateStateEvent(this, old, this.state));
         });
-        this.apply(json, "title", element -> {
+        this.apply(json, Keys.Ticket.TITLE, element -> {
             String old = this.title;
             this.title = element.getAsString();
             this.fireEvent(new TicketUpdateTitleEvent(this, old, this.title));
         });
-        this.apply(json, "category", element -> {
+        this.apply(json, Keys.Ticket.CATEGORY, element -> {
             String old = this.category;
             this.category = element.getAsString();
             this.fireEvent(new TicketUpdateCategoryEvent(this, old, this.category));
         });
-        this.apply(json, "discord_channel", element -> {
+        this.apply(json, Keys.Ticket.DISCORD_CHANNEL, element -> {
             long old = this.discordChannel;
             this.discordChannel = element.getAsLong();
             this.fireEvent(new TicketUpdateDiscordChannelEvent(this, old, this.discordChannel));
         });
-        this.apply(json, "tags", element -> {
+        this.apply(json, Keys.Ticket.TAGS, element -> {
             Set<String> old = this.tags;
             Set<String> set = Sets.newConcurrentHashSet();
             for (JsonElement entry : element.getAsJsonArray())
@@ -72,7 +73,7 @@ public class TicketImpl extends TurtleImpl implements Ticket {
             this.tags = set;
             UpdateHelper.ofTicketTags(this, old, set);
         });
-        this.apply(json, "users", element -> {
+        this.apply(json, Keys.Ticket.USERS, element -> {
             TurtleSet<User> old = this.users;
             TurtleSet<User> set = new TurtleSet<>();
             for (JsonElement entry : element.getAsJsonArray())
@@ -92,7 +93,7 @@ public class TicketImpl extends TurtleImpl implements Ticket {
 
     @Override
     public @NotNull Action<Ticket> modifyState(@NotNull TicketState state) {
-        return getClient().getProvider().patch(this, "state", state.getCode()).andThenParse(Ticket.class);
+        return getClient().getProvider().patch(this, Keys.Ticket.STATE, state.getCode()).andThenParse(Ticket.class);
     }
 
     /* - TITLE - */
@@ -104,7 +105,7 @@ public class TicketImpl extends TurtleImpl implements Ticket {
 
     @Override
     public @NotNull Action<Ticket> modifyTitle(@Nullable String title) {
-        return getClient().getProvider().patch(this, "title", String.valueOf(title)).andThenParse(Ticket.class);
+        return getClient().getProvider().patch(this, Keys.Ticket.TITLE, String.valueOf(title)).andThenParse(Ticket.class);
     }
 
     /* - CATEGORY - */
@@ -116,7 +117,7 @@ public class TicketImpl extends TurtleImpl implements Ticket {
 
     @Override
     public @NotNull Action<Ticket> modifyCategory(@NotNull String category) {
-        return getClient().getProvider().patch(this, "category", category).andThenParse(Ticket.class);
+        return getClient().getProvider().patch(this, Keys.Ticket.CATEGORY, category).andThenParse(Ticket.class);
     }
 
     /* - TAGS - */
@@ -128,12 +129,12 @@ public class TicketImpl extends TurtleImpl implements Ticket {
 
     @Override
     public @NotNull Action<Ticket> addTag(@NotNull String tag) {
-        return getClient().getProvider().patchEntryAdd(this, "tags", tag).andThenParse(Ticket.class);
+        return getClient().getProvider().patchEntryAdd(this, Keys.Ticket.TAGS, tag).andThenParse(Ticket.class);
     }
 
     @Override
     public @NotNull Action<Ticket> removeTag(@NotNull String tag) {
-        return getClient().getProvider().patchEntryDel(this, "tags", tag).andThenParse(Ticket.class);
+        return getClient().getProvider().patchEntryDel(this, Keys.Ticket.TAGS, tag).andThenParse(Ticket.class);
     }
 
     /* - DISCORD - */
@@ -145,7 +146,7 @@ public class TicketImpl extends TurtleImpl implements Ticket {
 
     @Override
     public @NotNull Action<Ticket> modifyDiscordChannel(long channel) {
-        return getClient().getProvider().patch(this, "channel", channel).andThenParse(Ticket.class);
+        return getClient().getProvider().patch(this, Keys.Ticket.DISCORD_CHANNEL, channel).andThenParse(Ticket.class);
     }
 
     /* - USERS - */
@@ -166,11 +167,11 @@ public class TicketImpl extends TurtleImpl implements Ticket {
 
     @Override
     public @NotNull Action<Ticket> addUser(long user) {
-        return getClient().getProvider().patchEntryAdd(this, "users", user).andThenParse(Ticket.class);
+        return getClient().getProvider().patchEntryAdd(this, Keys.Ticket.USERS, user).andThenParse(Ticket.class);
     }
 
     @Override
     public @NotNull Action<Ticket> removeUser(long user) {
-        return getClient().getProvider().patchEntryDel(this, "users", user).andThenParse(Ticket.class);
+        return getClient().getProvider().patchEntryDel(this, Keys.Ticket.USERS, user).andThenParse(Ticket.class);
     }
 }

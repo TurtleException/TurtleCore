@@ -15,33 +15,28 @@ import de.turtle_exception.client.internal.util.logging.NestedLogger;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.annotation.AnnotationFormatError;
-import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
-import java.util.stream.Stream;
 
-public class JsonBuilder {
+public class ResourceBuilder {
     private final TurtleClient client;
     private final NestedLogger logger;
 
-    public JsonBuilder(@NotNull TurtleClient client) {
+    public ResourceBuilder(@NotNull TurtleClient client) {
         this.client = client;
-        this.logger = new NestedLogger("JsonBuilder", client.getLogger());
+        this.logger = new NestedLogger("ResourceBuilder", client.getLogger());
     }
 
     public <T extends Turtle> @NotNull T buildObject(@NotNull Class<T> type, JsonObject json) throws IllegalArgumentException, AnnotationFormatError {
         Checks.nonNull(json, "JSON data");
 
         // Make sure the @Resource annotation is present
-        Resource annotation = DataUtil.getResourceAnnotation(type);
+        Resource annotation = ResourceUtil.getResourceAnnotation(type);
 
         this.logger.log(Level.FINE, "Build call (JSON > obj) for object of type " + type.getSimpleName());
-
-        System.out.println(json);
+        this.logger.log(Level.FINEST, "\tJSON:  " + json);
 
         try {
             Method buildMethod = EntityBuilder.class.getMethod(annotation.builder(), JsonObject.class, TurtleClient.class);
@@ -61,8 +56,7 @@ public class JsonBuilder {
         Checks.nonNull(json, "JSON data");
 
         this.logger.log(Level.FINE, "Build call (JSON > obj) for " + json.size() + " objects of type " + type.getSimpleName());
-
-        System.out.println(json);
+        this.logger.log(Level.FINEST, "\tJSON:  " + json);
 
         ArrayList<T> list = new ArrayList<>();
         for (JsonElement element : json)
@@ -71,28 +65,23 @@ public class JsonBuilder {
     }
 
     public @NotNull JsonObject buildJson(@NotNull Turtle object) throws IllegalArgumentException, AnnotationFormatError {
-        Resource resource = DataUtil.getResourceAnnotation(object.getClass());
+        Resource resource = ResourceUtil.getResourceAnnotation(object.getClass());
 
         this.logger.log(Level.FINE, "Build call (obj > JSON) for object of type " + object.getClass().getSimpleName());
+        this.logger.log(Level.FINEST, "\tObject:  " + object);
 
         JsonObject json = new JsonObject();
 
-        Stream<AccessibleObject> stream = Stream.concat(
-                Arrays.stream(object.getClass().getMethods()),
-                Arrays.stream(object.getClass().getFields())
-        );
-
-        for (Iterator<AccessibleObject> it = stream.iterator(); it.hasNext(); ) {
-            AccessibleObject accObj = it.next();
-            Key atKey = AnnotationUtil.getAnnotation(object.getClass(), accObj, Key.class);
+        for (Method method : object.getClass().getMethods()) {
+            Key atKey = AnnotationUtil.getAnnotation(method, Key.class);
 
             // value should be ignored
             if (atKey == null) continue;
 
-            Object value = DataUtil.getValue(accObj, object);
+            Object value = ResourceUtil.getValue(method, object);
 
             if (atKey.relation() == Relation.ONE_TO_ONE)
-                DataUtil.addValue(json, atKey.name(), value);
+                ResourceUtil.addValue(json, atKey.name(), value);
             else
                 json.add(atKey.name(), handleReference(atKey, value));
         }
@@ -104,13 +93,15 @@ public class JsonBuilder {
         if (annotation.relation() == Relation.ONE_TO_ONE)
             throw new IllegalArgumentException("Key may not mark a 1:1 relation");
 
+        // TODO: Handle Relation.ONE_TO_MANY
+
         if (!(value instanceof Iterable<?> iterable))
-            throw new AnnotationFormatError("Unexpected type " + value.getClass().getName() + "on reference: " + annotation.name());
+            throw new AnnotationFormatError("Unexpected type " + value.getClass().getName() + " on reference: " + annotation.name());
 
         JsonArray arr = new JsonArray();
 
         // reference to another resource
-        if (annotation.type().getAnnotation(Resource.class) != null) {
+        if (AnnotationUtil.getAnnotation(annotation.type(), Resource.class) != null) {
             try {
                 for (Object o : iterable)
                     arr.add(((Turtle) o).getId());
@@ -122,7 +113,7 @@ public class JsonBuilder {
 
         // reference to a primitive type
         for (Object o : iterable)
-            DataUtil.addValue(arr, o);
+            ResourceUtil.addValue(arr, o);
 
         return arr;
     }

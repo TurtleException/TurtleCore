@@ -4,7 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.api.entities.Turtle;
-import de.turtle_exception.client.internal.data.DataUtil;
+import de.turtle_exception.client.internal.data.ResourceUtil;
 import de.turtle_exception.client.internal.util.Worker;
 import de.turtle_exception.client.internal.util.logging.NestedLogger;
 import org.jetbrains.annotations.NotNull;
@@ -32,13 +32,17 @@ public abstract class Provider {
         this.workers = new Worker[workerSize];
     }
 
-    private void init() {
-        this.onInit();
+    public final void start() throws ProviderException {
+        try {
+            this.onStart();
+        } catch (Exception e) {
+            throw new ProviderException(e);
+        }
 
         this.logger.log(Level.INFO, "Allocating " + workers.length + " Worker(s).");
 
         for (int i = 0; i < workers.length; i++) {
-            workers[i] = new Worker(() -> status != Status.STOPPED, () -> {
+            workers[i] = new Worker(() -> status != Status.STOPPING && status != Status.STOPPED, () -> {
                 Runnable task = priorityCallbacks.poll();
 
                 if (task == null)
@@ -52,7 +56,7 @@ public abstract class Provider {
         this.status = Status.RUNNING;
     }
 
-    protected void onInit() { }
+    protected void onStart() throws Exception { }
 
     /* - - - */
 
@@ -72,7 +76,7 @@ public abstract class Provider {
 
     public <T extends Turtle> @NotNull ActionImpl<JsonObject> patch(@NotNull T turtle, @NotNull String key, @NotNull Object obj) throws AnnotationFormatError {
         JsonObject json = new JsonObject();
-        DataUtil.addValue(json, key, obj);
+        ResourceUtil.addValue(json, key, obj);
         return this.patch(turtle.getClass(), json, turtle.getId());
     }
 
@@ -93,11 +97,9 @@ public abstract class Provider {
     final void setClient(@NotNull TurtleClientImpl client) {
         this.client = client;
         this.logger = new NestedLogger("Provider", client.getLogger());
-
-        this.init();
     }
 
-    public @NotNull TurtleClient getClient() {
+    public TurtleClient getClient() {
         return this.client;
     }
 

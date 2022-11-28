@@ -44,7 +44,7 @@ public abstract class Handshake {
         this.logger.log(Level.WARNING, "Sending error: " + msg, t);
         this.connection.send(
                 new ErrorPacket(
-                        connection.getAdapter().getClient().getDefaultTimeoutOutbound(),
+                        connection.getAdapter().getClient().getTimeoutOutbound(),
                         connection,
                         respondingTo.getResponseCode(),
                         msg,
@@ -57,7 +57,7 @@ public abstract class Handshake {
         this.logger.log(Level.FINE, "Sending message: " + msg);
         this.connection.send(
                 new HandshakePacket(
-                        connection.getAdapter().getClient().getDefaultTimeoutOutbound(),
+                        connection.getAdapter().getClient().getTimeoutOutbound(),
                         connection,
                         respondingTo.getResponseCode(),
                         msg

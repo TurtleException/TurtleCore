@@ -1,6 +1,6 @@
 package de.turtle_exception.server.util;
 
-public class Status {
+public class StatusView {
     public static final int PRE_INIT = 0;
     public static final int INIT     = 1;
     public static final int RUNNING  = 2;

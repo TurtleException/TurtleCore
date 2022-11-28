@@ -1,0 +1,12 @@
+
+# HELP SCREEN - COMMAND 'listuser'
+
+Lists all client logins.
+
+Arguments:
+    <none>
+
+Aliases:
+    listlogin
+    listusers
+    listlogins

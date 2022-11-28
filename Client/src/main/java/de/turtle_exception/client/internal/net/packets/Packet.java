@@ -48,7 +48,7 @@ public abstract class Packet {
     }
 
     private @NotNull CompiledPacket doCompile(byte[] bytes) {
-        return new CompiledPacket(bytes, direction, connection, deadline, id, responseCode, type);
+        return new CompiledPacket(id, responseCode, type, bytes, direction, connection, deadline);
     }
 
     public abstract byte[] getBytes();

@@ -1,0 +1,13 @@
+
+# HELP SCREEN - COMMAND 'exit'
+
+Closes all connections and shuts down the server.
+
+Arguments:
+    <none>
+
+Aliases:
+    exit
+    shutdown
+    stop
+    quit

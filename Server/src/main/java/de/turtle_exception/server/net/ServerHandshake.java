@@ -27,7 +27,7 @@ class ServerHandshake extends Handshake {
         // initial request (version)
         this.connection.send(
                 new HandshakePacket(
-                        server.getClient().getDefaultTimeoutOutbound(),
+                        server.getClient().getTimeoutOutbound(),
                         connection,
                         "VERSION"
                 ), false
@@ -67,7 +67,7 @@ class ServerHandshake extends Handshake {
             String pass = null;
 
             try {
-                pass = server.checkLogin(login);
+                pass = server.getServer().getLoginHandler().checkLogin(login);
             } catch (LoginException e) {
                 this.sendError(packet, "Login error", e);
             }

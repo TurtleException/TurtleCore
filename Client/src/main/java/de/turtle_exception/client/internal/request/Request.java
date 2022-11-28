@@ -20,7 +20,7 @@ public class Request {
 
     public Request(@NotNull Connection connection, @NotNull Data data) {
         this.packet = new DataPacket(
-                System.currentTimeMillis() + connection.getAdapter().getClient().getDefaultTimeoutOutbound(),
+                System.currentTimeMillis() + connection.getAdapter().getClient().getTimeoutOutbound(),
                 connection,
                 TurtleUtil.newId(TurtleType.RESPONSE_CODE),
                 data

@@ -1,0 +1,11 @@
+
+# HELP SCREEN - COMMAND 'verbose'
+
+Toggles the CLI verbose-mode. In verbose-mode exceptions are printed to the console when running into errors (within the
+CLI). Some commands may provide more detailed output in verbose-mode.
+
+Arguments:
+    <none>
+
+Aliases:
+    <none>

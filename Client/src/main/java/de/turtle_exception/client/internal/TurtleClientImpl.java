@@ -8,7 +8,11 @@ import de.turtle_exception.client.api.entities.Turtle;
 import de.turtle_exception.client.api.entities.User;
 import de.turtle_exception.client.api.event.EventManager;
 import de.turtle_exception.client.api.request.Action;
-import de.turtle_exception.client.internal.data.JsonBuilder;
+import de.turtle_exception.client.api.request.GroupAction;
+import de.turtle_exception.client.api.request.TicketAction;
+import de.turtle_exception.client.api.request.UserAction;
+import de.turtle_exception.client.internal.data.ResourceBuilder;
+import de.turtle_exception.client.internal.data.annotations.Keys;
 import de.turtle_exception.client.internal.entities.GroupImpl;
 import de.turtle_exception.client.internal.entities.TicketImpl;
 import de.turtle_exception.client.internal.entities.TurtleImpl;
@@ -16,7 +20,10 @@ import de.turtle_exception.client.internal.entities.UserImpl;
 import de.turtle_exception.client.internal.event.UpdateHelper;
 import de.turtle_exception.client.internal.net.NetClient;
 import de.turtle_exception.client.internal.net.NetworkProvider;
+import de.turtle_exception.client.internal.request.actions.GroupActionImpl;
 import de.turtle_exception.client.internal.request.actions.SimpleAction;
+import de.turtle_exception.client.internal.request.actions.TicketActionImpl;
+import de.turtle_exception.client.internal.request.actions.UserActionImpl;
 import de.turtle_exception.client.internal.util.TurtleSet;
 import de.turtle_exception.client.internal.util.version.IllegalVersionException;
 import de.turtle_exception.client.internal.util.version.Version;
@@ -51,14 +58,14 @@ public class TurtleClientImpl implements TurtleClient {
     /** Name of this instance. Naming is not required, but it may be helpful when using multiple instances. */
     private final @Nullable String name;
 
-    private final JsonBuilder jsonBuilder;
+    private final ResourceBuilder resourceBuilder;
     private final EventManager eventManager;
     /** The internal network part of the client */
     private final NetworkAdapter networkAdapter;
     private final Provider provider;
 
-    private long defaultTimeoutInbound  = TimeUnit.HOURS.toMillis( 8);
-    private long defaultTimeoutOutbound = TimeUnit.HOURS.toMillis(16);
+    private long defaultTimeoutInbound  = TimeUnit.SECONDS.toMillis( 8);
+    private long defaultTimeoutOutbound = TimeUnit.SECONDS.toMillis(16);
 
     private final TurtleSet<Group> groupCache = new TurtleSet<>();
     private final TurtleSet<Ticket> ticketCache = new TurtleSet<>();
@@ -68,13 +75,13 @@ public class TurtleClientImpl implements TurtleClient {
     private Server spigotServer = null;
     private JDA    jda          = null;
 
-    public TurtleClientImpl(@Nullable String name, @NotNull Logger logger, @NotNull NetworkAdapter networkAdapter, @NotNull Provider provider, boolean autoFillCache) throws IOException, LoginException, TimeoutException {
+    public TurtleClientImpl(@Nullable String name, @NotNull Logger logger, @NotNull NetworkAdapter networkAdapter, @NotNull Provider provider, boolean autoFillCache) throws IOException, LoginException, TimeoutException, ProviderException {
         this.name = name;
         this.logger = logger;
         this.logger.log(Level.INFO, "Hello there  (Starting...)");
 
-        this.logger.log(Level.FINE, "Initializing JsonBuilder.");
-        this.jsonBuilder = new JsonBuilder(this);
+        this.logger.log(Level.FINE, "Initializing ResourceBuilder.");
+        this.resourceBuilder = new ResourceBuilder(this);
 
         this.logger.log(Level.FINE, "Initializing EventManager.");
         this.eventManager = new EventManager(this);
@@ -87,6 +94,7 @@ public class TurtleClientImpl implements TurtleClient {
         this.logger.log(Level.FINE, "Starting Provider (" + provider.getClass().getSimpleName() + ")");
         this.provider = provider;
         this.provider.setClient(this);
+        this.provider.start();
 
         if (this.provider instanceof NetworkProvider netProvider) {
             if (networkAdapter instanceof NetClient netClient)
@@ -127,8 +135,8 @@ public class TurtleClientImpl implements TurtleClient {
         return VERSION;
     }
 
-    public @NotNull JsonBuilder getJsonBuilder() {
-        return jsonBuilder;
+    public @NotNull ResourceBuilder getResourceBuilder() {
+        return resourceBuilder;
     }
 
     @Override
@@ -287,13 +295,30 @@ public class TurtleClientImpl implements TurtleClient {
 
     /* - - - */
 
+    @Override
+    public @NotNull GroupAction createGroup() {
+        return new GroupActionImpl(this.provider);
+    }
+
+    @Override
+    public @NotNull TicketAction createTicket() {
+        return new TicketActionImpl(this.provider);
+    }
+
+    @Override
+    public @NotNull UserAction createUser() {
+        return new UserActionImpl(this.provider);
+    }
+
+    /* - - - */
+
     public <T extends Turtle> Turtle updateTurtle(@NotNull Class<T> type, @NotNull JsonObject content) {
-        long id = content.get("id").getAsLong();
+        long id = content.get(Keys.Turtle.ID).getAsLong();
         T turtle = this.getTurtleById(id, type);
 
         if (turtle == null) {
             // create new object
-            turtle = this.getJsonBuilder().buildObject(type, content);
+            turtle = this.getResourceBuilder().buildObject(type, content);
             UpdateHelper.ofCreateTurtle(turtle);
         } else {
             // update object
@@ -365,23 +390,23 @@ public class TurtleClientImpl implements TurtleClient {
     /* - - - */
 
     @Override
-    public @Range(from = 0, to = Long.MAX_VALUE) long getDefaultTimeoutInbound() {
+    public @Range(from = 0, to = Long.MAX_VALUE) long getTimeoutInbound() {
         return defaultTimeoutInbound;
     }
 
     @Override
-    public void setDefaultTimeoutInbound(@Range(from = 0, to = Long.MAX_VALUE) long defaultTimeoutInbound) {
-        this.defaultTimeoutInbound = defaultTimeoutInbound;
+    public void setTimeoutInbound(@Range(from = 0, to = Long.MAX_VALUE) long ms) {
+        this.defaultTimeoutInbound = ms;
     }
 
     @Override
-    public @Range(from = 0, to = Long.MAX_VALUE) long getDefaultTimeoutOutbound() {
+    public @Range(from = 0, to = Long.MAX_VALUE) long getTimeoutOutbound() {
         return defaultTimeoutOutbound;
     }
 
     @Override
-    public void setDefaultTimeoutOutbound(@Range(from = 0, to = Long.MAX_VALUE) long defaultTimeoutOutbound) {
-        this.defaultTimeoutOutbound = defaultTimeoutOutbound;
+    public void setTimeoutOutbound(@Range(from = 0, to = Long.MAX_VALUE) long ms) {
+        this.defaultTimeoutOutbound = ms;
     }
 
     /* - - - */

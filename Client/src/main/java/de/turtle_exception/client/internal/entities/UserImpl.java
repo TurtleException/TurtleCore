@@ -2,6 +2,7 @@ package de.turtle_exception.client.internal.entities;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import de.turtle_exception.client.internal.data.annotations.Keys;
 import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.api.entities.User;
 import de.turtle_exception.client.api.event.entities.user.UserUpdateNameEvent;
@@ -29,12 +30,12 @@ public class UserImpl extends TurtleImpl implements User {
 
     @Override
     public synchronized @NotNull UserImpl handleUpdate(@NotNull JsonObject json) {
-        this.apply(json, "name", element -> {
+        this.apply(json, Keys.User.NAME, element -> {
             String old = this.name;
             this.name = element.getAsString();
             this.fireEvent(new UserUpdateNameEvent(this, old, this.name));
         });
-        this.apply(json, "discord", element -> {
+        this.apply(json, Keys.User.DISCORD, element -> {
             ArrayList<Long> old = this.discord;
             ArrayList<Long> list = new ArrayList<>();
             for (JsonElement entry : element.getAsJsonArray())
@@ -42,7 +43,7 @@ public class UserImpl extends TurtleImpl implements User {
             this.discord = list;
             UpdateHelper.ofUserDiscord(this, old, list);
         });
-        this.apply(json, "minecraft", element -> {
+        this.apply(json, Keys.User.MINECRAFT, element -> {
             ArrayList<UUID> old = this.minecraft;
             ArrayList<UUID> list = new ArrayList<>();
             for (JsonElement entry : element.getAsJsonArray())
@@ -62,7 +63,7 @@ public class UserImpl extends TurtleImpl implements User {
 
     @Override
     public @NotNull Action<User> modifyName(@NotNull String name) {
-        return getClient().getProvider().patch(this, "name", name).andThenParse(User.class);
+        return getClient().getProvider().patch(this, Keys.User.NAME, name).andThenParse(User.class);
     }
 
     /* - DISCORD - */
@@ -74,12 +75,12 @@ public class UserImpl extends TurtleImpl implements User {
 
     @Override
     public @NotNull Action<User> addDiscordId(long discordId) {
-        return getClient().getProvider().patchEntryAdd(this, "discord", discordId).andThenParse(User.class);
+        return getClient().getProvider().patchEntryAdd(this, Keys.User.DISCORD, discordId).andThenParse(User.class);
     }
 
     @Override
     public @NotNull Action<User> removeDiscordId(long discordId) {
-        return getClient().getProvider().patchEntryDel(this, "discord", discordId).andThenParse(User.class);
+        return getClient().getProvider().patchEntryDel(this, Keys.User.DISCORD, discordId).andThenParse(User.class);
     }
 
     /* - MINECRAFT - */
@@ -91,11 +92,11 @@ public class UserImpl extends TurtleImpl implements User {
 
     @Override
     public @NotNull Action<User> addMinecraftId(@NotNull UUID minecraftId) {
-        return getClient().getProvider().patchEntryAdd(this, "minecraft", minecraftId.toString()).andThenParse(User.class);
+        return getClient().getProvider().patchEntryAdd(this, Keys.User.MINECRAFT, minecraftId.toString()).andThenParse(User.class);
     }
 
     @Override
     public @NotNull Action<User> removeMinecraftId(@NotNull UUID minecraftId) {
-        return getClient().getProvider().patchEntryDel(this, "minecraft", minecraftId.toString()).andThenParse(User.class);
+        return getClient().getProvider().patchEntryDel(this, Keys.User.MINECRAFT, minecraftId.toString()).andThenParse(User.class);
     }
 }

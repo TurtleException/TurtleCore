@@ -3,22 +3,25 @@ package de.turtle_exception.client.internal.data;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import de.turtle_exception.client.internal.data.annotations.Keys;
 import de.turtle_exception.client.internal.util.Checks;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
+import java.util.concurrent.Callable;
 
 public class JsonChecks {
     private JsonChecks() { }
 
     public static void validateGroup(@NotNull JsonObject json) throws IllegalJsonException {
         try {
-            long id     = json.get("id").getAsLong();
-            String name = json.get("name").getAsString();
+            long   id   = json.get(Keys.Turtle.ID).getAsLong();
+            String name = json.get(Keys.Group.NAME).getAsString();
 
-            Checks.nonNull(name, "Name");
+            Checks.nonNull(name, Keys.Group.NAME);
 
-            validateLongArray(json.getAsJsonArray("users"));
+            validateLongArray(json.getAsJsonArray(Keys.Group.MEMBERS));
         } catch (Exception e) {
             if (e instanceof IllegalJsonException)
                 throw e;
@@ -28,13 +31,13 @@ public class JsonChecks {
 
     public static void validateUser(@NotNull JsonObject json) throws IllegalJsonException {
         try {
-            long id     = json.get("id").getAsLong();
-            String name = json.get("name").getAsString();
+            long   id   = json.get(Keys.Turtle.ID).getAsLong();
+            String name = json.get(Keys.User.NAME).getAsString();
 
-            Checks.nonNull(name, "Name");
+            Checks.nonNull(name, Keys.User.NAME);
 
-            validateLongArray(json.getAsJsonArray("discord"));
-            validateUUIDArray(json.getAsJsonArray("minecraft"));
+            validateLongArray(json.getAsJsonArray(Keys.User.DISCORD));
+            validateUUIDArray(json.getAsJsonArray(Keys.User.MINECRAFT));
         } catch (Exception e) {
             if (e instanceof IllegalJsonException)
                 throw e;
@@ -44,21 +47,28 @@ public class JsonChecks {
 
     public static void validateTicket(@NotNull JsonObject json) throws IllegalJsonException {
         try {
-            long   id             = json.get("id").getAsLong();
-            byte   state          = json.get("state").getAsByte();
-            // nullable
-            String title          = json.get("title").getAsString();
-            String category       = json.get("category").getAsString();
-            long   discordChannel = json.get("discord_channel").getAsLong();
+            long   id             = json.get(Keys.Turtle.ID).getAsLong();
+            byte   state          = json.get(Keys.Ticket.STATE).getAsByte();
+            String title          = getOptional(() -> json.get(Keys.Ticket.TITLE).getAsString());
+            String category       = json.get(Keys.Ticket.CATEGORY).getAsString();
+            long   discordChannel = json.get(Keys.Ticket.DISCORD_CHANNEL).getAsLong();
 
-            Checks.nonNull(category, "Category");
+            Checks.nonNull(category, Keys.Ticket.CATEGORY);
 
-            validateStringArray(json.getAsJsonArray("tags"));
-            validateLongArray(json.getAsJsonArray("users"));
+            validateStringArray(json.getAsJsonArray(Keys.Ticket.TAGS));
+            validateLongArray(json.getAsJsonArray(Keys.Ticket.USERS));
         } catch (Exception e) {
             if (e instanceof IllegalJsonException)
                 throw e;
             throw new IllegalJsonException(e);
+        }
+    }
+
+    private static <T> @Nullable T getOptional(@NotNull Callable<T> callable) {
+        try {
+            return callable.call();
+        } catch (Exception e) {
+            return null;
         }
     }
 

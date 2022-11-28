@@ -1,0 +1,14 @@
+
+# HELP SCREEN - COMMAND 'adduser'
+
+Creates a new client login.
+The handshake protocol will only exchange the login string, as the pass must be stored manually on either side. The
+login is then used to retrieve the pass locally.
+
+Arguments:
+    login   (optional)  The login string. (basically a username)
+    pass    (required)  The pass string. This will be used as encryption phrase and has to be saved on server- and
+                        client-side manually.
+
+Aliases:
+    addlogin

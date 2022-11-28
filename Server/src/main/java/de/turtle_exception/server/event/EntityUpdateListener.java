@@ -6,12 +6,10 @@ import de.turtle_exception.client.api.entities.Group;
 import de.turtle_exception.client.api.entities.Turtle;
 import de.turtle_exception.client.api.event.Event;
 import de.turtle_exception.client.api.event.EventListener;
-import de.turtle_exception.client.api.event.entities.EntityEvent;
-import de.turtle_exception.client.api.event.entities.group.*;
-import de.turtle_exception.client.api.event.entities.ticket.*;
-import de.turtle_exception.client.api.event.entities.user.*;
+import de.turtle_exception.client.api.event.entities.*;
 import de.turtle_exception.client.internal.data.Data;
-import de.turtle_exception.client.internal.data.DataUtil;
+import de.turtle_exception.client.internal.data.ResourceUtil;
+import de.turtle_exception.client.internal.data.annotations.Keys;
 import de.turtle_exception.client.internal.net.Connection;
 import de.turtle_exception.client.internal.net.packets.DataPacket;
 import de.turtle_exception.client.internal.util.time.TurtleType;
@@ -20,7 +18,7 @@ import de.turtle_exception.server.net.NetServer;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
-import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 public class EntityUpdateListener extends EventListener {
     private final @NotNull NetServer server;
@@ -30,7 +28,7 @@ public class EntityUpdateListener extends EventListener {
     }
 
     private final void sendPacket(@NotNull Data data) {
-        final long deadline = System.currentTimeMillis() + server.getClient().getDefaultTimeoutOutbound();
+        final long deadline = System.currentTimeMillis() + server.getClient().getTimeoutOutbound();
         final long responseCode = TurtleUtil.newId(TurtleType.RESPONSE_CODE);
 
         for (Connection client : server.getClients())
@@ -43,51 +41,21 @@ public class EntityUpdateListener extends EventListener {
     public void onGenericEvent(@NotNull Event event) {
         if (!(event instanceof EntityEvent<?>)) return;
 
-        if (event instanceof GroupCreateEvent e)
-            onCreate(e.getEntity());
-        if (event instanceof TicketCreateEvent e)
-            onCreate(e.getEntity());
-        if (event instanceof UserCreateEvent e)
+        if (event instanceof EntityCreateEvent<?> e)
             onCreate(e.getEntity());
 
-        if (event instanceof GroupDeleteEvent e)
-            onDelete(e.getEntity());
-        if (event instanceof TicketDeleteEvent e)
-            onDelete(e.getEntity());
-        if (event instanceof UserDeleteEvent e)
+        if (event instanceof EntityDeleteEvent<?> e)
             onDelete(e.getEntity());
 
-        if (event instanceof GroupUpdateEvent<?> e)
-            onUpdate(e.getKey(), e.getNewValue(), e.getEntity());
-        if (event instanceof TicketUpdateEvent<?> e)
-            onUpdate(e.getKey(), e.getNewValue(), e.getEntity());
-        if (event instanceof UserUpdateEvent<?> e)
+        if (event instanceof EntityUpdateEvent<?,?> e)
             onUpdate(e.getKey(), e.getNewValue(), e.getEntity());
 
-        if (event instanceof GroupMemberJoinEvent e)
-            onUpdateCollection(e.getEntity(), "users", e.getEntity().getUsers(), (arr, user) -> arr.add(user.getId()));
-        if (event instanceof GroupMemberLeaveEvent e)
-            onUpdateCollection(e.getEntity(), "users", e.getEntity().getUsers(), (arr, user) -> arr.add(user.getId()));
-        if (event instanceof TicketTagAddEvent e)
-            onUpdateCollection(e.getEntity(), "tags", e.getEntity().getTags(), JsonArray::add);
-        if (event instanceof TicketTagRemoveEvent e)
-            onUpdateCollection(e.getEntity(), "tags", e.getEntity().getTags(), JsonArray::add);
-        if (event instanceof TicketUserAddEvent e)
-            onUpdateCollection(e.getEntity(), "users", e.getEntity().getUsers(), (arr, user) -> arr.add(user.getId()));
-        if (event instanceof TicketUserRemoveEvent e)
-            onUpdateCollection(e.getEntity(), "users", e.getEntity().getUsers(), (arr, user) -> arr.add(user.getId()));
-        if (event instanceof UserDiscordAddEvent e)
-            onUpdateCollection(e.getEntity(), "discord", e.getEntity().getDiscordIds(), JsonArray::add);
-        if (event instanceof UserDiscordRemoveEvent e)
-            onUpdateCollection(e.getEntity(), "discord", e.getEntity().getDiscordIds(), JsonArray::add);
-        if (event instanceof UserMinecraftAddEvent e)
-            onUpdateCollection(e.getEntity(), "minecraft", e.getEntity().getMinecraftIds(), (arr, id) -> arr.add(id.toString()));
-        if (event instanceof UserMinecraftRemoveEvent e)
-            onUpdateCollection(e.getEntity(), "minecraft", e.getEntity().getMinecraftIds(), (arr, id) -> arr.add(id.toString()));
+        if (event instanceof EntityUpdateEntryEvent<?,?> e)
+            onUpdateCollection(e.getEntity(), e.getKey(), e.getCollection(), e.getMutator());
     }
 
     private void onCreate(@NotNull Turtle turtle) {
-        JsonObject json = server.getClientImpl().getJsonBuilder().buildJson(turtle);
+        JsonObject json = server.getClientImpl().getResourceBuilder().buildJson(turtle);
         this.sendPacket(Data.buildUpdate(turtle.getClass(), json));
     }
 
@@ -97,17 +65,22 @@ public class EntityUpdateListener extends EventListener {
 
     private void onUpdate(@NotNull String key, @NotNull Object value, @NotNull Turtle turtle) {
         JsonObject json = new JsonObject();
-        DataUtil.addValue(json, "id", turtle.getId());
-        DataUtil.addValue(json, key, value);
+        ResourceUtil.addValue(json, Keys.Turtle.ID, turtle.getId());
+        ResourceUtil.addValue(json, key, value);
         this.sendPacket(Data.buildUpdate(turtle.getClass(), json));
     }
 
-    private <T extends Turtle, U> void onUpdateCollection(@NotNull Turtle turtle, @NotNull String key, @NotNull Collection<U> c, @NotNull BiConsumer<JsonArray, U> consumer) {
+    @SuppressWarnings("unchecked")
+    private <U> void onUpdateCollection(@NotNull Turtle turtle, @NotNull String key, @NotNull Collection<?> c, @NotNull Function<U, Object> mutator) {
         JsonObject json = new JsonObject();
         JsonArray  arr  = new JsonArray();
-        DataUtil.addValue(json, "id", turtle.getId());
-        for (U obj : c)
-            consumer.accept(arr, obj);
+        ResourceUtil.addValue(json, Keys.Turtle.ID, turtle.getId());
+        /*
+         * Casting an entry of c to U is safe because this method is only used for EntityUpdateEntryEvents, which guarantees
+         * that with a Function<U, Object>, you also have a Collection<U>.
+         */
+        for (Object obj : c)
+            ResourceUtil.addValue(arr, mutator.apply((U) obj));
         json.add(key, arr);
         this.sendPacket(Data.buildUpdate(Group.class, json));
     }

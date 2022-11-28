@@ -1,0 +1,12 @@
+
+# HELP SCREEN - COMMAND 'level'
+
+Prints the current level of the internal logger.
+If an argument is provided, the level of the internal logger is adjusted. The level may be the name of a standard level
+defined by java.util.logging.Level or an integer for a custom level.
+
+Arguments:
+    level   (optional)  The new log level
+
+Aliases:
+    log-level

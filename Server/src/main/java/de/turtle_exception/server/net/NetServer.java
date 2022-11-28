@@ -1,7 +1,6 @@
 package de.turtle_exception.server.net;
 
 import com.google.common.collect.Sets;
-import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -24,32 +23,30 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.security.auth.login.LoginException;
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 
 public class NetServer extends NetworkAdapter {
-    private final TurtleServer server;
+    private final @NotNull TurtleServer server;
     private final int port;
-
-    private final File loginFile;
 
     private Set<Connection> clients;
     private ServerSocket socket;
     private Worker heartbeats;
     private Worker listener;
 
+    // pragmatic solution (works for now...)
+    private boolean heartbeatExceptionLogged = false;
+
     public NetServer(@NotNull TurtleServer server, int port) {
         this.server = server;
         this.port = port;
-
-        this.loginFile = new File(TurtleServer.DIR, "meta" + File.separator + "login.json");
     }
 
     @Override
@@ -64,17 +61,31 @@ public class NetServer extends NetworkAdapter {
             getLogger().log(Level.FINEST, "Dispatching heartbeats for " + clients.size() + " client(s).");
             this.clients.forEach(connection -> {
                 connection.send(
-                        new HeartbeatPacket(server.getClient().getDefaultTimeoutOutbound(), connection), false
+                        new HeartbeatPacket(server.getClient().getTimeoutOutbound(), connection), false
                 );
             });
-        }, 10, TimeUnit.SECONDS);
+        }, 10, TimeUnit.SECONDS, e -> {
+            if (heartbeatExceptionLogged)      return;
+            if (status == Status.DISCONNECTED) return;
+
+            getLogger().log(Level.WARNING, "Exception in heartbeat-worker.", e);
+            heartbeatExceptionLogged = true;
+        });
 
         getLogger().log(Level.FINE, "Starting listener.");
         this.listener = new Worker(() -> status == Status.INIT || status == Status.CONNECTED, () -> {
             try {
                 getLogger().log(Level.FINE, "Listening for new connection...");
-                Socket client = socket.accept();
-                getLogger().log(Level.FINE, "New socket connection: " + socket.getInetAddress().toString());
+                Socket client;
+                try {
+                    client = socket.accept();
+                } catch (SocketException e) {
+                    // botched fix to prevent exception on shutdown
+                    if (status != Status.DISCONNECTED)
+                        throw e;
+                    return;
+                }
+                getLogger().log(Level.FINE, "New socket connection: " + client.getInetAddress().toString());
 
                 try {
                     Handshake handshake  = new ServerHandshake(this);
@@ -142,9 +153,10 @@ public class NetServer extends NetworkAdapter {
     /* - - - */
 
     private void handleDelete(@NotNull DataPacket packet) {
-        // TODO: should the data type be checked?
+        Class<? extends Turtle> type = packet.getData().type();
         long id = packet.getData().id();
-        Turtle turtle = getClientImpl().getTurtleById(id);
+
+        Turtle turtle = getClientImpl().getTurtleById(id, type);
 
         getLogger().log(Level.FINER, "DELETE request for turtle " + id);
 
@@ -170,9 +182,10 @@ public class NetServer extends NetworkAdapter {
             return;
         }
 
-        // TODO: should the data type be checked?
         long id = packet.getData().id();
-        Turtle turtle = getClientImpl().getTurtleById(id);
+        Class<? extends Turtle> type = packet.getData().type();
+
+        Turtle turtle = getClientImpl().getTurtleById(id, type);
 
         getLogger().log(Level.FINER, "GET request for turtle " + id);
 
@@ -181,7 +194,7 @@ public class NetServer extends NetworkAdapter {
             return;
         }
 
-        JsonObject content = getClientImpl().getJsonBuilder().buildJson(turtle);
+        JsonObject content = getClientImpl().getResourceBuilder().buildJson(turtle);
         respond(packet, Data.buildUpdate(turtle.getClass(), content));
     }
 
@@ -195,7 +208,7 @@ public class NetServer extends NetworkAdapter {
             // filter types
             if (!type.isInstance(turtle)) continue;
 
-            JsonObject turtleJson = getClientImpl().getJsonBuilder().buildJson(turtle);
+            JsonObject turtleJson = getClientImpl().getResourceBuilder().buildJson(turtle);
             content.add(turtleJson);
         }
 
@@ -212,7 +225,7 @@ public class NetServer extends NetworkAdapter {
 
         // TODO: check for used discord / minecraft / ...
 
-        notifyClients(packet, Data.buildUpdate(type, getClientImpl().getJsonBuilder().buildJson(turtle)));
+        notifyClients(packet, Data.buildUpdate(type, getClientImpl().getResourceBuilder().buildJson(turtle)));
     }
 
     private void handlePatch(@NotNull DataPacket packet) {
@@ -221,8 +234,7 @@ public class NetServer extends NetworkAdapter {
 
         getLogger().log(Level.FINER, "PATCH request for turtle " + id);
 
-        // TODO: should the data type be checked?
-        Turtle turtle = getClientImpl().getTurtleById(id);
+        Turtle turtle = getClientImpl().getTurtleById(id, type);
         if (turtle == null) {
             respond(packet, "Turtle " + id + " does not exist", null);
             return;
@@ -230,7 +242,7 @@ public class NetServer extends NetworkAdapter {
 
         getClient().getProvider().patch(type, packet.getData().contentObject(), turtle.getId()).queue(result -> {
             Turtle resTurtle = getClientImpl().updateTurtle(turtle.getClass(), result);
-            notifyClients(packet, Data.buildUpdate(resTurtle.getClass(), getClientImpl().getJsonBuilder().buildJson(resTurtle)));
+            notifyClients(packet, Data.buildUpdate(resTurtle.getClass(), getClientImpl().getResourceBuilder().buildJson(resTurtle)));
         }, throwable -> {
             respond(packet, "Internal error", throwable);
         });
@@ -252,7 +264,7 @@ public class NetServer extends NetworkAdapter {
 
         action.queue(result -> {
             Turtle resTurtle = getClientImpl().updateTurtle(type, result);
-            notifyClients(packet, Data.buildUpdate(resTurtle.getClass(), getClientImpl().getJsonBuilder().buildJson(resTurtle)));
+            notifyClients(packet, Data.buildUpdate(resTurtle.getClass(), getClientImpl().getResourceBuilder().buildJson(resTurtle)));
         }, throwable -> {
             respond(packet, "Internal error", throwable);
         });
@@ -287,42 +299,14 @@ public class NetServer extends NetworkAdapter {
     }
 
     private long defaultDeadline() {
-        return System.currentTimeMillis() + getClient().getDefaultTimeoutOutbound();
+        return System.currentTimeMillis() + getClient().getTimeoutOutbound();
     }
 
     /* - - - */
 
-    @SuppressWarnings("ResultOfMethodCallIgnored")
-    synchronized @Nullable String checkLogin(@NotNull String login) throws LoginException {
-        try {
-            loginFile.getParentFile().mkdir();
-            loginFile.createNewFile();
-
-            JsonObject json = new Gson().fromJson(new FileReader(loginFile), JsonObject.class);
-
-            String pass = json.get(login).getAsString();
-
-            if (pass == null)
-                throw new LoginException("Unknown login or pass");
-
-            getLogger().log(Level.INFO, "Permitted check for login \"" + login + "\"");
-            return pass;
-        } catch (IOException e) {
-            getLogger().log(Level.WARNING, "Internal IO error for login request \"" + login + "\"", e);
-            throw new LoginException("Internal IO error");
-        } catch (ClassCastException | IllegalStateException e) {
-            getLogger().log(Level.FINE, "JSON error for login request \"" + login + "\"", e);
-            return null;
-        } catch (LoginException e) {
-            // TODO: log
-            throw e;
-        } catch (Throwable t) {
-            getLogger().log(Level.WARNING, "Unknown internal error for login request \"" + login + "\"", t);
-            throw new LoginException("Unknown internal error");
-        }
+    public @NotNull TurtleServer getServer() {
+        return this.server;
     }
-
-    /* - - - */
 
     public @NotNull Set<Connection> getClients() {
         return Set.copyOf(clients);
