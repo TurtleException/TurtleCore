@@ -3,8 +3,37 @@ package de.turtle_exception.client.internal.data.annotations;
 public class Keys {
     private Keys() { }
 
+    /* - PACKAGES - */
+
+    public static class Messages {
+        public static class SyncChannel {
+
+        }
+
+        public static class SyncMessage {
+            public static final String FORMAT  = "format";
+            public static final String AUTHOR  = "author";
+            public static final String CONTENT = "content";
+        }
+    }
+
+    /* - - - */
+
     public static class Group {
         public static final String NAME    = "name";
+        public static final String MEMBERS = "users";
+    }
+
+    public static class JsonResource {
+        public static final String IDENTIFIER = "identifier";
+        public static final String CONTENT    = "content";
+        public static final String EPHEMERAL  = "ephemeral";
+    }
+
+    public static class Project {
+        public static final String TITLE   = "title";
+        public static final String CODE    = "code";
+        public static final String STATE   = "state";
         public static final String MEMBERS = "users";
     }
 

@@ -9,10 +9,37 @@ public class Types {
         public static final String UUID      = "VARCHAR(36)";
     }
 
+    /* - PACKAGES - */
+
+    public static class Messages {
+        public static class SyncChannel {
+
+        }
+
+        public static class SyncMessage {
+            public static final String FORMAT  = "TINYINT";
+            public static final String AUTHOR  = Templates.TURTLE;
+            public static final String CONTENT = "TEXT";
+        }
+    }
+
     /* - - - */
 
     public static class Group {
         public static final String NAME    = "TINYTEXT";
+        public static final String MEMBERS = Templates.TURTLE;
+    }
+
+    public static class JsonResource {
+        public static final String IDENTIFIER = "TEXT";
+        public static final String CONTENT    = "LONGTEXT";
+        public static final String EPHEMERAL  = "BOOLEAN";
+    }
+
+    public static class Project {
+        public static final String TITLE   = "TINYTEXT";
+        public static final String CODE    = "TINYTEXT";
+        public static final String STATE   = "TINYINT";
         public static final String MEMBERS = Templates.TURTLE;
     }
 

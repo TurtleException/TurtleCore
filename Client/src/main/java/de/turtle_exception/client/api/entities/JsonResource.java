@@ -4,7 +4,9 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import de.turtle_exception.client.internal.data.annotations.Key;
+import de.turtle_exception.client.internal.data.annotations.Keys;
 import de.turtle_exception.client.internal.data.annotations.Resource;
+import de.turtle_exception.client.internal.data.annotations.Types;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -21,7 +23,7 @@ public interface JsonResource extends Turtle {
      * parsing this JsonResource should be prepared for possible identifier collisions by properly handling exceptions.
      * @return String identifying the nature of this JsonResource.
      */
-    @Key(name = "identifier", sqlType = "TEXT")
+    @Key(name = Keys.JsonResource.IDENTIFIER, sqlType = Types.JsonResource.IDENTIFIER)
     @NotNull String getIdentifier();
 
     /**
@@ -29,7 +31,7 @@ public interface JsonResource extends Turtle {
      * {@link JsonArray} for most use-cases of this resource.
      * @return The underlying JSON data.
      */
-    @Key(name = "content", sqlType = "LONGTEXT")
+    @Key(name = Keys.JsonResource.CONTENT, sqlType = Types.JsonResource.CONTENT)
     @NotNull JsonElement getContent();
 
     // TODO: update this when the event-thing is implemented
@@ -41,6 +43,6 @@ public interface JsonResource extends Turtle {
      * would amount to great sums of unnecessarily complex data.
      * @return {@code true} if this resource is ephemeral.
      */
-    @Key(name = "ephemeral", sqlType = "BOOLEAN")
+    @Key(name = Keys.JsonResource.EPHEMERAL, sqlType = Types.JsonResource.EPHEMERAL)
     boolean isEphemeral();
 }

@@ -1,10 +1,7 @@
 package de.turtle_exception.client.api.entities;
 
 import de.turtle_exception.client.api.entities.attributes.ProjectState;
-import de.turtle_exception.client.internal.data.annotations.Key;
-import de.turtle_exception.client.internal.data.annotations.Relation;
-import de.turtle_exception.client.internal.data.annotations.Relational;
-import de.turtle_exception.client.internal.data.annotations.Resource;
+import de.turtle_exception.client.internal.data.annotations.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -13,20 +10,20 @@ import java.util.List;
 @Resource(path = "projects", builder = "buildProject")
 @SuppressWarnings("unused")
 public interface Project extends Turtle {
-    @Key(name = "title", sqlType = "TINYTEXT")
+    @Key(name = Keys.Project.TITLE, sqlType = Types.Project.TITLE)
     @Nullable String getTitle();
 
-    @Key(name = "code", sqlType = "TINYTEXT")
+    @Key(name = Keys.Project.CODE, sqlType = Types.Project.CODE)
     @NotNull String getCode();
 
     @NotNull ProjectState getState();
 
-    @Key(name = "state", sqlType = "TINYINT")
+    @Key(name = Keys.Project.STATE, sqlType = Types.Project.STATE)
     default byte getStateCode() {
         return this.getState().getCode();
     }
 
-    @Key(name = "users", relation = Relation.MANY_TO_MANY, type = User.class, sqlType = "TURTLE")
+    @Key(name = Keys.Project.MEMBERS, relation = Relation.MANY_TO_MANY, type = User.class, sqlType = Types.Project.MEMBERS)
     @Relational(table = "project_members", self = "project", foreign = "user")
     @NotNull List<User> getMembers();
 
