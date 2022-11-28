@@ -1,9 +1,9 @@
 package de.turtle_exception.client.api.request;
 
-import de.turtle_exception.client.api.TicketState;
 import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.api.entities.Ticket;
 import de.turtle_exception.client.api.entities.User;
+import de.turtle_exception.client.api.entities.attributes.TicketState;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import org.jetbrains.annotations.NotNull;
 
