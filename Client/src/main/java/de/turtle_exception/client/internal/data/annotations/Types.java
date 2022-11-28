@@ -41,6 +41,15 @@ public class Types {
         public static final String CODE    = "TINYTEXT";
         public static final String STATE   = "TINYINT";
         public static final String MEMBERS = Templates.TURTLE;
+
+        public static class ApplicationForm {
+            public static final String PROJECT = Templates.TURTLE;
+        }
+
+        public static class Application {
+            public static final String PROJECT = Templates.TURTLE;
+            public static final String USER    = Templates.TURTLE;
+        }
     }
 
     public static class Ticket {

@@ -28,4 +28,25 @@ public interface Project extends Turtle {
     @NotNull List<User> getMembers();
 
     // TODO: times
+
+    @Resource(path = "project_application_forms", builder = "buildProjectApplicationForm")
+    interface ApplicationForm extends Turtle {
+        @Key(name = Keys.Project.ApplicationForm.PROJECT, sqlType = Types.Project.ApplicationForm.PROJECT)
+        @NotNull Project getProject();
+
+        // TODO: queries + datatypes
+    }
+
+    @Resource(path = "project_applications", builder = "buildProjectApplication")
+    interface Application extends Turtle {
+        @Key(name = Keys.Project.Application.PROJECT, sqlType = Types.Project.Application.PROJECT)
+        @NotNull Project getProject();
+
+        @Key(name = Keys.Project.Application.USER, sqlType = Types.Project.Application.USER)
+        @NotNull User getUser();
+
+        // TODO: times
+
+        // TODO: content (queries)
+    }
 }

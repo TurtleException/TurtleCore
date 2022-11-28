@@ -194,4 +194,6 @@ public interface User extends Turtle {
 
         return List.copyOf(list);
     }
+
+    // TODO: project applications (reference, like groups)
 }
