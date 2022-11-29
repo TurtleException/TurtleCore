@@ -6,8 +6,15 @@ public class Keys {
     /* - PACKAGES - */
 
     public static class Messages {
-        public static class SyncChannel {
+        public static class MinecraftChannel {
+            public static final String SYNC_CHANNEL = "sync_channel";
+            public static final String TYPE         = "type";
+            public static final String IDENTIFIER   = "identifier";
+        }
 
+        public static class SyncChannel {
+            public static final String DISCORD   = "discord";
+            public static final String MINECRAFT = "minecraft";
         }
 
         public static class SyncMessage {

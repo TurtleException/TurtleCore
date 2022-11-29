@@ -12,8 +12,15 @@ public class Types {
     /* - PACKAGES - */
 
     public static class Messages {
-        public static class SyncChannel {
+        public static class MinecraftChannel {
+            public static final String SYNC_CHANNEL = Templates.TURTLE;
+            public static final String TYPE         = "TINYINT";
+            public static final String IDENTIFIER   = "TEXT";
+        }
 
+        public static class SyncChannel {
+            public static final String DISCORD   = Templates.SNOWFLAKE;
+            public static final String MINECRAFT = Templates.UUID;
         }
 
         public static class SyncMessage {
