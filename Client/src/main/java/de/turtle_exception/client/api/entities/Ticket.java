@@ -92,8 +92,8 @@ public interface Ticket extends Turtle, IUserContainer {
      * <p> Tags are custom Strings that can be assigned by the Ticket author(s) or by team, moderation and bots.
      * @return List of Ticket tags.
      */
-    @Key(name = Keys.Ticket.TAGS, relation = Relation.MANY_TO_MANY, type = String.class, sqlType = Types.Ticket.TAGS)
-    @Relational(table = "ticket_tags", self = "ticket", foreign = "tag")
+    @Key(name = Keys.Ticket.TAGS, relation = Relation.MANY_TO_MANY, sqlType = Types.Ticket.TAGS)
+    @Relational(table = "ticket_tags", self = "ticket", foreign = "tag", type = String.class)
     @NotNull List<String> getTags();
 
     /**
@@ -149,8 +149,8 @@ public interface Ticket extends Turtle, IUserContainer {
      * <p> Team members, moderation and bots are not included in this list unless they have explicitly been added.
      * @return List of Users.
      */
-    @Key(name = Keys.Ticket.USERS, relation = Relation.MANY_TO_MANY, type = User.class, sqlType = Types.Ticket.USERS)
-    @Relational(table = "ticket_users", self = "ticket", foreign = "user")
+    @Key(name = Keys.Ticket.USERS, relation = Relation.MANY_TO_MANY, sqlType = Types.Ticket.USERS)
+    @Relational(table = "ticket_users", self = "ticket", foreign = "user", type = User.class)
     @NotNull List<User> getUsers();
 
     /**

@@ -17,4 +17,7 @@ public @interface Relational {
 
     /** Foreign name in a relational table */
     String foreign();
+
+    /** Generic content of a marked collection. */
+    Class<?> type();
 }

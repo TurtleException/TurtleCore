@@ -7,6 +7,7 @@ import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.api.entities.Turtle;
 import de.turtle_exception.client.internal.data.annotations.Key;
 import de.turtle_exception.client.internal.data.annotations.Relation;
+import de.turtle_exception.client.internal.data.annotations.Relational;
 import de.turtle_exception.client.internal.data.annotations.Resource;
 import de.turtle_exception.client.internal.entities.EntityBuilder;
 import de.turtle_exception.client.internal.util.AnnotationUtil;
@@ -66,13 +67,14 @@ public class ResourceBuilder {
 
     public @NotNull JsonObject buildJson(@NotNull Turtle object) throws IllegalArgumentException, AnnotationFormatError {
         Resource resource = ResourceUtil.getResourceAnnotation(object.getClass());
+        Class<? extends Turtle> type = object.getClass();
 
-        this.logger.log(Level.FINE, "Build call (obj > JSON) for object of type " + object.getClass().getSimpleName());
+        this.logger.log(Level.FINE, "Build call (obj > JSON) for object of type " + type.getSimpleName());
         this.logger.log(Level.FINEST, "\tObject:  " + object);
 
         JsonObject json = new JsonObject();
 
-        for (Method method : object.getClass().getMethods()) {
+        for (Method method : type.getMethods()) {
             Key atKey = AnnotationUtil.getAnnotation(method, Key.class);
 
             // value should be ignored
@@ -83,17 +85,22 @@ public class ResourceBuilder {
             if (atKey.relation() == Relation.ONE_TO_ONE)
                 ResourceUtil.addValue(json, atKey.name(), value);
             else
-                json.add(atKey.name(), handleReference(atKey, value));
+                json.add(atKey.name(), handleReference(type, atKey, value));
         }
 
         return json;
     }
 
-    private static JsonArray handleReference(@NotNull Key annotation, @NotNull Object value) {
+    private static JsonArray handleReference(@NotNull Class<? extends Turtle> type, @NotNull Key annotation, @NotNull Object value) {
         if (annotation.relation() == Relation.ONE_TO_ONE)
             throw new IllegalArgumentException("Key may not mark a 1:1 relation");
 
-        // TODO: Handle Relation.ONE_TO_MANY
+        Relational relational = ResourceUtil.getRelationalAnnotation(type, annotation.name());
+
+        if (relational == null)
+            throw new AnnotationFormatError("Missing Relational annotation on " + type.getName() + ":" + annotation.name());
+
+        // TODO: Handle Relation.MANY_TO_ONE
 
         if (!(value instanceof Iterable<?> iterable))
             throw new AnnotationFormatError("Unexpected type " + value.getClass().getName() + " on reference: " + annotation.name());
@@ -101,7 +108,7 @@ public class ResourceBuilder {
         JsonArray arr = new JsonArray();
 
         // reference to another resource
-        if (AnnotationUtil.getAnnotation(annotation.type(), Resource.class) != null) {
+        if (AnnotationUtil.getAnnotation(relational.type(), Resource.class) != null) {
             try {
                 for (Object o : iterable)
                     arr.add(((Turtle) o).getId());

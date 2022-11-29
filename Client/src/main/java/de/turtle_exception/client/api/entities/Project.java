@@ -23,8 +23,8 @@ public interface Project extends Turtle {
         return this.getState().getCode();
     }
 
-    @Key(name = Keys.Project.MEMBERS, relation = Relation.MANY_TO_MANY, type = User.class, sqlType = Types.Project.MEMBERS)
-    @Relational(table = "project_members", self = "project", foreign = "user")
+    @Key(name = Keys.Project.MEMBERS, relation = Relation.MANY_TO_MANY, sqlType = Types.Project.MEMBERS)
+    @Relational(table = "project_members", self = "project", foreign = "user", type = User.class)
     @NotNull List<User> getMembers();
 
     // TODO: times
