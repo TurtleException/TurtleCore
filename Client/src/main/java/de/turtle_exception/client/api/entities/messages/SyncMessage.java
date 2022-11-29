@@ -27,5 +27,16 @@ public interface SyncMessage extends Turtle {
 
     @NotNull String getContent(@NotNull MessageFormat format);
 
-    // TODO: source (+ source-reference), referenced message, attachments, recipients
+    @Key(name = Keys.Messages.SyncMessage.REFERENCE, sqlType = Types.Messages.SyncMessage.REFERENCE)
+    long getReference();
+
+    // not relational -> the id is stored with the message, that's it
+    @Key(name = Keys.Messages.SyncMessage.CHANNEL, sqlType = Types.Messages.SyncMessage.CHANNEL)
+    @NotNull SyncChannel getChannel();
+
+    // not relational -> the id is stored with the message, that's it
+    @Key(name = Keys.Messages.SyncMessage.SOURCE, sqlType = Types.Messages.SyncMessage.SOURCE)
+    @NotNull IChannel getSource();
+
+    // TODO: attachments, recipients
 }

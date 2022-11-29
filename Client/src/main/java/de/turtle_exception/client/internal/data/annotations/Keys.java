@@ -29,6 +29,8 @@ public class Keys {
             public static final String AUTHOR    = "author";
             public static final String CONTENT   = "content";
             public static final String REFERENCE = "reference";
+            public static final String CHANNEL   = "channel";
+            public static final String SOURCE    = "source";
         }
     }
 

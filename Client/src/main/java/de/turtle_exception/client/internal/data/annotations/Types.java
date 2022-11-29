@@ -35,6 +35,8 @@ public class Types {
             public static final String AUTHOR    = Templates.TURTLE;
             public static final String CONTENT   = "TEXT";
             public static final String REFERENCE = Turtle.ID;
+            public static final String CHANNEL   = Templates.TURTLE;
+            public static final String SOURCE    = Templates.TURTLE;
         }
     }
 
