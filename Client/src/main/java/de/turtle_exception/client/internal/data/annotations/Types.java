@@ -12,21 +12,29 @@ public class Types {
     /* - PACKAGES - */
 
     public static class Messages {
-        public static class MinecraftChannel {
+        public static class DiscordChannel {
+
+        }
+
+        public static class IChannel {
             public static final String SYNC_CHANNEL = Templates.TURTLE;
+        }
+
+        public static class MinecraftChannel {
             public static final String TYPE         = "TINYINT";
             public static final String IDENTIFIER   = "TEXT";
         }
 
         public static class SyncChannel {
-            public static final String DISCORD   = Templates.SNOWFLAKE;
-            public static final String MINECRAFT = Templates.UUID;
+            public static final String DISCORD   = Templates.TURTLE;
+            public static final String MINECRAFT = Templates.TURTLE;
         }
 
         public static class SyncMessage {
-            public static final String FORMAT  = "TINYINT";
-            public static final String AUTHOR  = Templates.TURTLE;
-            public static final String CONTENT = "TEXT";
+            public static final String FORMAT    = "TINYINT";
+            public static final String AUTHOR    = Templates.TURTLE;
+            public static final String CONTENT   = "TEXT";
+            public static final String REFERENCE = Turtle.ID;
         }
     }
 

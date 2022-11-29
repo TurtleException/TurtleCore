@@ -1,17 +1,13 @@
 package de.turtle_exception.client.api.entities.messages;
 
-import de.turtle_exception.client.api.entities.Turtle;
 import de.turtle_exception.client.internal.data.annotations.*;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
-@Resource(path = "minecraft_channel", builder = "buildMinecraftChannel")
-public interface MinecraftChannel extends Turtle {
-    @Key(name = Keys.Messages.MinecraftChannel.SYNC_CHANNEL, relation = Relation.MANY_TO_ONE, sqlType = Types.Messages.MinecraftChannel.SYNC_CHANNEL)
-    @NotNull SyncChannel getSyncChannel();
-
+@Resource(path = "minecraft_channels", builder = "buildMinecraftChannel")
+public interface MinecraftChannel extends IChannel {
     enum Type {
         USER((byte) 0),
         WORLD((byte) 1),
@@ -38,9 +34,6 @@ public interface MinecraftChannel extends Turtle {
             throw new IllegalStateException("Illegal channel type: " + this.getType());
         return UUID.fromString(this.getIdentifier());
     }
-
-    // TODO
-    void send(@NotNull SyncMessage msg);
 
     // TODO
     void receive(@NotNull Player player, @NotNull String msg);
