@@ -10,12 +10,12 @@ import java.util.stream.Stream;
 @Resource(path = "channels", builder = "buildSyncChannel")
 @SuppressWarnings("unused")
 public interface SyncChannel extends Turtle {
-    @Key(name = Keys.Messages.SyncChannel.DISCORD, relation = Relation.ONE_TO_MANY, type = DiscordChannel.class, sqlType = Types.Messages.SyncChannel.DISCORD)
-    @Relational(table = "channel_discord", self = "channel", foreign = "discord")
+    @Key(name = Keys.Messages.SyncChannel.DISCORD, relation = Relation.ONE_TO_MANY, sqlType = Types.Messages.SyncChannel.DISCORD)
+    @Relational(table = "channel_discord", self = "channel", foreign = "discord", type = DiscordChannel.class)
     @NotNull List<DiscordChannel> getDiscordChannels();
 
-    @Key(name = Keys.Messages.SyncChannel.MINECRAFT, relation = Relation.ONE_TO_MANY, type = MinecraftChannel.class, sqlType = Types.Messages.SyncChannel.MINECRAFT)
-    @Relational(table = "channel_minecraft", self = "channel", foreign = "minecraft")
+    @Key(name = Keys.Messages.SyncChannel.MINECRAFT, relation = Relation.ONE_TO_MANY, sqlType = Types.Messages.SyncChannel.MINECRAFT)
+    @Relational(table = "channel_minecraft", self = "channel", foreign = "minecraft", type = MinecraftChannel.class)
     @NotNull List<MinecraftChannel> getMinecraftChannels();
 
     default @NotNull List<IChannel> getChannels() {

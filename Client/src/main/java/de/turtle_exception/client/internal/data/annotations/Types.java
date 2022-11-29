@@ -13,7 +13,7 @@ public class Types {
 
     public static class Messages {
         public static class DiscordChannel {
-
+            public static final String SNOWFLAKE = Templates.SNOWFLAKE;
         }
 
         public static class IChannel {

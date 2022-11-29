@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.UUID;
 
 @Resource(path = "minecraft_channels", builder = "buildMinecraftChannel")
+@SuppressWarnings("unused")
 public interface MinecraftChannel extends IChannel {
     enum Type {
         USER((byte) 0),

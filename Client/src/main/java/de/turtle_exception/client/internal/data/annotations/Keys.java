@@ -7,7 +7,7 @@ public class Keys {
 
     public static class Messages {
         public static class DiscordChannel {
-
+            public static final String SNOWFLAKE = "snowflake";
         }
 
         public static class IChannel {
