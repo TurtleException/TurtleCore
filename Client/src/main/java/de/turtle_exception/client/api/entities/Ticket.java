@@ -149,6 +149,7 @@ public interface Ticket extends Turtle, IUserContainer {
      * <p> Team members, moderation and bots are not included in this list unless they have explicitly been added.
      * @return List of Users.
      */
+    @Override
     @Key(name = Keys.Ticket.USERS, relation = Relation.MANY_TO_MANY, sqlType = Types.Ticket.USERS)
     @Relational(table = "ticket_users", self = "ticket", foreign = "user", type = User.class)
     @NotNull List<User> getUsers();

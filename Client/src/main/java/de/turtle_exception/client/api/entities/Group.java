@@ -43,6 +43,7 @@ public interface Group extends Turtle, IUserContainer {
      * <p> A Group can have multiple Users; A User can also be part of multiple Groups.
      * @return List of members.
      */
+    @Override
     @Key(name = Keys.Group.MEMBERS, relation = Relation.MANY_TO_MANY, sqlType = Types.Group.MEMBERS)
     @Relational(table = "group_members", self = "group", foreign = "user", type = User.class)
     @NotNull List<User> getUsers();

@@ -1,5 +1,6 @@
 package de.turtle_exception.client.api.entities.messages;
 
+import de.turtle_exception.client.api.request.Action;
 import de.turtle_exception.client.internal.data.annotations.Key;
 import de.turtle_exception.client.internal.data.annotations.Keys;
 import de.turtle_exception.client.internal.data.annotations.Resource;
@@ -10,6 +11,11 @@ import org.jetbrains.annotations.NotNull;
 @Resource(path = "discord_channels", builder = "buildDiscordChannel")
 @SuppressWarnings("unused")
 public interface DiscordChannel extends IChannel {
+    @Override
+    default @NotNull Action<DiscordChannel> update() {
+        return this.getClient().retrieveDiscordChannel(this.getId());
+    }
+
     @Key(name = Keys.Messages.DiscordChannel.SNOWFLAKE, sqlType = Types.Messages.DiscordChannel.SNOWFLAKE)
     long getSnowflake();
 

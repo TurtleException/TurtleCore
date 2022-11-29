@@ -15,7 +15,7 @@ public interface IChannelContainer extends ITurtleContainer {
      * Returns an immutable List of all cached {@link SyncChannel} objects.
      * @return List of cached SyncChannels.
      */
-    @NotNull List<SyncChannel> getSyncChannels();
+    @NotNull List<SyncChannel> getChannels();
 
     /**
      * Returns a single {@link SyncChannel} specified by its id, or {@code null} if no such object is stored in the
@@ -24,15 +24,15 @@ public interface IChannelContainer extends ITurtleContainer {
      * @return The requested SyncChannel (may be {@code null}).
      * @see SyncChannel#getId()
      */
-    @Nullable SyncChannel getSyncChannelById(long id);
+    @Nullable SyncChannel getChannelById(long id);
 
     @Override
     default @NotNull List<Turtle> getTurtles() {
-        return List.copyOf(new ArrayList<>(getSyncChannels()));
+        return List.copyOf(new ArrayList<>(getChannels()));
     }
 
     @Override
     default @Nullable Turtle getTurtleById(long id) {
-        return getSyncChannelById(id);
+        return getChannelById(id);
     }
 }

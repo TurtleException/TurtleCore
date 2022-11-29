@@ -1,5 +1,6 @@
 package de.turtle_exception.client.api.entities.messages;
 
+import de.turtle_exception.client.api.request.Action;
 import de.turtle_exception.client.internal.data.annotations.*;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -9,6 +10,11 @@ import java.util.UUID;
 @Resource(path = "minecraft_channels", builder = "buildMinecraftChannel")
 @SuppressWarnings("unused")
 public interface MinecraftChannel extends IChannel {
+    @Override
+    default @NotNull Action<MinecraftChannel> update() {
+        return this.getClient().retrieveMinecraftChannel(this.getId());
+    }
+
     enum Type {
         USER((byte) 0),
         WORLD((byte) 1),

@@ -15,7 +15,7 @@ public interface IMessageContainer extends ITurtleContainer {
      * Returns an immutable List of all cached {@link SyncMessage} objects.
      * @return List of cached SyncMessages.
      */
-    @NotNull List<SyncMessage> getSyncMessages();
+    @NotNull List<SyncMessage> getMessages();
 
     /**
      * Returns a single {@link SyncMessage} specified by its id, or {@code null} if no such object is stored in the
@@ -24,15 +24,15 @@ public interface IMessageContainer extends ITurtleContainer {
      * @return The requested SyncMessage (may be {@code null}).
      * @see SyncMessage#getId()
      */
-    @Nullable SyncMessage getSyncMessageById(long id);
+    @Nullable SyncMessage getMessageById(long id);
 
     @Override
     default @NotNull List<Turtle> getTurtles() {
-        return List.copyOf(new ArrayList<>(getSyncMessages()));
+        return List.copyOf(new ArrayList<>(getMessages()));
     }
 
     @Override
     default @Nullable Turtle getTurtleById(long id) {
-        return getSyncMessageById(id);
+        return getMessageById(id);
     }
 }

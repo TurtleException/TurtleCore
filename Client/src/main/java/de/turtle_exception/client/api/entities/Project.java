@@ -1,6 +1,8 @@
 package de.turtle_exception.client.api.entities;
 
 import de.turtle_exception.client.api.entities.attributes.ProjectState;
+import de.turtle_exception.client.api.entities.containers.IUserContainer;
+import de.turtle_exception.client.api.request.Action;
 import de.turtle_exception.client.internal.data.annotations.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -9,7 +11,13 @@ import java.util.List;
 
 @Resource(path = "projects", builder = "buildProject")
 @SuppressWarnings("unused")
-public interface Project extends Turtle {
+public interface Project extends Turtle, IUserContainer {
+    @Override
+    @NotNull
+    default Action<Project> update() {
+        return this.getClient().retrieveProject(this.getId());
+    }
+
     @Key(name = Keys.Project.TITLE, sqlType = Types.Project.TITLE)
     @Nullable String getTitle();
 
@@ -23,9 +31,10 @@ public interface Project extends Turtle {
         return this.getState().getCode();
     }
 
+    @Override
     @Key(name = Keys.Project.MEMBERS, relation = Relation.MANY_TO_MANY, sqlType = Types.Project.MEMBERS)
     @Relational(table = "project_members", self = "project", foreign = "user", type = User.class)
-    @NotNull List<User> getMembers();
+    @NotNull List<User> getUsers();
 
     // TODO: times
 

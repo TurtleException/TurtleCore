@@ -3,6 +3,7 @@ package de.turtle_exception.client.api.entities;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import de.turtle_exception.client.api.request.Action;
 import de.turtle_exception.client.internal.data.annotations.Key;
 import de.turtle_exception.client.internal.data.annotations.Keys;
 import de.turtle_exception.client.internal.data.annotations.Resource;
@@ -16,6 +17,11 @@ import org.jetbrains.annotations.NotNull;
 @Resource(path = "json_resources", builder = "buildJsonResource")
 @SuppressWarnings("unused")
 public interface JsonResource extends Turtle {
+    @Override
+    default @NotNull Action<JsonResource> update() {
+        return this.getClient().retrieveJsonResource(this.getId());
+    }
+
     /**
      * Returns the String identifier of this JsonResource. Meaning, a hint for intended recipients as to how this
      * JsonResource should be handled / parsed.

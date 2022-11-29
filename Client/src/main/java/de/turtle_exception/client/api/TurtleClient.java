@@ -1,12 +1,15 @@
 package de.turtle_exception.client.api;
 
-import de.turtle_exception.client.api.entities.Group;
-import de.turtle_exception.client.api.entities.Ticket;
-import de.turtle_exception.client.api.entities.Turtle;
-import de.turtle_exception.client.api.entities.User;
-import de.turtle_exception.client.api.entities.containers.IGroupContainer;
-import de.turtle_exception.client.api.entities.containers.ITicketContainer;
-import de.turtle_exception.client.api.entities.containers.IUserContainer;
+import de.turtle_exception.client.api.entities.*;
+import de.turtle_exception.client.api.entities.containers.*;
+import de.turtle_exception.client.api.entities.containers.messages.IChannelContainer;
+import de.turtle_exception.client.api.entities.containers.messages.IDiscordChannelContainer;
+import de.turtle_exception.client.api.entities.containers.messages.IMessageContainer;
+import de.turtle_exception.client.api.entities.containers.messages.IMinecraftChannelContainer;
+import de.turtle_exception.client.api.entities.messages.DiscordChannel;
+import de.turtle_exception.client.api.entities.messages.MinecraftChannel;
+import de.turtle_exception.client.api.entities.messages.SyncChannel;
+import de.turtle_exception.client.api.entities.messages.SyncMessage;
 import de.turtle_exception.client.api.event.EventListener;
 import de.turtle_exception.client.api.event.EventManager;
 import de.turtle_exception.client.api.request.Action;
@@ -38,7 +41,10 @@ import java.util.logging.Logger;
  * @see Turtle
  */
 @SuppressWarnings("unused")
-public interface TurtleClient extends IUserContainer, IGroupContainer, ITicketContainer {
+public interface TurtleClient extends
+        IUserContainer, IGroupContainer, IJsonResourceContainer, IProjectContainer, ITicketContainer,
+        IDiscordChannelContainer, IMinecraftChannelContainer, IChannelContainer, IMessageContainer
+{
     /**
      * Returns the root logger of the API.
      * <p> Every {@link Logger} that is used by parts of the API is a {@link NestedLogger} that will stream its output
@@ -126,6 +132,13 @@ public interface TurtleClient extends IUserContainer, IGroupContainer, ITicketCo
      */
     @NotNull Action<List<Group>> retrieveGroups();
 
+    // no retrieve-all because JsonResources aren't designed for that
+    @NotNull Action<JsonResource> retrieveJsonResource(long id);
+
+    @NotNull Action<Project> retrieveProject(long id);
+
+    @NotNull Action<List<Project>> retrieveProjects();
+
     /**
      * Creates an Action with the Provider request to retrieve a {@link Ticket} specified by its id.
      * <p> If the operation is successful, the Ticket will also be put into cache, if not already present.
@@ -159,6 +172,23 @@ public interface TurtleClient extends IUserContainer, IGroupContainer, ITicketCo
      * @see TurtleClient#getUsers()
      */
     @NotNull Action<List<User>> retrieveUsers();
+
+    // MESSAGES
+
+    @NotNull Action<DiscordChannel> retrieveDiscordChannel(long id);
+
+    @NotNull Action<List<DiscordChannel>> retrieveDiscordChannels();
+
+    @NotNull Action<MinecraftChannel> retrieveMinecraftChannel(long id);
+
+    @NotNull Action<List<MinecraftChannel>> retrieveMinecraftChannels();
+
+    @NotNull Action<SyncChannel> retrieveChannel(long id);
+
+    @NotNull Action<List<SyncChannel>> retrieveChannels();
+
+    // no retrieve-all because why
+    @NotNull Action<SyncMessage> retrieveMessage(long id);
 
     /* - - - */
 
