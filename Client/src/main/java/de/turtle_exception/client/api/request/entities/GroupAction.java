@@ -1,8 +1,9 @@
-package de.turtle_exception.client.api.request;
+package de.turtle_exception.client.api.request.entities;
 
 import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.api.entities.Group;
 import de.turtle_exception.client.api.entities.User;
+import de.turtle_exception.client.api.request.Action;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;

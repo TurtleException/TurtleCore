@@ -1,11 +1,12 @@
-package de.turtle_exception.client.internal.request.actions;
+package de.turtle_exception.client.internal.request.actions.entities;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import de.turtle_exception.client.api.entities.User;
-import de.turtle_exception.client.api.request.UserAction;
+import de.turtle_exception.client.api.request.entities.UserAction;
 import de.turtle_exception.client.internal.Provider;
+import de.turtle_exception.client.internal.request.actions.EntityAction;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;

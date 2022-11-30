@@ -1,12 +1,13 @@
-package de.turtle_exception.client.internal.request.actions;
+package de.turtle_exception.client.internal.request.actions.entities;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import de.turtle_exception.client.api.TicketState;
 import de.turtle_exception.client.api.entities.Ticket;
-import de.turtle_exception.client.api.request.TicketAction;
+import de.turtle_exception.client.api.entities.attributes.TicketState;
+import de.turtle_exception.client.api.request.entities.TicketAction;
 import de.turtle_exception.client.internal.Provider;
+import de.turtle_exception.client.internal.request.actions.EntityAction;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;

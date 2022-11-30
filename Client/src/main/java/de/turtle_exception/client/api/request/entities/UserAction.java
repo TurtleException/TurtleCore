@@ -1,7 +1,8 @@
-package de.turtle_exception.client.api.request;
+package de.turtle_exception.client.api.request.entities;
 
 import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.api.entities.User;
+import de.turtle_exception.client.api.request.Action;
 import net.dv8tion.jda.api.entities.ISnowflake;
 import net.dv8tion.jda.api.entities.UserSnowflake;
 import org.bukkit.OfflinePlayer;
