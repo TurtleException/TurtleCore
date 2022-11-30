@@ -27,4 +27,13 @@ public enum ProjectState {
     public @NotNull String getName() {
         return name;
     }
+
+    /* - - - */
+
+    public static @NotNull ProjectState of(byte code) {
+        for (ProjectState value : ProjectState.values())
+            if (value.getCode() == code)
+                return value;
+        return ProjectState.UNDEFINED;
+    }
 }

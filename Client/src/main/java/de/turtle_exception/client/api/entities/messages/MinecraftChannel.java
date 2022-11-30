@@ -20,7 +20,7 @@ public interface MinecraftChannel extends IChannel {
         WORLD((byte) 1),
         SERVER((byte) 2);
 
-        final byte code;
+        public final byte code;
         Type(byte code) {
             this.code = code;
         }

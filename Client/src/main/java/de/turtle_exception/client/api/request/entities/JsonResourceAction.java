@@ -5,7 +5,7 @@ import de.turtle_exception.client.api.entities.JsonResource;
 import de.turtle_exception.client.api.request.Action;
 
 public interface JsonResourceAction extends Action<JsonResource> {
-    JsonResourceAction setName(String name);
+    JsonResourceAction setIdentifier(String identifier);
 
     JsonResourceAction setContent(JsonElement content);
 

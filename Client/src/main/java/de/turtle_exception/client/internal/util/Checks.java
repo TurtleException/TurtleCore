@@ -18,6 +18,11 @@ public class Checks {
             throw new NullPointerException(name + " may not be null");
     }
 
+    public static void nonNull(Object obj) throws NullPointerException {
+        if (obj == null)
+            throw new NullPointerException("Object may not be null");
+    }
+
     public static <T> @NotNull T nullOr(@Nullable T o1, @NotNull T o2) {
         return o1 != null ? o1 : o2;
     }
