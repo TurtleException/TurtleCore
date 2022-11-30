@@ -8,6 +8,7 @@ import de.turtle_exception.client.internal.data.annotations.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -20,7 +21,12 @@ public interface SyncChannel extends Turtle, IDiscordChannelContainer, IMinecraf
     }
 
     @Override
-    @NotNull List<Turtle> getTurtles();
+    default @NotNull List<Turtle> getTurtles() {
+        ArrayList<Turtle> list = new ArrayList<>();
+        list.addAll(this.getDiscordChannels());
+        list.addAll(this.getMinecraftChannels());
+        return List.copyOf(list);
+    }
 
     @Override
     @Nullable Turtle getTurtleById(long id);
