@@ -13,9 +13,11 @@ import de.turtle_exception.client.api.entities.messages.SyncMessage;
 import de.turtle_exception.client.api.event.EventListener;
 import de.turtle_exception.client.api.event.EventManager;
 import de.turtle_exception.client.api.request.Action;
-import de.turtle_exception.client.api.request.entities.GroupAction;
-import de.turtle_exception.client.api.request.entities.TicketAction;
-import de.turtle_exception.client.api.request.entities.UserAction;
+import de.turtle_exception.client.api.request.entities.*;
+import de.turtle_exception.client.api.request.entities.messages.DiscordChannelAction;
+import de.turtle_exception.client.api.request.entities.messages.MinecraftChannelAction;
+import de.turtle_exception.client.api.request.entities.messages.SyncChannelAction;
+import de.turtle_exception.client.api.request.entities.messages.SyncMessageAction;
 import de.turtle_exception.client.internal.NetworkAdapter;
 import de.turtle_exception.client.internal.Provider;
 import de.turtle_exception.client.internal.net.NetClient;
@@ -201,6 +203,10 @@ public interface TurtleClient extends
      */
     @NotNull GroupAction createGroup();
 
+    @NotNull JsonResourceAction createJsonResource();
+
+    @NotNull ProjectAction createProject();
+
     /**
      * Creates an Action with the Provider request to create a new {@link Ticket}. The returned {@link TicketAction} may
      * be used to modify the request and to set each required field. If any required field is missing the server will
@@ -218,6 +224,16 @@ public interface TurtleClient extends
      * @return Action that provides the newly crated {@link User} on completion.
      */
     @NotNull UserAction createUser();
+
+    // MESSAGES
+
+    @NotNull DiscordChannelAction createDiscordChannel();
+
+    @NotNull MinecraftChannelAction createMinecraftChannel();
+
+    @NotNull SyncChannelAction createChannel();
+
+    @NotNull SyncMessageAction createMessage();
 
     /* - - - */
 

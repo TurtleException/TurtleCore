@@ -9,19 +9,23 @@ import de.turtle_exception.client.api.entities.messages.SyncChannel;
 import de.turtle_exception.client.api.entities.messages.SyncMessage;
 import de.turtle_exception.client.api.event.EventManager;
 import de.turtle_exception.client.api.request.Action;
-import de.turtle_exception.client.api.request.entities.GroupAction;
-import de.turtle_exception.client.api.request.entities.TicketAction;
-import de.turtle_exception.client.api.request.entities.UserAction;
+import de.turtle_exception.client.api.request.entities.*;
+import de.turtle_exception.client.api.request.entities.messages.DiscordChannelAction;
+import de.turtle_exception.client.api.request.entities.messages.MinecraftChannelAction;
+import de.turtle_exception.client.api.request.entities.messages.SyncChannelAction;
+import de.turtle_exception.client.api.request.entities.messages.SyncMessageAction;
 import de.turtle_exception.client.internal.data.ResourceBuilder;
 import de.turtle_exception.client.internal.data.annotations.Keys;
 import de.turtle_exception.client.internal.entities.*;
 import de.turtle_exception.client.internal.event.UpdateHelper;
 import de.turtle_exception.client.internal.net.NetClient;
 import de.turtle_exception.client.internal.net.NetworkProvider;
-import de.turtle_exception.client.internal.request.actions.entities.GroupActionImpl;
+import de.turtle_exception.client.internal.request.actions.entities.*;
 import de.turtle_exception.client.internal.request.actions.SimpleAction;
-import de.turtle_exception.client.internal.request.actions.entities.TicketActionImpl;
-import de.turtle_exception.client.internal.request.actions.entities.UserActionImpl;
+import de.turtle_exception.client.internal.request.actions.entities.messages.DiscordChannelActionImpl;
+import de.turtle_exception.client.internal.request.actions.entities.messages.MinecraftChannelActionImpl;
+import de.turtle_exception.client.internal.request.actions.entities.messages.SyncChannelActionImpl;
+import de.turtle_exception.client.internal.request.actions.entities.messages.SyncMessageActionImpl;
 import de.turtle_exception.client.internal.util.TurtleSet;
 import de.turtle_exception.client.internal.util.version.IllegalVersionException;
 import de.turtle_exception.client.internal.util.version.Version;
@@ -514,6 +518,16 @@ public class TurtleClientImpl implements TurtleClient {
     }
 
     @Override
+    public @NotNull JsonResourceAction createJsonResource() {
+        return new JsonResourceActionImpl(this.provider);
+    }
+
+    @Override
+    public @NotNull ProjectAction createProject() {
+        return new ProjectActionImpl(this.provider);
+    }
+
+    @Override
     public @NotNull TicketAction createTicket() {
         return new TicketActionImpl(this.provider);
     }
@@ -521,6 +535,28 @@ public class TurtleClientImpl implements TurtleClient {
     @Override
     public @NotNull UserAction createUser() {
         return new UserActionImpl(this.provider);
+    }
+
+    // MESSAGES
+
+    @Override
+    public @NotNull DiscordChannelAction createDiscordChannel() {
+        return new DiscordChannelActionImpl(this.provider);
+    }
+
+    @Override
+    public @NotNull MinecraftChannelAction createMinecraftChannel() {
+        return new MinecraftChannelActionImpl(this.provider);
+    }
+
+    @Override
+    public @NotNull SyncChannelAction createChannel() {
+        return new SyncChannelActionImpl(this.provider);
+    }
+
+    @Override
+    public @NotNull SyncMessageAction createMessage() {
+        return new SyncMessageActionImpl(this.provider);
     }
 
     /* - - - */
