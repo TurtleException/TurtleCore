@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
 public class JsonResourceActionImpl extends EntityAction<JsonResource> implements JsonResourceAction {
     protected String identifier;
     protected JsonElement jsonContent;
-    protected Boolean ephemeral;
+    protected boolean ephemeral = false;
 
     @SuppressWarnings("CodeBlock2Expr")
     public JsonResourceActionImpl(@NotNull Provider provider) {
@@ -47,8 +47,8 @@ public class JsonResourceActionImpl extends EntityAction<JsonResource> implement
     }
 
     @Override
-    public JsonResourceAction setEphemeral(Boolean b) {
-        this.ephemeral = b;
+    public JsonResourceAction setEphemeral() {
+        this.ephemeral = true;
         return this;
     }
 }

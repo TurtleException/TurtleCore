@@ -26,7 +26,6 @@ public class SyncMessageActionImpl extends EntityAction<SyncMessage> implements 
         this.checks.add(json -> { MessageFormat.of(json.get(Keys.Messages.SyncMessage.FORMAT).getAsByte()); });
         this.checks.add(json -> { json.get(Keys.Messages.SyncMessage.AUTHOR).getAsLong(); });
         this.checks.add(json -> { json.get(Keys.Messages.SyncMessage.CONTENT).getAsString(); });
-        this.checks.add(json -> { json.get(Keys.Messages.SyncMessage.REFERENCE).getAsLong(); });
         this.checks.add(json -> { json.get(Keys.Messages.SyncMessage.CHANNEL).getAsLong(); });
         this.checks.add(json -> { json.get(Keys.Messages.SyncMessage.SOURCE).getAsLong(); });
     }
