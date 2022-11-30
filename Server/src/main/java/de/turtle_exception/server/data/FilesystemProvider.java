@@ -33,6 +33,7 @@ public class FilesystemProvider extends DatabaseProvider {
 
     /* - - - */
 
+
     @Override
     protected boolean doDelete(@NotNull Class<? extends Turtle> type, long id) throws AnnotationFormatError {
         Resource annotation = ResourceUtil.getResourceAnnotation(type);
@@ -94,7 +95,7 @@ public class FilesystemProvider extends DatabaseProvider {
         Resource annotation = ResourceUtil.getResourceAnnotation(type);
 
         long id = TurtleUtil.newId(TurtleType.ofResource(type));
-        data.addProperty("id", id);
+        data.addProperty(Keys.Turtle.ID, id);
 
         File file = getFile(annotation, id);
 

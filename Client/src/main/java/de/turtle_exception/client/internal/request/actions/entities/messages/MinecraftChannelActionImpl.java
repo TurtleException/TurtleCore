@@ -1,12 +1,11 @@
 package de.turtle_exception.client.internal.request.actions.entities.messages;
 
 import com.google.gson.JsonObject;
-import de.turtle_exception.client.api.entities.messages.DiscordChannel;
 import de.turtle_exception.client.api.entities.messages.MinecraftChannel;
 import de.turtle_exception.client.api.entities.messages.SyncChannel;
-import de.turtle_exception.client.api.request.entities.messages.DiscordChannelAction;
 import de.turtle_exception.client.api.request.entities.messages.MinecraftChannelAction;
 import de.turtle_exception.client.internal.Provider;
+import de.turtle_exception.client.internal.data.annotations.Keys;
 import de.turtle_exception.client.internal.request.actions.EntityAction;
 import org.jetbrains.annotations.NotNull;
 
@@ -18,17 +17,17 @@ public class MinecraftChannelActionImpl extends EntityAction<MinecraftChannel> i
     public MinecraftChannelActionImpl(@NotNull Provider provider) {
         super(provider, MinecraftChannel.class);
 
-        this.checks.add(json -> { json.get("channel").getAsLong(); });
-        this.checks.add(json -> { json.get("type").getAsByte(); });
-        this.checks.add(json -> { json.get("identifier").getAsString(); });
+        this.checks.add(json -> { json.get(Keys.Messages.IChannel.SYNC_CHANNEL).getAsLong(); });
+        this.checks.add(json -> { json.get(Keys.Messages.MinecraftChannel.TYPE).getAsByte(); });
+        this.checks.add(json -> { json.get(Keys.Messages.MinecraftChannel.IDENTIFIER).getAsString(); });
     }
 
     @Override
     protected void updateContent() {
         this.content = new JsonObject();
-        this.content.addProperty("channel", syncChannel.getId());
-        this.content.addProperty("type", type);
-        this.content.addProperty("identifier", identifier);
+        this.content.addProperty(Keys.Messages.IChannel.SYNC_CHANNEL, syncChannel.getId());
+        this.content.addProperty(Keys.Messages.MinecraftChannel.TYPE, type);
+        this.content.addProperty(Keys.Messages.MinecraftChannel.IDENTIFIER, identifier);
     }
 
     /* - - - */

@@ -7,6 +7,7 @@ import de.turtle_exception.client.api.entities.Ticket;
 import de.turtle_exception.client.api.entities.attributes.TicketState;
 import de.turtle_exception.client.api.request.entities.TicketAction;
 import de.turtle_exception.client.internal.Provider;
+import de.turtle_exception.client.internal.data.annotations.Keys;
 import de.turtle_exception.client.internal.request.actions.EntityAction;
 import org.jetbrains.annotations.NotNull;
 
@@ -25,17 +26,17 @@ public class TicketActionImpl extends EntityAction<Ticket> implements TicketActi
     public TicketActionImpl(@NotNull Provider provider) {
         super(provider, Ticket.class);
 
-        this.checks.add(json -> { TicketState.of(json.get("state").getAsByte()); });
-        this.checks.add(json -> { json.get("title").getAsString(); });
-        this.checks.add(json -> { json.get("category").getAsString(); });
+        this.checks.add(json -> { TicketState.of(json.get(Keys.Ticket.STATE).getAsByte()); });
+        this.checks.add(json -> { json.get(Keys.Ticket.TITLE).getAsString(); });
+        this.checks.add(json -> { json.get(Keys.Ticket.CATEGORY).getAsString(); });
         this.checks.add(json -> {
-            JsonArray arr = json.get("tags").getAsJsonArray();
+            JsonArray arr = json.get(Keys.Ticket.TAGS).getAsJsonArray();
             for (JsonElement entry : arr)
                 entry.getAsString();
         });
-        this.checks.add(json -> { json.get("discord_channel").getAsLong(); });
+        this.checks.add(json -> { json.get(Keys.Ticket.DISCORD_CHANNEL).getAsLong(); });
         this.checks.add(json -> {
-            JsonArray arr = json.get("users").getAsJsonArray();
+            JsonArray arr = json.get(Keys.Ticket.USERS).getAsJsonArray();
             for (JsonElement entry : arr)
                 entry.getAsLong();
         });
@@ -44,21 +45,21 @@ public class TicketActionImpl extends EntityAction<Ticket> implements TicketActi
     @Override
     protected void updateContent() {
         this.content = new JsonObject();
-        this.content.addProperty("state", state.getCode());
-        this.content.addProperty("title", title);
-        this.content.addProperty("category", category);
+        this.content.addProperty(Keys.Ticket.STATE, state.getCode());
+        this.content.addProperty(Keys.Ticket.TITLE, title);
+        this.content.addProperty(Keys.Ticket.CATEGORY, category);
 
         JsonArray tags = new JsonArray();
         for (String tag : this.tags)
             tags.add(tag);
-        this.content.add("tags", tags);
+        this.content.add(Keys.Ticket.TAGS, tags);
 
-        this.content.addProperty("discord_channel", discordChannel);
+        this.content.addProperty(Keys.Ticket.DISCORD_CHANNEL, discordChannel);
 
         JsonArray users = new JsonArray();
         for (Long user : this.users)
             users.add(user);
-        this.content.add("users", users);
+        this.content.add(Keys.Ticket.USERS, users);
     }
 
     /* - - - */

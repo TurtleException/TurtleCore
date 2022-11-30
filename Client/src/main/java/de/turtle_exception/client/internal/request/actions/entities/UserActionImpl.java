@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import de.turtle_exception.client.api.entities.User;
 import de.turtle_exception.client.api.request.entities.UserAction;
 import de.turtle_exception.client.internal.Provider;
+import de.turtle_exception.client.internal.data.annotations.Keys;
 import de.turtle_exception.client.internal.request.actions.EntityAction;
 import org.jetbrains.annotations.NotNull;
 
@@ -22,14 +23,14 @@ public class UserActionImpl extends EntityAction<User> implements UserAction {
     public UserActionImpl(@NotNull Provider provider) {
         super(provider, User.class);
 
-        this.checks.add(json -> { json.get("name").getAsString(); });
+        this.checks.add(json -> { json.get(Keys.User.NAME).getAsString(); });
         this.checks.add(json -> {
-            JsonArray arr = json.get("discord").getAsJsonArray();
+            JsonArray arr = json.get(Keys.User.DISCORD).getAsJsonArray();
             for (JsonElement entry : arr)
                 entry.getAsLong();
         });
         this.checks.add(json -> {
-            JsonArray arr = json.get("minecraft").getAsJsonArray();
+            JsonArray arr = json.get(Keys.User.MINECRAFT).getAsJsonArray();
             for (JsonElement entry : arr)
                 UUID.fromString(entry.getAsString());
         });
@@ -38,17 +39,17 @@ public class UserActionImpl extends EntityAction<User> implements UserAction {
     @Override
     protected void updateContent() {
         this.content = new JsonObject();
-        this.content.addProperty("name", name);
+        this.content.addProperty(Keys.User.NAME, name);
 
         JsonArray discord = new JsonArray();
         for (Long id : this.discord)
             discord.add(id);
-        this.content.add("discord", discord);
+        this.content.add(Keys.User.DISCORD, discord);
 
         JsonArray minecraft = new JsonArray();
         for (UUID id : this.minecraft)
             minecraft.add(id.toString());
-        this.content.add("minecraft", minecraft);
+        this.content.add(Keys.User.MINECRAFT, minecraft);
     }
 
     /* - - - */

@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import de.turtle_exception.client.api.entities.messages.SyncChannel;
 import de.turtle_exception.client.api.request.entities.messages.SyncChannelAction;
 import de.turtle_exception.client.internal.Provider;
+import de.turtle_exception.client.internal.data.annotations.Keys;
 import de.turtle_exception.client.internal.request.actions.EntityAction;
 import org.jetbrains.annotations.NotNull;
 
@@ -20,12 +21,12 @@ public class SyncChannelActionImpl extends EntityAction<SyncChannel> implements 
         super(provider, SyncChannel.class);
 
         this.checks.add(json -> {
-            JsonArray arr = json.get("discord_channels").getAsJsonArray();
+            JsonArray arr = json.get(Keys.Messages.SyncChannel.DISCORD).getAsJsonArray();
             for (JsonElement entry : arr)
                 entry.getAsLong();
         });
         this.checks.add(json -> {
-            JsonArray arr = json.get("minecraft_channels").getAsJsonArray();
+            JsonArray arr = json.get(Keys.Messages.SyncChannel.MINECRAFT).getAsJsonArray();
             for (JsonElement entry : arr)
                 entry.getAsLong();
         });
@@ -38,11 +39,11 @@ public class SyncChannelActionImpl extends EntityAction<SyncChannel> implements 
         JsonArray discordArr = new JsonArray();
         for (Long discord : this.discordChannels)
             discordArr.add(discord);
-        this.content.add("discord_channels", discordArr);
+        this.content.add(Keys.Messages.SyncChannel.DISCORD, discordArr);
         JsonArray minecraftArr = new JsonArray();
         for (Long minecraft : this.minecraftChannels)
             minecraftArr.add(minecraft);
-        this.content.add("minecraft_channels", minecraftArr);
+        this.content.add(Keys.Messages.SyncChannel.MINECRAFT, minecraftArr);
     }
 
     /* - - - */

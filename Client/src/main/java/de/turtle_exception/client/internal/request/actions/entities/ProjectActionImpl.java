@@ -9,6 +9,7 @@ import de.turtle_exception.client.api.entities.attributes.ProjectState;
 import de.turtle_exception.client.api.request.entities.GroupAction;
 import de.turtle_exception.client.api.request.entities.ProjectAction;
 import de.turtle_exception.client.internal.Provider;
+import de.turtle_exception.client.internal.data.annotations.Keys;
 import de.turtle_exception.client.internal.request.actions.EntityAction;
 import org.jetbrains.annotations.NotNull;
 
@@ -25,11 +26,11 @@ public class ProjectActionImpl extends EntityAction<Project> implements ProjectA
     public ProjectActionImpl(@NotNull Provider provider) {
         super(provider, Project.class);
 
-        this.checks.add(json -> { json.get("title").getAsString(); });
-        this.checks.add(json -> { json.get("code").getAsString(); });
-        this.checks.add(json -> { ProjectState.of(json.get("state").getAsByte()); });
+        this.checks.add(json -> { json.get(Keys.Project.TITLE).getAsString(); });
+        this.checks.add(json -> { json.get(Keys.Project.CODE).getAsString(); });
+        this.checks.add(json -> { ProjectState.of(json.get(Keys.Project.STATE).getAsByte()); });
         this.checks.add(json -> {
-            JsonArray arr = json.get("users").getAsJsonArray();
+            JsonArray arr = json.get(Keys.Project.MEMBERS).getAsJsonArray();
             for (JsonElement entry : arr)
                 entry.getAsLong();
         });
@@ -38,14 +39,14 @@ public class ProjectActionImpl extends EntityAction<Project> implements ProjectA
     @Override
     protected void updateContent() {
         this.content = new JsonObject();
-        this.content.addProperty("title", title);
-        this.content.addProperty("code", code);
-        this.content.addProperty("state", state.getCode());
+        this.content.addProperty(Keys.Project.TITLE, title);
+        this.content.addProperty(Keys.Project.CODE, code);
+        this.content.addProperty(Keys.Project.STATE, state.getCode());
 
         JsonArray arr = new JsonArray();
         for (Long user : this.users)
             arr.add(user);
-        this.content.add("users", arr);
+        this.content.add(Keys.Project.MEMBERS, arr);
     }
 
     /* - - - */

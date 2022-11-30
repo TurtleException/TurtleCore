@@ -8,6 +8,7 @@ import de.turtle_exception.client.api.entities.messages.SyncChannel;
 import de.turtle_exception.client.api.entities.messages.SyncMessage;
 import de.turtle_exception.client.api.request.entities.messages.SyncMessageAction;
 import de.turtle_exception.client.internal.Provider;
+import de.turtle_exception.client.internal.data.annotations.Keys;
 import de.turtle_exception.client.internal.request.actions.EntityAction;
 import org.jetbrains.annotations.NotNull;
 
@@ -22,23 +23,23 @@ public class SyncMessageActionImpl extends EntityAction<SyncMessage> implements 
     public SyncMessageActionImpl(@NotNull Provider provider) {
         super(provider, SyncMessage.class);
 
-        this.checks.add(json -> { MessageFormat.of(json.get("format").getAsByte()); });
-        this.checks.add(json -> { json.get("author").getAsLong(); });
-        this.checks.add(json -> { json.get("content").getAsString(); });
-        this.checks.add(json -> { json.get("reference").getAsLong(); });
-        this.checks.add(json -> { json.get("channel").getAsLong(); });
-        this.checks.add(json -> { json.get("source").getAsLong(); });
+        this.checks.add(json -> { MessageFormat.of(json.get(Keys.Messages.SyncMessage.FORMAT).getAsByte()); });
+        this.checks.add(json -> { json.get(Keys.Messages.SyncMessage.AUTHOR).getAsLong(); });
+        this.checks.add(json -> { json.get(Keys.Messages.SyncMessage.CONTENT).getAsString(); });
+        this.checks.add(json -> { json.get(Keys.Messages.SyncMessage.REFERENCE).getAsLong(); });
+        this.checks.add(json -> { json.get(Keys.Messages.SyncMessage.CHANNEL).getAsLong(); });
+        this.checks.add(json -> { json.get(Keys.Messages.SyncMessage.SOURCE).getAsLong(); });
     }
 
     @Override
     protected void updateContent() {
         this.content = new JsonObject();
-        this.content.addProperty("format", format.getCode());
-        this.content.addProperty("author", author.getId());
-        this.content.addProperty("content", msgContent);
-        this.content.addProperty("reference", reference);
-        this.content.addProperty("channel", channel.getId());
-        this.content.addProperty("source", source.getId());
+        this.content.addProperty(Keys.Messages.SyncMessage.FORMAT, format.getCode());
+        this.content.addProperty(Keys.Messages.SyncMessage.AUTHOR, author.getId());
+        this.content.addProperty(Keys.Messages.SyncMessage.CONTENT, msgContent);
+        this.content.addProperty(Keys.Messages.SyncMessage.REFERENCE, reference);
+        this.content.addProperty(Keys.Messages.SyncMessage.CHANNEL, channel.getId());
+        this.content.addProperty(Keys.Messages.SyncMessage.SOURCE, source.getId());
     }
 
     /* - - - */

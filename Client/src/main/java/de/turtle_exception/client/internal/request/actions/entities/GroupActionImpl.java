@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import de.turtle_exception.client.api.entities.Group;
 import de.turtle_exception.client.api.request.entities.GroupAction;
 import de.turtle_exception.client.internal.Provider;
+import de.turtle_exception.client.internal.data.annotations.Keys;
 import de.turtle_exception.client.internal.request.actions.EntityAction;
 import org.jetbrains.annotations.NotNull;
 
@@ -20,9 +21,9 @@ public class GroupActionImpl extends EntityAction<Group> implements GroupAction 
     public GroupActionImpl(@NotNull Provider provider) {
         super(provider, Group.class);
 
-        this.checks.add(json -> { json.get("name").getAsString(); });
+        this.checks.add(json -> { json.get(Keys.Group.NAME).getAsString(); });
         this.checks.add(json -> {
-            JsonArray arr = json.get("users").getAsJsonArray();
+            JsonArray arr = json.get(Keys.Group.MEMBERS).getAsJsonArray();
             for (JsonElement entry : arr)
                 entry.getAsLong();
         });
@@ -31,12 +32,12 @@ public class GroupActionImpl extends EntityAction<Group> implements GroupAction 
     @Override
     protected void updateContent() {
         this.content = new JsonObject();
-        this.content.addProperty("name", name);
+        this.content.addProperty(Keys.Group.NAME, name);
 
         JsonArray arr = new JsonArray();
         for (Long user : this.users)
             arr.add(user);
-        this.content.add("users", arr);
+        this.content.add(Keys.Group.MEMBERS, arr);
     }
 
     /* - - - */
