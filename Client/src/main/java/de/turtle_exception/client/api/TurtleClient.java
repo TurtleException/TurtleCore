@@ -134,11 +134,32 @@ public interface TurtleClient extends
      */
     @NotNull Action<List<Group>> retrieveGroups();
 
+    /**
+     * Creates an Action with the Provider request to retrieve a {@link JsonResource} specified by its id.
+     * <p> If the operation is successful and {@code ephemeral} is set to {@code true}, the JsonResource will also be
+     * put into cache, if not already present.
+     * @return Action that provides the {@link JsonResource} on completion.
+     * @see TurtleClient#getJsonResourceById(long)
+     * @see JsonResource#update()
+     */
     // no retrieve-all because JsonResources aren't designed for that
     @NotNull Action<JsonResource> retrieveJsonResource(long id);
 
+    /**
+     * Creates an Action with the Provider request to retrieve a {@link Project} specified by its id.
+     * <p> If the operation is successful, the Project will also be put into cache, if not already present.
+     * @return Action that provides the {@link Project} on completion.
+     * @see TurtleClient#getDiscordChannelById(long)
+     * @see DiscordChannel#update()
+     */
     @NotNull Action<Project> retrieveProject(long id);
 
+    /**
+     * Creates an Action with the Provider request to retrieve all available {@link Project Projects}.
+     * <p> If the operation is successful, the retrieved Projects will also be put into cache, if not already present.
+     * @return Action that provides the List of {@link Project Projects} on completion.
+     * @see TurtleClient#getProjects()
+     */
     @NotNull Action<List<Project>> retrieveProjects();
 
     /**
@@ -177,18 +198,64 @@ public interface TurtleClient extends
 
     // MESSAGES
 
+    /**
+     * Creates an Action with the Provider request to retrieve a {@link DiscordChannel} specified by its id.
+     * <p> If the operation is successful, the DiscordChannel will also be put into cache, if not already present.
+     * @return Action that provides the {@link DiscordChannel} on completion.
+     * @see TurtleClient#getDiscordChannelById(long)
+     * @see DiscordChannel#update()
+     */
     @NotNull Action<DiscordChannel> retrieveDiscordChannel(long id);
 
+    /**
+     * Creates an Action with the Provider request to retrieve all available {@link DiscordChannel DiscordChannels}.
+     * <p> If the operation is successful, the retrieved DiscordChannels will also be put into cache, if not already present.
+     * @return Action that provides the List of {@link DiscordChannel DiscordChannels} on completion.
+     * @see TurtleClient#getDiscordChannels()
+     */
     @NotNull Action<List<DiscordChannel>> retrieveDiscordChannels();
 
+    /**
+     * Creates an Action with the Provider request to retrieve a {@link MinecraftChannel} specified by its id.
+     * <p> If the operation is successful, the MinecraftChannel will also be put into cache, if not already present.
+     * @return Action that provides the {@link MinecraftChannel} on completion.
+     * @see TurtleClient#getMinecraftChannelById(long)
+     * @see MinecraftChannel#update()
+     */
     @NotNull Action<MinecraftChannel> retrieveMinecraftChannel(long id);
 
+    /**
+     * Creates an Action with the Provider request to retrieve all available {@link MinecraftChannel MinecraftChannels}.
+     * <p> If the operation is successful, the retrieved MinecraftChannels will also be put into cache, if not already present.
+     * @return Action that provides the List of {@link MinecraftChannel MinecraftChannels} on completion.
+     * @see TurtleClient#getMinecraftChannels()
+     */
     @NotNull Action<List<MinecraftChannel>> retrieveMinecraftChannels();
 
+    /**
+     * Creates an Action with the Provider request to retrieve a {@link SyncChannel} specified by its id.
+     * <p> If the operation is successful, the Channel will also be put into cache, if not already present.
+     * @return Action that provides the {@link SyncChannel} on completion.
+     * @see TurtleClient#getChannelById(long)
+     * @see SyncChannel#update()
+     */
     @NotNull Action<SyncChannel> retrieveChannel(long id);
 
+    /**
+     * Creates an Action with the Provider request to retrieve all available {@link SyncChannel Channels}.
+     * <p> If the operation is successful, the retrieved Channels will also be put into cache, if not already present.
+     * @return Action that provides the List of {@link SyncChannel Channels} on completion.
+     * @see TurtleClient#getChannels()
+     */
     @NotNull Action<List<SyncChannel>> retrieveChannels();
 
+    /**
+     * Creates an Action with the Provider request to retrieve a {@link SyncMessage} specified by its id.
+     * <p> If the operation is successful, the Message will also be put into cache, if not already present.
+     * @return Action that provides the {@link SyncMessage} on completion.
+     * @see TurtleClient#getMessageById(long)
+     * @see SyncMessage#update()
+     */
     // no retrieve-all because why
     @NotNull Action<SyncMessage> retrieveMessage(long id);
 
@@ -203,8 +270,23 @@ public interface TurtleClient extends
      */
     @NotNull GroupAction createGroup();
 
+    /**
+     * Creates an Action with the Provider request to create a new {@link JsonResource}. The returned
+     * {@link JsonResourceAction} may be used to modify the request and to set each required field. If any required
+     * field is missing the server will reject the request and respond with an error.
+     * <p> If the operation is successful and {@code ephemeral} is set to {@code true}, the created JsonResource will
+     * also be put into cache, if not already present.
+     * @return Action that provides the newly crated {@link JsonResource} on completion.
+     */
     @NotNull JsonResourceAction createJsonResource();
 
+    /**
+     * Creates an Action with the Provider request to create a new {@link Project}. The returned {@link ProjectAction}
+     * may be used to modify the request and to set each required field. If any required field is missing the server
+     * will reject the request and respond with an error.
+     * <p> If the operation is successful, the created Project will also be put into cache, if not already present.
+     * @return Action that provides the newly crated {@link Project} on completion.
+     */
     @NotNull ProjectAction createProject();
 
     /**
@@ -227,12 +309,40 @@ public interface TurtleClient extends
 
     // MESSAGES
 
+    /**
+     * Creates an Action with the Provider request to create a new {@link DiscordChannel}. The returned
+     * {@link DiscordChannelAction} may be used to modify the request and to set each required field. If any required
+     * field is missing the server will reject the request and respond with an error.
+     * <p> If the operation is successful, the created DiscordChannel will also be put into cache, if not already present.
+     * @return Action that provides the newly crated {@link DiscordChannel} on completion.
+     */
     @NotNull DiscordChannelAction createDiscordChannel();
 
+    /**
+     * Creates an Action with the Provider request to create a new {@link MinecraftChannel}. The returned
+     * {@link MinecraftChannelAction} may be used to modify the request and to set each required field. If any required
+     * field is missing the server will reject the request and respond with an error.
+     * <p> If the operation is successful, the created MinecraftChannel will also be put into cache, if not already present.
+     * @return Action that provides the newly crated {@link MinecraftChannel} on completion.
+     */
     @NotNull MinecraftChannelAction createMinecraftChannel();
 
+    /**
+     * Creates an Action with the Provider request to create a new {@link SyncChannel}. The returned
+     * {@link SyncChannelAction} may be used to modify the request and to set each required field. If any required field
+     * is missing the server will reject the request and respond with an error.
+     * <p> If the operation is successful, the created Channel will also be put into cache, if not already present.
+     * @return Action that provides the newly crated {@link SyncChannel} on completion.
+     */
     @NotNull SyncChannelAction createChannel();
 
+    /**
+     * Creates an Action with the Provider request to create a new {@link SyncMessage}. The returned
+     * {@link SyncMessage} may be used to modify the request and to set each required field. If any required field is
+     * missing the server will reject the request and respond with an error.
+     * <p> If the operation is successful, the created Message will also be put into cache, if not already present.
+     * @return Action that provides the newly crated {@link SyncMessage} on completion.
+     */
     @NotNull SyncMessageAction createMessage();
 
     /* - - - */
