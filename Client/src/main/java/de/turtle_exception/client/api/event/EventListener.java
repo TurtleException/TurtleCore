@@ -5,6 +5,7 @@ import de.turtle_exception.client.api.event.entities.json_resource.*;
 import de.turtle_exception.client.api.event.entities.messages.discord_channel.*;
 import de.turtle_exception.client.api.event.entities.messages.minecraft_channel.*;
 import de.turtle_exception.client.api.event.entities.messages.sync_channel.*;
+import de.turtle_exception.client.api.event.entities.messages.sync_message.*;
 import de.turtle_exception.client.api.event.entities.project.*;
 import de.turtle_exception.client.api.event.entities.ticket.*;
 import de.turtle_exception.client.api.event.entities.user.*;
@@ -92,6 +93,17 @@ public abstract class EventListener {
     public void onSyncChannelDiscordChannelRemove(@NotNull SyncChannelDiscordChannelRemoveEvent event) { }
     public void onSyncChannelMinecraftChannelAdd(@NotNull SyncChannelMinecraftChannelAddEvent event) { }
     public void onSyncChannelMinecraftChannelRemove(@NotNull SyncChannelMinecraftChannelRemoveEvent event) { }
+
+    // SyncMessage Events
+    public void onSyncMessageCreate(@NotNull SyncMessageCreateEvent event) { }
+    public void onSyncMessageDelete(@NotNull SyncMessageDeleteEvent event) { }
+    public void onSyncMessageUpdate(@NotNull SyncMessageUpdateEvent<?> event) { }
+    public void onSyncMessageUpdateFormat(@NotNull SyncMessageUpdateFormatEvent event) { }
+    public void onSyncMessageUpdateAuthor(@NotNull SyncMessageUpdateAuthorEvent event) { }
+    public void onSyncMessageUpdateContent(@NotNull SyncMessageUpdateContentEvent event) { }
+    public void onSyncMessageUpdateReference(@NotNull SyncMessageUpdateReferenceEvent event) { }
+    public void onSyncMessageUpdateChannel(@NotNull SyncMessageUpdateChannelEvent event) { }
+    public void onSyncMessageUpdateSource(@NotNull SyncMessageUpdateSourceEvent event) { }
 
     /* - - - */
 

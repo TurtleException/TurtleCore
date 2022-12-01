@@ -4,6 +4,7 @@ import de.turtle_exception.client.api.entities.*;
 import de.turtle_exception.client.api.entities.messages.DiscordChannel;
 import de.turtle_exception.client.api.entities.messages.MinecraftChannel;
 import de.turtle_exception.client.api.entities.messages.SyncChannel;
+import de.turtle_exception.client.api.entities.messages.SyncMessage;
 import de.turtle_exception.client.api.event.entities.group.GroupCreateEvent;
 import de.turtle_exception.client.api.event.entities.group.GroupDeleteEvent;
 import de.turtle_exception.client.api.event.entities.group.GroupMemberJoinEvent;
@@ -15,6 +16,9 @@ import de.turtle_exception.client.api.event.entities.messages.discord_channel.Di
 import de.turtle_exception.client.api.event.entities.messages.minecraft_channel.MinecraftChannelCreateEvent;
 import de.turtle_exception.client.api.event.entities.messages.minecraft_channel.MinecraftChannelDeleteEvent;
 import de.turtle_exception.client.api.event.entities.messages.sync_channel.*;
+import de.turtle_exception.client.api.event.entities.messages.sync_message.SyncMessageCreateEvent;
+import de.turtle_exception.client.api.event.entities.messages.sync_message.SyncMessageDeleteEvent;
+import de.turtle_exception.client.api.event.entities.messages.sync_message.SyncMessageUpdateEvent;
 import de.turtle_exception.client.api.event.entities.project.ProjectCreateEvent;
 import de.turtle_exception.client.api.event.entities.project.ProjectDeleteEvent;
 import de.turtle_exception.client.api.event.entities.project.ProjectMemberJoinEvent;
@@ -52,6 +56,8 @@ public class UpdateHelper {
             turtle.getClient().getEventManager().handleEvent(new MinecraftChannelCreateEvent(minecraftChannel));
         if (turtle instanceof SyncChannel syncChannel)
             turtle.getClient().getEventManager().handleEvent(new SyncChannelCreateEvent(syncChannel));
+        if (turtle instanceof SyncMessage syncMessage)
+            turtle.getClient().getEventManager().handleEvent(new SyncMessageCreateEvent(syncMessage));
     }
 
     public static void ofDeleteTurtle(@NotNull Turtle turtle) {
@@ -73,6 +79,8 @@ public class UpdateHelper {
             turtle.getClient().getEventManager().handleEvent(new MinecraftChannelDeleteEvent(minecraftChannel));
         if (turtle instanceof SyncChannel syncChannel)
             turtle.getClient().getEventManager().handleEvent(new SyncChannelDeleteEvent(syncChannel));
+        if (turtle instanceof SyncMessage syncMessage)
+            turtle.getClient().getEventManager().handleEvent(new SyncMessageDeleteEvent(syncMessage));
     }
 
     /* - GROUP - */
