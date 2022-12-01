@@ -3,6 +3,7 @@ package de.turtle_exception.client.api.event;
 import de.turtle_exception.client.api.event.entities.group.*;
 import de.turtle_exception.client.api.event.entities.json_resource.*;
 import de.turtle_exception.client.api.event.entities.messages.discord_channel.*;
+import de.turtle_exception.client.api.event.entities.messages.minecraft_channel.*;
 import de.turtle_exception.client.api.event.entities.project.*;
 import de.turtle_exception.client.api.event.entities.ticket.*;
 import de.turtle_exception.client.api.event.entities.user.*;
@@ -73,6 +74,14 @@ public abstract class EventListener {
     public void onDiscordChannelUpdate(@NotNull DiscordChannelUpdateEvent<?> event) { }
     public void onDiscordChannelUpdateSyncChannel(@NotNull DiscordChannelUpdateSyncChannelEvent event) { }
     public void onDiscordChannelUpdateSnowflake(@NotNull DiscordChannelUpdateSnowflakeEvent event) { }
+
+    // MinecraftChannel Events
+    public void onMinecraftChannelCreate(@NotNull MinecraftChannelCreateEvent event) { }
+    public void onMinecraftChannelDelete(@NotNull MinecraftChannelDeleteEvent event) { }
+    public void onMinecraftChannelUpdate(@NotNull MinecraftChannelUpdateEvent<?> event) { }
+    public void onMinecraftChannelUpdateSyncChannel(@NotNull MinecraftChannelUpdateSyncChannelEvent event) { }
+    public void onMinecraftChannelUpdateType(@NotNull MinecraftChannelUpdateTypeEvent event) { }
+    public void onMinecraftChannelUpdateIdentifier(@NotNull MinecraftChannelUpdateIdentifierEvent event) { }
 
     /* - - - */
 
