@@ -1,12 +1,15 @@
 package de.turtle_exception.client.internal.event;
 
 import de.turtle_exception.client.api.entities.*;
+import de.turtle_exception.client.api.entities.messages.DiscordChannel;
 import de.turtle_exception.client.api.event.entities.group.GroupCreateEvent;
 import de.turtle_exception.client.api.event.entities.group.GroupDeleteEvent;
 import de.turtle_exception.client.api.event.entities.group.GroupMemberJoinEvent;
 import de.turtle_exception.client.api.event.entities.group.GroupMemberLeaveEvent;
 import de.turtle_exception.client.api.event.entities.json_resource.JsonResourceCreateEvent;
 import de.turtle_exception.client.api.event.entities.json_resource.JsonResourceDeleteEvent;
+import de.turtle_exception.client.api.event.entities.messages.discord_channel.DiscordChannelCreateEvent;
+import de.turtle_exception.client.api.event.entities.messages.discord_channel.DiscordChannelDeleteEvent;
 import de.turtle_exception.client.api.event.entities.project.ProjectCreateEvent;
 import de.turtle_exception.client.api.event.entities.project.ProjectDeleteEvent;
 import de.turtle_exception.client.api.event.entities.project.ProjectMemberJoinEvent;
@@ -35,6 +38,10 @@ public class UpdateHelper {
             turtle.getClient().getEventManager().handleEvent(new TicketCreateEvent(ticket));
         if (turtle instanceof User user)
             turtle.getClient().getEventManager().handleEvent(new UserCreateEvent(user));
+
+        // MESSAGES
+        if (turtle instanceof DiscordChannel discordChannel)
+            turtle.getClient().getEventManager().handleEvent(new DiscordChannelCreateEvent(discordChannel));
     }
 
     public static void ofDeleteTurtle(@NotNull Turtle turtle) {
@@ -48,6 +55,10 @@ public class UpdateHelper {
             turtle.getClient().getEventManager().handleEvent(new TicketDeleteEvent(ticket));
         if (turtle instanceof User user)
             turtle.getClient().getEventManager().handleEvent(new UserDeleteEvent(user));
+
+        // MESSAGES
+        if (turtle instanceof DiscordChannel discordChannel)
+            turtle.getClient().getEventManager().handleEvent(new DiscordChannelDeleteEvent(discordChannel));
     }
 
     /* - GROUP - */

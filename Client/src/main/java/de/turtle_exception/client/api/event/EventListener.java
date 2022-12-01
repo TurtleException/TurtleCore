@@ -2,6 +2,7 @@ package de.turtle_exception.client.api.event;
 
 import de.turtle_exception.client.api.event.entities.group.*;
 import de.turtle_exception.client.api.event.entities.json_resource.*;
+import de.turtle_exception.client.api.event.entities.messages.discord_channel.*;
 import de.turtle_exception.client.api.event.entities.project.*;
 import de.turtle_exception.client.api.event.entities.ticket.*;
 import de.turtle_exception.client.api.event.entities.user.*;
@@ -63,6 +64,15 @@ public abstract class EventListener {
     public void onTicketTagRemove(@NotNull TicketTagRemoveEvent event) { }
     public void onTicketUserAdd(@NotNull TicketUserAddEvent event) { }
     public void onTicketUserRemove(@NotNull TicketUserRemoveEvent event) { }
+
+    /* - MESSAGES - */
+
+    // DiscordChannel Events
+    public void onDiscordChannelCreate(@NotNull DiscordChannelCreateEvent event) { }
+    public void onDiscordChannelDelete(@NotNull DiscordChannelDeleteEvent event) { }
+    public void onDiscordChannelUpdate(@NotNull DiscordChannelUpdateEvent<?> event) { }
+    public void onDiscordChannelUpdateSyncChannel(@NotNull DiscordChannelUpdateSyncChannelEvent event) { }
+    public void onDiscordChannelUpdateSnowflake(@NotNull DiscordChannelUpdateSnowflakeEvent event) { }
 
     /* - - - */
 
