@@ -1,13 +1,12 @@
 package de.turtle_exception.client.internal.event;
 
-import de.turtle_exception.client.api.entities.Group;
-import de.turtle_exception.client.api.entities.Ticket;
-import de.turtle_exception.client.api.entities.Turtle;
-import de.turtle_exception.client.api.entities.User;
+import de.turtle_exception.client.api.entities.*;
 import de.turtle_exception.client.api.event.entities.group.GroupCreateEvent;
 import de.turtle_exception.client.api.event.entities.group.GroupDeleteEvent;
 import de.turtle_exception.client.api.event.entities.group.GroupMemberJoinEvent;
 import de.turtle_exception.client.api.event.entities.group.GroupMemberLeaveEvent;
+import de.turtle_exception.client.api.event.entities.json_resource.JsonResourceCreateEvent;
+import de.turtle_exception.client.api.event.entities.json_resource.JsonResourceDeleteEvent;
 import de.turtle_exception.client.api.event.entities.ticket.*;
 import de.turtle_exception.client.api.event.entities.user.*;
 import de.turtle_exception.client.internal.util.TurtleSet;
@@ -24,6 +23,8 @@ public class UpdateHelper {
     public static void ofCreateTurtle(@NotNull Turtle turtle) {
         if (turtle instanceof Group group)
             turtle.getClient().getEventManager().handleEvent(new GroupCreateEvent(group));
+        if (turtle instanceof JsonResource jsonResource)
+            turtle.getClient().getEventManager().handleEvent(new JsonResourceCreateEvent(jsonResource));
         if (turtle instanceof Ticket ticket)
             turtle.getClient().getEventManager().handleEvent(new TicketCreateEvent(ticket));
         if (turtle instanceof User user)
@@ -33,6 +34,8 @@ public class UpdateHelper {
     public static void ofDeleteTurtle(@NotNull Turtle turtle) {
         if (turtle instanceof Group group)
             turtle.getClient().getEventManager().handleEvent(new GroupDeleteEvent(group));
+        if (turtle instanceof JsonResource jsonResource)
+            turtle.getClient().getEventManager().handleEvent(new JsonResourceDeleteEvent(jsonResource));
         if (turtle instanceof Ticket ticket)
             turtle.getClient().getEventManager().handleEvent(new TicketDeleteEvent(ticket));
         if (turtle instanceof User user)
