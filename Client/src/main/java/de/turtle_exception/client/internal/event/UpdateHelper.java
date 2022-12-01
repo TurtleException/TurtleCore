@@ -3,6 +3,7 @@ package de.turtle_exception.client.internal.event;
 import de.turtle_exception.client.api.entities.*;
 import de.turtle_exception.client.api.entities.messages.DiscordChannel;
 import de.turtle_exception.client.api.entities.messages.MinecraftChannel;
+import de.turtle_exception.client.api.entities.messages.SyncChannel;
 import de.turtle_exception.client.api.event.entities.group.GroupCreateEvent;
 import de.turtle_exception.client.api.event.entities.group.GroupDeleteEvent;
 import de.turtle_exception.client.api.event.entities.group.GroupMemberJoinEvent;
@@ -13,6 +14,7 @@ import de.turtle_exception.client.api.event.entities.messages.discord_channel.Di
 import de.turtle_exception.client.api.event.entities.messages.discord_channel.DiscordChannelDeleteEvent;
 import de.turtle_exception.client.api.event.entities.messages.minecraft_channel.MinecraftChannelCreateEvent;
 import de.turtle_exception.client.api.event.entities.messages.minecraft_channel.MinecraftChannelDeleteEvent;
+import de.turtle_exception.client.api.event.entities.messages.sync_channel.*;
 import de.turtle_exception.client.api.event.entities.project.ProjectCreateEvent;
 import de.turtle_exception.client.api.event.entities.project.ProjectDeleteEvent;
 import de.turtle_exception.client.api.event.entities.project.ProjectMemberJoinEvent;
@@ -22,6 +24,7 @@ import de.turtle_exception.client.api.event.entities.user.*;
 import de.turtle_exception.client.internal.util.TurtleSet;
 import org.jetbrains.annotations.NotNull;
 
+import java.nio.channels.SelectableChannel;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -47,6 +50,8 @@ public class UpdateHelper {
             turtle.getClient().getEventManager().handleEvent(new DiscordChannelCreateEvent(discordChannel));
         if (turtle instanceof MinecraftChannel minecraftChannel)
             turtle.getClient().getEventManager().handleEvent(new MinecraftChannelCreateEvent(minecraftChannel));
+        if (turtle instanceof SyncChannel syncChannel)
+            turtle.getClient().getEventManager().handleEvent(new SyncChannelCreateEvent(syncChannel));
     }
 
     public static void ofDeleteTurtle(@NotNull Turtle turtle) {
@@ -66,6 +71,8 @@ public class UpdateHelper {
             turtle.getClient().getEventManager().handleEvent(new DiscordChannelDeleteEvent(discordChannel));
         if (turtle instanceof MinecraftChannel minecraftChannel)
             turtle.getClient().getEventManager().handleEvent(new MinecraftChannelDeleteEvent(minecraftChannel));
+        if (turtle instanceof SyncChannel syncChannel)
+            turtle.getClient().getEventManager().handleEvent(new SyncChannelDeleteEvent(syncChannel));
     }
 
     /* - GROUP - */
@@ -134,5 +141,29 @@ public class UpdateHelper {
             user.getClient().getEventManager().handleEvent(new UserMinecraftAddEvent(user, newMinecraft));
         for (UUID oldMinecraft : removed)
             user.getClient().getEventManager().handleEvent(new UserMinecraftRemoveEvent(user, oldMinecraft));
+    }
+
+    /* - - - MESSAGES - - - */
+
+    /* - SYNC CHANNEL - */
+
+    public static void ofSyncChannelDiscord(@NotNull SyncChannel syncChannel, @NotNull TurtleSet<DiscordChannel> oldDiscordSet, @NotNull TurtleSet<DiscordChannel> newDiscordSet) {
+        List<DiscordChannel> added   = newDiscordSet.stream().filter(channel -> !oldDiscordSet.containsId(channel.getId())).toList();
+        List<DiscordChannel> removed = oldDiscordSet.stream().filter(channel -> !newDiscordSet.containsId(channel.getId())).toList();
+
+        for (DiscordChannel newDiscord : added)
+            syncChannel.getClient().getEventManager().handleEvent(new SyncChannelDiscordChannelAddEvent(syncChannel, newDiscord));
+        for (DiscordChannel newDiscord : removed)
+            syncChannel.getClient().getEventManager().handleEvent(new SyncChannelDiscordChannelRemoveEvent(syncChannel, newDiscord));
+    }
+
+    public static void ofSyncChannelMinecraft(@NotNull SyncChannel syncChannel, @NotNull TurtleSet<MinecraftChannel> oldMinecraftSet, @NotNull TurtleSet<MinecraftChannel> newMinecraftSet) {
+        List<MinecraftChannel> added   = newMinecraftSet.stream().filter(channel -> !oldMinecraftSet.containsId(channel.getId())).toList();
+        List<MinecraftChannel> removed = oldMinecraftSet.stream().filter(channel -> !newMinecraftSet.containsId(channel.getId())).toList();
+
+        for (MinecraftChannel newMinecraft : added)
+            syncChannel.getClient().getEventManager().handleEvent(new SyncChannelMinecraftChannelAddEvent(syncChannel, newMinecraft));
+        for (MinecraftChannel newMinecraft : removed)
+            syncChannel.getClient().getEventManager().handleEvent(new SyncChannelMinecraftChannelRemoveEvent(syncChannel, newMinecraft));
     }
 }
