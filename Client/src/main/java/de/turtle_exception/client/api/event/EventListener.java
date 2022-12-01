@@ -2,6 +2,7 @@ package de.turtle_exception.client.api.event;
 
 import de.turtle_exception.client.api.event.entities.group.*;
 import de.turtle_exception.client.api.event.entities.json_resource.*;
+import de.turtle_exception.client.api.event.entities.project.*;
 import de.turtle_exception.client.api.event.entities.ticket.*;
 import de.turtle_exception.client.api.event.entities.user.*;
 import de.turtle_exception.client.internal.util.StringUtil;
@@ -29,6 +30,16 @@ public abstract class EventListener {
     public void onJsonResourceUpdateIdentifier(@NotNull JsonResourceUpdateIdentifierEvent event) { }
     public void onJsonResourceUpdateContent(@NotNull JsonResourceUpdateContentEvent event) { }
     public void onJsonResourceUpdateEphemeral(@NotNull JsonResourceUpdateEphemeralEvent event) { }
+
+    // Project Events
+    public void onProjectCreate(@NotNull ProjectCreateEvent event) { }
+    public void onProjectDelete(@NotNull ProjectDeleteEvent event) { }
+    public void onProjectUpdate(@NotNull ProjectUpdateEvent<?> event) { }
+    public void onProjectUpdateTitle(@NotNull ProjectUpdateTitleEvent event) { }
+    public void onProjectUpdateCode(@NotNull ProjectUpdateCodeEvent event) { }
+    public void onProjectUpdateState(@NotNull  ProjectUpdateStateEvent event) { }
+    public void onProjectMemberJoin(@NotNull ProjectMemberJoinEvent event) { }
+    public void onProjectMemberLeave(@NotNull ProjectMemberLeaveEvent event) { }
 
     // User Events
     public void onUserCreate(@NotNull UserCreateEvent event) { }

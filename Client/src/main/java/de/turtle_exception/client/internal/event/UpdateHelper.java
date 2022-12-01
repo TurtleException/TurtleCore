@@ -7,6 +7,10 @@ import de.turtle_exception.client.api.event.entities.group.GroupMemberJoinEvent;
 import de.turtle_exception.client.api.event.entities.group.GroupMemberLeaveEvent;
 import de.turtle_exception.client.api.event.entities.json_resource.JsonResourceCreateEvent;
 import de.turtle_exception.client.api.event.entities.json_resource.JsonResourceDeleteEvent;
+import de.turtle_exception.client.api.event.entities.project.ProjectCreateEvent;
+import de.turtle_exception.client.api.event.entities.project.ProjectDeleteEvent;
+import de.turtle_exception.client.api.event.entities.project.ProjectMemberJoinEvent;
+import de.turtle_exception.client.api.event.entities.project.ProjectMemberLeaveEvent;
 import de.turtle_exception.client.api.event.entities.ticket.*;
 import de.turtle_exception.client.api.event.entities.user.*;
 import de.turtle_exception.client.internal.util.TurtleSet;
@@ -25,6 +29,8 @@ public class UpdateHelper {
             turtle.getClient().getEventManager().handleEvent(new GroupCreateEvent(group));
         if (turtle instanceof JsonResource jsonResource)
             turtle.getClient().getEventManager().handleEvent(new JsonResourceCreateEvent(jsonResource));
+        if (turtle instanceof Project project)
+            turtle.getClient().getEventManager().handleEvent(new ProjectCreateEvent(project));
         if (turtle instanceof Ticket ticket)
             turtle.getClient().getEventManager().handleEvent(new TicketCreateEvent(ticket));
         if (turtle instanceof User user)
@@ -36,6 +42,8 @@ public class UpdateHelper {
             turtle.getClient().getEventManager().handleEvent(new GroupDeleteEvent(group));
         if (turtle instanceof JsonResource jsonResource)
             turtle.getClient().getEventManager().handleEvent(new JsonResourceDeleteEvent(jsonResource));
+        if (turtle instanceof Project project)
+            turtle.getClient().getEventManager().handleEvent(new ProjectDeleteEvent(project));
         if (turtle instanceof Ticket ticket)
             turtle.getClient().getEventManager().handleEvent(new TicketDeleteEvent(ticket));
         if (turtle instanceof User user)
@@ -52,6 +60,18 @@ public class UpdateHelper {
             group.getClient().getEventManager().handleEvent(new GroupMemberJoinEvent(group, newUser));
         for (User oldUser : removed)
             group.getClient().getEventManager().handleEvent(new GroupMemberLeaveEvent(group, oldUser));
+    }
+
+    /* - PROJECT - */
+
+    public static void ofProjectMembers(@NotNull Project project, @NotNull TurtleSet<User> oldUsers, @NotNull TurtleSet<User> newUsers) {
+        List<User> added   = newUsers.stream().filter(user -> !oldUsers.containsId(user.getId())).toList();
+        List<User> removed = oldUsers.stream().filter(user -> !newUsers.containsId(user.getId())).toList();
+
+        for (User newUser : added)
+            project.getClient().getEventManager().handleEvent(new ProjectMemberJoinEvent(project, newUser));
+        for (User oldUser : removed)
+            project.getClient().getEventManager().handleEvent(new ProjectMemberLeaveEvent(project, oldUser));
     }
 
     /* - TICKET - */
