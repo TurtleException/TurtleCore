@@ -3,7 +3,13 @@ package de.turtle_exception.client.internal.entities;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import de.turtle_exception.client.api.entities.attributes.MessageFormat;
+import de.turtle_exception.client.api.entities.attributes.ProjectState;
 import de.turtle_exception.client.api.entities.attributes.TicketState;
+import de.turtle_exception.client.api.entities.messages.DiscordChannel;
+import de.turtle_exception.client.api.entities.messages.IChannel;
+import de.turtle_exception.client.api.entities.messages.MinecraftChannel;
+import de.turtle_exception.client.api.entities.messages.SyncChannel;
 import de.turtle_exception.client.internal.data.annotations.Keys;
 import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.api.entities.Group;
@@ -11,13 +17,16 @@ import de.turtle_exception.client.api.entities.Ticket;
 import de.turtle_exception.client.api.entities.User;
 import de.turtle_exception.client.internal.data.IllegalJsonException;
 import de.turtle_exception.client.internal.data.JsonChecks;
+import de.turtle_exception.client.internal.entities.messages.DiscordChannelImpl;
+import de.turtle_exception.client.internal.entities.messages.MinecraftChannelImpl;
+import de.turtle_exception.client.internal.entities.messages.SyncChannelImpl;
+import de.turtle_exception.client.internal.entities.messages.SyncMessageImpl;
 import de.turtle_exception.client.internal.util.Checks;
 import de.turtle_exception.client.internal.util.TurtleSet;
 import de.turtle_exception.client.internal.util.logging.NestedLogger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -56,6 +65,40 @@ public class EntityBuilder {
         }
 
         return new GroupImpl(client, id, name, users);
+    }
+
+    public static @NotNull JsonResourceImpl buildJsonResource(@NotNull JsonObject data, @NotNull TurtleClient client) throws NullPointerException, IllegalArgumentException, IllegalJsonException {
+        Checks.nonNull(data, "JSON");
+        JsonChecks.validateJsonResource(data);
+
+        long        id         = data.get(Keys.Turtle.ID).getAsLong();
+        String      identifier = data.get(Keys.JsonResource.IDENTIFIER).getAsString();
+        JsonElement content    = data.get(Keys.JsonResource.CONTENT);
+        boolean     ephemeral  = data.get(Keys.JsonResource.EPHEMERAL).getAsBoolean();
+
+        return new JsonResourceImpl(client, id, identifier, content, ephemeral);
+    }
+
+    public static @NotNull ProjectImpl buildProject(@NotNull JsonObject data, @NotNull TurtleClient client) throws NullPointerException, IllegalArgumentException, IllegalJsonException {
+        Checks.nonNull(data, "JSON");
+        JsonChecks.validateProject(data);
+
+        long         id    = data.get(Keys.Turtle.ID).getAsLong();
+        String       title = data.get(Keys.Project.TITLE).getAsString();
+        String       code  = data.get(Keys.Project.CODE).getAsString();
+        ProjectState state = ProjectState.of(data.get(Keys.Project.STATE).getAsByte());
+
+        JsonArray       userArr  = data.getAsJsonArray(Keys.Project.MEMBERS);
+        TurtleSet<User> users    = new TurtleSet<>();
+        for (JsonElement element : userArr) {
+            User userElement = client.getUserById(element.getAsLong());
+            if (userElement == null)
+                log(client, Level.FINE, "Project", id, "Could not link User:" + element.getAsLong() + ". Has it been deleted?");
+            else
+                users.add(userElement);
+        }
+
+        return new ProjectImpl(client, id, title, code, state, users);
     }
 
     public static @NotNull Ticket buildTicket(@NotNull JsonObject data, @NotNull TurtleClient client) throws NullPointerException, IllegalArgumentException, IllegalJsonException {
@@ -116,5 +159,85 @@ public class EntityBuilder {
             minecraftList.add(UUID.fromString(element.getAsString()));
 
         return new UserImpl(client, id, name, discordList, minecraftList);
+    }
+
+    /* - MESSAGES - */
+
+    public static @NotNull DiscordChannelImpl buildDiscordChannel(@NotNull JsonObject data, @NotNull TurtleClient client) throws NullPointerException, IllegalArgumentException, IllegalJsonException {
+        Checks.nonNull(data, "JSON");
+        JsonChecks.validateDiscordChannel(data);
+
+        long        id          = data.get(Keys.Turtle.ID).getAsLong();
+        SyncChannel syncChannel = client.getChannelById(data.get(Keys.Messages.IChannel.SYNC_CHANNEL).getAsLong());
+        long        snowflake   = data.get(Keys.Messages.DiscordChannel.SNOWFLAKE).getAsLong();
+
+        return new DiscordChannelImpl(client, id, syncChannel, snowflake);
+    }
+
+    public static @NotNull MinecraftChannelImpl buildMinecraftChannel(@NotNull JsonObject data, @NotNull TurtleClient client) throws NullPointerException, IllegalArgumentException, IllegalJsonException {
+        Checks.nonNull(data, "JSON");
+        JsonChecks.validateMinecraftChannel(data);
+
+        long           id          = data.get(Keys.Turtle.ID).getAsLong();
+        SyncChannel    syncChannel = client.getChannelById(data.get(Keys.Messages.IChannel.SYNC_CHANNEL).getAsLong());
+        MinecraftChannel.Type type = MinecraftChannel.Type.of(data.get(Keys.Messages.MinecraftChannel.TYPE).getAsByte());
+        String         identifier  = data.get(Keys.Messages.MinecraftChannel.IDENTIFIER).getAsString();
+
+        return new MinecraftChannelImpl(client, id, syncChannel, type, identifier);
+    }
+
+    public static @NotNull SyncChannelImpl buildSyncChannel(@NotNull JsonObject data, @NotNull TurtleClient client) throws NullPointerException, IllegalArgumentException, IllegalJsonException {
+        Checks.nonNull(data, "JSON");
+        JsonChecks.validateSyncChannel(data);
+
+        long        id          = data.get(Keys.Turtle.ID).getAsLong();
+
+        JsonArray                 discordArr  = data.getAsJsonArray(Keys.Messages.SyncChannel.DISCORD);
+        TurtleSet<DiscordChannel> discord    = new TurtleSet<>();
+        for (JsonElement element : discordArr) {
+            DiscordChannel channelElement = client.getDiscordChannelById(element.getAsLong());
+            if (channelElement == null)
+                log(client, Level.FINE, "SyncChannel", id, "Could not link DiscordChannel:" + element.getAsLong() + ". Has it been deleted?");
+            else
+                discord.add(channelElement);
+        }
+
+        JsonArray                   minecraftArr  = data.getAsJsonArray(Keys.Messages.SyncChannel.MINECRAFT);
+        TurtleSet<MinecraftChannel> minecraft    = new TurtleSet<>();
+        for (JsonElement element : minecraftArr) {
+            MinecraftChannel channelElement = client.getMinecraftChannelById(element.getAsLong());
+            if (channelElement == null)
+                log(client, Level.FINE, "SyncChannel", id, "Could not link MinecraftChannel:" + element.getAsLong() + ". Has it been deleted?");
+            else
+                minecraft.add(channelElement);
+        }
+
+        return new SyncChannelImpl(client, id, discord, minecraft);
+    }
+
+    public static @NotNull SyncMessageImpl buildMessage(@NotNull JsonObject data, @NotNull TurtleClient client) throws NullPointerException, IllegalArgumentException, IllegalJsonException {
+        Checks.nonNull(data, "JSON");
+        JsonChecks.validateMessage(data);
+
+        long          id      = data.get(Keys.Turtle.ID).getAsLong();
+        MessageFormat format  = MessageFormat.of(data.get(Keys.Messages.SyncMessage.FORMAT).getAsByte());
+        User          author  = client.getUserById(data.get(Keys.Messages.SyncMessage.AUTHOR).getAsLong());
+        String        content = data.get(Keys.Messages.SyncMessage.CONTENT).getAsString();
+        SyncChannel  channel  = client.getChannelById(data.get(Keys.Messages.SyncMessage.CHANNEL).getAsLong());
+
+        Long reference = null;
+        if (data.has(Keys.Messages.SyncMessage.REFERENCE))
+            reference = data.get(Keys.Messages.SyncMessage.REFERENCE).getAsLong();
+
+        IChannel source = null;
+        if (data.has(Keys.Messages.SyncMessage.SOURCE)) {
+            long sourceId = data.get(Keys.Messages.SyncMessage.SOURCE).getAsLong();
+
+            source = client.getDiscordChannelById(sourceId);
+            if (source == null)
+                source = client.getMinecraftChannelById(sourceId);
+        }
+
+        return new SyncMessageImpl(client, id, format, author, content, reference, channel, source);
     }
 }

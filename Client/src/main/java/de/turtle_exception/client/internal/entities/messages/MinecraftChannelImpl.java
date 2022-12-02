@@ -19,7 +19,7 @@ public class MinecraftChannelImpl extends ChannelImpl implements MinecraftChanne
     private Type type;
     private String identifier;
 
-    protected MinecraftChannelImpl(@NotNull TurtleClient client, long id, SyncChannel syncChannel, Type type, String identifier) {
+    public MinecraftChannelImpl(@NotNull TurtleClient client, long id, SyncChannel syncChannel, Type type, String identifier) {
         super(client, id, syncChannel);
 
         this.type        = type;

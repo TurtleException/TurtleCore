@@ -21,7 +21,7 @@ public class SyncChannelImpl extends TurtleImpl implements SyncChannel {
     private TurtleSet<DiscordChannel>   discordChannels;
     private TurtleSet<MinecraftChannel> minecraftChannels;
 
-    protected SyncChannelImpl(@NotNull TurtleClient client, long id, TurtleSet<DiscordChannel> discordChannels, TurtleSet<MinecraftChannel> minecraftChannels) {
+    public SyncChannelImpl(@NotNull TurtleClient client, long id, TurtleSet<DiscordChannel> discordChannels, TurtleSet<MinecraftChannel> minecraftChannels) {
         super(client, id);
 
         this.discordChannels   = discordChannels;

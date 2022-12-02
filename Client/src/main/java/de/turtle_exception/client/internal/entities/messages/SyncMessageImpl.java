@@ -22,7 +22,7 @@ public class SyncMessageImpl extends TurtleImpl implements SyncMessage {
     private SyncChannel channel;
     private IChannel source;
 
-    protected SyncMessageImpl(@NotNull TurtleClient client, long id, MessageFormat format, User author, String content, long reference, SyncChannel channel, IChannel source) {
+    public SyncMessageImpl(@NotNull TurtleClient client, long id, MessageFormat format, User author, String content, Long reference, SyncChannel channel, IChannel source) {
         super(client, id);
 
         this.format    = format;

@@ -16,7 +16,7 @@ import org.jetbrains.annotations.NotNull;
 public class DiscordChannelImpl extends ChannelImpl implements DiscordChannel {
     private long snowflake;
 
-    protected DiscordChannelImpl(@NotNull TurtleClient client, long id, SyncChannel syncChannel, long snowflake) {
+    public DiscordChannelImpl(@NotNull TurtleClient client, long id, SyncChannel syncChannel, long snowflake) {
         super(client, id, syncChannel);
 
         this.snowflake   = snowflake;
