@@ -5,6 +5,8 @@ import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.api.entities.messages.DiscordChannel;
 import de.turtle_exception.client.api.entities.messages.SyncChannel;
 import de.turtle_exception.client.api.entities.messages.SyncMessage;
+import de.turtle_exception.client.api.request.Action;
+import de.turtle_exception.client.internal.data.annotations.Keys;
 import de.turtle_exception.client.internal.entities.TurtleImpl;
 import net.dv8tion.jda.api.entities.Message;
 import org.jetbrains.annotations.NotNull;
@@ -36,8 +38,22 @@ public class DiscordChannelImpl extends ChannelImpl implements DiscordChannel {
         // TODO
     }
 
+    /* - SYNC_CHANNEL - */
+
+    @Override
+    public @NotNull Action<DiscordChannel> modifySyncChannel(long syncChannel) {
+        return getClient().getProvider().patch(this, Keys.Messages.IChannel.SYNC_CHANNEL, syncChannel).andThenParse(DiscordChannel.class);
+    }
+
+    /* - SNOWFLAKE - */
+
     @Override
     public long getSnowflake() {
         return this.snowflake;
+    }
+
+    @Override
+    public @NotNull Action<DiscordChannel> modifySnowflake(long snowflake) {
+        return getClient().getProvider().patch(this, Keys.Messages.DiscordChannel.SNOWFLAKE, snowflake).andThenParse(DiscordChannel.class);
     }
 }

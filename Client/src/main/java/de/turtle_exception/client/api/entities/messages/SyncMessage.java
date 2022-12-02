@@ -57,10 +57,10 @@ public interface SyncMessage extends Turtle {
     @Key(name = Keys.Messages.SyncMessage.CHANNEL, sqlType = Types.Messages.SyncMessage.CHANNEL)
     @NotNull SyncChannel getChannel();
 
-    @NotNull Action<SyncMessage> modifyChannel(@Nullable Long reference);
+    @NotNull Action<SyncMessage> modifyChannel(@NotNull Long channel);
 
-    default @NotNull Action<SyncMessage> modifyChannel(SyncChannel channel) {
-        return this.modifyChannel(channel == null ? null : channel.getId());
+    default @NotNull Action<SyncMessage> modifyChannel(@NotNull SyncChannel channel) {
+        return this.modifyChannel(channel.getId());
     }
 
     // not relational -> the id is stored with the message, that's it

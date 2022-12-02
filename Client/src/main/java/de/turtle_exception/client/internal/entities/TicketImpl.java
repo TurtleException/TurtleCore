@@ -105,7 +105,7 @@ public class TicketImpl extends TurtleImpl implements Ticket {
 
     @Override
     public @NotNull Action<Ticket> modifyTitle(@Nullable String title) {
-        return getClient().getProvider().patch(this, Keys.Ticket.TITLE, String.valueOf(title)).andThenParse(Ticket.class);
+        return getClient().getProvider().patch(this, Keys.Ticket.TITLE, title).andThenParse(Ticket.class);
     }
 
     /* - CATEGORY - */

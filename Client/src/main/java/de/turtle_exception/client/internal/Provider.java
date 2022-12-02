@@ -74,7 +74,7 @@ public abstract class Provider {
 
     public abstract <T extends Turtle> @NotNull ActionImpl<JsonObject> patch(@NotNull Class<T> type, @NotNull JsonObject content, long id) throws AnnotationFormatError;
 
-    public <T extends Turtle> @NotNull ActionImpl<JsonObject> patch(@NotNull T turtle, @NotNull String key, @NotNull Object obj) throws AnnotationFormatError {
+    public <T extends Turtle> @NotNull ActionImpl<JsonObject> patch(@NotNull T turtle, @NotNull String key, Object obj) throws AnnotationFormatError {
         JsonObject json = new JsonObject();
         ResourceUtil.addValue(json, key, obj);
         return this.patch(turtle.getClass(), json, turtle.getId());
