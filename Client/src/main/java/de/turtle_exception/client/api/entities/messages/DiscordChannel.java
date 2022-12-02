@@ -16,8 +16,19 @@ public interface DiscordChannel extends IChannel {
         return this.getClient().retrieveDiscordChannel(this.getId());
     }
 
+    @Override
+    @NotNull Action<DiscordChannel> modifySyncChannel(long syncChannel);
+
+    @Override
+    @NotNull
+    default Action<DiscordChannel> modifySyncChannel(@NotNull SyncChannel channel) {
+        return this.modifySyncChannel(channel.getId());
+    }
+
     @Key(name = Keys.Messages.DiscordChannel.SNOWFLAKE, sqlType = Types.Messages.DiscordChannel.SNOWFLAKE)
     long getSnowflake();
+
+    @NotNull Action<DiscordChannel> modifySnowflake(long snowflake);
 
     void receive(@NotNull Message msg);
 }

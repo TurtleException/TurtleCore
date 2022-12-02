@@ -21,10 +21,16 @@ public interface Project extends Turtle, IUserContainer {
     @Key(name = Keys.Project.TITLE, sqlType = Types.Project.TITLE)
     @Nullable String getTitle();
 
+    @NotNull Action<Project> modifyTitle(@Nullable String title);
+
     @Key(name = Keys.Project.CODE, sqlType = Types.Project.CODE)
     @NotNull String getCode();
 
+    @NotNull Action<Project> modifyCode(@NotNull String code);
+
     @NotNull ProjectState getState();
+
+    @NotNull Action<Project> modifyState(@NotNull ProjectState state);
 
     @Key(name = Keys.Project.STATE, sqlType = Types.Project.STATE)
     default byte getStateCode() {
@@ -35,6 +41,18 @@ public interface Project extends Turtle, IUserContainer {
     @Key(name = Keys.Project.MEMBERS, relation = Relation.MANY_TO_MANY, sqlType = Types.Project.MEMBERS)
     @Relational(table = "project_members", self = "project", foreign = "user", type = User.class)
     @NotNull List<User> getUsers();
+
+    @NotNull Action<Project> addUser(long user);
+
+    default @NotNull Action<Project> addUser(@NotNull User user) {
+        return this.addUser(user.getId());
+    }
+
+    @NotNull Action<Project> removeUser(long user);
+
+    default @NotNull Action<Project> removeUser(@NotNull User user) {
+        return this.removeUser(user.getId());
+    }
 
     // TODO: times
 

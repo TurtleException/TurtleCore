@@ -32,6 +32,8 @@ public interface JsonResource extends Turtle {
     @Key(name = Keys.JsonResource.IDENTIFIER, sqlType = Types.JsonResource.IDENTIFIER)
     @NotNull String getIdentifier();
 
+    @NotNull Action<JsonResource> modifyIdentifier(@NotNull String identifier);
+
     /**
      * Provides the underlying data in form of a {@link JsonElement}. This would probably be a {@link JsonObject} or
      * {@link JsonArray} for most use-cases of this resource.
@@ -39,6 +41,8 @@ public interface JsonResource extends Turtle {
      */
     @Key(name = Keys.JsonResource.CONTENT, sqlType = Types.JsonResource.CONTENT)
     @NotNull JsonElement getContent();
+
+    @NotNull Action<JsonResource> modifyContent(@NotNull JsonElement content);
 
     // TODO: update this when the event-thing is implemented
     /**
@@ -51,4 +55,6 @@ public interface JsonResource extends Turtle {
      */
     @Key(name = Keys.JsonResource.EPHEMERAL, sqlType = Types.JsonResource.EPHEMERAL)
     boolean isEphemeral();
+
+    @NotNull Action<JsonResource> modifyEphemeral(boolean ephemeral);
 }

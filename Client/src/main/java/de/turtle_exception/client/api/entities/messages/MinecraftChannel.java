@@ -15,6 +15,15 @@ public interface MinecraftChannel extends IChannel {
         return this.getClient().retrieveMinecraftChannel(this.getId());
     }
 
+    @Override
+    @NotNull Action<MinecraftChannel> modifySyncChannel(long syncChannel);
+
+    @Override
+    @NotNull
+    default Action<MinecraftChannel> modifySyncChannel(@NotNull SyncChannel channel) {
+        return this.modifySyncChannel(channel.getId());
+    }
+
     enum Type {
         USER((byte) 0),
         WORLD((byte) 1),
@@ -33,8 +42,12 @@ public interface MinecraftChannel extends IChannel {
 
     @NotNull Type getType();
 
+    @NotNull Action<MinecraftChannel> modifyType(@NotNull Type type);
+
     @Key(name = Keys.Messages.MinecraftChannel.IDENTIFIER, sqlType = Types.Messages.MinecraftChannel.IDENTIFIER)
     @NotNull String getIdentifier();
+
+    @NotNull Action<MinecraftChannel> modifyIdentifier(@NotNull String identifier);
 
     default @NotNull UUID getUUID() throws IllegalStateException {
         if (this.getType() == Type.SERVER)

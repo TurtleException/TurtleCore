@@ -9,12 +9,13 @@ import de.turtle_exception.client.api.entities.messages.SyncChannel;
 import de.turtle_exception.client.api.entities.messages.SyncMessage;
 import de.turtle_exception.client.internal.entities.TurtleImpl;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class SyncMessageImpl extends TurtleImpl implements SyncMessage {
     private MessageFormat format;
     private User author;
     private String content;
-    private long reference;
+    private Long reference;
     private SyncChannel channel;
     private IChannel source;
 
@@ -59,7 +60,7 @@ public class SyncMessageImpl extends TurtleImpl implements SyncMessage {
     }
 
     @Override
-    public long getReference() {
+    public @Nullable Long getReference() {
         return this.reference;
     }
 

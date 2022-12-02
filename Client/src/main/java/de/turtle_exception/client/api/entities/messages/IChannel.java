@@ -18,6 +18,12 @@ public interface IChannel extends Turtle {
     @Key(name = Keys.Messages.IChannel.SYNC_CHANNEL, relation = Relation.MANY_TO_ONE, sqlType = Types.Messages.IChannel.SYNC_CHANNEL)
     @NotNull SyncChannel getSyncChannel();
 
+    @NotNull Action<? extends IChannel> modifySyncChannel(long syncChannel);
+
+    default @NotNull Action<? extends IChannel> modifySyncChannel(@NotNull SyncChannel channel) {
+        return this.modifySyncChannel(channel.getId());
+    }
+
     // TODO
     void send(@NotNull SyncMessage msg);
 }
