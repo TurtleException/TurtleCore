@@ -1,5 +1,6 @@
 package de.turtle_exception.client.internal.entities.messages;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.api.entities.Turtle;
@@ -9,6 +10,7 @@ import de.turtle_exception.client.api.entities.messages.SyncChannel;
 import de.turtle_exception.client.api.request.Action;
 import de.turtle_exception.client.internal.data.annotations.Keys;
 import de.turtle_exception.client.internal.entities.TurtleImpl;
+import de.turtle_exception.client.internal.event.UpdateHelper;
 import de.turtle_exception.client.internal.util.TurtleSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -16,8 +18,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 public class SyncChannelImpl extends TurtleImpl implements SyncChannel {
-    private final TurtleSet<DiscordChannel>   discordChannels;
-    private final TurtleSet<MinecraftChannel> minecraftChannels;
+    private TurtleSet<DiscordChannel>   discordChannels;
+    private TurtleSet<MinecraftChannel> minecraftChannels;
 
     protected SyncChannelImpl(@NotNull TurtleClient client, long id, TurtleSet<DiscordChannel> discordChannels, TurtleSet<MinecraftChannel> minecraftChannels) {
         super(client, id);
@@ -28,8 +30,23 @@ public class SyncChannelImpl extends TurtleImpl implements SyncChannel {
 
     @Override
     public @NotNull TurtleImpl handleUpdate(@NotNull JsonObject json) {
-        // TODO
-        return null;
+        this.apply(json, Keys.Messages.SyncChannel.DISCORD, element -> {
+            TurtleSet<DiscordChannel> old = this.discordChannels;
+            TurtleSet<DiscordChannel> set = new TurtleSet<>();
+            for (JsonElement entry : element.getAsJsonArray())
+                set.add(client.getDiscordChannelById(entry.getAsLong()));
+            this.discordChannels = set;
+            UpdateHelper.ofSyncChannelDiscord(this, old, set);
+        });
+        this.apply(json, Keys.Messages.SyncChannel.MINECRAFT, element -> {
+            TurtleSet<MinecraftChannel> old = this.minecraftChannels;
+            TurtleSet<MinecraftChannel> set = new TurtleSet<>();
+            for (JsonElement entry : element.getAsJsonArray())
+                set.add(client.getMinecraftChannelById(entry.getAsLong()));
+            this.minecraftChannels = set;
+            UpdateHelper.ofSyncChannelMinecraft(this, old, set);
+        });
+        return this;
     }
 
     /* - - - */

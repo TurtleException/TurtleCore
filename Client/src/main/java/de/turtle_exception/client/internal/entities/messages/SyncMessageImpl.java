@@ -1,6 +1,5 @@
 package de.turtle_exception.client.internal.entities.messages;
 
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.api.entities.User;
@@ -8,6 +7,7 @@ import de.turtle_exception.client.api.entities.attributes.MessageFormat;
 import de.turtle_exception.client.api.entities.messages.IChannel;
 import de.turtle_exception.client.api.entities.messages.SyncChannel;
 import de.turtle_exception.client.api.entities.messages.SyncMessage;
+import de.turtle_exception.client.api.event.entities.messages.sync_message.*;
 import de.turtle_exception.client.api.request.Action;
 import de.turtle_exception.client.internal.data.annotations.Keys;
 import de.turtle_exception.client.internal.entities.TurtleImpl;
@@ -35,8 +35,39 @@ public class SyncMessageImpl extends TurtleImpl implements SyncMessage {
 
     @Override
     public @NotNull TurtleImpl handleUpdate(@NotNull JsonObject json) {
-        // TODO
-        return null;
+        this.apply(json, Keys.Messages.SyncMessage.FORMAT, element -> {
+            MessageFormat old = this.format;
+            this.format = MessageFormat.of(json.getAsByte());
+            this.fireEvent(new SyncMessageUpdateFormatEvent(this, old, this.format));
+        });
+        this.apply(json, Keys.Messages.SyncMessage.AUTHOR, element -> {
+            User old = this.author;
+            this.author = client.getUserById(element.getAsLong());
+            this.fireEvent(new SyncMessageUpdateAuthorEvent(this, old, this.author));
+        });
+        this.apply(json, Keys.Messages.SyncMessage.CONTENT, element -> {
+            String old = this.content;
+            this.content = element.getAsString();
+            this.fireEvent(new SyncMessageUpdateContentEvent(this, old, this.content));
+        });
+        this.apply(json, Keys.Messages.SyncMessage.REFERENCE, element -> {
+            long old = this.reference;
+            this.reference = element.getAsLong();
+            this.fireEvent(new SyncMessageUpdateReferenceEvent(this, old, this.reference));
+        });
+        this.apply(json, Keys.Messages.SyncMessage.CHANNEL, element -> {
+            SyncChannel old = this.channel;
+            this.channel = client.getChannelById(element.getAsLong());
+            this.fireEvent(new SyncMessageUpdateChannelEvent(this, old, this.channel));
+        });
+        this.apply(json, Keys.Messages.SyncMessage.SOURCE, element -> {
+            IChannel old = this.source;
+            this.source = client.getDiscordChannelById(element.getAsLong());
+            if (this.source == null)
+                this.source = client.getMinecraftChannelById(element.getAsLong());
+            this.fireEvent(new SyncMessageUpdateSourceEvent(this, old, this.source));
+        });
+        return this;
     }
 
     /* - FORMAT - */

@@ -5,6 +5,8 @@ import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.api.entities.messages.DiscordChannel;
 import de.turtle_exception.client.api.entities.messages.SyncChannel;
 import de.turtle_exception.client.api.entities.messages.SyncMessage;
+import de.turtle_exception.client.api.event.entities.messages.discord_channel.DiscordChannelUpdateSnowflakeEvent;
+import de.turtle_exception.client.api.event.entities.messages.discord_channel.DiscordChannelUpdateSyncChannelEvent;
 import de.turtle_exception.client.api.request.Action;
 import de.turtle_exception.client.internal.data.annotations.Keys;
 import de.turtle_exception.client.internal.entities.TurtleImpl;
@@ -22,8 +24,17 @@ public class DiscordChannelImpl extends ChannelImpl implements DiscordChannel {
 
     @Override
     public @NotNull TurtleImpl handleUpdate(@NotNull JsonObject json) {
-        // TODO
-        return null;
+        this.apply(json, Keys.Messages.IChannel.SYNC_CHANNEL, element -> {
+            SyncChannel old = this.syncChannel;
+            this.syncChannel = client.getChannelById(element.getAsLong());
+            this.fireEvent(new DiscordChannelUpdateSyncChannelEvent(this, old, this.syncChannel));
+        });
+        this.apply(json, Keys.Messages.DiscordChannel.SNOWFLAKE, element -> {
+            long old = this.snowflake;
+            this.snowflake = element.getAsLong();
+            this.fireEvent(new DiscordChannelUpdateSnowflakeEvent(this, old, this.snowflake));
+        });
+        return this;
     }
 
     /* - - - */

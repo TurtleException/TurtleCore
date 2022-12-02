@@ -27,11 +27,19 @@ public interface MinecraftChannel extends IChannel {
     enum Type {
         USER((byte) 0),
         WORLD((byte) 1),
-        SERVER((byte) 2);
+        SERVER((byte) 2),
+        UNDEFINED(Byte.MAX_VALUE);
 
         public final byte code;
         Type(byte code) {
             this.code = code;
+        }
+
+        public static @NotNull Type of(byte code) {
+            for (Type value : Type.values())
+                if (value.code == code)
+                    return value;
+            return Type.UNDEFINED;
         }
     }
 

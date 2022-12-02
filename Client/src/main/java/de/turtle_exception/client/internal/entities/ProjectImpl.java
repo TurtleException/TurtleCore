@@ -1,13 +1,18 @@
 package de.turtle_exception.client.internal.entities;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.api.entities.JsonResource;
 import de.turtle_exception.client.api.entities.Project;
 import de.turtle_exception.client.api.entities.User;
 import de.turtle_exception.client.api.entities.attributes.ProjectState;
+import de.turtle_exception.client.api.event.entities.project.ProjectUpdateCodeEvent;
+import de.turtle_exception.client.api.event.entities.project.ProjectUpdateStateEvent;
+import de.turtle_exception.client.api.event.entities.project.ProjectUpdateTitleEvent;
 import de.turtle_exception.client.api.request.Action;
 import de.turtle_exception.client.internal.data.annotations.Keys;
+import de.turtle_exception.client.internal.event.UpdateHelper;
 import de.turtle_exception.client.internal.util.TurtleSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -19,7 +24,7 @@ public class ProjectImpl extends TurtleImpl implements Project {
     private String code;
     private ProjectState state;
 
-    private final TurtleSet<User> users;
+    private TurtleSet<User> users;
 
     protected ProjectImpl(@NotNull TurtleClient client, long id, String title, String code, ProjectState state, TurtleSet<User> users) {
         super(client, id);
@@ -33,8 +38,30 @@ public class ProjectImpl extends TurtleImpl implements Project {
 
     @Override
     public @NotNull ProjectImpl handleUpdate(@NotNull JsonObject json) {
-        // TODO
-        return null;
+        this.apply(json, Keys.Project.TITLE, element -> {
+            String old = this.title;
+            this.title = element.getAsString();
+            this.fireEvent(new ProjectUpdateTitleEvent(this, old, this.title));
+        });
+        this.apply(json, Keys.Project.CODE, element -> {
+            String old = this.code;
+            this.code = element.getAsString();
+            this.fireEvent(new ProjectUpdateCodeEvent(this, old, this.code));
+        });
+        this.apply(json, Keys.Project.STATE, element -> {
+            ProjectState old = this.state;
+            this.state = ProjectState.of(element.getAsByte());
+            this.fireEvent(new ProjectUpdateStateEvent(this, old, this.state));
+        });
+        this.apply(json, Keys.Project.MEMBERS, element -> {
+            TurtleSet<User> old = this.users;
+            TurtleSet<User> set = new TurtleSet<>();
+            for (JsonElement entry : element.getAsJsonArray())
+                set.add(client.getUserById(entry.getAsLong()));
+            this.users = set;
+            UpdateHelper.ofProjectMembers(this, old, set);
+        });
+        return this;
     }
 
     /* - TITLE - */

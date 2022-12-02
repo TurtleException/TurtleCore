@@ -4,6 +4,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.api.entities.JsonResource;
+import de.turtle_exception.client.api.event.entities.json_resource.JsonResourceUpdateContentEvent;
+import de.turtle_exception.client.api.event.entities.json_resource.JsonResourceUpdateEphemeralEvent;
+import de.turtle_exception.client.api.event.entities.json_resource.JsonResourceUpdateIdentifierEvent;
 import de.turtle_exception.client.api.request.Action;
 import de.turtle_exception.client.internal.data.annotations.Keys;
 import org.jetbrains.annotations.NotNull;
@@ -23,8 +26,22 @@ public class JsonResourceImpl extends TurtleImpl implements JsonResource {
 
     @Override
     public @NotNull JsonResourceImpl handleUpdate(@NotNull JsonObject json) {
-        // TODO
-        return null;
+        this.apply(json, Keys.JsonResource.IDENTIFIER, element -> {
+            String old = this.identifier;
+            this.identifier = element.getAsString();
+            this.fireEvent(new JsonResourceUpdateIdentifierEvent(this, old, this.identifier));
+        });
+        this.apply(json, Keys.JsonResource.CONTENT, element -> {
+            JsonElement old = this.content;
+            this.content = element;
+            this.fireEvent(new JsonResourceUpdateContentEvent(this, old, this.content));
+        });
+        this.apply(json, Keys.JsonResource.EPHEMERAL, element -> {
+            boolean old = this.ephemeral;
+            this.ephemeral = element.getAsBoolean();
+            this.fireEvent(new JsonResourceUpdateEphemeralEvent(this, old, this.ephemeral));
+        });
+        return this;
     }
 
     /* - IDENTIFIER - */
