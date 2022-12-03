@@ -42,7 +42,7 @@ public class SyncMessageImpl extends TurtleImpl implements SyncMessage {
         });
         this.apply(json, Keys.Messages.SyncMessage.AUTHOR, element -> {
             User old = this.author;
-            this.author = client.getUserById(element.getAsLong());
+            this.author = client.getTurtleById(element.getAsLong(), User.class);
             this.fireEvent(new SyncMessageUpdateAuthorEvent(this, old, this.author));
         });
         this.apply(json, Keys.Messages.SyncMessage.CONTENT, element -> {
@@ -57,14 +57,12 @@ public class SyncMessageImpl extends TurtleImpl implements SyncMessage {
         });
         this.apply(json, Keys.Messages.SyncMessage.CHANNEL, element -> {
             SyncChannel old = this.channel;
-            this.channel = client.getChannelById(element.getAsLong());
+            this.channel = client.getTurtleById(element.getAsLong(), SyncChannel.class);
             this.fireEvent(new SyncMessageUpdateChannelEvent(this, old, this.channel));
         });
         this.apply(json, Keys.Messages.SyncMessage.SOURCE, element -> {
             IChannel old = this.source;
-            this.source = client.getDiscordChannelById(element.getAsLong());
-            if (this.source == null)
-                this.source = client.getMinecraftChannelById(element.getAsLong());
+            this.source = client.getTurtleById(element.getAsLong(), IChannel.class);
             this.fireEvent(new SyncMessageUpdateSourceEvent(this, old, this.source));
         });
         return this;

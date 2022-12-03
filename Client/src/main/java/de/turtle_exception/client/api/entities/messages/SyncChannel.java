@@ -1,8 +1,7 @@
 package de.turtle_exception.client.api.entities.messages;
 
 import de.turtle_exception.client.api.entities.Turtle;
-import de.turtle_exception.client.api.entities.containers.messages.IDiscordChannelContainer;
-import de.turtle_exception.client.api.entities.containers.messages.IMinecraftChannelContainer;
+import de.turtle_exception.client.api.entities.containers.TurtleContainer;
 import de.turtle_exception.client.api.request.Action;
 import de.turtle_exception.client.internal.data.annotations.*;
 import org.jetbrains.annotations.NotNull;
@@ -10,28 +9,29 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Stream;
 
 @Resource(path = "channels", builder = "buildSyncChannel")
 @SuppressWarnings("unused")
-public interface SyncChannel extends Turtle, IDiscordChannelContainer, IMinecraftChannelContainer {
+public interface SyncChannel extends Turtle, TurtleContainer<IChannel> {
     @Override
     default @NotNull Action<SyncChannel> update() {
         return this.getClient().retrieveChannel(this.getId());
     }
 
     @Override
-    default @NotNull List<Turtle> getTurtles() {
-        ArrayList<Turtle> list = new ArrayList<>();
+    default @NotNull List<IChannel> getTurtles() {
+        ArrayList<IChannel> list = new ArrayList<>();
         list.addAll(this.getDiscordChannels());
         list.addAll(this.getMinecraftChannels());
         return List.copyOf(list);
     }
 
     @Override
-    @Nullable Turtle getTurtleById(long id);
+    @Nullable IChannel getTurtleById(long id);
 
     /* - DISCORD - */
+
+    @NotNull List<DiscordChannel> getDiscordChannels();
 
     @NotNull Action<SyncChannel> addDiscordChannel(long discordChannel);
 
@@ -47,6 +47,8 @@ public interface SyncChannel extends Turtle, IDiscordChannelContainer, IMinecraf
 
     /* - MINECRAFT - */
 
+    @NotNull List<MinecraftChannel> getMinecraftChannels();
+
     @NotNull Action<SyncChannel> addMinecraftChannel(long minecraftChannel);
 
     default @NotNull Action<SyncChannel> addMinecraftChanel(@NotNull MinecraftChannel minecraftChannel) {
@@ -60,13 +62,6 @@ public interface SyncChannel extends Turtle, IDiscordChannelContainer, IMinecraf
     }
 
     /* - - - */
-
-    default @NotNull List<IChannel> getChannels() {
-        return Stream.concat(
-                this.getDiscordChannels().stream(),
-                this.getMinecraftChannels().stream()
-        ).toList();
-    }
 
     // TODO: send & receive
 }

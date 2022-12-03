@@ -77,11 +77,16 @@ public class TicketImpl extends TurtleImpl implements Ticket {
             TurtleSet<User> old = this.users;
             TurtleSet<User> set = new TurtleSet<>();
             for (JsonElement entry : element.getAsJsonArray())
-                set.add(client.getUserById(entry.getAsLong()));
+                set.add(client.getTurtleById(entry.getAsLong(), User.class));
             this.users = set;
             UpdateHelper.ofTicketUsers(this, old, set);
         });
         return this;
+    }
+
+    @Override
+    public @Nullable User getTurtleById(long id) {
+        return this.users.get(id);
     }
 
     /* - STATE - */
@@ -154,15 +159,6 @@ public class TicketImpl extends TurtleImpl implements Ticket {
     @Override
     public @NotNull List<User> getUsers() {
         return List.copyOf(users);
-    }
-
-    public @NotNull TurtleSet<User> getUserSet() {
-        return users;
-    }
-
-    @Override
-    public @Nullable User getUserById(long id) {
-        return users.get(id);
     }
 
     @Override

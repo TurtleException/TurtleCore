@@ -54,7 +54,7 @@ public class EntityBuilder {
         JsonArray       userArr  = data.getAsJsonArray(Keys.Group.MEMBERS);
         TurtleSet<User> users    = new TurtleSet<>();
         for (JsonElement element : userArr) {
-            User userElement = client.getUserById(element.getAsLong());
+            User userElement = client.getTurtleById(element.getAsLong(), User.class);
             if (userElement == null)
                 log(client, Level.FINE, "Group", id, "Could not link User:" + element.getAsLong() + ". Has it been deleted?");
             else
@@ -86,7 +86,7 @@ public class EntityBuilder {
         JsonArray       userArr  = data.getAsJsonArray(Keys.Project.MEMBERS);
         TurtleSet<User> users    = new TurtleSet<>();
         for (JsonElement element : userArr) {
-            User userElement = client.getUserById(element.getAsLong());
+            User userElement = client.getTurtleById(element.getAsLong(), User.class);
             if (userElement == null)
                 log(client, Level.FINE, "Project", id, "Could not link User:" + element.getAsLong() + ". Has it been deleted?");
             else
@@ -115,7 +115,7 @@ public class EntityBuilder {
         JsonArray       userArr  = data.getAsJsonArray(Keys.Ticket.USERS);
         TurtleSet<User> users    = new TurtleSet<>();
         for (JsonElement element : userArr) {
-            User userElement = client.getUserById(element.getAsLong());
+            User userElement = client.getTurtleById(element.getAsLong(), User.class);
             if (userElement == null)
                 log(client, Level.FINE, "Ticket", id, "Could not link User:" + element.getAsLong() + ". Has it been deleted?");
             else
@@ -187,18 +187,11 @@ public class EntityBuilder {
 
         long          id        = data.get(Keys.Turtle.ID).getAsLong();
         MessageFormat format    = MessageFormat.of(data.get(Keys.Messages.SyncMessage.FORMAT).getAsByte());
-        User          author    = client.getUserById(data.get(Keys.Messages.SyncMessage.AUTHOR).getAsLong());
+        User          author    = client.getTurtleById(data.get(Keys.Messages.SyncMessage.AUTHOR).getAsLong(), User.class);
         String        content   = data.get(Keys.Messages.SyncMessage.CONTENT).getAsString();
         Long          reference = getOptional(() -> data.get(Keys.Messages.SyncMessage.REFERENCE).getAsLong());
-        SyncChannel   channel   = client.getChannelById(data.get(Keys.Messages.SyncMessage.CHANNEL).getAsLong());
-        IChannel      source    = getOptional(() -> {
-            long sourceId = data.get(Keys.Messages.SyncMessage.SOURCE).getAsLong();
-
-            IChannel s = client.getDiscordChannelById(sourceId);
-            if (s == null)
-                s = client.getMinecraftChannelById(sourceId);
-            return s;
-        });
+        SyncChannel   channel   = client.getTurtleById(data.get(Keys.Messages.SyncMessage.CHANNEL).getAsLong(), SyncChannel.class);
+        IChannel      source    = getOptional(() -> client.getTurtleById(data.get(Keys.Messages.SyncMessage.SOURCE).getAsLong(), IChannel.class));
 
         return new SyncMessageImpl(client, id, format, author, content, reference, channel, source);
     }

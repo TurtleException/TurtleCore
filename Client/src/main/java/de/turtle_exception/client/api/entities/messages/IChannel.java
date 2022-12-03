@@ -15,7 +15,7 @@ public interface IChannel extends Turtle {
     long getSyncChannelId();
 
     default SyncChannel getSyncChannel() {
-        return getClient().getChannelById(this.getSyncChannelId());
+        return getClient().getTurtleById(this.getSyncChannelId(), SyncChannel.class);
     }
 
     @NotNull Action<? extends IChannel> modifySyncChannel(long syncChannel);

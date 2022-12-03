@@ -16,12 +16,12 @@ import de.turtle_exception.client.api.request.entities.messages.SyncChannelActio
 import de.turtle_exception.client.api.request.entities.messages.SyncMessageAction;
 import de.turtle_exception.client.internal.data.ResourceBuilder;
 import de.turtle_exception.client.internal.data.annotations.Keys;
-import de.turtle_exception.client.internal.entities.*;
+import de.turtle_exception.client.internal.entities.TurtleImpl;
 import de.turtle_exception.client.internal.event.UpdateHelper;
 import de.turtle_exception.client.internal.net.NetClient;
 import de.turtle_exception.client.internal.net.NetworkProvider;
-import de.turtle_exception.client.internal.request.actions.entities.*;
 import de.turtle_exception.client.internal.request.actions.SimpleAction;
+import de.turtle_exception.client.internal.request.actions.entities.*;
 import de.turtle_exception.client.internal.request.actions.entities.messages.DiscordChannelActionImpl;
 import de.turtle_exception.client.internal.request.actions.entities.messages.MinecraftChannelActionImpl;
 import de.turtle_exception.client.internal.request.actions.entities.messages.SyncChannelActionImpl;
@@ -256,54 +256,6 @@ public class TurtleClientImpl implements TurtleClient {
         return list;
     }
 
-    @Override
-    public @NotNull List<Group> getGroups() {
-        return List.copyOf(groupCache);
-    }
-
-    @Override
-    public @NotNull List<JsonResource> getJsonResources() {
-        return List.copyOf(jsonResourceCache);
-    }
-
-    @Override
-    public @NotNull List<Project> getProjects() {
-        return List.copyOf(projectCache);
-    }
-
-    @Override
-    public @NotNull List<Ticket> getTickets() {
-        return List.copyOf(ticketCache);
-    }
-
-    @Override
-    public @NotNull List<User> getUsers() {
-        return List.copyOf(userCache);
-    }
-
-    // MESSAGES
-
-
-    @Override
-    public @NotNull List<DiscordChannel> getDiscordChannels() {
-        return List.copyOf(discordChannelCache);
-    }
-
-    @Override
-    public @NotNull List<MinecraftChannel> getMinecraftChannels() {
-        return List.copyOf(minecraftChannelCache);
-    }
-
-    @Override
-    public @NotNull List<SyncChannel> getChannels() {
-        return List.copyOf(channelCache);
-    }
-
-    @Override
-    public @NotNull List<SyncMessage> getMessages() {
-        return List.copyOf(messageCache);
-    }
-
     @SuppressWarnings("RedundantIfStatement")
     @Override
     public @Nullable Turtle getTurtleById(long id) {
@@ -328,53 +280,6 @@ public class TurtleClientImpl implements TurtleClient {
         SyncMessage message = messageCache.get(id);
         if (message != null) return message;
         return null;
-    }
-
-    @Override
-    public @Nullable Group getGroupById(long id) {
-        return groupCache.get(id);
-    }
-
-    @Override
-    public @Nullable JsonResource getJsonResourceById(long id) {
-        return jsonResourceCache.get(id);
-    }
-
-    @Override
-    public @Nullable Project getProjectById(long id) {
-        return projectCache.get(id);
-    }
-
-    @Override
-    public @Nullable Ticket getTicketById(long id) {
-        return ticketCache.get(id);
-    }
-
-    @Override
-    public @Nullable User getUserById(long id) {
-        return userCache.get(id);
-    }
-
-    // MESSAGES
-
-    @Override
-    public @Nullable DiscordChannel getDiscordChannelById(long id) {
-        return discordChannelCache.get(id);
-    }
-
-    @Override
-    public @Nullable MinecraftChannel getMinecraftChannelById(long id) {
-        return minecraftChannelCache.get(id);
-    }
-
-    @Override
-    public @Nullable SyncChannel getChannelById(long id) {
-        return channelCache.get(id);
-    }
-
-    @Override
-    public @Nullable SyncMessage getMessageById(long id) {
-        return messageCache.get(id);
     }
 
     /* - - - */

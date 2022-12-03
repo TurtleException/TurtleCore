@@ -3,7 +3,6 @@ package de.turtle_exception.client.internal.entities;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import de.turtle_exception.client.api.TurtleClient;
-import de.turtle_exception.client.api.entities.JsonResource;
 import de.turtle_exception.client.api.entities.Project;
 import de.turtle_exception.client.api.entities.User;
 import de.turtle_exception.client.api.entities.attributes.ProjectState;
@@ -57,11 +56,16 @@ public class ProjectImpl extends TurtleImpl implements Project {
             TurtleSet<User> old = this.users;
             TurtleSet<User> set = new TurtleSet<>();
             for (JsonElement entry : element.getAsJsonArray())
-                set.add(client.getUserById(entry.getAsLong()));
+                set.add(client.getTurtleById(entry.getAsLong(), User.class));
             this.users = set;
             UpdateHelper.ofProjectMembers(this, old, set);
         });
         return this;
+    }
+
+    @Override
+    public @Nullable User getTurtleById(long id) {
+        return this.users.get(id);
     }
 
     /* - TITLE - */
@@ -105,15 +109,6 @@ public class ProjectImpl extends TurtleImpl implements Project {
     @Override
     public @NotNull List<User> getUsers() {
         return List.copyOf(this.users);
-    }
-
-    public @NotNull TurtleSet<User> getUserSet() {
-        return users;
-    }
-
-    @Override
-    public @Nullable User getUserById(long id) {
-        return users.get(id);
     }
 
     @Override

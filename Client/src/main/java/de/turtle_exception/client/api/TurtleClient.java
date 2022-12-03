@@ -1,11 +1,7 @@
 package de.turtle_exception.client.api;
 
 import de.turtle_exception.client.api.entities.*;
-import de.turtle_exception.client.api.entities.containers.*;
-import de.turtle_exception.client.api.entities.containers.messages.IChannelContainer;
-import de.turtle_exception.client.api.entities.containers.messages.IDiscordChannelContainer;
-import de.turtle_exception.client.api.entities.containers.messages.IMessageContainer;
-import de.turtle_exception.client.api.entities.containers.messages.IMinecraftChannelContainer;
+import de.turtle_exception.client.api.entities.containers.TurtleContainer;
 import de.turtle_exception.client.api.entities.messages.DiscordChannel;
 import de.turtle_exception.client.api.entities.messages.MinecraftChannel;
 import de.turtle_exception.client.api.entities.messages.SyncChannel;
@@ -43,10 +39,7 @@ import java.util.logging.Logger;
  * @see Turtle
  */
 @SuppressWarnings("unused")
-public interface TurtleClient extends
-        IUserContainer, IGroupContainer, IJsonResourceContainer, IProjectContainer, ITicketContainer,
-        IDiscordChannelContainer, IMinecraftChannelContainer, IChannelContainer, IMessageContainer
-{
+public interface TurtleClient extends TurtleContainer<Turtle> {
     /**
      * Returns the root logger of the API.
      * <p> Every {@link Logger} that is used by parts of the API is a {@link NestedLogger} that will stream its output
@@ -121,7 +114,6 @@ public interface TurtleClient extends
      * Creates an Action with the Provider request to retrieve a {@link Group} specified by its id.
      * <p> If the operation is successful, the Group will also be put into cache, if not already present.
      * @return Action that provides the {@link Group} on completion.
-     * @see TurtleClient#getGroupById(long)
      * @see Group#update()
      */
     @NotNull Action<Group> retrieveGroup(long id);
@@ -130,7 +122,6 @@ public interface TurtleClient extends
      * Creates an Action with the Provider request to retrieve all available {@link Group Groups}.
      * <p> If the operation is successful, the retrieved Groups will also be put into cache, if not already present.
      * @return Action that provides the List of {@link Group Groups} on completion.
-     * @see TurtleClient#getGroups()
      */
     @NotNull Action<List<Group>> retrieveGroups();
 
@@ -139,7 +130,6 @@ public interface TurtleClient extends
      * <p> If the operation is successful and {@code ephemeral} is set to {@code true}, the JsonResource will also be
      * put into cache, if not already present.
      * @return Action that provides the {@link JsonResource} on completion.
-     * @see TurtleClient#getJsonResourceById(long)
      * @see JsonResource#update()
      */
     // no retrieve-all because JsonResources aren't designed for that
@@ -149,7 +139,6 @@ public interface TurtleClient extends
      * Creates an Action with the Provider request to retrieve a {@link Project} specified by its id.
      * <p> If the operation is successful, the Project will also be put into cache, if not already present.
      * @return Action that provides the {@link Project} on completion.
-     * @see TurtleClient#getDiscordChannelById(long)
      * @see DiscordChannel#update()
      */
     @NotNull Action<Project> retrieveProject(long id);
@@ -158,7 +147,6 @@ public interface TurtleClient extends
      * Creates an Action with the Provider request to retrieve all available {@link Project Projects}.
      * <p> If the operation is successful, the retrieved Projects will also be put into cache, if not already present.
      * @return Action that provides the List of {@link Project Projects} on completion.
-     * @see TurtleClient#getProjects()
      */
     @NotNull Action<List<Project>> retrieveProjects();
 
@@ -166,7 +154,6 @@ public interface TurtleClient extends
      * Creates an Action with the Provider request to retrieve a {@link Ticket} specified by its id.
      * <p> If the operation is successful, the Ticket will also be put into cache, if not already present.
      * @return Action that provides the {@link Ticket} on completion.
-     * @see TurtleClient#getTicketById(long)
      * @see Ticket#update()
      */
     @NotNull Action<Ticket> retrieveTicket(long id);
@@ -175,7 +162,6 @@ public interface TurtleClient extends
      * Creates an Action with the Provider request to retrieve all available {@link Ticket Tickets}.
      * <p> If the operation is successful, the retrieved Tickets will also be put into cache, if not already present.
      * @return Action that provides the List of {@link Ticket Tickets} on completion.
-     * @see TurtleClient#getTickets()
      */
     @NotNull Action<List<Ticket>> retrieveTickets();
 
@@ -183,7 +169,6 @@ public interface TurtleClient extends
      * Creates an Action with the Provider request to retrieve a {@link User} specified by its id.
      * <p> If the operation is successful, the User will also be put into cache, if not already present.
      * @return Action that provides the {@link User} on completion.
-     * @see TurtleClient#getUserById(long)
      * @see User#update()
      */
     @NotNull Action<User> retrieveUser(long id);
@@ -192,7 +177,6 @@ public interface TurtleClient extends
      * Creates an Action with the Provider request to retrieve all available {@link User Users}.
      * <p> If the operation is successful, the retrieved Users will also be put into cache, if not already present.
      * @return Action that provides the List of {@link User Users} on completion.
-     * @see TurtleClient#getUsers()
      */
     @NotNull Action<List<User>> retrieveUsers();
 
@@ -202,7 +186,6 @@ public interface TurtleClient extends
      * Creates an Action with the Provider request to retrieve a {@link DiscordChannel} specified by its id.
      * <p> If the operation is successful, the DiscordChannel will also be put into cache, if not already present.
      * @return Action that provides the {@link DiscordChannel} on completion.
-     * @see TurtleClient#getDiscordChannelById(long)
      * @see DiscordChannel#update()
      */
     @NotNull Action<DiscordChannel> retrieveDiscordChannel(long id);
@@ -211,7 +194,6 @@ public interface TurtleClient extends
      * Creates an Action with the Provider request to retrieve all available {@link DiscordChannel DiscordChannels}.
      * <p> If the operation is successful, the retrieved DiscordChannels will also be put into cache, if not already present.
      * @return Action that provides the List of {@link DiscordChannel DiscordChannels} on completion.
-     * @see TurtleClient#getDiscordChannels()
      */
     @NotNull Action<List<DiscordChannel>> retrieveDiscordChannels();
 
@@ -219,7 +201,6 @@ public interface TurtleClient extends
      * Creates an Action with the Provider request to retrieve a {@link MinecraftChannel} specified by its id.
      * <p> If the operation is successful, the MinecraftChannel will also be put into cache, if not already present.
      * @return Action that provides the {@link MinecraftChannel} on completion.
-     * @see TurtleClient#getMinecraftChannelById(long)
      * @see MinecraftChannel#update()
      */
     @NotNull Action<MinecraftChannel> retrieveMinecraftChannel(long id);
@@ -228,7 +209,6 @@ public interface TurtleClient extends
      * Creates an Action with the Provider request to retrieve all available {@link MinecraftChannel MinecraftChannels}.
      * <p> If the operation is successful, the retrieved MinecraftChannels will also be put into cache, if not already present.
      * @return Action that provides the List of {@link MinecraftChannel MinecraftChannels} on completion.
-     * @see TurtleClient#getMinecraftChannels()
      */
     @NotNull Action<List<MinecraftChannel>> retrieveMinecraftChannels();
 
@@ -236,7 +216,6 @@ public interface TurtleClient extends
      * Creates an Action with the Provider request to retrieve a {@link SyncChannel} specified by its id.
      * <p> If the operation is successful, the Channel will also be put into cache, if not already present.
      * @return Action that provides the {@link SyncChannel} on completion.
-     * @see TurtleClient#getChannelById(long)
      * @see SyncChannel#update()
      */
     @NotNull Action<SyncChannel> retrieveChannel(long id);
@@ -245,7 +224,6 @@ public interface TurtleClient extends
      * Creates an Action with the Provider request to retrieve all available {@link SyncChannel Channels}.
      * <p> If the operation is successful, the retrieved Channels will also be put into cache, if not already present.
      * @return Action that provides the List of {@link SyncChannel Channels} on completion.
-     * @see TurtleClient#getChannels()
      */
     @NotNull Action<List<SyncChannel>> retrieveChannels();
 
@@ -253,7 +231,6 @@ public interface TurtleClient extends
      * Creates an Action with the Provider request to retrieve a {@link SyncMessage} specified by its id.
      * <p> If the operation is successful, the Message will also be put into cache, if not already present.
      * @return Action that provides the {@link SyncMessage} on completion.
-     * @see TurtleClient#getMessageById(long)
      * @see SyncMessage#update()
      */
     // no retrieve-all because why

@@ -57,8 +57,8 @@ public interface User extends Turtle {
      */
     default @NotNull List<Group> getGroups() {
         ArrayList<Group> groups = new ArrayList<>();
-        for (Group group : getClient().getGroups())
-            if (group.getUserById(this.getId()) != null)
+        for (Group group : getClient().getTurtles(Group.class))
+            if (group.getTurtleById(this.getId()) != null)
                 groups.add(group);
         return List.copyOf(groups);
     }

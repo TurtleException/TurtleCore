@@ -2,7 +2,7 @@ package de.turtle_exception.client.api.entities;
 
 import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.api.entities.attributes.TicketState;
-import de.turtle_exception.client.api.entities.containers.IUserContainer;
+import de.turtle_exception.client.api.entities.containers.TurtleContainer;
 import de.turtle_exception.client.api.request.Action;
 import de.turtle_exception.client.internal.data.annotations.*;
 import net.dv8tion.jda.api.JDA;
@@ -20,7 +20,7 @@ import java.util.List;
  */
 @Resource(path = "tickets", builder = "buildTicket")
 @SuppressWarnings("unused")
-public interface Ticket extends Turtle, IUserContainer {
+public interface Ticket extends Turtle, TurtleContainer<User> {
     @Override
     default @NotNull Action<Ticket> update() {
         return this.getClient().retrieveTicket(this.getId());
@@ -143,13 +143,17 @@ public interface Ticket extends Turtle, IUserContainer {
 
     /* - USERS - */
 
+    @Override
+    default @NotNull List<User> getTurtles() {
+        return this.getUsers();
+    }
+
     /**
      * Provides a List of all {@link User Users} that have access to this Ticket.
      * <p> A Ticket can have multiple Users; A User can also have access to multiple Groups.
      * <p> Team members, moderation and bots are not included in this list unless they have explicitly been added.
      * @return List of Users.
      */
-    @Override
     @Key(name = Keys.Ticket.USERS, relation = Relation.MANY_TO_MANY, sqlType = Types.Ticket.USERS)
     @Relational(table = "ticket_users", self = "ticket", foreign = "user", type = User.class)
     @NotNull List<User> getUsers();

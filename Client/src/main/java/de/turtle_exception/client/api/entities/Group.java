@@ -1,6 +1,6 @@
 package de.turtle_exception.client.api.entities;
 
-import de.turtle_exception.client.api.entities.containers.IUserContainer;
+import de.turtle_exception.client.api.entities.containers.TurtleContainer;
 import de.turtle_exception.client.api.request.Action;
 import de.turtle_exception.client.internal.data.annotations.*;
 import org.jetbrains.annotations.NotNull;
@@ -13,7 +13,7 @@ import java.util.List;
  */
 @Resource(path = "groups", builder = "buildGroup")
 @SuppressWarnings("unused")
-public interface Group extends Turtle, IUserContainer {
+public interface Group extends Turtle, TurtleContainer<User> {
     @Override
     default @NotNull Action<Group> update() {
         return this.getClient().retrieveGroup(this.getId());
@@ -38,12 +38,16 @@ public interface Group extends Turtle, IUserContainer {
 
     /* - USERS - */
 
+    @Override
+    default @NotNull List<User> getTurtles() {
+        return this.getUsers();
+    }
+
     /**
      * Provides a List of all {@link User Users} that are a member of this Group.
      * <p> A Group can have multiple Users; A User can also be part of multiple Groups.
      * @return List of members.
      */
-    @Override
     @Key(name = Keys.Group.MEMBERS, relation = Relation.MANY_TO_MANY, sqlType = Types.Group.MEMBERS)
     @Relational(table = "group_members", self = "group", foreign = "user", type = User.class)
     @NotNull List<User> getUsers();
