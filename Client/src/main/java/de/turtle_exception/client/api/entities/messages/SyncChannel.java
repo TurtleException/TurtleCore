@@ -31,10 +31,7 @@ public interface SyncChannel extends Turtle, IDiscordChannelContainer, IMinecraf
     @Override
     @Nullable Turtle getTurtleById(long id);
 
-    @Override
-    @Key(name = Keys.Messages.SyncChannel.DISCORD, relation = Relation.ONE_TO_MANY, sqlType = Types.Messages.SyncChannel.DISCORD)
-    @Relational(table = "channel_discord", self = "channel", foreign = "discord", type = DiscordChannel.class)
-    @NotNull List<DiscordChannel> getDiscordChannels();
+    /* - DISCORD - */
 
     @NotNull Action<SyncChannel> addDiscordChannel(long discordChannel);
 
@@ -48,10 +45,7 @@ public interface SyncChannel extends Turtle, IDiscordChannelContainer, IMinecraf
         return this.removeDiscordChannel(discordChannel.getId());
     }
 
-    @Override
-    @Key(name = Keys.Messages.SyncChannel.MINECRAFT, relation = Relation.ONE_TO_MANY, sqlType = Types.Messages.SyncChannel.MINECRAFT)
-    @Relational(table = "channel_minecraft", self = "channel", foreign = "minecraft", type = MinecraftChannel.class)
-    @NotNull List<MinecraftChannel> getMinecraftChannels();
+    /* - MINECRAFT - */
 
     @NotNull Action<SyncChannel> addMinecraftChannel(long minecraftChannel);
 
@@ -64,6 +58,8 @@ public interface SyncChannel extends Turtle, IDiscordChannelContainer, IMinecraf
     default @NotNull Action<SyncChannel> removeMinecraftChannel(@NotNull MinecraftChannel minecraftChannel) {
         return this.removeMinecraftChannel(minecraftChannel.getId());
     }
+
+    /* - - - */
 
     default @NotNull List<IChannel> getChannels() {
         return Stream.concat(

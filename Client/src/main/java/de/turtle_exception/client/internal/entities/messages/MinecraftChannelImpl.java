@@ -3,9 +3,7 @@ package de.turtle_exception.client.internal.entities.messages;
 import com.google.gson.JsonObject;
 import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.api.entities.messages.MinecraftChannel;
-import de.turtle_exception.client.api.entities.messages.SyncChannel;
 import de.turtle_exception.client.api.entities.messages.SyncMessage;
-import de.turtle_exception.client.api.event.entities.messages.discord_channel.DiscordChannelUpdateSyncChannelEvent;
 import de.turtle_exception.client.api.event.entities.messages.minecraft_channel.MinecraftChannelUpdateIdentifierEvent;
 import de.turtle_exception.client.api.event.entities.messages.minecraft_channel.MinecraftChannelUpdateSyncChannelEvent;
 import de.turtle_exception.client.api.event.entities.messages.minecraft_channel.MinecraftChannelUpdateTypeEvent;
@@ -19,7 +17,7 @@ public class MinecraftChannelImpl extends ChannelImpl implements MinecraftChanne
     private Type type;
     private String identifier;
 
-    public MinecraftChannelImpl(@NotNull TurtleClient client, long id, SyncChannel syncChannel, Type type, String identifier) {
+    public MinecraftChannelImpl(@NotNull TurtleClient client, long id, long syncChannel, Type type, String identifier) {
         super(client, id, syncChannel);
 
         this.type        = type;
@@ -29,8 +27,8 @@ public class MinecraftChannelImpl extends ChannelImpl implements MinecraftChanne
     @Override
     public @NotNull TurtleImpl handleUpdate(@NotNull JsonObject json) {
         this.apply(json, Keys.Messages.IChannel.SYNC_CHANNEL, element -> {
-            SyncChannel old = this.syncChannel;
-            this.syncChannel = client.getChannelById(element.getAsLong());
+            long old = this.syncChannel;
+            this.syncChannel = element.getAsLong();
             this.fireEvent(new MinecraftChannelUpdateSyncChannelEvent(this, old, this.syncChannel));
         });
         this.apply(json, Keys.Messages.MinecraftChannel.TYPE, element -> {

@@ -10,7 +10,6 @@ import de.turtle_exception.client.api.entities.User;
 import de.turtle_exception.client.api.entities.attributes.MessageFormat;
 import de.turtle_exception.client.api.entities.attributes.ProjectState;
 import de.turtle_exception.client.api.entities.attributes.TicketState;
-import de.turtle_exception.client.api.entities.messages.DiscordChannel;
 import de.turtle_exception.client.api.entities.messages.IChannel;
 import de.turtle_exception.client.api.entities.messages.MinecraftChannel;
 import de.turtle_exception.client.api.entities.messages.SyncChannel;
@@ -157,9 +156,9 @@ public class EntityBuilder {
     public static @NotNull DiscordChannelImpl buildDiscordChannel(@NotNull JsonObject data, @NotNull TurtleClient client) throws NullPointerException, IllegalArgumentException, IllegalJsonException {
         Checks.nonNull(data, "JSON");
 
-        long        id          = data.get(Keys.Turtle.ID).getAsLong();
-        SyncChannel syncChannel = client.getChannelById(data.get(Keys.Messages.IChannel.SYNC_CHANNEL).getAsLong());
-        long        snowflake   = data.get(Keys.Messages.DiscordChannel.SNOWFLAKE).getAsLong();
+        long id          = data.get(Keys.Turtle.ID).getAsLong();
+        long syncChannel = data.get(Keys.Messages.IChannel.SYNC_CHANNEL).getAsLong();
+        long snowflake   = data.get(Keys.Messages.DiscordChannel.SNOWFLAKE).getAsLong();
 
         return new DiscordChannelImpl(client, id, syncChannel, snowflake);
     }
@@ -168,7 +167,7 @@ public class EntityBuilder {
         Checks.nonNull(data, "JSON");
 
         long           id          = data.get(Keys.Turtle.ID).getAsLong();
-        SyncChannel    syncChannel = client.getChannelById(data.get(Keys.Messages.IChannel.SYNC_CHANNEL).getAsLong());
+        long           syncChannel = data.get(Keys.Messages.IChannel.SYNC_CHANNEL).getAsLong();
         MinecraftChannel.Type type = MinecraftChannel.Type.of(data.get(Keys.Messages.MinecraftChannel.TYPE).getAsByte());
         String         identifier  = data.get(Keys.Messages.MinecraftChannel.IDENTIFIER).getAsString();
 
@@ -180,27 +179,7 @@ public class EntityBuilder {
 
         long id = data.get(Keys.Turtle.ID).getAsLong();
 
-        JsonArray                 discordArr  = data.getAsJsonArray(Keys.Messages.SyncChannel.DISCORD);
-        TurtleSet<DiscordChannel> discord    = new TurtleSet<>();
-        for (JsonElement element : discordArr) {
-            DiscordChannel channelElement = client.getDiscordChannelById(element.getAsLong());
-            if (channelElement == null)
-                log(client, Level.FINE, "SyncChannel", id, "Could not link DiscordChannel:" + element.getAsLong() + ". Has it been deleted?");
-            else
-                discord.add(channelElement);
-        }
-
-        JsonArray                   minecraftArr = data.getAsJsonArray(Keys.Messages.SyncChannel.MINECRAFT);
-        TurtleSet<MinecraftChannel> minecraft    = new TurtleSet<>();
-        for (JsonElement element : minecraftArr) {
-            MinecraftChannel channelElement = client.getMinecraftChannelById(element.getAsLong());
-            if (channelElement == null)
-                log(client, Level.FINE, "SyncChannel", id, "Could not link MinecraftChannel:" + element.getAsLong() + ". Has it been deleted?");
-            else
-                minecraft.add(channelElement);
-        }
-
-        return new SyncChannelImpl(client, id, discord, minecraft);
+        return new SyncChannelImpl(client, id);
     }
 
     public static @NotNull SyncMessageImpl buildMessage(@NotNull JsonObject data, @NotNull TurtleClient client) throws NullPointerException, IllegalArgumentException, IllegalJsonException {

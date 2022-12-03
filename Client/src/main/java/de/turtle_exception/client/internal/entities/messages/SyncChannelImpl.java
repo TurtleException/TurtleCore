@@ -1,6 +1,5 @@
 package de.turtle_exception.client.internal.entities.messages;
 
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.api.entities.Turtle;
@@ -10,54 +9,33 @@ import de.turtle_exception.client.api.entities.messages.SyncChannel;
 import de.turtle_exception.client.api.request.Action;
 import de.turtle_exception.client.internal.data.annotations.Keys;
 import de.turtle_exception.client.internal.entities.TurtleImpl;
-import de.turtle_exception.client.internal.event.UpdateHelper;
-import de.turtle_exception.client.internal.util.TurtleSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
 public class SyncChannelImpl extends TurtleImpl implements SyncChannel {
-    private TurtleSet<DiscordChannel>   discordChannels;
-    private TurtleSet<MinecraftChannel> minecraftChannels;
-
-    public SyncChannelImpl(@NotNull TurtleClient client, long id, TurtleSet<DiscordChannel> discordChannels, TurtleSet<MinecraftChannel> minecraftChannels) {
+    public SyncChannelImpl(@NotNull TurtleClient client, long id) {
         super(client, id);
-
-        this.discordChannels   = discordChannels;
-        this.minecraftChannels = minecraftChannels;
     }
 
     @Override
     public @NotNull TurtleImpl handleUpdate(@NotNull JsonObject json) {
-        this.apply(json, Keys.Messages.SyncChannel.DISCORD, element -> {
-            TurtleSet<DiscordChannel> old = this.discordChannels;
-            TurtleSet<DiscordChannel> set = new TurtleSet<>();
-            for (JsonElement entry : element.getAsJsonArray())
-                set.add(client.getDiscordChannelById(entry.getAsLong()));
-            this.discordChannels = set;
-            UpdateHelper.ofSyncChannelDiscord(this, old, set);
-        });
-        this.apply(json, Keys.Messages.SyncChannel.MINECRAFT, element -> {
-            TurtleSet<MinecraftChannel> old = this.minecraftChannels;
-            TurtleSet<MinecraftChannel> set = new TurtleSet<>();
-            for (JsonElement entry : element.getAsJsonArray())
-                set.add(client.getMinecraftChannelById(entry.getAsLong()));
-            this.minecraftChannels = set;
-            UpdateHelper.ofSyncChannelMinecraft(this, old, set);
-        });
         return this;
     }
 
     /* - - - */
 
-    @SuppressWarnings("RedundantIfStatement")
     @Override
     public @Nullable Turtle getTurtleById(long id) {
-        DiscordChannel discordChannel = discordChannels.get(id);
-        if (discordChannel != null) return discordChannel;
-        MinecraftChannel minecraftChannel = minecraftChannels.get(id);
-        if (minecraftChannel != null) return minecraftChannel;
+        DiscordChannel discordChannel = client.getDiscordChannelById(id);
+        if (discordChannel != null && discordChannel.getSyncChannelId() == this.getId())
+            return discordChannel;
+
+        MinecraftChannel minecraftChannel = client.getMinecraftChannelById(id);
+        if (minecraftChannel != null && minecraftChannel.getSyncChannelId() == this.getId())
+            return minecraftChannel;
+
         return null;
     }
 
@@ -65,16 +43,17 @@ public class SyncChannelImpl extends TurtleImpl implements SyncChannel {
 
     @Override
     public @NotNull List<DiscordChannel> getDiscordChannels() {
-        return List.copyOf(this.discordChannels);
-    }
-
-    public @NotNull TurtleSet<DiscordChannel> getDiscordSet() {
-        return this.discordChannels;
+        return getClient().getDiscordChannels().stream()
+                .filter(discordChannel -> discordChannel.getSyncChannelId() == this.getId())
+                .toList();
     }
 
     @Override
     public @Nullable DiscordChannel getDiscordChannelById(long id) {
-        return this.discordChannels.get(id);
+        DiscordChannel channel = getClient().getDiscordChannelById(id);
+        if (channel != null && channel.getSyncChannelId() == this.getId())
+            return channel;
+        return null;
     }
 
     @Override
@@ -91,16 +70,17 @@ public class SyncChannelImpl extends TurtleImpl implements SyncChannel {
 
     @Override
     public @NotNull List<MinecraftChannel> getMinecraftChannels() {
-        return List.copyOf(this.minecraftChannels);
-    }
-
-    public @NotNull TurtleSet<MinecraftChannel> getMinecraftSet() {
-        return this.minecraftChannels;
+        return getClient().getMinecraftChannels().stream()
+                .filter(minecraftChannel -> minecraftChannel.getSyncChannelId() == this.getId())
+                .toList();
     }
 
     @Override
     public @Nullable MinecraftChannel getMinecraftChannelById(long id) {
-        return this.minecraftChannels.get(id);
+        MinecraftChannel channel = getClient().getMinecraftChannelById(id);
+        if (channel != null && channel.getSyncChannelId() == this.getId())
+            return channel;
+        return null;
     }
 
     @Override
