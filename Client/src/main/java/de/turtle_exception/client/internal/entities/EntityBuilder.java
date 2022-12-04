@@ -70,7 +70,7 @@ public class EntityBuilder {
         long        id         = data.get(Keys.Turtle.ID).getAsLong();
         String      identifier = data.get(Keys.JsonResource.IDENTIFIER).getAsString();
         JsonElement content    = data.get(Keys.JsonResource.CONTENT);
-        boolean     ephemeral  = data.get(Keys.JsonResource.EPHEMERAL).getAsBoolean();
+        boolean     ephemeral  = data.get(Keys.Attribute.EphemeralType.EPHEMERAL).getAsBoolean();
 
         return new JsonResourceImpl(client, id, identifier, content, ephemeral);
     }
