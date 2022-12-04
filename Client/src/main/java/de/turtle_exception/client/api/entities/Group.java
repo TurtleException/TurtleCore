@@ -16,7 +16,7 @@ import java.util.List;
 public interface Group extends Turtle, TurtleContainer<User> {
     @Override
     default @NotNull Action<Group> update() {
-        return this.getClient().retrieveGroup(this.getId());
+        return this.getClient().retrieveTurtle(this.getId(), Group.class);
     }
 
     /* - NAME - */

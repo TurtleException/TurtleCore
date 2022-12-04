@@ -25,7 +25,7 @@ import java.util.UUID;
 public interface User extends Turtle {
     @Override
     default @NotNull Action<User> update() {
-        return this.getClient().retrieveUser(this.getId());
+        return this.getClient().retrieveTurtle(this.getId(), User.class);
     }
 
     /* - NAME - */

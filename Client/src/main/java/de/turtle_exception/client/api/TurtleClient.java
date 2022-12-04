@@ -111,130 +111,19 @@ public interface TurtleClient extends TurtleContainer<Turtle> {
     /* - - - */
 
     /**
-     * Creates an Action with the Provider request to retrieve a {@link Group} specified by its id.
-     * <p> If the operation is successful, the Group will also be put into cache, if not already present.
-     * @return Action that provides the {@link Group} on completion.
-     * @see Group#update()
+     * Creates an Action with the Provider request to retrieve a {@link Turtle} of type {@code T}, specified by its id.
+     * <p> If the operation is successful, the object will also be put into cache, if not already present.
+     * @return Action that provides the Turtle on completion.
+     * @see Turtle#update()
      */
-    @NotNull Action<Group> retrieveGroup(long id);
+    <T extends Turtle> @NotNull Action<T> retrieveTurtle(long id, @NotNull Class<T> type);
 
     /**
-     * Creates an Action with the Provider request to retrieve all available {@link Group Groups}.
-     * <p> If the operation is successful, the retrieved Groups will also be put into cache, if not already present.
-     * @return Action that provides the List of {@link Group Groups} on completion.
+     * Creates an Action with the Provider request to retrieve all available {@link Turtle Turtles} of type {@code T}.
+     * <p> If the operation is successful, the retrieved objects will also be put into cache, if not already present.
+     * @return Action that provides the List of Turtles on completion.
      */
-    @NotNull Action<List<Group>> retrieveGroups();
-
-    /**
-     * Creates an Action with the Provider request to retrieve a {@link JsonResource} specified by its id.
-     * <p> If the operation is successful and {@code ephemeral} is set to {@code true}, the JsonResource will also be
-     * put into cache, if not already present.
-     * @return Action that provides the {@link JsonResource} on completion.
-     * @see JsonResource#update()
-     */
-    // no retrieve-all because JsonResources aren't designed for that
-    @NotNull Action<JsonResource> retrieveJsonResource(long id);
-
-    /**
-     * Creates an Action with the Provider request to retrieve a {@link Project} specified by its id.
-     * <p> If the operation is successful, the Project will also be put into cache, if not already present.
-     * @return Action that provides the {@link Project} on completion.
-     * @see DiscordChannel#update()
-     */
-    @NotNull Action<Project> retrieveProject(long id);
-
-    /**
-     * Creates an Action with the Provider request to retrieve all available {@link Project Projects}.
-     * <p> If the operation is successful, the retrieved Projects will also be put into cache, if not already present.
-     * @return Action that provides the List of {@link Project Projects} on completion.
-     */
-    @NotNull Action<List<Project>> retrieveProjects();
-
-    /**
-     * Creates an Action with the Provider request to retrieve a {@link Ticket} specified by its id.
-     * <p> If the operation is successful, the Ticket will also be put into cache, if not already present.
-     * @return Action that provides the {@link Ticket} on completion.
-     * @see Ticket#update()
-     */
-    @NotNull Action<Ticket> retrieveTicket(long id);
-
-    /**
-     * Creates an Action with the Provider request to retrieve all available {@link Ticket Tickets}.
-     * <p> If the operation is successful, the retrieved Tickets will also be put into cache, if not already present.
-     * @return Action that provides the List of {@link Ticket Tickets} on completion.
-     */
-    @NotNull Action<List<Ticket>> retrieveTickets();
-
-    /**
-     * Creates an Action with the Provider request to retrieve a {@link User} specified by its id.
-     * <p> If the operation is successful, the User will also be put into cache, if not already present.
-     * @return Action that provides the {@link User} on completion.
-     * @see User#update()
-     */
-    @NotNull Action<User> retrieveUser(long id);
-
-    /**
-     * Creates an Action with the Provider request to retrieve all available {@link User Users}.
-     * <p> If the operation is successful, the retrieved Users will also be put into cache, if not already present.
-     * @return Action that provides the List of {@link User Users} on completion.
-     */
-    @NotNull Action<List<User>> retrieveUsers();
-
-    // MESSAGES
-
-    /**
-     * Creates an Action with the Provider request to retrieve a {@link DiscordChannel} specified by its id.
-     * <p> If the operation is successful, the DiscordChannel will also be put into cache, if not already present.
-     * @return Action that provides the {@link DiscordChannel} on completion.
-     * @see DiscordChannel#update()
-     */
-    @NotNull Action<DiscordChannel> retrieveDiscordChannel(long id);
-
-    /**
-     * Creates an Action with the Provider request to retrieve all available {@link DiscordChannel DiscordChannels}.
-     * <p> If the operation is successful, the retrieved DiscordChannels will also be put into cache, if not already present.
-     * @return Action that provides the List of {@link DiscordChannel DiscordChannels} on completion.
-     */
-    @NotNull Action<List<DiscordChannel>> retrieveDiscordChannels();
-
-    /**
-     * Creates an Action with the Provider request to retrieve a {@link MinecraftChannel} specified by its id.
-     * <p> If the operation is successful, the MinecraftChannel will also be put into cache, if not already present.
-     * @return Action that provides the {@link MinecraftChannel} on completion.
-     * @see MinecraftChannel#update()
-     */
-    @NotNull Action<MinecraftChannel> retrieveMinecraftChannel(long id);
-
-    /**
-     * Creates an Action with the Provider request to retrieve all available {@link MinecraftChannel MinecraftChannels}.
-     * <p> If the operation is successful, the retrieved MinecraftChannels will also be put into cache, if not already present.
-     * @return Action that provides the List of {@link MinecraftChannel MinecraftChannels} on completion.
-     */
-    @NotNull Action<List<MinecraftChannel>> retrieveMinecraftChannels();
-
-    /**
-     * Creates an Action with the Provider request to retrieve a {@link SyncChannel} specified by its id.
-     * <p> If the operation is successful, the Channel will also be put into cache, if not already present.
-     * @return Action that provides the {@link SyncChannel} on completion.
-     * @see SyncChannel#update()
-     */
-    @NotNull Action<SyncChannel> retrieveChannel(long id);
-
-    /**
-     * Creates an Action with the Provider request to retrieve all available {@link SyncChannel Channels}.
-     * <p> If the operation is successful, the retrieved Channels will also be put into cache, if not already present.
-     * @return Action that provides the List of {@link SyncChannel Channels} on completion.
-     */
-    @NotNull Action<List<SyncChannel>> retrieveChannels();
-
-    /**
-     * Creates an Action with the Provider request to retrieve a {@link SyncMessage} specified by its id.
-     * <p> If the operation is successful, the Message will also be put into cache, if not already present.
-     * @return Action that provides the {@link SyncMessage} on completion.
-     * @see SyncMessage#update()
-     */
-    // no retrieve-all because why
-    @NotNull Action<SyncMessage> retrieveMessage(long id);
+    <T extends Turtle> @NotNull Action<List<T>> retrieveTurtles(@NotNull Class<T> type);
 
     /* - - - */
 

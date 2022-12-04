@@ -16,7 +16,7 @@ import org.jetbrains.annotations.Nullable;
 public interface SyncMessage extends Turtle {
     @Override
     default @NotNull Action<SyncMessage> update() {
-        return this.getClient().retrieveMessage(this.getId());
+        return this.getClient().retrieveTurtle(this.getId(), SyncMessage.class);
     }
 
     @NotNull MessageFormat getMessageFormat();

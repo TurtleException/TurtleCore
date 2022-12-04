@@ -15,7 +15,7 @@ import java.util.List;
 public interface SyncChannel extends Turtle, TurtleContainer<IChannel> {
     @Override
     default @NotNull Action<SyncChannel> update() {
-        return this.getClient().retrieveChannel(this.getId());
+        return this.getClient().retrieveTurtle(this.getId(), SyncChannel.class);
     }
 
     @Override

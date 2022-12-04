@@ -15,7 +15,7 @@ public interface Project extends Turtle, TurtleContainer<User> {
     @Override
     @NotNull
     default Action<Project> update() {
-        return this.getClient().retrieveProject(this.getId());
+        return this.getClient().retrieveTurtle(this.getId(), Project.class);
     }
 
     @Key(name = Keys.Project.TITLE, sqlType = Types.Project.TITLE)

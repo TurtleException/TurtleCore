@@ -19,7 +19,7 @@ import org.jetbrains.annotations.NotNull;
 public interface JsonResource extends Turtle {
     @Override
     default @NotNull Action<JsonResource> update() {
-        return this.getClient().retrieveJsonResource(this.getId());
+        return this.getClient().retrieveTurtle(this.getId(), JsonResource.class);
     }
 
     /**

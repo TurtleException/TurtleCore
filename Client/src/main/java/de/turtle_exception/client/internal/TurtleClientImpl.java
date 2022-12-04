@@ -6,7 +6,6 @@ import de.turtle_exception.client.api.entities.*;
 import de.turtle_exception.client.api.entities.messages.DiscordChannel;
 import de.turtle_exception.client.api.entities.messages.MinecraftChannel;
 import de.turtle_exception.client.api.entities.messages.SyncChannel;
-import de.turtle_exception.client.api.entities.messages.SyncMessage;
 import de.turtle_exception.client.api.event.EventManager;
 import de.turtle_exception.client.api.request.Action;
 import de.turtle_exception.client.api.request.entities.*;
@@ -161,13 +160,13 @@ public class TurtleClientImpl implements TurtleClient {
              * While entities are normally ordered alphabetically, these requests have to be ordered like this because
              * the existence of some objects is essential to parsing other resources that reference them later.
              */
-            this.retrieveUsers().complete(); // depends on nothing
-            this.retrieveGroups().complete(); // depends on User
-            this.retrieveTickets().complete(); // depends on User
-            this.retrieveProjects().complete(); // depends on User
-            this.retrieveDiscordChannels().complete(); // depends on nothing
-            this.retrieveMinecraftChannels().complete(); // depends on nothing
-            this.retrieveChannels().complete(); // depends on DiscordChannel & MinecraftChannel
+            this.retrieveTurtles(            User.class).complete(); // depends on nothing
+            this.retrieveTurtles(           Group.class).complete(); // depends on User
+            this.retrieveTurtles(          Ticket.class).complete(); // depends on User
+            this.retrieveTurtles(            User.class).complete(); // depends on User
+            this.retrieveTurtles(  DiscordChannel.class).complete(); // depends on nothing
+            this.retrieveTurtles(MinecraftChannel.class).complete(); // depends on nothing
+            this.retrieveTurtles(     SyncChannel.class).complete(); // depends on DiscordChannel & MinecraftChannel
         }
     }
 
@@ -191,134 +190,26 @@ public class TurtleClientImpl implements TurtleClient {
 
     /* - - - */
 
-    @Override
-    public @NotNull Action<Group> retrieveGroup(long id) {
-        return provider.get(Group.class, id).andThenParse(Group.class).onSuccess(group -> {
+    public <T extends Turtle> @NotNull Action<T> retrieveTurtle(long id, @NotNull Class<T> type) {
+        return provider.get(type, id).andThenParse(type).onSuccess(t -> {
             cache.removeById(id);
-            cache.add(group);
+
+            // don't cache ephemeral JsonResources
+            if (t instanceof JsonResource j && j.isEphemeral()) return;
+
+            cache.add(t);
         });
     }
 
-    @Override
-    public @NotNull Action<List<Group>> retrieveGroups() {
-        return provider.get(Group.class).andThenParseList(Group.class).onSuccess(l -> {
-            cache.removeAll(Group.class);
-            cache.addAll(l);
-        });
-    }
+    public <T extends Turtle> @NotNull Action<List<T>> retrieveTurtles(@NotNull Class<T> type) {
+        return provider.get(type).andThenParseList(type).onSuccess(l -> {
+            cache.removeAll(type);
+            for (T t : l) {
+                // don't cache ephemeral JsonResources
+                if (t instanceof JsonResource j && j.isEphemeral()) continue;
 
-    @Override
-    public @NotNull Action<JsonResource> retrieveJsonResource(long id) {
-        return provider.get(JsonResource.class, id).andThenParse(JsonResource.class).onSuccess(jsonResource -> {
-            cache.removeById(id);
-            if (!jsonResource.isEphemeral())
-                cache.add(jsonResource);
-        });
-    }
-
-    @Override
-    public @NotNull Action<Project> retrieveProject(long id) {
-        return provider.get(Project.class, id).andThenParse(Project.class).onSuccess(project -> {
-            cache.removeById(id);
-            cache.add(project);
-        });
-    }
-
-    @Override
-    public @NotNull Action<List<Project>> retrieveProjects() {
-        return provider.get(Project.class).andThenParseList(Project.class).onSuccess(l -> {
-            cache.removeAll(Project.class);
-            cache.addAll(l);
-        });
-    }
-
-    @Override
-    public @NotNull Action<Ticket> retrieveTicket(long id) {
-        return provider.get(Ticket.class, id).andThenParse(Ticket.class).onSuccess(ticket -> {
-            cache.removeById(id);
-            cache.add(ticket);
-        });
-    }
-
-    @Override
-    public @NotNull Action<List<Ticket>> retrieveTickets() {
-        return provider.get(Ticket.class).andThenParseList(Ticket.class).onSuccess(l -> {
-            cache.removeAll(Ticket.class);
-            cache.addAll(l);
-        });
-    }
-
-    @Override
-    public @NotNull Action<User> retrieveUser(long id) {
-        return provider.get(User.class, id).andThenParse(User.class).onSuccess(user -> {
-            cache.removeById(id);
-            cache.add(user);
-        });
-    }
-
-    @Override
-    public @NotNull Action<List<User>> retrieveUsers() {
-        return provider.get(User.class).andThenParseList(User.class).onSuccess(l -> {
-            cache.removeAll(User.class);
-            cache.addAll(l);
-        });
-    }
-
-    // MESSAGES
-
-    @Override
-    public @NotNull Action<DiscordChannel> retrieveDiscordChannel(long id) {
-        return provider.get(DiscordChannel.class, id).andThenParse(DiscordChannel.class).onSuccess(channel -> {
-            cache.removeById(id);
-            cache.add(channel);
-        });
-    }
-
-    @Override
-    public @NotNull Action<List<DiscordChannel>> retrieveDiscordChannels() {
-        return provider.get(DiscordChannel.class).andThenParseList(DiscordChannel.class).onSuccess(l -> {
-            cache.removeAll(DiscordChannel.class);
-            cache.addAll(l);
-        });
-    }
-
-    @Override
-    public @NotNull Action<MinecraftChannel> retrieveMinecraftChannel(long id) {
-        return provider.get(MinecraftChannel.class, id).andThenParse(MinecraftChannel.class).onSuccess(channel -> {
-            cache.removeById(id);
-            cache.add(channel);
-        });
-    }
-
-    @Override
-    public @NotNull Action<List<MinecraftChannel>> retrieveMinecraftChannels() {
-        return provider.get(MinecraftChannel.class).andThenParseList(MinecraftChannel.class).onSuccess(l -> {
-            cache.removeAll(MinecraftChannel.class);
-            cache.addAll(l);
-        });
-    }
-
-    @Override
-    public @NotNull Action<SyncChannel> retrieveChannel(long id) {
-        return provider.get(SyncChannel.class, id).andThenParse(SyncChannel.class).onSuccess(channel -> {
-            cache.removeById(id);
-            cache.add(channel);
-        });
-    }
-
-    @Override
-    public @NotNull Action<List<SyncChannel>> retrieveChannels() {
-        return provider.get(SyncChannel.class).andThenParseList(SyncChannel.class).onSuccess(l -> {
-            cache.removeAll(SyncChannel.class);
-            cache.addAll(l);
-        });
-    }
-
-    @Override
-    public @NotNull Action<SyncMessage> retrieveMessage(long id) {
-        return provider.get(SyncMessage.class, id).andThenParse(SyncMessage.class).onSuccess(message -> {
-            cache.removeById(id);
-            cache.add(message);
+                cache.add(t);
+            }
         });
     }
 

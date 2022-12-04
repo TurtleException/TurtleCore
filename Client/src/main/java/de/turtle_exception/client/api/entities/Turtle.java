@@ -46,8 +46,11 @@ public interface Turtle {
      * <p> If the operation is successful, the {@link TurtleClient} will also update any cache references to this resource.
      * <p> This will usually return the object itself, but with modified attributes, though this behaviour is not
      * guaranteed; the value provided by the completed action should replace any old representation of this resource.
+     *
      * @return The new / updated object.
      */
     @NotNull
-    Action<? extends Turtle> update();
+    default Action<? extends Turtle> update() {
+        return this.getClient().retrieveTurtle(this.getId(), this.getClass());
+    }
 }

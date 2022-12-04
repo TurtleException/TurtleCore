@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
 public interface DiscordChannel extends IChannel {
     @Override
     default @NotNull Action<DiscordChannel> update() {
-        return this.getClient().retrieveDiscordChannel(this.getId());
+        return this.getClient().retrieveTurtle(this.getId(), DiscordChannel.class);
     }
 
     @Override

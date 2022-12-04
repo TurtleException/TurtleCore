@@ -23,7 +23,7 @@ import java.util.List;
 public interface Ticket extends Turtle, TurtleContainer<User> {
     @Override
     default @NotNull Action<Ticket> update() {
-        return this.getClient().retrieveTicket(this.getId());
+        return this.getClient().retrieveTurtle(this.getId(), Ticket.class);
     }
 
     /* - STATE - */

@@ -12,7 +12,7 @@ import java.util.UUID;
 public interface MinecraftChannel extends IChannel {
     @Override
     default @NotNull Action<MinecraftChannel> update() {
-        return this.getClient().retrieveMinecraftChannel(this.getId());
+        return this.getClient().retrieveTurtle(this.getId(), MinecraftChannel.class);
     }
 
     @Override
