@@ -9,6 +9,14 @@ public class Types {
         public static final String UUID      = "VARCHAR(36)";
     }
 
+    /* - ATTRIBUTES - */
+
+    public static class Attributes {
+        public static class EphemeralType {
+            public static final String EPHEMERAL = "BOOLEAN";
+        }
+    }
+
     /* - PACKAGES - */
 
     public static class Messages {
@@ -50,7 +58,6 @@ public class Types {
     public static class JsonResource {
         public static final String IDENTIFIER = "TEXT";
         public static final String CONTENT    = "LONGTEXT";
-        public static final String EPHEMERAL  = "BOOLEAN";
     }
 
     public static class Project {

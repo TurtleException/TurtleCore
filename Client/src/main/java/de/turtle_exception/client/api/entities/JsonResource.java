@@ -3,6 +3,7 @@ package de.turtle_exception.client.api.entities;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import de.turtle_exception.client.api.entities.attributes.EphemeralType;
 import de.turtle_exception.client.api.request.Action;
 import de.turtle_exception.client.internal.data.annotations.Key;
 import de.turtle_exception.client.internal.data.annotations.Keys;
@@ -16,7 +17,7 @@ import org.jetbrains.annotations.NotNull;
  */
 @Resource(path = "json_resources", builder = "buildJsonResource")
 @SuppressWarnings("unused")
-public interface JsonResource extends Turtle {
+public interface JsonResource extends Turtle, EphemeralType {
     @Override
     default @NotNull Action<JsonResource> update() {
         return this.getClient().retrieveTurtle(this.getId(), JsonResource.class);
@@ -44,17 +45,6 @@ public interface JsonResource extends Turtle {
 
     @NotNull Action<JsonResource> modifyContent(@NotNull JsonElement content);
 
-    // TODO: update this when the event-thing is implemented
-    /**
-     * Returns true if this resource is ephemeral.
-     * <p> When a JsonResource is ephemeral it will not be cached by clients (at least not internally) or the server. It
-     * will however, fire an event so that it can be processed once.
-     * <p> This might be useful for resources that are used often, but don't need to be logged - especially if they
-     * would amount to great sums of unnecessarily complex data.
-     * @return {@code true} if this resource is ephemeral.
-     */
-    @Key(name = Keys.JsonResource.EPHEMERAL, sqlType = Types.JsonResource.EPHEMERAL)
-    boolean isEphemeral();
-
+    @Override
     @NotNull Action<JsonResource> modifyEphemeral(boolean ephemeral);
 }

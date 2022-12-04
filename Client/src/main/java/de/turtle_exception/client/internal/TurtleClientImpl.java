@@ -3,6 +3,7 @@ package de.turtle_exception.client.internal;
 import com.google.gson.JsonObject;
 import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.api.entities.*;
+import de.turtle_exception.client.api.entities.attributes.EphemeralType;
 import de.turtle_exception.client.api.entities.messages.DiscordChannel;
 import de.turtle_exception.client.api.entities.messages.MinecraftChannel;
 import de.turtle_exception.client.api.entities.messages.SyncChannel;
@@ -194,8 +195,8 @@ public class TurtleClientImpl implements TurtleClient {
         return provider.get(type, id).andThenParse(type).onSuccess(t -> {
             cache.removeById(id);
 
-            // don't cache ephemeral JsonResources
-            if (t instanceof JsonResource j && j.isEphemeral()) return;
+            // don't cache ephemeral resources
+            if (t instanceof EphemeralType e && e.isEphemeral()) return;
 
             cache.add(t);
         });
@@ -205,8 +206,8 @@ public class TurtleClientImpl implements TurtleClient {
         return provider.get(type).andThenParseList(type).onSuccess(l -> {
             cache.removeAll(type);
             for (T t : l) {
-                // don't cache ephemeral JsonResources
-                if (t instanceof JsonResource j && j.isEphemeral()) continue;
+                // don't cache ephemeral resources
+                if (t instanceof EphemeralType e && e.isEphemeral()) continue;
 
                 cache.add(t);
             }

@@ -3,6 +3,14 @@ package de.turtle_exception.client.internal.data.annotations;
 public class Keys {
     private Keys() { }
 
+    /* - ATTRIBUTES - */
+
+    public static class Attribute {
+        public static class EphemeralType {
+            public static final String EPHEMERAL = "ephemeral";
+        }
+    }
+
     /* - PACKAGES - */
 
     public static class Messages {
@@ -44,7 +52,6 @@ public class Keys {
     public static class JsonResource {
         public static final String IDENTIFIER = "identifier";
         public static final String CONTENT    = "content";
-        public static final String EPHEMERAL  = "ephemeral";
     }
 
     public static class Project {
