@@ -166,7 +166,7 @@ public class NetServer extends NetworkAdapter {
         }
 
         turtle.delete().queue(result -> {
-            getClientImpl().removeCache(turtle.getClass(), id);
+            getClientImpl().removeCache(id);
             if (result)
                 notifyClients(packet, Data.buildRemove(turtle.getClass(), id));
             else

@@ -37,7 +37,6 @@ import org.jetbrains.annotations.Range;
 
 import javax.security.auth.login.LoginException;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -69,17 +68,7 @@ public class TurtleClientImpl implements TurtleClient {
     private long defaultTimeoutInbound  = TimeUnit.SECONDS.toMillis( 8);
     private long defaultTimeoutOutbound = TimeUnit.SECONDS.toMillis(16);
 
-    private final TurtleSet<Group> groupCache = new TurtleSet<>();
-    private final TurtleSet<JsonResource> jsonResourceCache = new TurtleSet<>();
-    private final TurtleSet<Project> projectCache = new TurtleSet<>();
-    private final TurtleSet<Ticket> ticketCache = new TurtleSet<>();
-    private final TurtleSet<User> userCache = new TurtleSet<>();
-
-    // MESSAGES
-    private final TurtleSet<DiscordChannel> discordChannelCache = new TurtleSet<>();
-    private final TurtleSet<MinecraftChannel> minecraftChannelCache = new TurtleSet<>();
-    private final TurtleSet<SyncChannel> channelCache = new TurtleSet<>();
-    private final TurtleSet<SyncMessage> messageCache = new TurtleSet<>();
+    private final TurtleSet<Turtle> cache = new TurtleSet<>();
 
     /* THIRD PARTY SERVICES */
     private Server spigotServer = null;
@@ -165,17 +154,7 @@ public class TurtleClientImpl implements TurtleClient {
     }
 
     private synchronized void doInvalidateCaches(boolean retrieve) {
-        this.groupCache.clear();
-        this.jsonResourceCache.clear();
-        this.projectCache.clear();
-        this.ticketCache.clear();
-        this.userCache.clear();
-
-        // MESSAGES
-        this.discordChannelCache.clear();
-        this.minecraftChannelCache.clear();
-        this.channelCache.clear();
-        this.messageCache.clear();
+        this.cache.clear();
 
         if (retrieve) {
             /*
@@ -200,86 +179,14 @@ public class TurtleClientImpl implements TurtleClient {
         return name;
     }
 
-    public @NotNull TurtleSet<Group> getGroupCache() {
-        return groupCache;
-    }
-
-    public @NotNull TurtleSet<JsonResource> getJsonResourceCache() {
-        return jsonResourceCache;
-    }
-
-    public @NotNull TurtleSet<Project> getProjectCache() {
-        return projectCache;
-    }
-
-    public @NotNull TurtleSet<Ticket> getTicketCache() {
-        return ticketCache;
-    }
-
-    public @NotNull TurtleSet<User> getUserCache() {
-        return userCache;
-    }
-
-    // MESSAGES
-
-    public @NotNull TurtleSet<DiscordChannel> getDiscordChannelCache() {
-        return discordChannelCache;
-    }
-
-    public @NotNull TurtleSet<MinecraftChannel> getMinecraftChannelCache() {
-        return minecraftChannelCache;
-    }
-
-    public @NotNull TurtleSet<SyncChannel> getChannelCache() {
-        return channelCache;
-    }
-
-    public @NotNull TurtleSet<SyncMessage> getMessageCache() {
-        return messageCache;
-    }
-
     @Override
     public @NotNull List<Turtle> getTurtles() {
-        ArrayList<Turtle> list = new ArrayList<>();
-        list.addAll(groupCache);
-        list.addAll(jsonResourceCache);
-        list.addAll(projectCache);
-        list.addAll(userCache);
-        list.addAll(ticketCache);
-
-        // MESSAGES
-        list.addAll(discordChannelCache);
-        list.addAll(minecraftChannelCache);
-        list.addAll(channelCache);
-        list.addAll(messageCache);
-
-        return list;
+        return List.copyOf(this.cache);
     }
 
-    @SuppressWarnings("RedundantIfStatement")
     @Override
     public @Nullable Turtle getTurtleById(long id) {
-        Group group = groupCache.get(id);
-        if (group != null) return group;
-        JsonResource jsonResource = jsonResourceCache.get(id);
-        if (jsonResource != null) return jsonResource;
-        Project project = projectCache.get(id);
-        if (project != null) return project;
-        User user = userCache.get(id);
-        if (user != null) return user;
-        Ticket ticket = ticketCache.get(id);
-        if (ticket != null) return ticket;
-
-        // MESSAGES
-        DiscordChannel discordChannel = discordChannelCache.get(id);
-        if (discordChannel != null) return discordChannel;
-        MinecraftChannel minecraftChannel = minecraftChannelCache.get(id);
-        if (minecraftChannel != null) return minecraftChannel;
-        SyncChannel channel = channelCache.get(id);
-        if (channel != null) return channel;
-        SyncMessage message = messageCache.get(id);
-        if (message != null) return message;
-        return null;
+        return this.cache.get(id);
     }
 
     /* - - - */
@@ -287,73 +194,73 @@ public class TurtleClientImpl implements TurtleClient {
     @Override
     public @NotNull Action<Group> retrieveGroup(long id) {
         return provider.get(Group.class, id).andThenParse(Group.class).onSuccess(group -> {
-            groupCache.removeById(id);
-            groupCache.add(group);
+            cache.removeById(id);
+            cache.add(group);
         });
     }
 
     @Override
     public @NotNull Action<List<Group>> retrieveGroups() {
         return provider.get(Group.class).andThenParseList(Group.class).onSuccess(l -> {
-            groupCache.clear();
-            groupCache.addAll(l);
+            cache.removeAll(Group.class);
+            cache.addAll(l);
         });
     }
 
     @Override
     public @NotNull Action<JsonResource> retrieveJsonResource(long id) {
         return provider.get(JsonResource.class, id).andThenParse(JsonResource.class).onSuccess(jsonResource -> {
-            jsonResourceCache.removeById(id);
+            cache.removeById(id);
             if (!jsonResource.isEphemeral())
-                jsonResourceCache.add(jsonResource);
+                cache.add(jsonResource);
         });
     }
 
     @Override
     public @NotNull Action<Project> retrieveProject(long id) {
         return provider.get(Project.class, id).andThenParse(Project.class).onSuccess(project -> {
-            projectCache.removeById(id);
-            projectCache.add(project);
+            cache.removeById(id);
+            cache.add(project);
         });
     }
 
     @Override
     public @NotNull Action<List<Project>> retrieveProjects() {
         return provider.get(Project.class).andThenParseList(Project.class).onSuccess(l -> {
-            projectCache.clear();
-            projectCache.addAll(l);
+            cache.removeAll(Project.class);
+            cache.addAll(l);
         });
     }
 
     @Override
     public @NotNull Action<Ticket> retrieveTicket(long id) {
         return provider.get(Ticket.class, id).andThenParse(Ticket.class).onSuccess(ticket -> {
-            ticketCache.removeById(id);
-            ticketCache.add(ticket);
+            cache.removeById(id);
+            cache.add(ticket);
         });
     }
 
     @Override
     public @NotNull Action<List<Ticket>> retrieveTickets() {
         return provider.get(Ticket.class).andThenParseList(Ticket.class).onSuccess(l -> {
-            ticketCache.clear();
-            ticketCache.addAll(l);
+            cache.removeAll(Ticket.class);
+            cache.addAll(l);
         });
     }
 
     @Override
     public @NotNull Action<User> retrieveUser(long id) {
         return provider.get(User.class, id).andThenParse(User.class).onSuccess(user -> {
-            userCache.removeById(id);
-            userCache.add(user);
+            cache.removeById(id);
+            cache.add(user);
         });
     }
 
     @Override
     public @NotNull Action<List<User>> retrieveUsers() {
         return provider.get(User.class).andThenParseList(User.class).onSuccess(l -> {
-            userCache.clear();
-            userCache.addAll(l);
+            cache.removeAll(User.class);
+            cache.addAll(l);
         });
     }
 
@@ -362,56 +269,56 @@ public class TurtleClientImpl implements TurtleClient {
     @Override
     public @NotNull Action<DiscordChannel> retrieveDiscordChannel(long id) {
         return provider.get(DiscordChannel.class, id).andThenParse(DiscordChannel.class).onSuccess(channel -> {
-            discordChannelCache.removeById(id);
-            discordChannelCache.add(channel);
+            cache.removeById(id);
+            cache.add(channel);
         });
     }
 
     @Override
     public @NotNull Action<List<DiscordChannel>> retrieveDiscordChannels() {
         return provider.get(DiscordChannel.class).andThenParseList(DiscordChannel.class).onSuccess(l -> {
-            discordChannelCache.clear();
-            discordChannelCache.addAll(l);
+            cache.removeAll(DiscordChannel.class);
+            cache.addAll(l);
         });
     }
 
     @Override
     public @NotNull Action<MinecraftChannel> retrieveMinecraftChannel(long id) {
         return provider.get(MinecraftChannel.class, id).andThenParse(MinecraftChannel.class).onSuccess(channel -> {
-            minecraftChannelCache.removeById(id);
-            minecraftChannelCache.add(channel);
+            cache.removeById(id);
+            cache.add(channel);
         });
     }
 
     @Override
     public @NotNull Action<List<MinecraftChannel>> retrieveMinecraftChannels() {
         return provider.get(MinecraftChannel.class).andThenParseList(MinecraftChannel.class).onSuccess(l -> {
-            minecraftChannelCache.clear();
-            minecraftChannelCache.addAll(l);
+            cache.removeAll(MinecraftChannel.class);
+            cache.addAll(l);
         });
     }
 
     @Override
     public @NotNull Action<SyncChannel> retrieveChannel(long id) {
         return provider.get(SyncChannel.class, id).andThenParse(SyncChannel.class).onSuccess(channel -> {
-            channelCache.removeById(id);
-            channelCache.add(channel);
+            cache.removeById(id);
+            cache.add(channel);
         });
     }
 
     @Override
     public @NotNull Action<List<SyncChannel>> retrieveChannels() {
         return provider.get(SyncChannel.class).andThenParseList(SyncChannel.class).onSuccess(l -> {
-            channelCache.clear();
-            channelCache.addAll(l);
+            cache.removeAll(SyncChannel.class);
+            cache.addAll(l);
         });
     }
 
     @Override
     public @NotNull Action<SyncMessage> retrieveMessage(long id) {
         return provider.get(SyncMessage.class, id).andThenParse(SyncMessage.class).onSuccess(message -> {
-            messageCache.removeById(id);
-            messageCache.add(message);
+            cache.removeById(id);
+            cache.add(message);
         });
     }
 
@@ -491,58 +398,20 @@ public class TurtleClientImpl implements TurtleClient {
     }
 
     public void removeTurtle(@NotNull Turtle turtle) {
-        this.removeCache(turtle.getClass(), turtle.getId());
+        this.removeCache(turtle.getId());
         UpdateHelper.ofDeleteTurtle(turtle);
     }
 
     private void updateCache(@NotNull Turtle turtle) throws IllegalArgumentException {
-        if (turtle instanceof Group group)
-            groupCache.put(group);
-        if (turtle instanceof JsonResource jsonResource)
-            if (!jsonResource.isEphemeral())
-                jsonResourceCache.put(jsonResource);
-        if (turtle instanceof Project project)
-            projectCache.put(project);
-        if (turtle instanceof Ticket ticket)
-            ticketCache.put(ticket);
-        if (turtle instanceof User user)
-            userCache.put(user);
+        // don't cache ephemeral JsonResources
+        if ((turtle instanceof JsonResource j) && j.isEphemeral()) return;
 
-        // MESSAGES
-        if (turtle instanceof DiscordChannel discordChannel)
-            discordChannelCache.put(discordChannel);
-        if (turtle instanceof MinecraftChannel minecraftChannel)
-            minecraftChannelCache.put(minecraftChannel);
-        if (turtle instanceof SyncChannel channel)
-            channelCache.put(channel);
-        if (turtle instanceof SyncMessage message)
-            messageCache.put(message);
-
+        this.cache.add(turtle);
         this.logger.log(Level.FINER, "Updated cache for turtle " + turtle.getId() + ".");
     }
 
-    public void removeCache(@NotNull Class<? extends Turtle> type, long id) throws IllegalArgumentException, ClassCastException {
-        if (Group.class.isAssignableFrom(type))
-            groupCache.removeById(id);
-        if (JsonResource.class.isAssignableFrom(type))
-            jsonResourceCache.removeById(id);
-        if (Project.class.isAssignableFrom(type))
-            projectCache.removeById(id);
-        if (Ticket.class.isAssignableFrom(type))
-            ticketCache.removeById(id);
-        if (User.class.isAssignableFrom(type))
-            userCache.removeById(id);
-
-        // MESSAGES
-        if (DiscordChannel.class.isAssignableFrom(type))
-            discordChannelCache.removeById(id);
-        if (MinecraftChannel.class.isAssignableFrom(type))
-            minecraftChannelCache.removeById(id);
-        if (SyncChannel.class.isAssignableFrom(type))
-            channelCache.removeById(id);
-        if (SyncMessage.class.isAssignableFrom(type))
-            messageCache.removeById(id);
-
+    public void removeCache(long id) {
+        this.cache.removeById(id);
         this.logger.log(Level.FINER, "Removed turtle " + id + " from cache.");
     }
 
