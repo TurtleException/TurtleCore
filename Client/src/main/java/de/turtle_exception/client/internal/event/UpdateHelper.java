@@ -1,10 +1,12 @@
 package de.turtle_exception.client.internal.event;
 
 import de.turtle_exception.client.api.entities.*;
+import de.turtle_exception.client.api.entities.attributes.EphemeralType;
 import de.turtle_exception.client.api.entities.messages.DiscordChannel;
 import de.turtle_exception.client.api.entities.messages.MinecraftChannel;
 import de.turtle_exception.client.api.entities.messages.SyncChannel;
 import de.turtle_exception.client.api.entities.messages.SyncMessage;
+import de.turtle_exception.client.api.event.entities.EphemeralEntityEvent;
 import de.turtle_exception.client.api.event.entities.group.GroupCreateEvent;
 import de.turtle_exception.client.api.event.entities.group.GroupDeleteEvent;
 import de.turtle_exception.client.api.event.entities.group.GroupMemberJoinEvent;
@@ -18,7 +20,6 @@ import de.turtle_exception.client.api.event.entities.messages.minecraft_channel.
 import de.turtle_exception.client.api.event.entities.messages.sync_channel.*;
 import de.turtle_exception.client.api.event.entities.messages.sync_message.SyncMessageCreateEvent;
 import de.turtle_exception.client.api.event.entities.messages.sync_message.SyncMessageDeleteEvent;
-import de.turtle_exception.client.api.event.entities.messages.sync_message.SyncMessageUpdateEvent;
 import de.turtle_exception.client.api.event.entities.project.ProjectCreateEvent;
 import de.turtle_exception.client.api.event.entities.project.ProjectDeleteEvent;
 import de.turtle_exception.client.api.event.entities.project.ProjectMemberJoinEvent;
@@ -28,7 +29,6 @@ import de.turtle_exception.client.api.event.entities.user.*;
 import de.turtle_exception.client.internal.util.TurtleSet;
 import org.jetbrains.annotations.NotNull;
 
-import java.nio.channels.SelectableChannel;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -38,6 +38,11 @@ public class UpdateHelper {
     private UpdateHelper() { }
 
     public static void ofCreateTurtle(@NotNull Turtle turtle) {
+        if (turtle instanceof EphemeralType e && e.isEphemeral()) {
+            turtle.getClient().getEventManager().handleEvent(new EphemeralEntityEvent<>(e));
+            return;
+        }
+
         if (turtle instanceof Group group)
             turtle.getClient().getEventManager().handleEvent(new GroupCreateEvent(group));
         if (turtle instanceof JsonResource jsonResource)

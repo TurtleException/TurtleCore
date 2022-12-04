@@ -1,5 +1,6 @@
 package de.turtle_exception.client.api.event;
 
+import de.turtle_exception.client.api.event.entities.EphemeralEntityEvent;
 import de.turtle_exception.client.api.event.entities.group.*;
 import de.turtle_exception.client.api.event.entities.json_resource.*;
 import de.turtle_exception.client.api.event.entities.messages.discord_channel.*;
@@ -18,6 +19,11 @@ import java.util.logging.Level;
 @SuppressWarnings("unused")
 public abstract class EventListener {
     public void onGenericEvent(@NotNull Event event) { }
+
+    // EPHEMERAL ENTITY
+    public void onEphemeralEntity(@NotNull EphemeralEntityEvent<?> event) { }
+
+    /* - ENTITIES - */
 
     // Group Events
     public void onGroupCreate(@NotNull GroupCreateEvent event) { }
