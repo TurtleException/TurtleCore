@@ -51,7 +51,7 @@ public interface CompletedFormAction extends Action<CompletedForm> {
         return this.addQueryResponseId(queryResponse.getId());
     }
 
-    CompletedFormAction removeQueryResponseId(long queryAction);
+    CompletedFormAction removeQueryResponseId(long queryResponse);
 
     default CompletedFormAction removeQueryResponse(@NotNull QueryResponse queryResponse) {
         return this.removeQueryResponseId(queryResponse.getId());
