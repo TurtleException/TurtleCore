@@ -10,6 +10,7 @@ import de.turtle_exception.client.api.event.EventListener;
 import de.turtle_exception.client.api.event.EventManager;
 import de.turtle_exception.client.api.request.Action;
 import de.turtle_exception.client.api.request.entities.*;
+import de.turtle_exception.client.api.request.entities.form.*;
 import de.turtle_exception.client.api.request.entities.messages.DiscordChannelAction;
 import de.turtle_exception.client.api.request.entities.messages.MinecraftChannelAction;
 import de.turtle_exception.client.api.request.entities.messages.SyncChannelAction;
@@ -172,6 +173,18 @@ public interface TurtleClient extends TurtleContainer<Turtle> {
      * @return Action that provides the newly crated {@link User} on completion.
      */
     @NotNull UserAction createUser();
+
+    // FORM
+
+    @NotNull CompletedFormAction createCompletedForm();
+
+    @NotNull QueryElementAction createQueryElement();
+
+    @NotNull QueryResponseAction createQueryResponse();
+
+    @NotNull TemplateFormAction createTemplateForm();
+
+    @NotNull TextElementAction createTextElement();
 
     // MESSAGES
 

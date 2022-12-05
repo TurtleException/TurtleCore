@@ -10,6 +10,7 @@ import de.turtle_exception.client.api.entities.messages.SyncChannel;
 import de.turtle_exception.client.api.event.EventManager;
 import de.turtle_exception.client.api.request.Action;
 import de.turtle_exception.client.api.request.entities.*;
+import de.turtle_exception.client.api.request.entities.form.*;
 import de.turtle_exception.client.api.request.entities.messages.DiscordChannelAction;
 import de.turtle_exception.client.api.request.entities.messages.MinecraftChannelAction;
 import de.turtle_exception.client.api.request.entities.messages.SyncChannelAction;
@@ -22,6 +23,7 @@ import de.turtle_exception.client.internal.net.NetClient;
 import de.turtle_exception.client.internal.net.NetworkProvider;
 import de.turtle_exception.client.internal.request.actions.SimpleAction;
 import de.turtle_exception.client.internal.request.actions.entities.*;
+import de.turtle_exception.client.internal.request.actions.entities.form.*;
 import de.turtle_exception.client.internal.request.actions.entities.messages.DiscordChannelActionImpl;
 import de.turtle_exception.client.internal.request.actions.entities.messages.MinecraftChannelActionImpl;
 import de.turtle_exception.client.internal.request.actions.entities.messages.SyncChannelActionImpl;
@@ -239,6 +241,33 @@ public class TurtleClientImpl implements TurtleClient {
     @Override
     public @NotNull UserAction createUser() {
         return new UserActionImpl(this.provider);
+    }
+
+    // FORM
+
+    @Override
+    public @NotNull CompletedFormAction createCompletedForm() {
+        return new CompletedFormActionImpl(this.provider);
+    }
+
+    @Override
+    public @NotNull QueryElementAction createQueryElement() {
+        return new QueryElementActionImpl(this.provider);
+    }
+
+    @Override
+    public @NotNull QueryResponseAction createQueryResponse() {
+        return new QueryResponseActionImpl(this.provider);
+    }
+
+    @Override
+    public @NotNull TemplateFormAction createTemplateForm() {
+        return new TemplateFormActionImpl(this.provider);
+    }
+
+    @Override
+    public @NotNull TextElementAction createTextElement() {
+        return new TextElementActionImpl(this.provider);
     }
 
     // MESSAGES
