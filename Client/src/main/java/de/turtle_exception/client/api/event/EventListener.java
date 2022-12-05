@@ -1,6 +1,14 @@
 package de.turtle_exception.client.api.event;
 
 import de.turtle_exception.client.api.event.entities.EphemeralEntityEvent;
+import de.turtle_exception.client.api.event.entities.form.completed_form.CompletedFormCreateEvent;
+import de.turtle_exception.client.api.event.entities.form.completed_form.CompletedFormDeleteEvent;
+import de.turtle_exception.client.api.event.entities.form.query_element.*;
+import de.turtle_exception.client.api.event.entities.form.query_response.QueryResponseCreateEvent;
+import de.turtle_exception.client.api.event.entities.form.query_response.QueryResponseDeleteEvent;
+import de.turtle_exception.client.api.event.entities.form.template_form.TemplateFormCreateEvent;
+import de.turtle_exception.client.api.event.entities.form.template_form.TemplateFormDeleteEvent;
+import de.turtle_exception.client.api.event.entities.form.text_element.*;
 import de.turtle_exception.client.api.event.entities.group.*;
 import de.turtle_exception.client.api.event.entities.json_resource.*;
 import de.turtle_exception.client.api.event.entities.messages.discord_channel.*;
@@ -73,6 +81,34 @@ public abstract class EventListener {
     public void onTicketTagRemove(@NotNull TicketTagRemoveEvent event) { }
     public void onTicketUserAdd(@NotNull TicketUserAddEvent event) { }
     public void onTicketUserRemove(@NotNull TicketUserRemoveEvent event) { }
+
+    /* - FORM - */
+
+    // CompletedForm Events
+    public void onCompletedFormCreate(@NotNull CompletedFormCreateEvent event) { }
+    public void onCompletedFormDelete(@NotNull CompletedFormDeleteEvent event) { }
+
+    // QueryElement Events
+    public void onQueryElementCreate(@NotNull QueryElementCreateEvent event) { }
+    public void onQueryElementDelete(@NotNull QueryElementDeleteEvent event) { }
+    public void onQueryElementUpdate(@NotNull QueryElementUpdateEvent<?> event) { }
+    public void onQueryElementUpdateTitle(@NotNull QueryElementUpdateTitleEvent event) { }
+    public void onQueryElementUpdateDescription(@NotNull QueryElementUpdateDescriptionEvent event) { }
+
+    // QueryResponse Events
+    public void onQueryResponseCreate(@NotNull QueryResponseCreateEvent event) { }
+    public void onQueryResponseDelete(@NotNull QueryResponseDeleteEvent event) { }
+
+    // TemplateForm Events
+    public void onTemplateFormCreate(@NotNull TemplateFormCreateEvent event) { }
+    public void onTemplateFormDelete(@NotNull TemplateFormDeleteEvent event) { }
+
+    // TextElement Events
+    public void onTextElementCreate(@NotNull TextElementCreateEvent event) { }
+    public void onTextElementDelete(@NotNull TextElementDeleteEvent event) { }
+    public void onTextElementUpdate(@NotNull TextElementUpdateEvent<?> event) { }
+    public void onTextElementUpdateTitle(@NotNull TextElementUpdateTitleEvent event) { }
+    public void onTextElementUpdateContent(@NotNull TextElementUpdateContentEvent event) { }
 
     /* - MESSAGES - */
 
