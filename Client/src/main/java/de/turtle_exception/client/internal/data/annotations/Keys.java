@@ -13,6 +13,38 @@ public class Keys {
 
     /* - PACKAGES - */
 
+    public static class Form {
+        public static class CompletedForm {
+            public static final String FORM            = "form";
+            public static final String AUTHOR          = "author";
+            public static final String TIME_SUBMISSION = "time_submission";
+            public static final String QUERY_RESPONSES = "query_responses";
+        }
+
+        public static class Element {
+            public static final String TITLE = "title";
+        }
+
+        public static class QueryElement {
+            public static final String DESCRIPTION  = "description";
+            public static final String CONTENT_TYPE = "content_type";
+        }
+
+        public static class QueryResponse {
+            public static final String QUERY   = "query";
+            public static final String CONTENT = "content";
+        }
+
+        public static class TemplateForm {
+            public static final String TITLE   = "title";
+            public static final String QUERIES = "queries";
+        }
+
+        public static class TextElement {
+            public static final String CONTENT = "content";
+        }
+    }
+
     public static class Messages {
         public static class DiscordChannel {
             public static final String SNOWFLAKE = "snowflake";

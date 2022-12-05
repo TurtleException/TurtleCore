@@ -19,6 +19,38 @@ public class Types {
 
     /* - PACKAGES - */
 
+    public static class Form {
+        public static class CompletedForm {
+            public static final String FORM            = Templates.TURTLE;
+            public static final String AUTHOR          = Templates.TURTLE;
+            public static final String TIME_SUBMISSION = "BIGINT";
+            public static final String QUERY_RESPONSES = Templates.TURTLE;
+        }
+
+        public static class Element {
+            public static final String TITLE = "TEXT";
+        }
+
+        public static class QueryElement {
+            public static final String DESCRIPTION  = "TEXT";
+            public static final String CONTENT_TYPE = "TINYINT";
+        }
+
+        public static class QueryResponse {
+            public static final String QUERY   = Templates.TURTLE;
+            public static final String CONTENT = "TEXT";
+        }
+
+        public static class TemplateForm {
+            public static final String TITLE   = "TEXT";
+            public static final String QUERIES = Templates.TURTLE;
+        }
+
+        public static class TextElement {
+            public static final String CONTENT = "TEXT";
+        }
+    }
+
     public static class Messages {
         public static class DiscordChannel {
             public static final String SNOWFLAKE = Templates.SNOWFLAKE;
