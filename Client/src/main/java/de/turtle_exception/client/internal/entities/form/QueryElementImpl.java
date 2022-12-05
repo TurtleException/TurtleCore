@@ -5,7 +5,7 @@ import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.api.entities.form.ContentType;
 import de.turtle_exception.client.api.entities.form.QueryElement;
 import de.turtle_exception.client.api.request.Action;
-import de.turtle_exception.client.internal.entities.TurtleImpl;
+import de.turtle_exception.client.internal.data.annotations.Keys;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -29,8 +29,7 @@ public class QueryElementImpl extends ElementImpl implements QueryElement {
 
     @Override
     public @NotNull Action<QueryElement> modifyTitle(@Nullable String title) {
-        // TODO
-        return null;
+        return getClient().getProvider().patch(this, Keys.Form.Element.TITLE, title).andThenParse(QueryElement.class);
     }
 
     @Override
@@ -40,8 +39,7 @@ public class QueryElementImpl extends ElementImpl implements QueryElement {
 
     @Override
     public @NotNull Action<QueryElement> modifyDescription(@Nullable String description) {
-        // TODO
-        return null;
+        return getClient().getProvider().patch(this, Keys.Form.QueryElement.DESCRIPTION, description).andThenParse(QueryElement.class);
     }
 
     @Override

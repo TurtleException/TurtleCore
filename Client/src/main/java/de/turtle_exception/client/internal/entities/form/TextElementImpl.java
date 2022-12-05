@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.api.entities.form.TextElement;
 import de.turtle_exception.client.api.request.Action;
+import de.turtle_exception.client.internal.data.annotations.Keys;
 import de.turtle_exception.client.internal.entities.TurtleImpl;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -26,8 +27,7 @@ public class TextElementImpl extends ElementImpl implements TextElement {
 
     @Override
     public @NotNull Action<TextElement> modifyTitle(@Nullable String title) {
-        // TODO
-        return null;
+        return getClient().getProvider().patch(this, Keys.Form.Element.TITLE, title).andThenParse(TextElement.class);
     }
 
     @Override
@@ -37,7 +37,6 @@ public class TextElementImpl extends ElementImpl implements TextElement {
 
     @Override
     public @NotNull Action<TextElement> modifyContent(@NotNull String content) {
-        // TODO
-        return null;
+        return getClient().getProvider().patch(this, Keys.Form.TextElement.CONTENT, content).andThenParse(TextElement.class);
     }
 }
