@@ -26,7 +26,7 @@ public class TicketActionImpl extends EntityAction<Ticket> implements TicketActi
     public TicketActionImpl(@NotNull Provider provider) {
         super(provider, Ticket.class);
 
-        this.checks.add(json -> { TicketState.of(json.get(Keys.Ticket.STATE).getAsByte()); });
+        this.checks.add(json -> { json.get(Keys.Ticket.STATE).getAsByte(); });
         this.checks.add(json -> { json.get(Keys.Ticket.TITLE).getAsString(); });
         this.checks.add(json -> { json.get(Keys.Ticket.CATEGORY).getAsString(); });
         this.checks.add(json -> {

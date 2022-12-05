@@ -20,7 +20,7 @@ public class QueryElementActionImpl extends EntityAction<QueryElement> implement
 
         this.checks.add(json -> { json.get(Keys.Form.Element.TITLE).getAsString(); });
         this.checks.add(json -> { json.get(Keys.Form.QueryElement.DESCRIPTION).getAsString(); });
-        this.checks.add(json -> { ContentType.of(json.get(Keys.Form.QueryElement.CONTENT_TYPE).getAsByte()); });
+        this.checks.add(json -> { json.get(Keys.Form.QueryElement.CONTENT_TYPE).getAsByte(); });
     }
 
     @Override

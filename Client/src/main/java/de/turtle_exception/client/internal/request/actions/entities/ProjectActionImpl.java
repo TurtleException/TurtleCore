@@ -28,7 +28,7 @@ public class ProjectActionImpl extends EntityAction<Project> implements ProjectA
 
         this.checks.add(json -> { json.get(Keys.Project.TITLE).getAsString(); });
         this.checks.add(json -> { json.get(Keys.Project.CODE).getAsString(); });
-        this.checks.add(json -> { ProjectState.of(json.get(Keys.Project.STATE).getAsByte()); });
+        this.checks.add(json -> { json.get(Keys.Project.STATE).getAsByte(); });
         this.checks.add(json -> {
             JsonArray arr = json.get(Keys.Project.MEMBERS).getAsJsonArray();
             for (JsonElement entry : arr)

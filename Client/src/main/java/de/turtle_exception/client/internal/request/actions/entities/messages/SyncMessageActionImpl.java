@@ -23,7 +23,7 @@ public class SyncMessageActionImpl extends EntityAction<SyncMessage> implements 
     public SyncMessageActionImpl(@NotNull Provider provider) {
         super(provider, SyncMessage.class);
 
-        this.checks.add(json -> { MessageFormat.of(json.get(Keys.Messages.SyncMessage.FORMAT).getAsByte()); });
+        this.checks.add(json -> { json.get(Keys.Messages.SyncMessage.FORMAT).getAsByte(); });
         this.checks.add(json -> { json.get(Keys.Messages.SyncMessage.AUTHOR).getAsLong(); });
         this.checks.add(json -> { json.get(Keys.Messages.SyncMessage.CONTENT).getAsString(); });
         this.checks.add(json -> { json.get(Keys.Messages.SyncMessage.CHANNEL).getAsLong(); });
