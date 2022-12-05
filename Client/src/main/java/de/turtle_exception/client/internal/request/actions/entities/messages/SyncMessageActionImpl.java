@@ -20,6 +20,7 @@ public class SyncMessageActionImpl extends EntityAction<SyncMessage> implements 
     protected SyncChannel channel;
     protected IChannel source;
 
+    @SuppressWarnings("CodeBlock2Expr")
     public SyncMessageActionImpl(@NotNull Provider provider) {
         super(provider, SyncMessage.class);
 

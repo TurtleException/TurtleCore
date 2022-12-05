@@ -13,6 +13,7 @@ public class DiscordChannelActionImpl extends EntityAction<DiscordChannel> imple
     protected SyncChannel syncChannel;
     protected Long snowflake;
 
+    @SuppressWarnings("CodeBlock2Expr")
     public DiscordChannelActionImpl(@NotNull Provider provider) {
         super(provider, DiscordChannel.class);
 

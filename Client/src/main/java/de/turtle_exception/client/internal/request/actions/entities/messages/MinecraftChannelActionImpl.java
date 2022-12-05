@@ -14,6 +14,7 @@ public class MinecraftChannelActionImpl extends EntityAction<MinecraftChannel> i
     protected Byte type;
     protected String identifier;
 
+    @SuppressWarnings("CodeBlock2Expr")
     public MinecraftChannelActionImpl(@NotNull Provider provider) {
         super(provider, MinecraftChannel.class);
 

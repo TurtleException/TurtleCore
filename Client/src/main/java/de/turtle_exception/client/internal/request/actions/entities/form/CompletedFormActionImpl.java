@@ -4,7 +4,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import de.turtle_exception.client.api.entities.form.CompletedForm;
-import de.turtle_exception.client.api.entities.form.TemplateForm;
 import de.turtle_exception.client.api.request.entities.form.CompletedFormAction;
 import de.turtle_exception.client.internal.Provider;
 import de.turtle_exception.client.internal.data.annotations.Keys;

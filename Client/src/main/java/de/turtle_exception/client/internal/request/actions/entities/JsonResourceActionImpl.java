@@ -21,7 +21,7 @@ public class JsonResourceActionImpl extends EntityAction<JsonResource> implement
 
         this.checks.add(json -> { json.get(Keys.JsonResource.IDENTIFIER).getAsString(); });
         this.checks.add(json -> { Checks.nonNull(json.get(Keys.JsonResource.CONTENT)); });
-        this.checks.add(json -> { json.get(Keys.JsonResource.EPHEMERAL).getAsBoolean(); });
+        this.checks.add(json -> { json.get(Keys.Attribute.EphemeralType.EPHEMERAL).getAsBoolean(); });
     }
 
     @Override
@@ -29,7 +29,7 @@ public class JsonResourceActionImpl extends EntityAction<JsonResource> implement
         this.content = new JsonObject();
         this.content.addProperty(Keys.JsonResource.IDENTIFIER, identifier);
         this.content.add(Keys.JsonResource.CONTENT, jsonContent);
-        this.content.addProperty(Keys.JsonResource.EPHEMERAL, ephemeral);
+        this.content.addProperty(Keys.Attribute.EphemeralType.EPHEMERAL, ephemeral);
     }
 
     /* - - - */
