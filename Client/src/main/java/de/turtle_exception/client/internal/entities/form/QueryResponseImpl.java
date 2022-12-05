@@ -19,7 +19,7 @@ public class QueryResponseImpl extends TurtleImpl implements QueryResponse {
     }
 
     @Override
-    public @NotNull QueryResponseImpl handleUpdate(@NotNull JsonObject json) {
+    public synchronized @NotNull QueryResponseImpl handleUpdate(@NotNull JsonObject json) {
         // this resource is immutable
         return this;
     }

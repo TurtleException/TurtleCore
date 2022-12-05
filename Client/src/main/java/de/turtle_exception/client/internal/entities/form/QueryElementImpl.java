@@ -21,7 +21,16 @@ public class QueryElementImpl extends ElementImpl implements QueryElement {
 
     @Override
     public synchronized @NotNull QueryElementImpl handleUpdate(@NotNull JsonObject json) {
-        // TODO
+        this.apply(json, Keys.Form.Element.TITLE, element -> {
+            String old = this.title;
+            this.title = element.getAsString();
+            // TODO: event
+        });
+        this.apply(json, Keys.Form.QueryElement.DESCRIPTION, element -> {
+            String old = this.description;
+            this.description = element.getAsString();
+            // TODO: event
+        });
         return this;
     }
 

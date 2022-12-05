@@ -18,8 +18,17 @@ public class TextElementImpl extends ElementImpl implements TextElement {
     }
 
     @Override
-    public @NotNull TurtleImpl handleUpdate(@NotNull JsonObject json) {
-        // TODO
+    public synchronized @NotNull TextElementImpl handleUpdate(@NotNull JsonObject json) {
+        this.apply(json, Keys.Form.Element.TITLE, element -> {
+            String old = this.title;
+            this.title = element.getAsString();
+            // TODO: event
+        });
+        this.apply(json, Keys.Form.TextElement.CONTENT, element -> {
+            String old = this.content;
+            this.content = element.getAsString();
+            // TODO: event
+        });
         return this;
     }
 
