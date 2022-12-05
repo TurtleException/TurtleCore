@@ -1,8 +1,12 @@
 package de.turtle_exception.client.internal.request.actions.entities.form;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import de.turtle_exception.client.api.entities.form.TemplateForm;
 import de.turtle_exception.client.api.request.entities.form.TemplateFormAction;
 import de.turtle_exception.client.internal.Provider;
+import de.turtle_exception.client.internal.data.annotations.Keys;
 import de.turtle_exception.client.internal.request.actions.EntityAction;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.jetbrains.annotations.NotNull;
@@ -14,15 +18,27 @@ public class TemplateFormActionImpl extends EntityAction<TemplateForm> implement
     private String title;
     private ArrayList<Long> queries;
 
+    @SuppressWarnings("CodeBlock2Expr")
     public TemplateFormActionImpl(@NotNull Provider provider) {
         super(provider, TemplateForm.class);
 
-        // TODO: checks
+        this.checks.add(json -> { json.get(Keys.Form.TemplateForm.TITLE).getAsString(); });
+        this.checks.add(json -> {
+            JsonArray arr = json.get(Keys.Form.TemplateForm.QUERIES).getAsJsonArray();
+            for (JsonElement entry : arr)
+                entry.getAsLong();
+        });
     }
 
     @Override
     protected void updateContent() {
-        // TODO
+        this.content = new JsonObject();
+        this.content.addProperty(Keys.Form.TemplateForm.TITLE, title);
+
+        JsonArray arr = new JsonArray();
+        for (Long query : this.queries)
+            arr.add(query);
+        this.content.add(Keys.Form.TemplateForm.QUERIES, arr);
     }
 
     /* - - - */

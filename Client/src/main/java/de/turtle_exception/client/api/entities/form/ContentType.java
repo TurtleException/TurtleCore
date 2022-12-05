@@ -30,4 +30,13 @@ public enum ContentType {
     public Class<?> getType() {
         return type;
     }
+
+    /* - - - */
+
+    public static @NotNull ContentType of(byte code) {
+        for (ContentType value : ContentType.values())
+            if (value.getCode() == code)
+                return value;
+        return ContentType.LONG_TEXT;
+    }
 }

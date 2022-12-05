@@ -1,9 +1,13 @@
 package de.turtle_exception.client.internal.request.actions.entities.form;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import de.turtle_exception.client.api.entities.form.CompletedForm;
 import de.turtle_exception.client.api.entities.form.TemplateForm;
 import de.turtle_exception.client.api.request.entities.form.CompletedFormAction;
 import de.turtle_exception.client.internal.Provider;
+import de.turtle_exception.client.internal.data.annotations.Keys;
 import de.turtle_exception.client.internal.request.actions.EntityAction;
 import org.jetbrains.annotations.NotNull;
 
@@ -16,15 +20,31 @@ public class CompletedFormActionImpl extends EntityAction<CompletedForm> impleme
     private long submissionTime;
     private ArrayList<Long> queryResponses = new ArrayList<>();
 
+    @SuppressWarnings("CodeBlock2Expr")
     public CompletedFormActionImpl(@NotNull Provider provider) {
         super(provider, CompletedForm.class);
 
-        // TODO: checks
+        this.checks.add(json -> { json.get(Keys.Form.CompletedForm.FORM).getAsLong(); });
+        this.checks.add(json -> { json.get(Keys.Form.CompletedForm.AUTHOR).getAsLong(); });
+        this.checks.add(json -> { json.get(Keys.Form.CompletedForm.TIME_SUBMISSION).getAsLong(); });
+        this.checks.add(json -> {
+            JsonArray arr = json.get(Keys.Form.CompletedForm.QUERY_RESPONSES).getAsJsonArray();
+            for (JsonElement entry : arr)
+                entry.getAsLong();
+        });
     }
 
     @Override
     protected void updateContent() {
-        // TODO
+        this.content = new JsonObject();
+        this.content.addProperty(Keys.Form.CompletedForm.FORM, form);
+        this.content.addProperty(Keys.Form.CompletedForm.AUTHOR, author);
+        this.content.addProperty(Keys.Form.CompletedForm.TIME_SUBMISSION, submissionTime);
+
+        JsonArray arr = new JsonArray();
+        for (Long queryResponse : this.queryResponses)
+            arr.add(queryResponse);
+        this.content.add(Keys.Form.CompletedForm.QUERY_RESPONSES, arr);
     }
 
     /* - - - */

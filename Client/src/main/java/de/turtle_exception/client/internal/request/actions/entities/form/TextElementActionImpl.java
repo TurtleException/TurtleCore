@@ -1,24 +1,30 @@
 package de.turtle_exception.client.internal.request.actions.entities.form;
 
+import com.google.gson.JsonObject;
 import de.turtle_exception.client.api.entities.form.TextElement;
 import de.turtle_exception.client.api.request.entities.form.TextElementAction;
 import de.turtle_exception.client.internal.Provider;
+import de.turtle_exception.client.internal.data.annotations.Keys;
 import de.turtle_exception.client.internal.request.actions.EntityAction;
 import org.jetbrains.annotations.NotNull;
 
 public class TextElementActionImpl extends EntityAction<TextElement> implements TextElementAction {
     private String title;
-    private String content;
+    private String textContent;
 
+    @SuppressWarnings("CodeBlock2Expr")
     public TextElementActionImpl(@NotNull Provider provider) {
         super(provider, TextElement.class);
 
-        // TODO: checks
+        this.checks.add(json -> { json.get(Keys.Form.Element.TITLE).getAsString(); });
+        this.checks.add(json -> { json.get(Keys.Form.TextElement.CONTENT).getAsString(); });
     }
 
     @Override
     protected void updateContent() {
-        // TODO
+        this.content = new JsonObject();
+        this.content.addProperty(Keys.Form.Element.TITLE, title);
+        this.content.addProperty(Keys.Form.TextElement.CONTENT, textContent);
     }
 
     /* - - - */
@@ -31,7 +37,7 @@ public class TextElementActionImpl extends EntityAction<TextElement> implements 
 
     @Override
     public TextElementAction setContent(String content) {
-        this.content = content;
+        this.textContent = content;
         return this;
     }
 }

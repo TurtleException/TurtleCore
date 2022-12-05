@@ -1,9 +1,11 @@
 package de.turtle_exception.client.internal.request.actions.entities.form;
 
+import com.google.gson.JsonObject;
 import de.turtle_exception.client.api.entities.form.ContentType;
 import de.turtle_exception.client.api.entities.form.QueryElement;
 import de.turtle_exception.client.api.request.entities.form.QueryElementAction;
 import de.turtle_exception.client.internal.Provider;
+import de.turtle_exception.client.internal.data.annotations.Keys;
 import de.turtle_exception.client.internal.request.actions.EntityAction;
 import org.jetbrains.annotations.NotNull;
 
@@ -12,15 +14,21 @@ public class QueryElementActionImpl extends EntityAction<QueryElement> implement
     private String description;
     private ContentType contentType;
 
+    @SuppressWarnings("CodeBlock2Expr")
     public QueryElementActionImpl(@NotNull Provider provider) {
         super(provider, QueryElement.class);
 
-        // TODO: checks
+        this.checks.add(json -> { json.get(Keys.Form.Element.TITLE).getAsString(); });
+        this.checks.add(json -> { json.get(Keys.Form.QueryElement.DESCRIPTION).getAsString(); });
+        this.checks.add(json -> { ContentType.of(json.get(Keys.Form.QueryElement.CONTENT_TYPE).getAsByte()); });
     }
 
     @Override
     protected void updateContent() {
-        // TODO
+        this.content = new JsonObject();
+        this.content.addProperty(Keys.Form.Element.TITLE, title);
+        this.content.addProperty(Keys.Form.QueryElement.DESCRIPTION, description);
+        this.content.addProperty(Keys.Form.QueryElement.CONTENT_TYPE, contentType.getCode());
     }
 
     /* - - - */
