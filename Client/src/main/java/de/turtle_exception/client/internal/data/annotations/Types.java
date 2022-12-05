@@ -66,11 +66,11 @@ public class Types {
         public static final String STATE   = "TINYINT";
         public static final String MEMBERS = Templates.TURTLE;
 
-        public static class ApplicationForm {
+        public static class ApplyForm {
             public static final String PROJECT = Templates.TURTLE;
         }
 
-        public static class Application {
+        public static class ApplyRequest {
             public static final String PROJECT = Templates.TURTLE;
             public static final String USER    = Templates.TURTLE;
         }

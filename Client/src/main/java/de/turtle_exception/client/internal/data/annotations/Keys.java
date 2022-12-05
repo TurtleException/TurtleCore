@@ -60,11 +60,11 @@ public class Keys {
         public static final String STATE   = "state";
         public static final String MEMBERS = "users";
 
-        public static class ApplicationForm {
+        public static class ApplyForm {
             public static final String PROJECT = "project";
         }
 
-        public static class Application {
+        public static class ApplyRequest {
             public static final String PROJECT = "project";
             public static final String USER    = "user";
         }

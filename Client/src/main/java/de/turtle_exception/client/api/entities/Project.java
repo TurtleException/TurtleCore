@@ -60,20 +60,20 @@ public interface Project extends Turtle, TurtleContainer<User> {
 
     // TODO: times
 
-    @Resource(path = "project_application_forms", builder = "buildProjectApplicationForm")
-    interface ApplicationForm extends Turtle {
-        @Key(name = Keys.Project.ApplicationForm.PROJECT, sqlType = Types.Project.ApplicationForm.PROJECT)
+    @Resource(path = "project_apply_forms", builder = "buildProjectApplicationForm")
+    interface ApplyForm extends Turtle {
+        @Key(name = Keys.Project.ApplyForm.PROJECT, sqlType = Types.Project.ApplyForm.PROJECT)
         @NotNull Project getProject();
 
         // TODO: queries + datatypes
     }
 
-    @Resource(path = "project_applications", builder = "buildProjectApplication")
-    interface Application extends Turtle {
-        @Key(name = Keys.Project.Application.PROJECT, sqlType = Types.Project.Application.PROJECT)
+    @Resource(path = "project_apply_requests", builder = "buildProjectApplication")
+    interface ApplyRequest extends Turtle {
+        @Key(name = Keys.Project.ApplyRequest.PROJECT, sqlType = Types.Project.ApplyRequest.PROJECT)
         @NotNull Project getProject();
 
-        @Key(name = Keys.Project.Application.USER, sqlType = Types.Project.Application.USER)
+        @Key(name = Keys.Project.ApplyRequest.USER, sqlType = Types.Project.ApplyRequest.USER)
         @NotNull User getUser();
 
         // TODO: times
