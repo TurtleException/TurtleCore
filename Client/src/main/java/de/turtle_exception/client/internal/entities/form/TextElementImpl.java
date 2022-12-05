@@ -3,6 +3,8 @@ package de.turtle_exception.client.internal.entities.form;
 import com.google.gson.JsonObject;
 import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.api.entities.form.TextElement;
+import de.turtle_exception.client.api.event.entities.form.text_element.TextElementUpdateContentEvent;
+import de.turtle_exception.client.api.event.entities.form.text_element.TextElementUpdateTitleEvent;
 import de.turtle_exception.client.api.request.Action;
 import de.turtle_exception.client.internal.data.annotations.Keys;
 import de.turtle_exception.client.internal.entities.TurtleImpl;
@@ -22,12 +24,12 @@ public class TextElementImpl extends ElementImpl implements TextElement {
         this.apply(json, Keys.Form.Element.TITLE, element -> {
             String old = this.title;
             this.title = element.getAsString();
-            // TODO: event
+            this.fireEvent(new TextElementUpdateTitleEvent(this, old, this.title));
         });
         this.apply(json, Keys.Form.TextElement.CONTENT, element -> {
             String old = this.content;
             this.content = element.getAsString();
-            // TODO: event
+            this.fireEvent(new TextElementUpdateContentEvent(this, old, this.content));
         });
         return this;
     }

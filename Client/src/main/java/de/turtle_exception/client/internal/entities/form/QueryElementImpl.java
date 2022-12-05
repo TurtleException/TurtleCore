@@ -4,6 +4,8 @@ import com.google.gson.JsonObject;
 import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.api.entities.form.ContentType;
 import de.turtle_exception.client.api.entities.form.QueryElement;
+import de.turtle_exception.client.api.event.entities.form.query_element.QueryElementUpdateDescriptionEvent;
+import de.turtle_exception.client.api.event.entities.form.query_element.QueryElementUpdateTitleEvent;
 import de.turtle_exception.client.api.request.Action;
 import de.turtle_exception.client.internal.data.annotations.Keys;
 import org.jetbrains.annotations.NotNull;
@@ -24,12 +26,12 @@ public class QueryElementImpl extends ElementImpl implements QueryElement {
         this.apply(json, Keys.Form.Element.TITLE, element -> {
             String old = this.title;
             this.title = element.getAsString();
-            // TODO: event
+            this.fireEvent(new QueryElementUpdateTitleEvent(this, old, this.title));
         });
         this.apply(json, Keys.Form.QueryElement.DESCRIPTION, element -> {
             String old = this.description;
             this.description = element.getAsString();
-            // TODO: event
+            this.fireEvent(new QueryElementUpdateDescriptionEvent(this, old, this.description));
         });
         return this;
     }
