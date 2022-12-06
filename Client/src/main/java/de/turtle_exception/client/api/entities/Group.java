@@ -53,7 +53,7 @@ public interface Group extends Turtle, TurtleContainer<User> {
     @NotNull List<User> getUsers();
 
     /**
-     * Creates an Action with the instruction to add the provided id to the list of group members.
+     * Creates an Action with the instruction to add the provided id to the list of Group members.
      * <p> The provided {@code long} should be a representation of a {@link User} id.
      * @param user Turtle ID of a User.
      * @return Action that provides the modified {@link Group} on completion.
@@ -61,7 +61,7 @@ public interface Group extends Turtle, TurtleContainer<User> {
     @NotNull Action<Group> addUser(long user);
 
     /**
-     * Creates an Action with the instruction to add the provided {@link User} to the list of group members.
+     * Creates an Action with the instruction to add the provided {@link User} to the list of Group members.
      * <p> This is a shortcut for {@code Group.addUser(user.getId())}.
      * @param user A User.
      * @return Action that provides the modified {@link Group} on completion.
@@ -71,7 +71,7 @@ public interface Group extends Turtle, TurtleContainer<User> {
     }
 
     /**
-     * Creates an Action with the instruction to remove the provided id from the list of group members.
+     * Creates an Action with the instruction to remove the provided id from the list of Group members.
      * <p> The provided {@code long} should be a representation of a {@link User} id.
      * @param user Turtle ID of a User.
      * @return Action that provides the modified {@link Group} on completion.
@@ -79,7 +79,7 @@ public interface Group extends Turtle, TurtleContainer<User> {
     @NotNull Action<Group> removeUser(long user);
 
     /**
-     * Creates an Action with the instruction to remove the provided {@link User} from the list of group members.
+     * Creates an Action with the instruction to remove the provided {@link User} from the list of Group members.
      * <p> This is a shortcut for {@code Group.removeUser(user.getId())}.
      * @param user A User.
      * @return Action that provides the modified {@link Group} on completion.
