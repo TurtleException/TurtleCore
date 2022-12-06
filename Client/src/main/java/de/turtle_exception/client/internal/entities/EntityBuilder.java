@@ -10,17 +10,20 @@ import de.turtle_exception.client.api.entities.User;
 import de.turtle_exception.client.api.entities.attributes.MessageFormat;
 import de.turtle_exception.client.api.entities.attributes.ProjectState;
 import de.turtle_exception.client.api.entities.attributes.TicketState;
+import de.turtle_exception.client.api.entities.form.*;
 import de.turtle_exception.client.api.entities.messages.IChannel;
 import de.turtle_exception.client.api.entities.messages.MinecraftChannel;
 import de.turtle_exception.client.api.entities.messages.SyncChannel;
 import de.turtle_exception.client.internal.data.IllegalJsonException;
 import de.turtle_exception.client.internal.data.annotations.Keys;
+import de.turtle_exception.client.internal.entities.form.*;
 import de.turtle_exception.client.internal.entities.messages.DiscordChannelImpl;
 import de.turtle_exception.client.internal.entities.messages.MinecraftChannelImpl;
 import de.turtle_exception.client.internal.entities.messages.SyncChannelImpl;
 import de.turtle_exception.client.internal.entities.messages.SyncMessageImpl;
 import de.turtle_exception.client.internal.util.Checks;
 import de.turtle_exception.client.internal.util.TurtleSet;
+import net.dv8tion.jda.internal.entities.TeamMemberImpl;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -149,6 +152,69 @@ public class EntityBuilder {
             minecraftList.add(UUID.fromString(element.getAsString()));
 
         return new UserImpl(client, id, name, discordList, minecraftList);
+    }
+
+    /* - FORM - */
+
+    public static @NotNull CompletedFormImpl buildCompletedForm(@NotNull JsonObject data, @NotNull TurtleClient client) throws NullPointerException, IllegalArgumentException, IllegalJsonException {
+        Checks.nonNull(data, "JSON");
+
+        long         id     = data.get(Keys.Turtle.ID).getAsLong();
+        TemplateForm form   = client.getTurtleById(data.get(Keys.Form.CompletedForm.FORM).getAsLong(), TemplateForm.class);
+        User         author = client.getTurtleById(data.get(Keys.Form.CompletedForm.AUTHOR).getAsLong(), User.class);
+        long         time   = data.get(Keys.Form.CompletedForm.TIME_SUBMISSION).getAsLong();
+
+        JsonArray queryResponseArr = data.getAsJsonArray(Keys.Form.CompletedForm.QUERY_RESPONSES);
+        ArrayList<QueryResponse> queryResponses = new ArrayList<>();
+        for (JsonElement element : queryResponseArr)
+            queryResponses.add(client.getTurtleById(element.getAsLong(), QueryResponse.class));
+
+        return new CompletedFormImpl(client, id, form, author, time, queryResponses);
+    }
+
+    public static @NotNull QueryElementImpl buildQueryElement(@NotNull JsonObject data, @NotNull TurtleClient client) throws NullPointerException, IllegalArgumentException, IllegalJsonException {
+        Checks.nonNull(data, "JSON");
+
+        long        id          = data.get(Keys.Turtle.ID).getAsLong();
+        String      title       = getOptional(() -> data.get(Keys.Form.Element.TITLE).getAsString());
+        String      description = getOptional(() -> data.get(Keys.Form.QueryElement.DESCRIPTION).getAsString());
+        ContentType contentType = ContentType.of(data.get(Keys.Form.QueryElement.CONTENT_TYPE).getAsByte());
+
+        return new QueryElementImpl(client, id, title, description, contentType);
+    }
+
+    public static @NotNull QueryResponseImpl buildQueryResponse(@NotNull JsonObject data, @NotNull TurtleClient client) throws NullPointerException, IllegalArgumentException, IllegalJsonException {
+        Checks.nonNull(data, "JSON");
+
+        long         id      = data.get(Keys.Turtle.ID).getAsLong();
+        QueryElement query   = client.getTurtleById(data.get(Keys.Form.QueryResponse.QUERY).getAsLong(), QueryElement.class);
+        String       content = getOptional(() -> data.get(Keys.Form.QueryResponse.CONTENT).getAsString());
+
+        return new QueryResponseImpl(client, id, query, content);
+    }
+
+    public static @NotNull TemplateFormImpl buildTemplateForm(@NotNull JsonObject data, @NotNull TurtleClient client) throws NullPointerException, IllegalArgumentException, IllegalJsonException {
+        Checks.nonNull(data, "JSON");
+
+        long   id    = data.get(Keys.Turtle.ID).getAsLong();
+        String title = data.get(Keys.Form.TemplateForm.TITLE).getAsString();
+
+        JsonArray queryArr = data.getAsJsonArray(Keys.Form.TemplateForm.QUERIES);
+        ArrayList<QueryElement> queries = new ArrayList<>();
+        for (JsonElement element : queryArr)
+            queries.add(client.getTurtleById(element.getAsLong(), QueryElement.class));
+
+        return new TemplateFormImpl(client, id, title, queries);
+    }
+
+    public static @NotNull TextElementImpl buildTextElement(@NotNull JsonObject data, @NotNull TurtleClient client) throws NullPointerException, IllegalArgumentException, IllegalJsonException {
+        Checks.nonNull(data, "JSON");
+
+        long   id      = data.get(Keys.Turtle.ID).getAsLong();
+        String title   = getOptional(() -> data.get(Keys.Form.Element.TITLE).getAsString());
+        String content = data.get(Keys.Form.TextElement.CONTENT).getAsString();
+
+        return new TextElementImpl(client, id, title, content);
     }
 
     /* - MESSAGES - */
