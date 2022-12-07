@@ -11,14 +11,18 @@ import org.jetbrains.annotations.NotNull;
  * @see Ticket#modifyState(TicketState)
  */
 public enum TicketState {
+    /** Indicating that a Ticket has been closed (not solved). */
     CLOSED((byte) 0, "Closed", "\uD83D\uDD34"),
-
+    /** Indicating that a Ticket is still open. */
     OPEN((byte) 1, "Open", "\uD83D\uDFE1"),
-
+    /** Indicating that a Ticket is not yet open or currently frozen. DRAFT Tickets may only be converted to OPEN or CLOSED */
     DRAFT((byte) 2, "Draft", "\uD83D\uDFE0"),
-
+    /** Indicating that a Ticket has been processed successfully. */
     SOLVED((byte) 3, "Solved", "\uD83D\uDFE2"),
-
+    /**
+     * Undefined TicketState. Usually used by {@link TicketState#of(byte)} when a {@code byte} could not be parsed to a
+     * specific TicketState.
+     */
     UNDEFINED(Byte.MAX_VALUE, "Undefined", "\uD83D\uDFE3");
 
     private final byte code;

@@ -8,7 +8,6 @@ import de.turtle_exception.client.internal.data.annotations.Types;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-// TODO: add 'required' field (boolean)
 /** A Form Element that queries the User for input of a specific {@link ContentType}. */
 @Resource(path = "queries", builder = "buildQuery")
 @SuppressWarnings("unused")
@@ -20,11 +19,6 @@ public interface QueryElement extends Element {
 
     /* - TITLE - */
 
-    /**
-     * Creates an Action with the instruction to modify this QueryElement's title and change it to the provided String.
-     * @param title New Query title.
-     * @return Action that provides the modified {@link QueryElement} on completion.
-     */
     @Override
     @NotNull Action<QueryElement> modifyTitle(@Nullable String title);
 

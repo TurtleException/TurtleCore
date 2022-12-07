@@ -11,13 +11,23 @@ import org.jetbrains.annotations.NotNull;
  * @see Project#modifyState(ProjectState)
  */
 public enum ProjectState {
-    CONCEPT(        (byte) 0, "Concept"    , "\uD83D\uDCDA"),
-    PLANNING(       (byte) 1, "Planning"   , "\uD83D\uDCD9"),
-    APPLICATION(    (byte) 2, "Application", "\uD83D\uDCD8"),
-    RUNNING(        (byte) 3, "Running"    , "\uD83D\uDCD7"),
-    STOPPED(        (byte) 4, "Stopped"    , "\uD83D\uDCD5"),
-    CANCELED(       (byte) 5, "Cancelled"  , "\uD83D\uDEAB"),
-    UNDEFINED(Byte.MAX_VALUE, "Undefined"  , "\u2753");
+    /** Indicating that a Project is currently only a concept. */
+    CONCEPT((byte) 0, "Concept", "\uD83D\uDCDA"),
+    /** Indicating that a Project is currently being actively planned. */
+    PLANNING((byte) 1, "Planning", "\uD83D\uDCD9"),
+    /** Indicating that a Project is currently open for applications. */
+    APPLICATION((byte) 2, "Application", "\uD83D\uDCD8"),
+    /** Indicating that a Project is currently running. */
+    RUNNING((byte) 3, "Running", "\uD83D\uDCD7"),
+    /** Indicating that a Project is no longer running and has been stopped. */
+    STOPPED((byte) 4, "Stopped", "\uD83D\uDCD5"),
+    /** Indicating that a Project has been cancelled before starting. */
+    CANCELED((byte) 5, "Cancelled", "\uD83D\uDEAB"),
+    /**
+     * Undefined ProjectState. Usually used by {@link ProjectState#of(byte)} when a {@code byte} could not be parsed to
+     * a specific ProjectState.
+     */
+    UNDEFINED(Byte.MAX_VALUE, "Undefined", "\u2753");
 
     private final byte code;
     private final @NotNull String name;

@@ -24,6 +24,12 @@ public interface TurtleContainer<T extends Turtle> {
      */
     @Nullable T getTurtleById(long id);
 
+    /**
+     * Returns an immutable List of all cached {@link Turtle} objects of type {@code T}.
+     * @param type The requested Turtle (may be {@code null}).
+     * @return List of cached Turtles of type {@code T}.
+     * @param <T1> Subclass of {@code T}.
+     */
     @SuppressWarnings("unchecked")
     default <T1 extends T> @NotNull List<T1> getTurtles(@NotNull Class<T1> type) {
         ArrayList<T1> list = new ArrayList<>();
@@ -39,7 +45,7 @@ public interface TurtleContainer<T extends Turtle> {
      * @param id The unique id of the Turtle.
      * @param type The requested Turtle (mqy be {@code null}).
      * @return The requested Turtle (may be {@code null}).
-     * @param <T1> Subclass of {@code T}
+     * @param <T1> Subclass of {@code T}.
      */
     default <T1 extends T> @Nullable T1 getTurtleById(long id, @NotNull Class<T1> type) {
         T turtle = this.getTurtleById(id);

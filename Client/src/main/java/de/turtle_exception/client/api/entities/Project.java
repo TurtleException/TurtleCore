@@ -161,6 +161,10 @@ public interface Project extends Turtle, TurtleContainer<User> {
         return this.modifyApplicationForm(form.getId());
     }
 
+    /**
+     * Provides a List of all submitted application requests for this Project.
+     * @return List of application requests.
+     */
     default @NotNull List<CompletedForm> getApplicationRequests() {
         return this.getClient().getTurtles(CompletedForm.class).stream()
                 .filter(form -> form.getForm().getId() == this.getApplicationForm().getId())

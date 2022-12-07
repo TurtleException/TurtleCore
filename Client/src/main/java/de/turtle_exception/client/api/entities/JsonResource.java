@@ -33,6 +33,11 @@ public interface JsonResource extends Turtle, EphemeralType {
     @Key(name = Keys.JsonResource.IDENTIFIER, sqlType = Types.JsonResource.IDENTIFIER)
     @NotNull String getIdentifier();
 
+    /**
+     * Creates an Action with the instruction to modify this JsonResource's identifier and change it to the provided String.
+     * @param identifier New JsonResource identifier.
+     * @return Action that provides the modified {@link JsonResource} on completion.
+     */
     @NotNull Action<JsonResource> modifyIdentifier(@NotNull String identifier);
 
     /**
@@ -43,6 +48,11 @@ public interface JsonResource extends Turtle, EphemeralType {
     @Key(name = Keys.JsonResource.CONTENT, sqlType = Types.JsonResource.CONTENT)
     @NotNull JsonElement getContent();
 
+    /**
+     * Creates an Action with the instruction to modify this JsonResource's content and change it to the provided JsonElement.
+     * @param content New JsonResource content.
+     * @return Action that provides the modified {@link JsonResource} on completion.
+     */
     @NotNull Action<JsonResource> modifyContent(@NotNull JsonElement content);
 
     @Override
