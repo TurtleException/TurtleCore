@@ -137,10 +137,6 @@ public abstract class EventListener {
     public void onSyncChannelCreate(@NotNull SyncChannelCreateEvent event) { }
     public void onSyncChannelDelete(@NotNull SyncChannelDeleteEvent event) { }
     public void onSyncChannelUpdate(@NotNull SyncChannelUpdateEvent<?> event) { }
-    public void onSyncChannelDiscordChannelAdd(@NotNull SyncChannelDiscordChannelAddEvent event) { }
-    public void onSyncChannelDiscordChannelRemove(@NotNull SyncChannelDiscordChannelRemoveEvent event) { }
-    public void onSyncChannelMinecraftChannelAdd(@NotNull SyncChannelMinecraftChannelAddEvent event) { }
-    public void onSyncChannelMinecraftChannelRemove(@NotNull SyncChannelMinecraftChannelRemoveEvent event) { }
 
     // SyncMessage Events
     public void onSyncMessageCreate(@NotNull SyncMessageCreateEvent event) { }

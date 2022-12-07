@@ -190,26 +190,4 @@ public class UpdateHelper {
         for (UUID oldMinecraft : removed)
             user.getClient().getEventManager().handleEvent(new UserMinecraftRemoveEvent(user, oldMinecraft));
     }
-
-    /* - SYNC CHANNEL - */
-
-    public static void ofSyncChannelDiscord(@NotNull SyncChannel syncChannel, @NotNull TurtleSet<DiscordChannel> oldDiscordSet, @NotNull TurtleSet<DiscordChannel> newDiscordSet) {
-        List<DiscordChannel> added   = newDiscordSet.stream().filter(channel -> !oldDiscordSet.containsId(channel.getId())).toList();
-        List<DiscordChannel> removed = oldDiscordSet.stream().filter(channel -> !newDiscordSet.containsId(channel.getId())).toList();
-
-        for (DiscordChannel newDiscord : added)
-            syncChannel.getClient().getEventManager().handleEvent(new SyncChannelDiscordChannelAddEvent(syncChannel, newDiscord));
-        for (DiscordChannel newDiscord : removed)
-            syncChannel.getClient().getEventManager().handleEvent(new SyncChannelDiscordChannelRemoveEvent(syncChannel, newDiscord));
-    }
-
-    public static void ofSyncChannelMinecraft(@NotNull SyncChannel syncChannel, @NotNull TurtleSet<MinecraftChannel> oldMinecraftSet, @NotNull TurtleSet<MinecraftChannel> newMinecraftSet) {
-        List<MinecraftChannel> added   = newMinecraftSet.stream().filter(channel -> !oldMinecraftSet.containsId(channel.getId())).toList();
-        List<MinecraftChannel> removed = oldMinecraftSet.stream().filter(channel -> !newMinecraftSet.containsId(channel.getId())).toList();
-
-        for (MinecraftChannel newMinecraft : added)
-            syncChannel.getClient().getEventManager().handleEvent(new SyncChannelMinecraftChannelAddEvent(syncChannel, newMinecraft));
-        for (MinecraftChannel newMinecraft : removed)
-            syncChannel.getClient().getEventManager().handleEvent(new SyncChannelMinecraftChannelRemoveEvent(syncChannel, newMinecraft));
-    }
 }
