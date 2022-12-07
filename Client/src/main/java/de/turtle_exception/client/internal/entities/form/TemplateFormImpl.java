@@ -2,6 +2,7 @@ package de.turtle_exception.client.internal.entities.form;
 
 import com.google.gson.JsonObject;
 import de.turtle_exception.client.api.TurtleClient;
+import de.turtle_exception.client.api.entities.form.Element;
 import de.turtle_exception.client.api.entities.form.QueryElement;
 import de.turtle_exception.client.api.entities.form.TemplateForm;
 import de.turtle_exception.client.internal.entities.TurtleImpl;
@@ -11,12 +12,12 @@ import java.util.List;
 
 public class TemplateFormImpl extends TurtleImpl implements TemplateForm {
     private final String title;
-    private final List<QueryElement> queries;
+    private final List<Element> elements;
 
-    public TemplateFormImpl(@NotNull TurtleClient client, long id, String title, List<QueryElement> queries) {
+    public TemplateFormImpl(@NotNull TurtleClient client, long id, String title, List<Element> elements) {
         super(client, id);
         this.title = title;
-        this.queries = queries;
+        this.elements = elements;
     }
 
     @Override
@@ -33,7 +34,7 @@ public class TemplateFormImpl extends TurtleImpl implements TemplateForm {
     }
 
     @Override
-    public @NotNull List<QueryElement> getQueries() {
-        return List.copyOf(this.queries);
+    public @NotNull List<Element> getElements() {
+        return List.copyOf(this.elements);
     }
 }

@@ -37,8 +37,8 @@ public class Keys {
         }
 
         public static class TemplateForm {
-            public static final String TITLE   = "title";
-            public static final String QUERIES = "queries";
+            public static final String TITLE    = "title";
+            public static final String ELEMENTS = "elements";
         }
 
         public static class TextElement {

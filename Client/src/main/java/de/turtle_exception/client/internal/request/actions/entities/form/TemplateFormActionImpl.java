@@ -24,7 +24,7 @@ public class TemplateFormActionImpl extends EntityAction<TemplateForm> implement
 
         this.checks.add(json -> { json.get(Keys.Form.TemplateForm.TITLE).getAsString(); });
         this.checks.add(json -> {
-            JsonArray arr = json.get(Keys.Form.TemplateForm.QUERIES).getAsJsonArray();
+            JsonArray arr = json.get(Keys.Form.TemplateForm.ELEMENTS).getAsJsonArray();
             for (JsonElement entry : arr)
                 entry.getAsLong();
         });
@@ -38,7 +38,7 @@ public class TemplateFormActionImpl extends EntityAction<TemplateForm> implement
         JsonArray arr = new JsonArray();
         for (Long query : this.queries)
             arr.add(query);
-        this.content.add(Keys.Form.TemplateForm.QUERIES, arr);
+        this.content.add(Keys.Form.TemplateForm.ELEMENTS, arr);
     }
 
     /* - - - */

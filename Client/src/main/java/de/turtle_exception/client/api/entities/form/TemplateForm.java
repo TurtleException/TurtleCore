@@ -27,13 +27,13 @@ public interface TemplateForm extends Turtle {
     @Key(name = Keys.Form.TemplateForm.TITLE, sqlType = Types.Form.TemplateForm.TITLE)
     @NotNull String getTitle();
 
-    /* - QUERIES - */
+    /* - ELEMENTS - */
 
     /**
-     * Provides the {@link QueryElement QueryElements} of this TemplateForm.
-     * @return QueryResponses of this CompletedForm.
+     * Provides the {@link Element Elements} of this TemplateForm.
+     * @return Elements of this TemplateForm.
      */
-    @Key(name = Keys.Form.TemplateForm.QUERIES, relation = Relation.MANY_TO_MANY, sqlType = Types.Form.TemplateForm.QUERIES)
-    @Relational(table = "form_queries", self = "form", foreign = "query", type = QueryElement.class)
-    @NotNull List<QueryElement> getQueries();
+    @Key(name = Keys.Form.TemplateForm.ELEMENTS, relation = Relation.MANY_TO_MANY, sqlType = Types.Form.TemplateForm.ELEMENTS)
+    @Relational(table = "form_elements", self = "form", foreign = "element", type = Element.class)
+    @NotNull List<Element> getElements();
 }

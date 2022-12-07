@@ -43,8 +43,8 @@ public class Types {
         }
 
         public static class TemplateForm {
-            public static final String TITLE   = "TEXT";
-            public static final String QUERIES = Templates.TURTLE;
+            public static final String TITLE    = "TEXT";
+            public static final String ELEMENTS = Templates.TURTLE;
         }
 
         public static class TextElement {

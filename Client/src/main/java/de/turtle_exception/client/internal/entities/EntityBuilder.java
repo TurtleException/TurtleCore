@@ -10,10 +10,7 @@ import de.turtle_exception.client.api.entities.User;
 import de.turtle_exception.client.api.entities.attributes.MessageFormat;
 import de.turtle_exception.client.api.entities.attributes.ProjectState;
 import de.turtle_exception.client.api.entities.attributes.TicketState;
-import de.turtle_exception.client.api.entities.form.ContentType;
-import de.turtle_exception.client.api.entities.form.QueryElement;
-import de.turtle_exception.client.api.entities.form.QueryResponse;
-import de.turtle_exception.client.api.entities.form.TemplateForm;
+import de.turtle_exception.client.api.entities.form.*;
 import de.turtle_exception.client.api.entities.messages.IChannel;
 import de.turtle_exception.client.api.entities.messages.MinecraftChannel;
 import de.turtle_exception.client.api.entities.messages.SyncChannel;
@@ -208,12 +205,12 @@ public class EntityBuilder {
         long   id    = data.get(Keys.Turtle.ID).getAsLong();
         String title = data.get(Keys.Form.TemplateForm.TITLE).getAsString();
 
-        JsonArray queryArr = data.getAsJsonArray(Keys.Form.TemplateForm.QUERIES);
-        ArrayList<QueryElement> queries = new ArrayList<>();
+        JsonArray queryArr = data.getAsJsonArray(Keys.Form.TemplateForm.ELEMENTS);
+        ArrayList<Element> elements = new ArrayList<>();
         for (JsonElement element : queryArr)
-            queries.add(client.getTurtleById(element.getAsLong(), QueryElement.class));
+            elements.add(client.getTurtleById(element.getAsLong(), Element.class));
 
-        return new TemplateFormImpl(client, id, title, queries);
+        return new TemplateFormImpl(client, id, title, elements);
     }
 
     public static @NotNull TextElementImpl buildTextElement(@NotNull JsonObject data, @NotNull TurtleClient client) throws NullPointerException, IllegalArgumentException, IllegalJsonException {
