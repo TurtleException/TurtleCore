@@ -2,11 +2,22 @@ package de.turtle_exception.client.internal.event;
 
 import de.turtle_exception.client.api.entities.*;
 import de.turtle_exception.client.api.entities.attributes.EphemeralType;
+import de.turtle_exception.client.api.entities.form.*;
 import de.turtle_exception.client.api.entities.messages.DiscordChannel;
 import de.turtle_exception.client.api.entities.messages.MinecraftChannel;
 import de.turtle_exception.client.api.entities.messages.SyncChannel;
 import de.turtle_exception.client.api.entities.messages.SyncMessage;
 import de.turtle_exception.client.api.event.entities.EphemeralEntityEvent;
+import de.turtle_exception.client.api.event.entities.form.completed_form.CompletedFormCreateEvent;
+import de.turtle_exception.client.api.event.entities.form.completed_form.CompletedFormDeleteEvent;
+import de.turtle_exception.client.api.event.entities.form.query_element.QueryElementCreateEvent;
+import de.turtle_exception.client.api.event.entities.form.query_element.QueryElementDeleteEvent;
+import de.turtle_exception.client.api.event.entities.form.query_response.QueryResponseCreateEvent;
+import de.turtle_exception.client.api.event.entities.form.query_response.QueryResponseDeleteEvent;
+import de.turtle_exception.client.api.event.entities.form.template_form.TemplateFormCreateEvent;
+import de.turtle_exception.client.api.event.entities.form.template_form.TemplateFormDeleteEvent;
+import de.turtle_exception.client.api.event.entities.form.text_element.TextElementCreateEvent;
+import de.turtle_exception.client.api.event.entities.form.text_element.TextElementDeleteEvent;
 import de.turtle_exception.client.api.event.entities.group.GroupCreateEvent;
 import de.turtle_exception.client.api.event.entities.group.GroupDeleteEvent;
 import de.turtle_exception.client.api.event.entities.group.GroupMemberJoinEvent;
@@ -54,6 +65,18 @@ public class UpdateHelper {
         if (turtle instanceof User user)
             turtle.getClient().getEventManager().handleEvent(new UserCreateEvent(user));
 
+        // FORM
+        if (turtle instanceof CompletedForm form)
+            turtle.getClient().getEventManager().handleEvent(new CompletedFormCreateEvent(form));
+        if (turtle instanceof QueryElement element)
+            turtle.getClient().getEventManager().handleEvent(new QueryElementCreateEvent(element));
+        if (turtle instanceof QueryResponse query)
+            turtle.getClient().getEventManager().handleEvent(new QueryResponseCreateEvent(query));
+        if (turtle instanceof TemplateForm form)
+            turtle.getClient().getEventManager().handleEvent(new TemplateFormCreateEvent(form));
+        if (turtle instanceof TextElement element)
+            turtle.getClient().getEventManager().handleEvent(new TextElementCreateEvent(element));
+
         // MESSAGES
         if (turtle instanceof DiscordChannel discordChannel)
             turtle.getClient().getEventManager().handleEvent(new DiscordChannelCreateEvent(discordChannel));
@@ -76,6 +99,18 @@ public class UpdateHelper {
             turtle.getClient().getEventManager().handleEvent(new TicketDeleteEvent(ticket));
         if (turtle instanceof User user)
             turtle.getClient().getEventManager().handleEvent(new UserDeleteEvent(user));
+
+        // FORM
+        if (turtle instanceof CompletedForm form)
+            turtle.getClient().getEventManager().handleEvent(new CompletedFormDeleteEvent(form));
+        if (turtle instanceof QueryElement element)
+            turtle.getClient().getEventManager().handleEvent(new QueryElementDeleteEvent(element));
+        if (turtle instanceof QueryResponse query)
+            turtle.getClient().getEventManager().handleEvent(new QueryResponseDeleteEvent(query));
+        if (turtle instanceof TemplateForm form)
+            turtle.getClient().getEventManager().handleEvent(new TemplateFormDeleteEvent(form));
+        if (turtle instanceof TextElement element)
+            turtle.getClient().getEventManager().handleEvent(new TextElementDeleteEvent(element));
 
         // MESSAGES
         if (turtle instanceof DiscordChannel discordChannel)
@@ -155,8 +190,6 @@ public class UpdateHelper {
         for (UUID oldMinecraft : removed)
             user.getClient().getEventManager().handleEvent(new UserMinecraftRemoveEvent(user, oldMinecraft));
     }
-
-    /* - - - MESSAGES - - - */
 
     /* - SYNC CHANNEL - */
 
