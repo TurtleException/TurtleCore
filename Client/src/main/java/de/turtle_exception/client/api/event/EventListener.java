@@ -58,6 +58,11 @@ public abstract class EventListener {
     public void onProjectUpdateState(@NotNull  ProjectUpdateStateEvent event) { }
     public void onProjectMemberJoin(@NotNull ProjectMemberJoinEvent event) { }
     public void onProjectMemberLeave(@NotNull ProjectMemberLeaveEvent event) { }
+    public void onProjectUpdateApplicationForm(@NotNull ProjectUpdateApplicationFormEvent event) { }
+    public void onProjectUpdateTimeRelease(@NotNull ProjectUpdateTimeReleaseEvent event) { }
+    public void onProjectUpdateTimeApply(@NotNull ProjectUpdateTimeApplyEvent event) { }
+    public void onProjectUpdateTimeStart(@NotNull ProjectUpdateTimeStartEvent event) { }
+    public void onProjectUpdateTimeEnd(@NotNull ProjectUpdateTimeEndEvent event) { }
 
     // User Events
     public void onUserCreate(@NotNull UserCreateEvent event) { }

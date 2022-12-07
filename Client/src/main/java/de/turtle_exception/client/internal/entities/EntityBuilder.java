@@ -98,7 +98,13 @@ public class EntityBuilder {
                 users.add(userElement);
         }
 
-        return new ProjectImpl(client, id, title, code, state, users);
+        TemplateForm applicationForm = client.getTurtleById(data.get(Keys.Project.APP_FORM).getAsLong(), TemplateForm.class);
+        long         timeRelease     = data.get(Keys.Project.TIME_RELEASE).getAsLong();
+        long         timeApply       = data.get(Keys.Project.TIME_APPLY).getAsLong();
+        long         timeStart       = data.get(Keys.Project.TIME_START).getAsLong();
+        long         timeEnd         = data.get(Keys.Project.TIME_END).getAsLong();
+
+        return new ProjectImpl(client, id, title, code, state, users, applicationForm, timeRelease, timeApply, timeStart, timeEnd);
     }
 
     public static @NotNull Ticket buildTicket(@NotNull JsonObject data, @NotNull TurtleClient client) throws NullPointerException, IllegalArgumentException, IllegalJsonException {

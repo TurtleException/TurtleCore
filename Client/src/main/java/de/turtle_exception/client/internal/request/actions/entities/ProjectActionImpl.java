@@ -19,6 +19,11 @@ public class ProjectActionImpl extends EntityAction<Project> implements ProjectA
     protected String code;
     protected ProjectState state;
     protected ArrayList<Long> users = new ArrayList<>();
+    protected Long applicationForm;
+    protected Long timeRelease;
+    protected Long timeApply;
+    protected Long timeStart;
+    protected Long timeEnd;
 
     @SuppressWarnings("CodeBlock2Expr")
     public ProjectActionImpl(@NotNull Provider provider) {
@@ -32,6 +37,11 @@ public class ProjectActionImpl extends EntityAction<Project> implements ProjectA
             for (JsonElement entry : arr)
                 entry.getAsLong();
         });
+        this.checks.add(json -> { json.get(Keys.Project.APP_FORM).getAsLong(); });
+        this.checks.add(json -> { json.get(Keys.Project.TIME_RELEASE).getAsLong(); });
+        this.checks.add(json -> { json.get(Keys.Project.TIME_APPLY).getAsLong(); });
+        this.checks.add(json -> { json.get(Keys.Project.TIME_START).getAsLong(); });
+        this.checks.add(json -> { json.get(Keys.Project.TIME_END).getAsLong(); });
     }
 
     @Override
@@ -45,6 +55,12 @@ public class ProjectActionImpl extends EntityAction<Project> implements ProjectA
         for (Long user : this.users)
             arr.add(user);
         this.content.add(Keys.Project.MEMBERS, arr);
+
+        this.content.addProperty(Keys.Project.APP_FORM, applicationForm);
+        this.content.addProperty(Keys.Project.TIME_RELEASE, timeRelease);
+        this.content.addProperty(Keys.Project.TIME_APPLY, timeApply);
+        this.content.addProperty(Keys.Project.TIME_START, timeStart);
+        this.content.addProperty(Keys.Project.TIME_END, timeEnd);
     }
 
     /* - - - */
@@ -84,4 +100,36 @@ public class ProjectActionImpl extends EntityAction<Project> implements ProjectA
         this.users.remove(user);
         return this;
     }
+
+    @Override
+    public ProjectAction setApplicationForm(long form) {
+        this.applicationForm = form;
+        return this;
+    }
+
+    @Override
+    public ProjectAction setTimeRelease(long millis) {
+        this.timeRelease = millis;
+        return this;
+    }
+
+    @Override
+    public ProjectAction setTimeApply(long millis) {
+        this.timeApply = millis;
+        return this;
+    }
+
+    @Override
+    public ProjectAction setTimeStart(long millis) {
+        this.timeStart = millis;
+        return this;
+    }
+
+    @Override
+    public ProjectAction setTimeEnd(long millis) {
+        this.timeEnd = millis;
+        return this;
+    }
+
+
 }

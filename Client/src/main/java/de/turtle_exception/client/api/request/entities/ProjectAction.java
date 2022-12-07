@@ -4,9 +4,11 @@ import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.api.entities.Project;
 import de.turtle_exception.client.api.entities.User;
 import de.turtle_exception.client.api.entities.attributes.ProjectState;
+import de.turtle_exception.client.api.entities.form.TemplateForm;
 import de.turtle_exception.client.api.request.Action;
 import org.jetbrains.annotations.NotNull;
 
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -108,5 +110,85 @@ public interface ProjectAction extends Action<Project> {
      */
     default ProjectAction removeUser(@NotNull User user) {
         return this.removeUserId(user.getId());
+    }
+
+    /**
+     * Sets the application form id of this Project to the provided id.
+     * @param form Project application form id.
+     * @return This ProjectAction for chaining convenience.
+     */
+    ProjectAction setApplicationForm(long form);
+
+    /**
+     * Sets the application form of this Project to the provided TemplateForm.
+     * @param form Project application form.
+     * @return This ProjectAction for chaining convenience.
+     */
+    default ProjectAction setApplicationForm(@NotNull TemplateForm form) {
+        return this.setApplicationForm(form.getId());
+    }
+
+    /**
+     * Sets the RELEASE time of this Project to the provided unix timestamp (milliseconds).
+     * @param millis Project RELEASE time as unix timestamp.
+     * @return This ProjectAction for chaining convenience.
+     */
+    ProjectAction setTimeRelease(long millis);
+
+    /**
+     * Sets the RELEASE time of this Project to the provided Instant.
+     * @param instant Project RELEASE time.
+     * @return This ProjectAction for chaining convenience.
+     */
+    default ProjectAction setTimeRelease(@NotNull Instant instant) {
+        return this.setTimeRelease(instant.toEpochMilli());
+    }
+
+    /**
+     * Sets the APPLY time of this Project to the provided unix timestamp (milliseconds).
+     * @param millis Project APPLY time as unix timestamp.
+     * @return This ProjectAction for chaining convenience.
+     */
+    ProjectAction setTimeApply(long millis);
+
+    /**
+     * Sets the APPLY time of this Project to the provided Instant.
+     * @param instant Project APPLY time.
+     * @return This ProjectAction for chaining convenience.
+     */
+    default ProjectAction setTimeApply(@NotNull Instant instant) {
+        return this.setTimeApply(instant.toEpochMilli());
+    }
+
+    /**
+     * Sets the START time of this Project to the provided unix timestamp (milliseconds).
+     * @param millis Project START time as unix timestamp.
+     * @return This ProjectAction for chaining convenience.
+     */
+    ProjectAction setTimeStart(long millis);
+
+    /**
+     * Sets the START time of this Project to the provided Instant.
+     * @param instant Project START time.
+     * @return This ProjectAction for chaining convenience.
+     */
+    default ProjectAction setTimeStart(@NotNull Instant instant) {
+        return this.setTimeStart(instant.toEpochMilli());
+    }
+
+    /**
+     * Sets the END time of this Project to the provided unix timestamp (milliseconds).
+     * @param millis Project END time as unix timestamp.
+     * @return This ProjectAction for chaining convenience.
+     */
+    ProjectAction setTimeEnd(long millis);
+
+    /**
+     * Sets the END time of this Project to the provided Instant.
+     * @param instant Project END time.
+     * @return This ProjectAction for chaining convenience.
+     */
+    default ProjectAction setTimeEnd(@NotNull Instant instant) {
+        return this.setTimeEnd(instant.toEpochMilli());
     }
 }

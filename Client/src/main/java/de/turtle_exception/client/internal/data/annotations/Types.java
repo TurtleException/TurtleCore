@@ -94,19 +94,15 @@ public class Types {
     }
 
     public static class Project {
-        public static final String TITLE   = "TINYTEXT";
-        public static final String CODE    = "TINYTEXT";
-        public static final String STATE   = "TINYINT";
-        public static final String MEMBERS = Templates.TURTLE;
-
-        public static class ApplyForm {
-            public static final String PROJECT = Templates.TURTLE;
-        }
-
-        public static class ApplyRequest {
-            public static final String PROJECT = Templates.TURTLE;
-            public static final String USER    = Templates.TURTLE;
-        }
+        public static final String TITLE        = "TINYTEXT";
+        public static final String CODE         = "TINYTEXT";
+        public static final String STATE        = "TINYINT";
+        public static final String MEMBERS      = Templates.TURTLE;
+        public static final String APP_FORM     = Templates.TURTLE;
+        public static final String TIME_RELEASE = "BIGINT";
+        public static final String TIME_APPLY   = "BIGINT";
+        public static final String TIME_START   = "BIGINT";
+        public static final String TIME_END     = "BIGINT";
     }
 
     public static class Ticket {

@@ -9,6 +9,7 @@ import de.turtle_exception.client.internal.data.annotations.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.time.Instant;
 import java.util.List;
 
 /**
@@ -140,7 +141,7 @@ public interface Project extends Turtle, TurtleContainer<User> {
      * Provides the application form of this Project.
      * @return The Project application form.
      */
-    @Key(name = "application_form", sqlType = "TURTLE")
+    @Key(name = Keys.Project.APP_FORM, sqlType = Types.Project.APP_FORM)
     @NotNull TemplateForm getApplicationForm();
 
     /**
@@ -168,5 +169,135 @@ public interface Project extends Turtle, TurtleContainer<User> {
 
     /* - TIMES - */
 
-    // TODO: times
+    /**
+     * Provides the RELEASE time of this Project as UNIX epoch millis.
+     * @return RELEASE time of this Project.
+     */
+    @Key(name = Keys.Project.TIME_RELEASE, sqlType = Types.Project.TIME_RELEASE)
+    long getMilliTimeRelease();
+
+    /**
+     * Provides the RELEASE time this Project as an {@link Instant}.
+     * @return RELEASE time of this Project.
+     */
+    default @NotNull Instant getTimeRelease() {
+        return Instant.ofEpochMilli(this.getMilliTimeRelease());
+    }
+
+    /**
+     * Creates an Action with the instruction to modify this Project's RELEASE time and change it to the provided time
+     * in unix millis.
+     * @param millis New RELEASE time.
+     * @return Action that provides the modified {@link Project} on completion.
+     */
+    @NotNull Action<Project> modifyTimeRelease(long millis);
+
+    /**
+     * Creates an Action with the instruction to modify this Project's RELEASE time and change it to the provided
+     * {@link Instant}
+     * @param instant New RELEASE time.
+     * @return Action that provides the modified {@link Project} on completion.
+     */
+    default @NotNull Action<Project> modifyTimeRelease(@NotNull Instant instant) {
+        return this.modifyTimeRelease(instant.toEpochMilli());
+    }
+
+    /**
+     * Provides the APPLY time of this Project as UNIX epoch millis.
+     * @return APPLY time of this Project.
+     */
+    @Key(name = Keys.Project.TIME_APPLY, sqlType = Types.Project.TIME_APPLY)
+    long getMilliTimeApply();
+
+    /**
+     * Provides the APPLY time this Project as an {@link Instant}.
+     * @return APPLY time of this Project.
+     */
+    default @NotNull Instant getTimeApply() {
+        return Instant.ofEpochMilli(this.getMilliTimeApply());
+    }
+
+    /**
+     * Creates an Action with the instruction to modify this Project's APPLY time and change it to the provided time in
+     * unix millis.
+     * @param millis New APPLY time.
+     * @return Action that provides the modified {@link Project} on completion.
+     */
+    @NotNull Action<Project> modifyTimeApply(long millis);
+
+    /**
+     * Creates an Action with the instruction to modify this Project's APPLY time and change it to the provided
+     * {@link Instant}
+     * @param instant New APPLY time.
+     * @return Action that provides the modified {@link Project} on completion.
+     */
+    default @NotNull Action<Project> modifyTimeApply(@NotNull Instant instant) {
+        return this.modifyTimeApply(instant.toEpochMilli());
+    }
+
+    /**
+     * Provides the START time of this Project as UNIX epoch millis.
+     * @return START time of this Project.
+     */
+    @Key(name = Keys.Project.TIME_START, sqlType = Types.Project.TIME_START)
+    long getMilliTimeStart();
+
+    /**
+     * Provides the START time this Project as an {@link Instant}.
+     * @return START time of this Project.
+     */
+    default @NotNull Instant getTimeStart() {
+        return Instant.ofEpochMilli(this.getMilliTimeStart());
+    }
+
+    /**
+     * Creates an Action with the instruction to modify this Project's START time and change it to the provided time in
+     * unix millis.
+     * @param millis New START time.
+     * @return Action that provides the modified {@link Project} on completion.
+     */
+    @NotNull Action<Project> modifyTimeStart(long millis);
+
+    /**
+     * Creates an Action with the instruction to modify this Project's START time and change it to the provided
+     * {@link Instant}
+     * @param instant New START time.
+     * @return Action that provides the modified {@link Project} on completion.
+     */
+    default @NotNull Action<Project> modifyTimeStart(@NotNull Instant instant) {
+        return this.modifyTimeStart(instant.toEpochMilli());
+    }
+
+    /**
+     * Provides the END time of this Project as UNIX epoch millis.
+     * @return END time of this Project.
+     */
+    @Key(name = Keys.Project.TIME_END, sqlType = Types.Project.TIME_END)
+    long getMilliTimeEnd();
+
+    /**
+     * Provides the END time this Project as an {@link Instant}.
+     * @return END time of this Project.
+     */
+    default @NotNull Instant getTimeEnd() {
+        return Instant.ofEpochMilli(this.getMilliTimeEnd());
+    }
+
+    /**
+     * Creates an Action with the instruction to modify this Project's END time and change it to the provided time in
+     * unix millis.
+     * @param millis New END time.
+     * @return Action that provides the modified {@link Project} on completion.
+     */
+    @NotNull Action<Project> modifyTimeEnd(long millis);
+
+    /**
+     * Creates an Action with the instruction to modify this Project's END time and change it to the provided
+     * {@link Instant}
+     * @param instant New END time.
+     * @return Action that provides the modified {@link Project} on completion.
+     */
+    default @NotNull Action<Project> modifyTimeEnd(@NotNull Instant instant) {
+        return this.modifyTimeEnd(instant.toEpochMilli());
+    }
 }

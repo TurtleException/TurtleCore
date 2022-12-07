@@ -6,9 +6,8 @@ import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.api.entities.Project;
 import de.turtle_exception.client.api.entities.User;
 import de.turtle_exception.client.api.entities.attributes.ProjectState;
-import de.turtle_exception.client.api.event.entities.project.ProjectUpdateCodeEvent;
-import de.turtle_exception.client.api.event.entities.project.ProjectUpdateStateEvent;
-import de.turtle_exception.client.api.event.entities.project.ProjectUpdateTitleEvent;
+import de.turtle_exception.client.api.entities.form.TemplateForm;
+import de.turtle_exception.client.api.event.entities.project.*;
 import de.turtle_exception.client.api.request.Action;
 import de.turtle_exception.client.internal.data.annotations.Keys;
 import de.turtle_exception.client.internal.event.UpdateHelper;
@@ -22,17 +21,24 @@ public class ProjectImpl extends TurtleImpl implements Project {
     private String title;
     private String code;
     private ProjectState state;
-
     private TurtleSet<User> users;
+    private TemplateForm applicationForm;
+    private long timeRelease;
+    private long timeApply;
+    private long timeStart;
+    private long timeEnd;
 
-    protected ProjectImpl(@NotNull TurtleClient client, long id, String title, String code, ProjectState state, TurtleSet<User> users) {
+    protected ProjectImpl(@NotNull TurtleClient client, long id, String title, String code, ProjectState state, TurtleSet<User> users, TemplateForm applicationForm, long timeRelease, long timeApply, long timeStart, long timeEnd) {
         super(client, id);
-
         this.title = title;
         this.code  = code;
         this.state = state;
-
         this.users = users;
+        this.applicationForm = applicationForm;
+        this.timeRelease = timeRelease;
+        this.timeApply   = timeApply;
+        this.timeStart   = timeStart;
+        this.timeEnd     = timeEnd;
     }
 
     @Override
@@ -59,6 +65,31 @@ public class ProjectImpl extends TurtleImpl implements Project {
                 set.add(client.getTurtleById(entry.getAsLong(), User.class));
             this.users = set;
             UpdateHelper.ofProjectMembers(this, old, set);
+        });
+        this.apply(json, Keys.Project.APP_FORM, element -> {
+            TemplateForm old = this.applicationForm;
+            this.applicationForm = this.getClient().getTurtleById(element.getAsLong(), TemplateForm.class);
+            this.fireEvent(new ProjectUpdateApplicationFormEvent(this, old, this.applicationForm));
+        });
+        this.apply(json, Keys.Project.TIME_RELEASE, element -> {
+            long old = this.timeRelease;
+            this.timeRelease = element.getAsLong();
+            this.fireEvent(new ProjectUpdateTimeReleaseEvent(this, old ,this.timeRelease));
+        });
+        this.apply(json, Keys.Project.TIME_APPLY, element -> {
+            long old = this.timeApply;
+            this.timeApply = element.getAsLong();
+            this.fireEvent(new ProjectUpdateTimeApplyEvent(this, old ,this.timeApply));
+        });
+        this.apply(json, Keys.Project.TIME_START, element -> {
+            long old = this.timeStart;
+            this.timeStart = element.getAsLong();
+            this.fireEvent(new ProjectUpdateTimeStartEvent(this, old ,this.timeStart));
+        });
+        this.apply(json, Keys.Project.TIME_END, element -> {
+            long old = this.timeEnd;
+            this.timeEnd = element.getAsLong();
+            this.fireEvent(new ProjectUpdateTimeEndEvent(this, old ,this.timeEnd));
         });
         return this;
     }
@@ -119,5 +150,59 @@ public class ProjectImpl extends TurtleImpl implements Project {
     @Override
     public @NotNull Action<Project> removeUser(long user) {
         return getClient().getProvider().patchEntryDel(this, Keys.Project.MEMBERS, user).andThenParse(Project.class);
+    }
+
+    /* - APPLICATIONS - */
+
+    @Override
+    public @NotNull TemplateForm getApplicationForm() {
+        return this.applicationForm;
+    }
+
+    @Override
+    public @NotNull Action<Project> modifyApplicationForm(long form) {
+        return getClient().getProvider().patch(this, Keys.Project.APP_FORM, form).andThenParse(Project.class);
+    }
+
+    /* - TIMES - */
+
+    @Override
+    public long getMilliTimeRelease() {
+        return this.timeRelease;
+    }
+
+    @Override
+    public @NotNull Action<Project> modifyTimeRelease(long millis) {
+        return getClient().getProvider().patch(this, Keys.Project.TIME_RELEASE, millis).andThenParse(Project.class);
+    }
+
+    @Override
+    public long getMilliTimeApply() {
+        return this.timeApply;
+    }
+
+    @Override
+    public @NotNull Action<Project> modifyTimeApply(long millis) {
+        return getClient().getProvider().patch(this, Keys.Project.TIME_APPLY, millis).andThenParse(Project.class);
+    }
+
+    @Override
+    public long getMilliTimeStart() {
+        return this.timeStart;
+    }
+
+    @Override
+    public @NotNull Action<Project> modifyTimeStart(long millis) {
+        return getClient().getProvider().patch(this, Keys.Project.TIME_START, millis).andThenParse(Project.class);
+    }
+
+    @Override
+    public long getMilliTimeEnd() {
+        return timeEnd;
+    }
+
+    @Override
+    public @NotNull Action<Project> modifyTimeEnd(long millis) {
+        return getClient().getProvider().patch(this, Keys.Project.TIME_END, millis).andThenParse(Project.class);
     }
 }

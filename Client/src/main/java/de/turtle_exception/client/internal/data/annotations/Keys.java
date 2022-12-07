@@ -88,19 +88,15 @@ public class Keys {
     }
 
     public static class Project {
-        public static final String TITLE   = "title";
-        public static final String CODE    = "code";
-        public static final String STATE   = "state";
-        public static final String MEMBERS = "users";
-
-        public static class ApplyForm {
-            public static final String PROJECT = "project";
-        }
-
-        public static class ApplyRequest {
-            public static final String PROJECT = "project";
-            public static final String USER    = "user";
-        }
+        public static final String TITLE        = "title";
+        public static final String CODE         = "code";
+        public static final String STATE        = "state";
+        public static final String MEMBERS      = "users";
+        public static final String APP_FORM     = "application_form";
+        public static final String TIME_RELEASE = "time_release";
+        public static final String TIME_APPLY   = "time_apply";
+        public static final String TIME_START   = "time_start";
+        public static final String TIME_END     = "time_end";
     }
 
     public static class Ticket {
