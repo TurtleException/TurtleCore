@@ -1,6 +1,7 @@
 package de.turtle_exception.client.api.entities;
 
 import de.turtle_exception.client.api.TurtleClient;
+import de.turtle_exception.client.api.entities.form.CompletedForm;
 import de.turtle_exception.client.internal.data.annotations.*;
 import de.turtle_exception.client.api.request.Action;
 import net.dv8tion.jda.api.JDA;
@@ -195,5 +196,13 @@ public interface User extends Turtle {
         return List.copyOf(list);
     }
 
-    // TODO: project applications (reference, like groups)
+    /**
+     * Provides a List of all {@link CompletedForm CompletedForms} this User is the author of.
+     * @return List of the CompletedForms.
+     */
+    default @NotNull List<CompletedForm> getCompletedForms() {
+        return this.getClient().getTurtles(CompletedForm.class).stream()
+                .filter(form -> form.getAuthor().getId() == this.getId())
+                .toList();
+    }
 }
