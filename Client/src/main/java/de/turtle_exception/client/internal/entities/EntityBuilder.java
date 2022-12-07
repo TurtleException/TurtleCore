@@ -10,7 +10,10 @@ import de.turtle_exception.client.api.entities.User;
 import de.turtle_exception.client.api.entities.attributes.MessageFormat;
 import de.turtle_exception.client.api.entities.attributes.ProjectState;
 import de.turtle_exception.client.api.entities.attributes.TicketState;
-import de.turtle_exception.client.api.entities.form.*;
+import de.turtle_exception.client.api.entities.form.ContentType;
+import de.turtle_exception.client.api.entities.form.QueryElement;
+import de.turtle_exception.client.api.entities.form.QueryResponse;
+import de.turtle_exception.client.api.entities.form.TemplateForm;
 import de.turtle_exception.client.api.entities.messages.IChannel;
 import de.turtle_exception.client.api.entities.messages.MinecraftChannel;
 import de.turtle_exception.client.api.entities.messages.SyncChannel;
@@ -23,7 +26,6 @@ import de.turtle_exception.client.internal.entities.messages.SyncChannelImpl;
 import de.turtle_exception.client.internal.entities.messages.SyncMessageImpl;
 import de.turtle_exception.client.internal.util.Checks;
 import de.turtle_exception.client.internal.util.TurtleSet;
-import net.dv8tion.jda.internal.entities.TeamMemberImpl;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -179,8 +181,9 @@ public class EntityBuilder {
         String      title       = getOptional(() -> data.get(Keys.Form.Element.TITLE).getAsString());
         String      description = getOptional(() -> data.get(Keys.Form.QueryElement.DESCRIPTION).getAsString());
         ContentType contentType = ContentType.of(data.get(Keys.Form.QueryElement.CONTENT_TYPE).getAsByte());
+        boolean     required    = data.get(Keys.Form.QueryElement.REQUIRED).getAsBoolean();
 
-        return new QueryElementImpl(client, id, title, description, contentType);
+        return new QueryElementImpl(client, id, title, description, contentType, required);
     }
 
     public static @NotNull QueryResponseImpl buildQueryResponse(@NotNull JsonObject data, @NotNull TurtleClient client) throws NullPointerException, IllegalArgumentException, IllegalJsonException {

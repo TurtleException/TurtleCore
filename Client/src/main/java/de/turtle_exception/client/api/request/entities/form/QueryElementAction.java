@@ -36,4 +36,11 @@ public interface QueryElementAction extends Action<QueryElement> {
      * @return This QueryElementAction for chaining convenience.
      */
     QueryElementAction setContentType(ContentType contentType);
+
+    /**
+     * Sets the 'required' flag of this QueryElement to the provided boolean.
+     * @param required Query 'required' flag.
+     * @return This QueryElementAction for chaining convenience.
+     */
+    QueryElementAction setRequired(boolean required);
 }

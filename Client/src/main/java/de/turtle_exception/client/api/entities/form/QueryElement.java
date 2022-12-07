@@ -71,4 +71,21 @@ public interface QueryElement extends Element {
     default @NotNull Class<?> getContentClass() {
         return this.getContentType().getType();
     }
+
+    /* - REQUIRED - */
+
+    /**
+     * Provides the 'required' flag of this QueryElement.
+     * @return Value of the 'required' flag.
+     */
+    @Key(name = Keys.Form.QueryElement.REQUIRED, sqlType = Types.Form.QueryElement.REQUIRED)
+    boolean getRequired();
+
+    /**
+     * Creates an Action with the instruction to modify this QueryElement's 'required' flag and change it to the
+     * provided boolean.
+     * @param b New value for the 'required' flag.
+     * @return Action that provides the modified {@link QueryElement} on completion.
+     */
+    @NotNull Action<QueryElement> modifyRequired(boolean b);
 }

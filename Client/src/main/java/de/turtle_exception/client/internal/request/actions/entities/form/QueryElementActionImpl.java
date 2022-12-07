@@ -13,6 +13,7 @@ public class QueryElementActionImpl extends EntityAction<QueryElement> implement
     private String title;
     private String description;
     private ContentType contentType;
+    private Boolean required;
 
     @SuppressWarnings("CodeBlock2Expr")
     public QueryElementActionImpl(@NotNull Provider provider) {
@@ -21,6 +22,7 @@ public class QueryElementActionImpl extends EntityAction<QueryElement> implement
         this.checks.add(json -> { json.get(Keys.Form.Element.TITLE).getAsString(); });
         this.checks.add(json -> { json.get(Keys.Form.QueryElement.DESCRIPTION).getAsString(); });
         this.checks.add(json -> { json.get(Keys.Form.QueryElement.CONTENT_TYPE).getAsByte(); });
+        this.checks.add(json -> { json.get(Keys.Form.QueryElement.REQUIRED).getAsBoolean(); });
     }
 
     @Override
@@ -29,6 +31,7 @@ public class QueryElementActionImpl extends EntityAction<QueryElement> implement
         this.content.addProperty(Keys.Form.Element.TITLE, title);
         this.content.addProperty(Keys.Form.QueryElement.DESCRIPTION, description);
         this.content.addProperty(Keys.Form.QueryElement.CONTENT_TYPE, contentType.getCode());
+        this.content.addProperty(Keys.Form.QueryElement.REQUIRED, required);
     }
 
     /* - - - */
@@ -48,6 +51,12 @@ public class QueryElementActionImpl extends EntityAction<QueryElement> implement
     @Override
     public QueryElementAction setContentType(ContentType contentType) {
         this.contentType = contentType;
+        return this;
+    }
+
+    @Override
+    public QueryElementAction setRequired(boolean required) {
+        this.required = required;
         return this;
     }
 }

@@ -28,6 +28,7 @@ public class Keys {
         public static class QueryElement {
             public static final String DESCRIPTION  = "description";
             public static final String CONTENT_TYPE = "content_type";
+            public static final String REQUIRED     = "required";
         }
 
         public static class QueryResponse {

@@ -94,6 +94,7 @@ public abstract class EventListener {
     public void onQueryElementUpdate(@NotNull QueryElementUpdateEvent<?> event) { }
     public void onQueryElementUpdateTitle(@NotNull QueryElementUpdateTitleEvent event) { }
     public void onQueryElementUpdateDescription(@NotNull QueryElementUpdateDescriptionEvent event) { }
+    public void onQueryElementUpdateRequired(@NotNull QueryElementUpdateRequiredEvent event) { }
 
     // QueryResponse Events
     public void onQueryResponseCreate(@NotNull QueryResponseCreateEvent event) { }

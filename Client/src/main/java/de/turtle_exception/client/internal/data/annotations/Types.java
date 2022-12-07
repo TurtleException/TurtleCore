@@ -34,6 +34,7 @@ public class Types {
         public static class QueryElement {
             public static final String DESCRIPTION  = "TEXT";
             public static final String CONTENT_TYPE = "TINYINT";
+            public static final String REQUIRED     = "BOOLEAN";
         }
 
         public static class QueryResponse {
