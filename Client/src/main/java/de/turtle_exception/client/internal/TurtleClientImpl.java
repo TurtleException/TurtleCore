@@ -193,17 +193,6 @@ public class TurtleClientImpl implements TurtleClient {
 
     /* - - - */
 
-    public <T extends Turtle> @NotNull Action<T> retrieveTurtle(long id, @NotNull Class<T> type) {
-        return provider.get(type, id).andThenParse(type).onSuccess(t -> {
-            cache.removeById(id);
-
-            // don't cache ephemeral resources
-            if (t instanceof EphemeralType e && e.isEphemeral()) return;
-
-            cache.add(t);
-        });
-    }
-
     public <T extends Turtle> @NotNull Action<List<T>> retrieveTurtles(@NotNull Class<T> type) {
         return provider.get(type).andThenParseList(type).onSuccess(l -> {
             cache.removeAll(type);
@@ -213,6 +202,17 @@ public class TurtleClientImpl implements TurtleClient {
 
                 cache.add(t);
             }
+        });
+    }
+
+    public <T extends Turtle> @NotNull Action<T> retrieveTurtle(long id, @NotNull Class<T> type) {
+        return provider.get(type, id).andThenParse(type).onSuccess(t -> {
+            cache.removeById(id);
+
+            // don't cache ephemeral resources
+            if (t instanceof EphemeralType e && e.isEphemeral()) return;
+
+            cache.add(t);
         });
     }
 

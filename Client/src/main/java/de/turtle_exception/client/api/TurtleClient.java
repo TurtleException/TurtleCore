@@ -2,10 +2,8 @@ package de.turtle_exception.client.api;
 
 import de.turtle_exception.client.api.entities.*;
 import de.turtle_exception.client.api.entities.containers.TurtleContainer;
-import de.turtle_exception.client.api.entities.messages.DiscordChannel;
-import de.turtle_exception.client.api.entities.messages.MinecraftChannel;
-import de.turtle_exception.client.api.entities.messages.SyncChannel;
-import de.turtle_exception.client.api.entities.messages.SyncMessage;
+import de.turtle_exception.client.api.entities.form.*;
+import de.turtle_exception.client.api.entities.messages.*;
 import de.turtle_exception.client.api.event.EventListener;
 import de.turtle_exception.client.api.event.EventManager;
 import de.turtle_exception.client.api.request.Action;
@@ -109,7 +107,146 @@ public interface TurtleClient extends TurtleContainer<Turtle> {
     @Override
     @Nullable Turtle getTurtleById(long id);
 
+    default @NotNull List<Group> getGroups() {
+        return this.getTurtles(Group.class);
+    }
+
+    default @Nullable Group getGroupById(long id) {
+        return this.getTurtleById(id, Group.class);
+    }
+
+    default @NotNull List<JsonResource> getJsonResources() {
+        return this.getTurtles(JsonResource.class);
+    }
+
+    default @Nullable JsonResource getJsonResourceById(long id) {
+        return this.getTurtleById(id, JsonResource.class);
+    }
+
+    default @NotNull List<Project> getProjects() {
+        return this.getTurtles(Project.class);
+    }
+
+    default @Nullable Project getProjectById(long id) {
+        return this.getTurtleById(id, Project.class);
+    }
+
+    default @NotNull List<Ticket> getTickets() {
+        return this.getTurtles(Ticket.class);
+    }
+
+    default @Nullable Ticket getTicketById(long id) {
+        return this.getTurtleById(id, Ticket.class);
+    }
+
+    default @NotNull List<User> getUsers() {
+        return this.getTurtles(User.class);
+    }
+
+    default @Nullable User getUserById(long id) {
+        return this.getTurtleById(id, User.class);
+    }
+
+    // FORM
+
+    default @NotNull List<CompletedForm> getCompletedForms() {
+        return this.getTurtles(CompletedForm.class);
+    }
+
+    default @Nullable CompletedForm getCompletedFormById(long id) {
+        return this.getTurtleById(id, CompletedForm.class);
+    }
+
+    default @NotNull List<Element> getElements() {
+        return this.getTurtles(Element.class);
+    }
+
+    default @Nullable Element getElementFormById(long id) {
+        return this.getTurtleById(id, Element.class);
+    }
+
+    default @NotNull List<QueryElement> getQueryElements() {
+        return this.getTurtles(QueryElement.class);
+    }
+
+    default @Nullable QueryElement getQueryElementById(long id) {
+        return this.getTurtleById(id, QueryElement.class);
+    }
+
+    default @NotNull List<QueryResponse> getQueryResponses() {
+        return this.getTurtles(QueryResponse.class);
+    }
+
+    default @Nullable QueryResponse getQueryResponseById(long id) {
+        return this.getTurtleById(id, QueryResponse.class);
+    }
+
+    default @NotNull List<TemplateForm> getTemplateForms() {
+        return this.getTurtles(TemplateForm.class);
+    }
+
+    default @Nullable TemplateForm getTemplateFormById(long id) {
+        return this.getTurtleById(id, TemplateForm.class);
+    }
+
+    default @NotNull List<TextElement> getTextElements() {
+        return this.getTurtles(TextElement.class);
+    }
+
+    default @Nullable TextElement getTextElementById(long id) {
+        return this.getTurtleById(id, TextElement.class);
+    }
+
+    // MESSAGES
+
+    default @NotNull List<DiscordChannel> getDiscordChannels() {
+        return this.getTurtles(DiscordChannel.class);
+    }
+
+    default @Nullable DiscordChannel getDiscordChannelById(long id) {
+        return this.getTurtleById(id, DiscordChannel.class);
+    }
+
+    default @NotNull List<IChannel> getIChannels() {
+        return this.getTurtles(IChannel.class);
+    }
+
+    default @Nullable IChannel getIChannelById(long id) {
+        return this.getTurtleById(id, IChannel.class);
+    }
+
+    default @NotNull List<MinecraftChannel> getMinecraftChannels() {
+        return this.getTurtles(MinecraftChannel.class);
+    }
+
+    default @Nullable MinecraftChannel getMinecraftChannelById(long id) {
+        return this.getTurtleById(id, MinecraftChannel.class);
+    }
+
+    default @NotNull List<SyncChannel> getSyncChannels() {
+        return this.getTurtles(SyncChannel.class);
+    }
+
+    default @Nullable SyncChannel getSyncChannelById(long id) {
+        return this.getTurtleById(id, SyncChannel.class);
+    }
+
+    default @NotNull List<SyncMessage> getSyncMessages() {
+        return this.getTurtles(SyncMessage.class);
+    }
+
+    default @Nullable SyncMessage getSyncMessageById(long id) {
+        return this.getTurtleById(id, SyncMessage.class);
+    }
+
     /* - - - */
+
+    /**
+     * Creates an Action with the Provider request to retrieve all available {@link Turtle Turtles} of type {@code T}.
+     * <p> If the operation is successful, the retrieved objects will also be put into cache, if not already present.
+     * @return Action that provides the List of Turtles on completion.
+     */
+    <T extends Turtle> @NotNull Action<List<T>> retrieveTurtles(@NotNull Class<T> type);
 
     /**
      * Creates an Action with the Provider request to retrieve a {@link Turtle} of type {@code T}, specified by its id.
@@ -119,12 +256,117 @@ public interface TurtleClient extends TurtleContainer<Turtle> {
      */
     <T extends Turtle> @NotNull Action<T> retrieveTurtle(long id, @NotNull Class<T> type);
 
-    /**
-     * Creates an Action with the Provider request to retrieve all available {@link Turtle Turtles} of type {@code T}.
-     * <p> If the operation is successful, the retrieved objects will also be put into cache, if not already present.
-     * @return Action that provides the List of Turtles on completion.
-     */
-    <T extends Turtle> @NotNull Action<List<T>> retrieveTurtles(@NotNull Class<T> type);
+    default @NotNull Action<List<Group>> retrieveGroups() {
+        return this.retrieveTurtles(Group.class);
+    }
+
+    default @NotNull Action<Group> retrieveGroup(long id) {
+        return this.retrieveTurtle(id, Group.class);
+    }
+
+    // no retrieveJsonResources() to discourage users from retrieving ALL JsonResources at once
+
+    default @NotNull Action<JsonResource> retrieveJsonResource(long id) {
+        return this.retrieveTurtle(id, JsonResource.class);
+    }
+
+    default @NotNull Action<List<Project>> retrieveProjects() {
+        return this.retrieveTurtles(Project.class);
+    }
+
+    default @NotNull Action<Project> retrieveProject(long id) {
+        return this.retrieveTurtle(id, Project.class);
+    }
+
+    default @NotNull Action<List<Ticket>> retrieveTickets() {
+        return this.retrieveTurtles(Ticket.class);
+    }
+
+    default @NotNull Action<Ticket> retrieveTicket(long id) {
+        return this.retrieveTurtle(id, Ticket.class);
+    }
+
+    default @NotNull Action<List<User>> retrieveUsers() {
+        return this.retrieveTurtles(User.class);
+    }
+
+    default @NotNull Action<User> retrieveUser(long id) {
+        return this.retrieveTurtle(id, User.class);
+    }
+
+    // FORM
+
+    default @NotNull Action<List<CompletedForm>> retrieveCompletedForms() {
+        return this.retrieveTurtles(CompletedForm.class);
+    }
+
+    default @NotNull Action<CompletedForm> retrieveCompletedForm(long id) {
+        return this.retrieveTurtle(id, CompletedForm.class);
+    }
+
+    default @NotNull Action<List<QueryElement>> retrieveQueryElements() {
+        return this.retrieveTurtles(QueryElement.class);
+    }
+
+    default @NotNull Action<QueryElement> retrieveQueryElement(long id) {
+        return this.retrieveTurtle(id, QueryElement.class);
+    }
+
+    default @NotNull Action<List<QueryResponse>> retrieveQueryResponses() {
+        return this.retrieveTurtles(QueryResponse.class);
+    }
+
+    default @NotNull Action<QueryResponse> retrieveQueryResponse(long id) {
+        return this.retrieveTurtle(id, QueryResponse.class);
+    }
+
+    default @NotNull Action<List<TemplateForm>> retrieveTemplateForms() {
+        return this.retrieveTurtles(TemplateForm.class);
+    }
+
+    default @NotNull Action<TemplateForm> retrieveTemplateForm(long id) {
+        return this.retrieveTurtle(id, TemplateForm.class);
+    }
+
+    default @NotNull Action<List<TextElement>> retrieveTextElements() {
+        return this.retrieveTurtles(TextElement.class);
+    }
+
+    default @NotNull Action<TextElement> retrieveTextElement(long id) {
+        return this.retrieveTurtle(id, TextElement.class);
+    }
+
+    // MESSAGE
+
+    default @NotNull Action<List<DiscordChannel>> retrieveDiscordChannels() {
+        return this.retrieveTurtles(DiscordChannel.class);
+    }
+
+    default @NotNull Action<DiscordChannel> retrieveDiscordChannel(long id) {
+        return this.retrieveTurtle(id, DiscordChannel.class);
+    }
+
+    default @NotNull Action<List<MinecraftChannel>> retrieveMinecraftChannels() {
+        return this.retrieveTurtles(MinecraftChannel.class);
+    }
+
+    default @NotNull Action<MinecraftChannel> retrieveMinecraftChannel(long id) {
+        return this.retrieveTurtle(id, MinecraftChannel.class);
+    }
+
+    default @NotNull Action<List<SyncChannel>> retrieveSyncChannels() {
+        return this.retrieveTurtles(SyncChannel.class);
+    }
+
+    default @NotNull Action<SyncChannel> retrieveSyncChannel(long id) {
+        return this.retrieveTurtle(id, SyncChannel.class);
+    }
+
+    // no retrieveSyncMessages() to discourage users from retrieving ALL SyncMessages at once
+
+    default @NotNull Action<SyncMessage> retrieveSyncMessage(long id) {
+        return this.retrieveTurtle(id, SyncMessage.class);
+    }
 
     /* - - - */
 
