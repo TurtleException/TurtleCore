@@ -10,15 +10,15 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Collection;
 import java.util.function.Function;
 
-public class TicketUserRemoveEvent extends TicketEvent implements EntityUpdateEntryEvent<Ticket, User> {
-    protected final User user;
+public class TicketUserRemoveEvent extends TicketEvent implements EntityUpdateEntryEvent<Ticket, Long> {
+    protected final long user;
 
-    public TicketUserRemoveEvent(@NotNull Ticket ticket, @NotNull User user) {
+    public TicketUserRemoveEvent(@NotNull Ticket ticket, long user) {
         super(ticket);
         this.user = user;
     }
 
-    public @NotNull User getUser() {
+    public long getUserId() {
         return user;
     }
 
@@ -30,12 +30,12 @@ public class TicketUserRemoveEvent extends TicketEvent implements EntityUpdateEn
     }
 
     @Override
-    public final @NotNull Collection<User> getCollection() {
-        return getTicket().getUsers();
+    public final @NotNull Collection<Long> getCollection() {
+        return getTicket().getUserIds();
     }
 
     @Override
-    public final @NotNull Function<User, Object> getMutator() {
-        return Turtle::getId;
+    public final @NotNull Function<Long, Object> getMutator() {
+        return l -> l;
     }
 }

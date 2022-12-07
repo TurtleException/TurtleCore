@@ -155,8 +155,12 @@ public interface Ticket extends Turtle, TurtleContainer<User> {
      * @return List of Users.
      */
     @Key(name = Keys.Ticket.USERS, relation = Relation.MANY_TO_MANY, sqlType = Types.Ticket.USERS)
-    @Relational(table = "ticket_users", self = "ticket", foreign = "user", type = User.class)
-    @NotNull List<User> getUsers();
+    @Relational(table = "ticket_users", self = "ticket", foreign = "user", type = Long.class)
+    @NotNull List<Long> getUserIds();
+
+    default @NotNull List<User> getUsers() {
+        return this.getClient().getTurtles(User.class, this.getUserIds());
+    }
 
     /**
      * Creates an Action with the instruction to add the provided id to the list of Users that have access to this Ticket.

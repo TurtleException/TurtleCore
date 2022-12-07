@@ -7,6 +7,7 @@ import de.turtle_exception.client.internal.data.annotations.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.Objects;
 
 /** A template for a Form that can then be submitted as a {@link CompletedForm} by a {@link User}. */
 @Resource(path = "forms_template", builder = "buildTemplateForm")
@@ -34,6 +35,14 @@ public interface TemplateForm extends Turtle {
      * @return Elements of this TemplateForm.
      */
     @Key(name = Keys.Form.TemplateForm.ELEMENTS, relation = Relation.MANY_TO_MANY, sqlType = Types.Form.TemplateForm.ELEMENTS)
-    @Relational(table = "form_elements", self = "form", foreign = "element", type = Element.class)
-    @NotNull List<Element> getElements();
+    @Relational(table = "form_elements", self = "form", foreign = "element", type = Long.class)
+    @NotNull List<Long> getElementIds();
+
+    default @NotNull List<Element> getElements() {
+        return this.getElements(Element.class);
+    }
+
+    default <T extends Element> @NotNull List<T> getElements(@NotNull Class<T> type) {
+        return this.getClient().getTurtles(type, this.getElementIds());
+    }
 }

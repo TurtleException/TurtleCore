@@ -26,7 +26,11 @@ public interface QueryResponse extends Turtle {
      * @return The initial QueryElement.
      */
     @Key(name = Keys.Form.QueryResponse.QUERY, sqlType = Types.Form.QueryResponse.QUERY)
-    @NotNull QueryElement getQuery();
+    long getQueryId();
+
+    default QueryElement getQuery() {
+        return this.getClient().getTurtleById(this.getQueryId(), QueryElement.class);
+    }
 
     /* - CONTENT - */
 

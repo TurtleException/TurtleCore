@@ -16,13 +16,13 @@ import org.jetbrains.annotations.Nullable;
 
 public class SyncMessageImpl extends TurtleImpl implements SyncMessage {
     private MessageFormat format;
-    private User author;
+    private long author;
     private String content;
     private Long reference;
-    private SyncChannel channel;
-    private IChannel source;
+    private long channel;
+    private long source;
 
-    public SyncMessageImpl(@NotNull TurtleClient client, long id, MessageFormat format, User author, String content, Long reference, SyncChannel channel, IChannel source) {
+    public SyncMessageImpl(@NotNull TurtleClient client, long id, MessageFormat format, long author, String content, Long reference, long channel, long source) {
         super(client, id);
 
         this.format    = format;
@@ -41,8 +41,8 @@ public class SyncMessageImpl extends TurtleImpl implements SyncMessage {
             this.fireEvent(new SyncMessageUpdateFormatEvent(this, old, this.format));
         });
         this.apply(json, Keys.Messages.SyncMessage.AUTHOR, element -> {
-            User old = this.author;
-            this.author = client.getTurtleById(element.getAsLong(), User.class);
+            long old = this.author;
+            this.author = element.getAsLong();
             this.fireEvent(new SyncMessageUpdateAuthorEvent(this, old, this.author));
         });
         this.apply(json, Keys.Messages.SyncMessage.CONTENT, element -> {
@@ -56,13 +56,13 @@ public class SyncMessageImpl extends TurtleImpl implements SyncMessage {
             this.fireEvent(new SyncMessageUpdateReferenceEvent(this, old, this.reference));
         });
         this.apply(json, Keys.Messages.SyncMessage.CHANNEL, element -> {
-            SyncChannel old = this.channel;
-            this.channel = client.getTurtleById(element.getAsLong(), SyncChannel.class);
+            long old = this.channel;
+            this.channel = element.getAsLong();
             this.fireEvent(new SyncMessageUpdateChannelEvent(this, old, this.channel));
         });
         this.apply(json, Keys.Messages.SyncMessage.SOURCE, element -> {
-            IChannel old = this.source;
-            this.source = client.getTurtleById(element.getAsLong(), IChannel.class);
+            long old = this.source;
+            this.source = element.getAsLong();
             this.fireEvent(new SyncMessageUpdateSourceEvent(this, old, this.source));
         });
         return this;
@@ -83,7 +83,7 @@ public class SyncMessageImpl extends TurtleImpl implements SyncMessage {
     /* - AUTHOR - */
 
     @Override
-    public @NotNull User getAuthor() {
+    public long getAuthorId() {
         return this.author;
     }
 
@@ -113,7 +113,7 @@ public class SyncMessageImpl extends TurtleImpl implements SyncMessage {
     /* - REFERENCE - */
 
     @Override
-    public @Nullable Long getReference() {
+    public @Nullable Long getReferenceId() {
         return this.reference;
     }
 
@@ -125,7 +125,7 @@ public class SyncMessageImpl extends TurtleImpl implements SyncMessage {
     /* - CHANNEL - */
 
     @Override
-    public @NotNull SyncChannel getChannel() {
+    public long getChannelId() {
         return this.channel;
     }
 
@@ -137,7 +137,7 @@ public class SyncMessageImpl extends TurtleImpl implements SyncMessage {
     /* - SOURCE - */
 
     @Override
-    public @NotNull IChannel getSource() {
+    public long getSourceId() {
         return this.source;
     }
 

@@ -10,15 +10,15 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Collection;
 import java.util.function.Function;
 
-public class GroupMemberJoinEvent extends GroupEvent implements EntityUpdateEntryEvent<Group, User> {
-    protected final User user;
+public class GroupMemberJoinEvent extends GroupEvent implements EntityUpdateEntryEvent<Group, Long> {
+    protected final Long user;
 
-    public GroupMemberJoinEvent(@NotNull Group group, @NotNull User user) {
+    public GroupMemberJoinEvent(@NotNull Group group, @NotNull Long user) {
         super(group);
         this.user = user;
     }
 
-    public @NotNull User getUser() {
+    public Long getUserId() {
         return user;
     }
 
@@ -30,12 +30,12 @@ public class GroupMemberJoinEvent extends GroupEvent implements EntityUpdateEntr
     }
 
     @Override
-    public final @NotNull Collection<User> getCollection() {
-        return getGroup().getUsers();
+    public final @NotNull Collection<Long> getCollection() {
+        return getGroup().getUserIds();
     }
 
     @Override
-    public final @NotNull Function<User, Object> getMutator() {
-        return Turtle::getId;
+    public final @NotNull Function<Long, Object> getMutator() {
+        return l -> l;
     }
 }

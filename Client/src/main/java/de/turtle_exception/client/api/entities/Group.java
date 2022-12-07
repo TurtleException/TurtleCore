@@ -49,8 +49,12 @@ public interface Group extends Turtle, TurtleContainer<User> {
      * @return List of members.
      */
     @Key(name = Keys.Group.MEMBERS, relation = Relation.MANY_TO_MANY, sqlType = Types.Group.MEMBERS)
-    @Relational(table = "group_members", self = "group", foreign = "user", type = User.class)
-    @NotNull List<User> getUsers();
+    @Relational(table = "group_members", self = "group", foreign = "user", type = Long.class)
+    @NotNull List<Long> getUserIds();
+
+    default @NotNull List<User> getUsers() {
+        return this.getClient().getTurtles(User.class, this.getUserIds());
+    }
 
     /**
      * Creates an Action with the instruction to add the provided id to the list of Group members.

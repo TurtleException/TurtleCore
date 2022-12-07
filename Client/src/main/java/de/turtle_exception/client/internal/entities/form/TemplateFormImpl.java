@@ -12,9 +12,9 @@ import java.util.List;
 
 public class TemplateFormImpl extends TurtleImpl implements TemplateForm {
     private final String title;
-    private final List<Element> elements;
+    private final List<Long> elements;
 
-    public TemplateFormImpl(@NotNull TurtleClient client, long id, String title, List<Element> elements) {
+    public TemplateFormImpl(@NotNull TurtleClient client, long id, String title, List<Long> elements) {
         super(client, id);
         this.title = title;
         this.elements = elements;
@@ -34,7 +34,7 @@ public class TemplateFormImpl extends TurtleImpl implements TemplateForm {
     }
 
     @Override
-    public @NotNull List<Element> getElements() {
+    public @NotNull List<Long> getElementIds() {
         return List.copyOf(this.elements);
     }
 }

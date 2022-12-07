@@ -13,17 +13,16 @@ import de.turtle_exception.client.internal.util.TurtleSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class GroupImpl extends TurtleImpl implements Group {
     private String name;
+    private ArrayList<Long> users;
 
-    private TurtleSet<User> users;
-
-    GroupImpl(@NotNull TurtleClient client, long id, String name, TurtleSet<User> users) {
+    GroupImpl(@NotNull TurtleClient client, long id, String name, ArrayList<Long> users) {
         super(client, id);
         this.name = name;
-
         this.users = users;
     }
 
@@ -35,19 +34,19 @@ public class GroupImpl extends TurtleImpl implements Group {
             this.fireEvent(new GroupUpdateNameEvent(this, old, this.name));
         });
         this.apply(json, Keys.Group.MEMBERS, element -> {
-            TurtleSet<User> old = this.users;
-            TurtleSet<User> set = new TurtleSet<>();
+            ArrayList<Long> old  = this.users;
+            ArrayList<Long> list = new ArrayList<>();
             for (JsonElement entry : element.getAsJsonArray())
-                set.add(client.getTurtleById(entry.getAsLong(), User.class));
-            this.users = set;
-            UpdateHelper.ofGroupMembers(this, old, set);
+                list.add(entry.getAsLong());
+            this.users = list;
+            UpdateHelper.ofGroupMembers(this, old, list);
         });
         return this;
     }
 
     @Override
     public @Nullable User getTurtleById(long id) {
-        return this.users.get(id);
+        return this.getClient().getTurtleById(id, User.class);
     }
 
     /* - NAME - */
@@ -65,7 +64,7 @@ public class GroupImpl extends TurtleImpl implements Group {
     /* - MEMBERS - */
 
     @Override
-    public @NotNull List<User> getUsers() {
+    public @NotNull List<Long> getUserIds() {
         return List.copyOf(users);
     }
 

@@ -96,8 +96,12 @@ public interface Project extends Turtle, TurtleContainer<User> {
      * @return List of members.
      */
     @Key(name = Keys.Project.MEMBERS, relation = Relation.MANY_TO_MANY, sqlType = Types.Project.MEMBERS)
-    @Relational(table = "project_members", self = "project", foreign = "user", type = User.class)
-    @NotNull List<User> getUsers();
+    @Relational(table = "project_members", self = "project", foreign = "user", type = Long.class)
+    @NotNull List<Long> getUserIds();
+
+    default @NotNull List<User> getUsers() {
+        return this.getClient().getTurtles(User.class, this.getUserIds());
+    }
 
     /**
      * Creates an Action with the instruction to add the provided id to the list of Project members.
@@ -142,7 +146,11 @@ public interface Project extends Turtle, TurtleContainer<User> {
      * @return The Project application form.
      */
     @Key(name = Keys.Project.APP_FORM, sqlType = Types.Project.APP_FORM)
-    @NotNull TemplateForm getApplicationForm();
+    long getApplicationFormId();
+
+    default TemplateForm getApplicationForm() {
+        return this.getClient().getTurtleById(this.getApplicationFormId(), TemplateForm.class);
+    }
 
     /**
      * Creates an Action with the instruction to modify this Project's application form id and change it to the provided id.

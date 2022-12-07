@@ -40,6 +40,7 @@ import de.turtle_exception.client.api.event.entities.user.*;
 import de.turtle_exception.client.internal.util.TurtleSet;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -125,25 +126,25 @@ public class UpdateHelper {
 
     /* - GROUP - */
 
-    public static void ofGroupMembers(@NotNull Group group, @NotNull TurtleSet<User> oldUsers, @NotNull TurtleSet<User> newUsers) {
-        List<User> added   = newUsers.stream().filter(user -> !oldUsers.containsId(user.getId())).toList();
-        List<User> removed = oldUsers.stream().filter(user -> !newUsers.containsId(user.getId())).toList();
+    public static void ofGroupMembers(@NotNull Group group, @NotNull ArrayList<Long> oldUsers, @NotNull ArrayList<Long> newUsers) {
+        List<Long> added   = newUsers.stream().filter(user -> !oldUsers.contains(user)).toList();
+        List<Long> removed = oldUsers.stream().filter(user -> !newUsers.contains(user)).toList();
 
-        for (User newUser : added)
+        for (Long newUser : added)
             group.getClient().getEventManager().handleEvent(new GroupMemberJoinEvent(group, newUser));
-        for (User oldUser : removed)
+        for (Long oldUser : removed)
             group.getClient().getEventManager().handleEvent(new GroupMemberLeaveEvent(group, oldUser));
     }
 
     /* - PROJECT - */
 
-    public static void ofProjectMembers(@NotNull Project project, @NotNull TurtleSet<User> oldUsers, @NotNull TurtleSet<User> newUsers) {
-        List<User> added   = newUsers.stream().filter(user -> !oldUsers.containsId(user.getId())).toList();
-        List<User> removed = oldUsers.stream().filter(user -> !newUsers.containsId(user.getId())).toList();
+    public static void ofProjectMembers(@NotNull Project project, @NotNull ArrayList<Long> oldUsers, @NotNull ArrayList<Long> newUsers) {
+        List<Long> added   = newUsers.stream().filter(user -> !oldUsers.contains(user)).toList();
+        List<Long> removed = oldUsers.stream().filter(user -> !newUsers.contains(user)).toList();
 
-        for (User newUser : added)
+        for (Long newUser : added)
             project.getClient().getEventManager().handleEvent(new ProjectMemberJoinEvent(project, newUser));
-        for (User oldUser : removed)
+        for (Long oldUser : removed)
             project.getClient().getEventManager().handleEvent(new ProjectMemberLeaveEvent(project, oldUser));
     }
 
@@ -159,13 +160,13 @@ public class UpdateHelper {
             ticket.getClient().getEventManager().handleEvent(new TicketTagRemoveEvent(ticket, oldTag));
     }
 
-    public static void ofTicketUsers(@NotNull Ticket ticket, @NotNull TurtleSet<User> oldUsers, @NotNull TurtleSet<User> newUsers) {
-        List<User> added   = newUsers.stream().filter(user -> !oldUsers.containsId(user.getId())).toList();
-        List<User> removed = oldUsers.stream().filter(user -> !newUsers.containsId(user.getId())).toList();
+    public static void ofTicketUsers(@NotNull Ticket ticket, @NotNull ArrayList<Long> oldUsers, @NotNull ArrayList<Long> newUsers) {
+        List<Long> added   = newUsers.stream().filter(user -> !oldUsers.contains(user)).toList();
+        List<Long> removed = oldUsers.stream().filter(user -> !newUsers.contains(user)).toList();
 
-        for (User newUser : added)
+        for (Long newUser : added)
             ticket.getClient().getEventManager().handleEvent(new TicketUserAddEvent(ticket, newUser));
-        for (User oldUser : removed)
+        for (Long oldUser : removed)
             ticket.getClient().getEventManager().handleEvent(new TicketUserRemoveEvent(ticket, oldUser));
     }
 

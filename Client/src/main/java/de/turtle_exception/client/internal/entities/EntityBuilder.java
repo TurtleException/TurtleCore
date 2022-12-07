@@ -54,14 +54,9 @@ public class EntityBuilder {
         String name = data.get(Keys.Group.NAME).getAsString();
 
         JsonArray       userArr  = data.getAsJsonArray(Keys.Group.MEMBERS);
-        TurtleSet<User> users    = new TurtleSet<>();
-        for (JsonElement element : userArr) {
-            User userElement = client.getTurtleById(element.getAsLong(), User.class);
-            if (userElement == null)
-                log(client, Level.FINE, "Group", id, "Could not link User:" + element.getAsLong() + ". Has it been deleted?");
-            else
-                users.add(userElement);
-        }
+        ArrayList<Long> users    = new ArrayList<>();
+        for (JsonElement element : userArr)
+            users.add(element.getAsLong());
 
         return new GroupImpl(client, id, name, users);
     }
@@ -86,20 +81,15 @@ public class EntityBuilder {
         ProjectState state = ProjectState.of(data.get(Keys.Project.STATE).getAsByte());
 
         JsonArray       userArr  = data.getAsJsonArray(Keys.Project.MEMBERS);
-        TurtleSet<User> users    = new TurtleSet<>();
-        for (JsonElement element : userArr) {
-            User userElement = client.getTurtleById(element.getAsLong(), User.class);
-            if (userElement == null)
-                log(client, Level.FINE, "Project", id, "Could not link User:" + element.getAsLong() + ". Has it been deleted?");
-            else
-                users.add(userElement);
-        }
+        ArrayList<Long> users    = new ArrayList<>();
+        for (JsonElement element : userArr)
+            users.add(element.getAsLong());
 
-        TemplateForm applicationForm = client.getTurtleById(data.get(Keys.Project.APP_FORM).getAsLong(), TemplateForm.class);
-        long         timeRelease     = data.get(Keys.Project.TIME_RELEASE).getAsLong();
-        long         timeApply       = data.get(Keys.Project.TIME_APPLY).getAsLong();
-        long         timeStart       = data.get(Keys.Project.TIME_START).getAsLong();
-        long         timeEnd         = data.get(Keys.Project.TIME_END).getAsLong();
+        long applicationForm = data.get(Keys.Project.APP_FORM).getAsLong();
+        long timeRelease     = data.get(Keys.Project.TIME_RELEASE).getAsLong();
+        long timeApply       = data.get(Keys.Project.TIME_APPLY).getAsLong();
+        long timeStart       = data.get(Keys.Project.TIME_START).getAsLong();
+        long timeEnd         = data.get(Keys.Project.TIME_END).getAsLong();
 
         return new ProjectImpl(client, id, title, code, state, users, applicationForm, timeRelease, timeApply, timeStart, timeEnd);
     }
@@ -121,14 +111,9 @@ public class EntityBuilder {
             tags.add(element.getAsString());
 
         JsonArray       userArr  = data.getAsJsonArray(Keys.Ticket.USERS);
-        TurtleSet<User> users    = new TurtleSet<>();
-        for (JsonElement element : userArr) {
-            User userElement = client.getTurtleById(element.getAsLong(), User.class);
-            if (userElement == null)
-                log(client, Level.FINE, "Ticket", id, "Could not link User:" + element.getAsLong() + ". Has it been deleted?");
-            else
-                users.add(userElement);
-        }
+        ArrayList<Long> users    = new ArrayList<>();
+        for (JsonElement element : userArr)
+            users.add(element.getAsLong());
 
         return new TicketImpl(client, id, state, title, category, discordChannel, tags, users);
     }
@@ -164,15 +149,15 @@ public class EntityBuilder {
     public static @NotNull CompletedFormImpl buildCompletedForm(@NotNull JsonObject data, @NotNull TurtleClient client) throws NullPointerException, IllegalArgumentException, IllegalJsonException {
         Checks.nonNull(data, "JSON");
 
-        long         id     = data.get(Keys.Turtle.ID).getAsLong();
-        TemplateForm form   = client.getTurtleById(data.get(Keys.Form.CompletedForm.FORM).getAsLong(), TemplateForm.class);
-        User         author = client.getTurtleById(data.get(Keys.Form.CompletedForm.AUTHOR).getAsLong(), User.class);
-        long         time   = data.get(Keys.Form.CompletedForm.TIME_SUBMISSION).getAsLong();
+        long id     = data.get(Keys.Turtle.ID).getAsLong();
+        long form   = data.get(Keys.Form.CompletedForm.FORM).getAsLong();
+        long author = data.get(Keys.Form.CompletedForm.AUTHOR).getAsLong();
+        long time   = data.get(Keys.Form.CompletedForm.TIME_SUBMISSION).getAsLong();
 
         JsonArray queryResponseArr = data.getAsJsonArray(Keys.Form.CompletedForm.QUERY_RESPONSES);
-        ArrayList<QueryResponse> queryResponses = new ArrayList<>();
+        ArrayList<Long> queryResponses = new ArrayList<>();
         for (JsonElement element : queryResponseArr)
-            queryResponses.add(client.getTurtleById(element.getAsLong(), QueryResponse.class));
+            queryResponses.add(element.getAsLong());
 
         return new CompletedFormImpl(client, id, form, author, time, queryResponses);
     }
@@ -192,9 +177,9 @@ public class EntityBuilder {
     public static @NotNull QueryResponseImpl buildQueryResponse(@NotNull JsonObject data, @NotNull TurtleClient client) throws NullPointerException, IllegalArgumentException, IllegalJsonException {
         Checks.nonNull(data, "JSON");
 
-        long         id      = data.get(Keys.Turtle.ID).getAsLong();
-        QueryElement query   = client.getTurtleById(data.get(Keys.Form.QueryResponse.QUERY).getAsLong(), QueryElement.class);
-        String       content = getOptional(() -> data.get(Keys.Form.QueryResponse.CONTENT).getAsString());
+        long   id      = data.get(Keys.Turtle.ID).getAsLong();
+        long   query   = data.get(Keys.Form.QueryResponse.QUERY).getAsLong();
+        String content = getOptional(() -> data.get(Keys.Form.QueryResponse.CONTENT).getAsString());
 
         return new QueryResponseImpl(client, id, query, content);
     }
@@ -206,9 +191,9 @@ public class EntityBuilder {
         String title = data.get(Keys.Form.TemplateForm.TITLE).getAsString();
 
         JsonArray queryArr = data.getAsJsonArray(Keys.Form.TemplateForm.ELEMENTS);
-        ArrayList<Element> elements = new ArrayList<>();
+        ArrayList<Long> elements = new ArrayList<>();
         for (JsonElement element : queryArr)
-            elements.add(client.getTurtleById(element.getAsLong(), Element.class));
+            elements.add(element.getAsLong());
 
         return new TemplateFormImpl(client, id, title, elements);
     }
@@ -259,11 +244,11 @@ public class EntityBuilder {
 
         long          id        = data.get(Keys.Turtle.ID).getAsLong();
         MessageFormat format    = MessageFormat.of(data.get(Keys.Messages.SyncMessage.FORMAT).getAsByte());
-        User          author    = client.getTurtleById(data.get(Keys.Messages.SyncMessage.AUTHOR).getAsLong(), User.class);
+        long          author    = data.get(Keys.Messages.SyncMessage.AUTHOR).getAsLong();
         String        content   = data.get(Keys.Messages.SyncMessage.CONTENT).getAsString();
         Long          reference = getOptional(() -> data.get(Keys.Messages.SyncMessage.REFERENCE).getAsLong());
-        SyncChannel   channel   = client.getTurtleById(data.get(Keys.Messages.SyncMessage.CHANNEL).getAsLong(), SyncChannel.class);
-        IChannel      source    = getOptional(() -> client.getTurtleById(data.get(Keys.Messages.SyncMessage.SOURCE).getAsLong(), IChannel.class));
+        long          channel   = data.get(Keys.Messages.SyncMessage.CHANNEL).getAsLong();
+        long          source    = data.get(Keys.Messages.SyncMessage.SOURCE).getAsLong();
 
         return new SyncMessageImpl(client, id, format, author, content, reference, channel, source);
     }

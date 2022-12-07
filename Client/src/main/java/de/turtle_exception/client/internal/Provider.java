@@ -4,6 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.api.entities.Turtle;
+import de.turtle_exception.client.api.request.Action;
 import de.turtle_exception.client.internal.data.ResourceUtil;
 import de.turtle_exception.client.internal.util.Worker;
 import de.turtle_exception.client.internal.util.logging.NestedLogger;
@@ -57,6 +58,22 @@ public abstract class Provider {
     }
 
     protected void onStart() throws Exception { }
+
+    /* - - - */
+
+    public <T> @NotNull Action<T> completedAction(T val) {
+        return new Action<>() {
+            @Override
+            public @NotNull Provider getProvider() {
+                return Provider.this;
+            }
+
+            @Override
+            public @NotNull CompletableFuture<T> submit() {
+                return CompletableFuture.completedFuture(val);
+            }
+        };
+    }
 
     /* - - - */
 

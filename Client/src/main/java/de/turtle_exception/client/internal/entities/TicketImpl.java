@@ -18,6 +18,7 @@ import de.turtle_exception.client.internal.util.TurtleSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -29,9 +30,9 @@ public class TicketImpl extends TurtleImpl implements Ticket {
     private long discordChannel;
 
     private Set<String> tags = Sets.newConcurrentHashSet();
-    private TurtleSet<User> users;
+    private ArrayList<Long> users;
 
-    TicketImpl(@NotNull TurtleClient client, long id, TicketState state, String title, String category, long discordChannel, Collection<String> tags, TurtleSet<User> users) {
+    TicketImpl(@NotNull TurtleClient client, long id, TicketState state, String title, String category, long discordChannel, Collection<String> tags, ArrayList<Long> users) {
         super(client, id);
 
         this.state = state;
@@ -74,19 +75,19 @@ public class TicketImpl extends TurtleImpl implements Ticket {
             UpdateHelper.ofTicketTags(this, old, set);
         });
         this.apply(json, Keys.Ticket.USERS, element -> {
-            TurtleSet<User> old = this.users;
-            TurtleSet<User> set = new TurtleSet<>();
+            ArrayList<Long> old  = this.users;
+            ArrayList<Long> list = new ArrayList<>();
             for (JsonElement entry : element.getAsJsonArray())
-                set.add(client.getTurtleById(entry.getAsLong(), User.class));
-            this.users = set;
-            UpdateHelper.ofTicketUsers(this, old, set);
+                list.add(entry.getAsLong());
+            this.users = list;
+            UpdateHelper.ofTicketUsers(this, old, list);
         });
         return this;
     }
 
     @Override
     public @Nullable User getTurtleById(long id) {
-        return this.users.get(id);
+        return this.getClient().getTurtleById(id, User.class);
     }
 
     /* - STATE - */
@@ -157,7 +158,7 @@ public class TicketImpl extends TurtleImpl implements Ticket {
     /* - USERS - */
 
     @Override
-    public @NotNull List<User> getUsers() {
+    public @NotNull List<Long> getUserIds() {
         return List.copyOf(users);
     }
 

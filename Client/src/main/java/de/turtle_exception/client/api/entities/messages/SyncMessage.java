@@ -4,12 +4,15 @@ import de.turtle_exception.client.api.entities.Turtle;
 import de.turtle_exception.client.api.entities.User;
 import de.turtle_exception.client.api.entities.attributes.MessageFormat;
 import de.turtle_exception.client.api.request.Action;
+import de.turtle_exception.client.internal.Provider;
 import de.turtle_exception.client.internal.data.annotations.Key;
 import de.turtle_exception.client.internal.data.annotations.Keys;
 import de.turtle_exception.client.internal.data.annotations.Resource;
 import de.turtle_exception.client.internal.data.annotations.Types;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.concurrent.CompletableFuture;
 
 /**
  * A synchronized message that originates from an {@link IChannel} and will be shared with all other
@@ -50,7 +53,11 @@ public interface SyncMessage extends Turtle {
      * @return The Message author.
      */
     @Key(name = Keys.Messages.SyncMessage.AUTHOR, sqlType = Types.Messages.SyncMessage.AUTHOR)
-    @NotNull User getAuthor();
+    long getAuthorId();
+
+    default User getAuthor() {
+        return this.getClient().getTurtleById(this.getAuthorId(), User.class);
+    }
 
     /**
      * Creates an Action with the instruction to modify this Message's author id and change it to the provided id.
@@ -97,7 +104,14 @@ public interface SyncMessage extends Turtle {
      * @return The Message format.
      */
     @Key(name = Keys.Messages.SyncMessage.REFERENCE, sqlType = Types.Messages.SyncMessage.REFERENCE)
-    @Nullable Long getReference();
+    @Nullable Long getReferenceId();
+
+    default @NotNull Action<SyncMessage> retrieveReference() {
+        Long id = this.getReferenceId();
+        if (id == null)
+            return this.getClient().getProvider().completedAction(null);
+        return this.getClient().retrieveTurtle(id, SyncMessage.class);
+    }
 
     /**
      * Creates an Action with the instruction to modify this Message's reference id and change it to the provided id.
@@ -124,7 +138,11 @@ public interface SyncMessage extends Turtle {
      */
     // not relational -> the id is stored with the message, that's it
     @Key(name = Keys.Messages.SyncMessage.CHANNEL, sqlType = Types.Messages.SyncMessage.CHANNEL)
-    @NotNull SyncChannel getChannel();
+    long getChannelId();
+
+    default SyncChannel getChannel() {
+        return this.getClient().getTurtleById(this.getChannelId(), SyncChannel.class);
+    }
 
     /**
      * Creates an Action with the instruction to modify this Message's channel id and change it to the provided id.
@@ -150,7 +168,11 @@ public interface SyncMessage extends Turtle {
      */
     // not relational -> the id is stored with the message, that's it
     @Key(name = Keys.Messages.SyncMessage.SOURCE, sqlType = Types.Messages.SyncMessage.SOURCE)
-    @NotNull IChannel getSource();
+    long getSourceId();
+
+    default IChannel getSource() {
+        return this.getClient().getTurtleById(this.getSourceId(), IChannel.class);
+    }
 
     /**
      * Creates an Action with the instruction to modify this Message's source id and change it to the provided id.

@@ -15,20 +15,21 @@ import de.turtle_exception.client.internal.util.TurtleSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ProjectImpl extends TurtleImpl implements Project {
     private String title;
     private String code;
     private ProjectState state;
-    private TurtleSet<User> users;
-    private TemplateForm applicationForm;
+    private ArrayList<Long> users;
+    private long applicationForm;
     private long timeRelease;
     private long timeApply;
     private long timeStart;
     private long timeEnd;
 
-    protected ProjectImpl(@NotNull TurtleClient client, long id, String title, String code, ProjectState state, TurtleSet<User> users, TemplateForm applicationForm, long timeRelease, long timeApply, long timeStart, long timeEnd) {
+    protected ProjectImpl(@NotNull TurtleClient client, long id, String title, String code, ProjectState state, ArrayList<Long> users, long applicationForm, long timeRelease, long timeApply, long timeStart, long timeEnd) {
         super(client, id);
         this.title = title;
         this.code  = code;
@@ -59,16 +60,16 @@ public class ProjectImpl extends TurtleImpl implements Project {
             this.fireEvent(new ProjectUpdateStateEvent(this, old, this.state));
         });
         this.apply(json, Keys.Project.MEMBERS, element -> {
-            TurtleSet<User> old = this.users;
-            TurtleSet<User> set = new TurtleSet<>();
+            ArrayList<Long> old  = this.users;
+            ArrayList<Long> list = new ArrayList<>();
             for (JsonElement entry : element.getAsJsonArray())
-                set.add(client.getTurtleById(entry.getAsLong(), User.class));
-            this.users = set;
-            UpdateHelper.ofProjectMembers(this, old, set);
+                list.add(entry.getAsLong());
+            this.users = list;
+            UpdateHelper.ofProjectMembers(this, old, list);
         });
         this.apply(json, Keys.Project.APP_FORM, element -> {
-            TemplateForm old = this.applicationForm;
-            this.applicationForm = this.getClient().getTurtleById(element.getAsLong(), TemplateForm.class);
+            long old = this.applicationForm;
+            this.applicationForm = element.getAsLong();
             this.fireEvent(new ProjectUpdateApplicationFormEvent(this, old, this.applicationForm));
         });
         this.apply(json, Keys.Project.TIME_RELEASE, element -> {
@@ -96,7 +97,7 @@ public class ProjectImpl extends TurtleImpl implements Project {
 
     @Override
     public @Nullable User getTurtleById(long id) {
-        return this.users.get(id);
+        return this.getClient().getTurtleById(id, User.class);
     }
 
     /* - TITLE - */
@@ -138,7 +139,7 @@ public class ProjectImpl extends TurtleImpl implements Project {
     /* - USERS - */
 
     @Override
-    public @NotNull List<User> getUsers() {
+    public @NotNull List<Long> getUserIds() {
         return List.copyOf(this.users);
     }
 
@@ -155,7 +156,7 @@ public class ProjectImpl extends TurtleImpl implements Project {
     /* - APPLICATIONS - */
 
     @Override
-    public @NotNull TemplateForm getApplicationForm() {
+    public long getApplicationFormId() {
         return this.applicationForm;
     }
 

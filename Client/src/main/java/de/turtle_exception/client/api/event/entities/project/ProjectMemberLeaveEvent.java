@@ -10,15 +10,15 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Collection;
 import java.util.function.Function;
 
-public class ProjectMemberLeaveEvent extends ProjectEvent implements EntityUpdateEntryEvent<Project, User> {
-    protected final User user;
+public class ProjectMemberLeaveEvent extends ProjectEvent implements EntityUpdateEntryEvent<Project, Long> {
+    protected final long user;
 
-    public ProjectMemberLeaveEvent(@NotNull Project project, @NotNull User user) {
+    public ProjectMemberLeaveEvent(@NotNull Project project, long user) {
         super(project);
         this.user = user;
     }
 
-    public @NotNull User getUser() {
+    public long getUserId() {
         return user;
     }
 
@@ -30,12 +30,12 @@ public class ProjectMemberLeaveEvent extends ProjectEvent implements EntityUpdat
     }
 
     @Override
-    public final @NotNull Collection<User> getCollection() {
-        return getProject().getUsers();
+    public final @NotNull Collection<Long> getCollection() {
+        return getProject().getUserIds();
     }
 
     @Override
-    public final @NotNull Function<User, Object> getMutator() {
-        return Turtle::getId;
+    public final @NotNull Function<Long, Object> getMutator() {
+        return l -> l;
     }
 }

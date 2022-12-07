@@ -82,6 +82,6 @@ public class EntityUpdateListener extends EventListener {
         for (Object obj : c)
             ResourceUtil.addValue(arr, mutator.apply((U) obj));
         json.add(key, arr);
-        this.sendPacket(Data.buildUpdate(Group.class, json));
+        this.sendPacket(Data.buildUpdate(turtle.getClass(), json));
     }
 }

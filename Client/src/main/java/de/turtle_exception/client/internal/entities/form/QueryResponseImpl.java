@@ -9,10 +9,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class QueryResponseImpl extends TurtleImpl implements QueryResponse {
-    private final QueryElement query;
+    private final long query;
     private final String content;
 
-    public QueryResponseImpl(@NotNull TurtleClient client, long id, QueryElement query, String content) {
+    public QueryResponseImpl(@NotNull TurtleClient client, long id, long query, String content) {
         super(client, id);
         this.query = query;
         this.content = content;
@@ -27,7 +27,7 @@ public class QueryResponseImpl extends TurtleImpl implements QueryResponse {
     /* - - - */
 
     @Override
-    public @NotNull QueryElement getQuery() {
+    public long getQueryId() {
         return this.query;
     }
 

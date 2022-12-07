@@ -5,7 +5,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Stream;
 
 /** Represents an object that can cache {@link Turtle Turtles}. */
 public interface TurtleContainer<T extends Turtle> {
@@ -50,5 +53,17 @@ public interface TurtleContainer<T extends Turtle> {
     default <T1 extends T> @Nullable T1 getTurtleById(long id, @NotNull Class<T1> type) {
         T turtle = this.getTurtleById(id);
         return type.isInstance(turtle) ? type.cast(turtle) : null;
+    }
+
+    default <T1 extends T> @NotNull List<T1> getTurtles(@NotNull Class<T1> type, @NotNull Collection<Long> ids) {
+        return this.getTurtles(type, ids.stream());
+    }
+
+    default <T1 extends T> @NotNull List<T1> getTurtles(@NotNull Class<T1> type, @NotNull Stream<Long> ids) {
+        return ids
+                .filter(Objects::nonNull)
+                .map(l -> this.getTurtleById(l, type))
+                .filter(Objects::nonNull)
+                .toList();
     }
 }

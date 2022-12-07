@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * A CompletedForm is a {@link User} submission of a {@link TemplateForm} with custom (user-provided)
@@ -29,7 +30,11 @@ public interface CompletedForm extends Turtle {
      * @return The initial TemplateForm.
      */
     @Key(name = Keys.Form.CompletedForm.FORM, relation = Relation.MANY_TO_ONE, sqlType = Types.Form.CompletedForm.FORM)
-    @NotNull TemplateForm getForm();
+    long getFormId();
+
+    default TemplateForm getForm() {
+        return this.getClient().getTurtleById(this.getFormId(), TemplateForm.class);
+    }
 
     /* - AUTHOR - */
 
@@ -40,7 +45,11 @@ public interface CompletedForm extends Turtle {
      * @return The Author of this CompletedForm.
      */
     @Key(name = Keys.Form.CompletedForm.AUTHOR, sqlType = Types.Form.CompletedForm.AUTHOR)
-    @NotNull User getAuthor();
+    long getAuthorId();
+
+    default User getAuthor() {
+        return this.getClient().getTurtleById(this.getAuthorId(), User.class);
+    }
 
     /* - SUBMISSION TIME - */
 
@@ -67,6 +76,10 @@ public interface CompletedForm extends Turtle {
      * @return QueryResponses of this CompletedForm.
      */
     @Key(name = Keys.Form.CompletedForm.QUERY_RESPONSES, relation = Relation.ONE_TO_MANY, sqlType = Types.Form.CompletedForm.QUERY_RESPONSES)
-    @Relational(table = "form_query_responses", self = "form", foreign = "query_response", type = QueryResponse.class)
-    @NotNull List<QueryResponse> getQueryResponses();
+    @Relational(table = "form_query_responses", self = "form", foreign = "query_response", type = Long.class)
+    @NotNull List<Long> getQueryResponseIds();
+
+    default @NotNull List<QueryResponse> getQueryResponses() {
+        return this.getClient().getTurtles(QueryResponse.class, this.getQueryResponseIds());
+    }
 }

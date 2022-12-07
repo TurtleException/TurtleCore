@@ -4,7 +4,6 @@ public class Types {
     private Types() { }
 
     private static class Templates {
-        public static final String TURTLE    = "TURTLE";
         public static final String SNOWFLAKE = "BIGINT(20)";
         public static final String UUID      = "VARCHAR(36)";
     }
@@ -21,10 +20,10 @@ public class Types {
 
     public static class Form {
         public static class CompletedForm {
-            public static final String FORM            = Templates.TURTLE;
-            public static final String AUTHOR          = Templates.TURTLE;
+            public static final String FORM            = Turtle.ID;
+            public static final String AUTHOR          = Turtle.ID;
             public static final String TIME_SUBMISSION = "BIGINT";
-            public static final String QUERY_RESPONSES = Templates.TURTLE;
+            public static final String QUERY_RESPONSES = Turtle.ID;
         }
 
         public static class Element {
@@ -38,13 +37,13 @@ public class Types {
         }
 
         public static class QueryResponse {
-            public static final String QUERY   = Templates.TURTLE;
+            public static final String QUERY   = Turtle.ID;
             public static final String CONTENT = "TEXT";
         }
 
         public static class TemplateForm {
             public static final String TITLE    = "TEXT";
-            public static final String ELEMENTS = Templates.TURTLE;
+            public static final String ELEMENTS = Turtle.ID;
         }
 
         public static class TextElement {
@@ -58,7 +57,7 @@ public class Types {
         }
 
         public static class IChannel {
-            public static final String SYNC_CHANNEL = Templates.TURTLE;
+            public static final String SYNC_CHANNEL = Turtle.ID;
         }
 
         public static class MinecraftChannel {
@@ -66,18 +65,13 @@ public class Types {
             public static final String IDENTIFIER   = "TEXT";
         }
 
-        public static class SyncChannel {
-            public static final String DISCORD   = Templates.TURTLE;
-            public static final String MINECRAFT = Templates.TURTLE;
-        }
-
         public static class SyncMessage {
             public static final String FORMAT    = "TINYINT";
-            public static final String AUTHOR    = Templates.TURTLE;
+            public static final String AUTHOR    = Turtle.ID;
             public static final String CONTENT   = "TEXT";
             public static final String REFERENCE = Turtle.ID;
-            public static final String CHANNEL   = Templates.TURTLE;
-            public static final String SOURCE    = Templates.TURTLE;
+            public static final String CHANNEL   = Turtle.ID;
+            public static final String SOURCE    = Turtle.ID;
         }
     }
 
@@ -85,7 +79,7 @@ public class Types {
 
     public static class Group {
         public static final String NAME    = "TINYTEXT";
-        public static final String MEMBERS = Templates.TURTLE;
+        public static final String MEMBERS = Turtle.ID;
     }
 
     public static class JsonResource {
@@ -97,8 +91,8 @@ public class Types {
         public static final String TITLE        = "TINYTEXT";
         public static final String CODE         = "TINYTEXT";
         public static final String STATE        = "TINYINT";
-        public static final String MEMBERS      = Templates.TURTLE;
-        public static final String APP_FORM     = Templates.TURTLE;
+        public static final String MEMBERS      = Turtle.ID;
+        public static final String APP_FORM     = Turtle.ID;
         public static final String TIME_RELEASE = "BIGINT";
         public static final String TIME_APPLY   = "BIGINT";
         public static final String TIME_START   = "BIGINT";
@@ -111,7 +105,7 @@ public class Types {
         public static final String CATEGORY        = "TINYTEXT";
         public static final String TAGS            = "TINYTEXT";
         public static final String DISCORD_CHANNEL = Templates.SNOWFLAKE;
-        public static final String USERS           = Templates.TURTLE;
+        public static final String USERS           = Turtle.ID;
     }
 
     public static class Turtle {
