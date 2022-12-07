@@ -2,6 +2,8 @@ package de.turtle_exception.client.api.entities;
 
 import de.turtle_exception.client.api.entities.attributes.ProjectState;
 import de.turtle_exception.client.api.entities.containers.TurtleContainer;
+import de.turtle_exception.client.api.entities.form.CompletedForm;
+import de.turtle_exception.client.api.entities.form.TemplateForm;
 import de.turtle_exception.client.api.request.Action;
 import de.turtle_exception.client.internal.data.annotations.*;
 import org.jetbrains.annotations.NotNull;
@@ -132,26 +134,39 @@ public interface Project extends Turtle, TurtleContainer<User> {
         return this.removeUser(user.getId());
     }
 
+    /* - APPLICATIONS - */
+
+    /**
+     * Provides the application form of this Project.
+     * @return The Project application form.
+     */
+    @Key(name = "application_form", sqlType = "TURTLE")
+    @NotNull TemplateForm getApplicationForm();
+
+    /**
+     * Creates an Action with the instruction to modify this Project's application form id and change it to the provided id.
+     * @param form New application form id.
+     * @return Action that provides the modified {@link Project} on completion.
+     */
+    @NotNull Action<Project> modifyApplicationForm(long form);
+
+    /**
+     * Creates an Action with the instruction to modify this Project's application form and change it to the provided
+     * TemplateForm.
+     * @param form New application form.
+     * @return Action that provides the modified {@link Project} on completion.
+     */
+    default @NotNull Action<Project> modifyApplicationForm(@NotNull TemplateForm form) {
+        return this.modifyApplicationForm(form.getId());
+    }
+
+    default @NotNull List<CompletedForm> getApplicationRequests() {
+        return this.getClient().getTurtles(CompletedForm.class).stream()
+                .filter(form -> form.getForm().getId() == this.getApplicationForm().getId())
+                .toList();
+    }
+
+    /* - TIMES - */
+
     // TODO: times
-
-    @Resource(path = "project_apply_forms", builder = "buildProjectApplicationForm")
-    interface ApplyForm extends Turtle {
-        @Key(name = Keys.Project.ApplyForm.PROJECT, sqlType = Types.Project.ApplyForm.PROJECT)
-        @NotNull Project getProject();
-
-        // TODO: queries + datatypes
-    }
-
-    @Resource(path = "project_apply_requests", builder = "buildProjectApplication")
-    interface ApplyRequest extends Turtle {
-        @Key(name = Keys.Project.ApplyRequest.PROJECT, sqlType = Types.Project.ApplyRequest.PROJECT)
-        @NotNull Project getProject();
-
-        @Key(name = Keys.Project.ApplyRequest.USER, sqlType = Types.Project.ApplyRequest.USER)
-        @NotNull User getUser();
-
-        // TODO: times
-
-        // TODO: content (queries)
-    }
 }
