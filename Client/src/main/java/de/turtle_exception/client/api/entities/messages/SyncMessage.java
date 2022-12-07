@@ -15,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
  * A synchronized message that originates from an {@link IChannel} and will be shared with all other
  * {@link IChannel IChannels} the governing {@link SyncChannel} manages.
  */
-@Resource(path = "messages", builder = "buildMessage")
+@Resource(path = "messages", builder = "buildSyncMessage")
 @SuppressWarnings("unused")
 public interface SyncMessage extends Turtle {
     @Override

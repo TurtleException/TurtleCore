@@ -254,7 +254,7 @@ public class EntityBuilder {
         return new SyncChannelImpl(client, id);
     }
 
-    public static @NotNull SyncMessageImpl buildMessage(@NotNull JsonObject data, @NotNull TurtleClient client) throws NullPointerException, IllegalArgumentException, IllegalJsonException {
+    public static @NotNull SyncMessageImpl buildSyncMessage(@NotNull JsonObject data, @NotNull TurtleClient client) throws NullPointerException, IllegalArgumentException, IllegalJsonException {
         Checks.nonNull(data, "JSON");
 
         long          id        = data.get(Keys.Turtle.ID).getAsLong();

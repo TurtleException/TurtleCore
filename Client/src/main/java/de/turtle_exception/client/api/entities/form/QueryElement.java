@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /** A Form Element that queries the User for input of a specific {@link ContentType}. */
-@Resource(path = "queries", builder = "buildQuery")
+@Resource(path = "queries", builder = "buildQueryElement")
 @SuppressWarnings("unused")
 public interface QueryElement extends Element {
     @Override
