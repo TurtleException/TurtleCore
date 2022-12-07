@@ -107,134 +107,310 @@ public interface TurtleClient extends TurtleContainer<Turtle> {
     @Override
     @Nullable Turtle getTurtleById(long id);
 
+    /**
+     * Returns an immutable List of all cached {@link Group} objects.
+     * @return List of cached Groups.
+     */
     default @NotNull List<Group> getGroups() {
         return this.getTurtles(Group.class);
     }
 
+    /**
+     * Returns a single {@link Group} specified by its id, or {@code null} if no such object is stored in the underlying
+     * cache.
+     * @param id The unique id of the Group.
+     * @return The requested Group (may be {@code null}).
+     * @see Group#getId()
+     */
     default @Nullable Group getGroupById(long id) {
         return this.getTurtleById(id, Group.class);
     }
 
+    /**
+     * Returns an immutable List of all cached {@link JsonResource} objects.
+     * @return List of cached JsonResources.
+     */
     default @NotNull List<JsonResource> getJsonResources() {
         return this.getTurtles(JsonResource.class);
     }
 
+    /**
+     * Returns a single {@link JsonResource} specified by its id, or {@code null} if no such object is stored in the
+     * underlying cache.
+     * @param id The unique id of the JsonResource.
+     * @return The requested JsonResource (may be {@code null}).
+     * @see JsonResource#getId()
+     */
     default @Nullable JsonResource getJsonResourceById(long id) {
         return this.getTurtleById(id, JsonResource.class);
     }
 
+    /**
+     * Returns an immutable List of all cached {@link Project} objects.
+     * @return List of cached Projects.
+     */
     default @NotNull List<Project> getProjects() {
         return this.getTurtles(Project.class);
     }
 
+    /**
+     * Returns a single {@link Project} specified by its id, or {@code null} if no such object is stored in the
+     * underlying cache.
+     * @param id The unique id of the Project.
+     * @return The requested Project (may be {@code null}).
+     * @see Project#getId()
+     */
     default @Nullable Project getProjectById(long id) {
         return this.getTurtleById(id, Project.class);
     }
 
+    /**
+     * Returns an immutable List of all cached {@link Ticket} objects.
+     * @return List of cached Tickets.
+     */
     default @NotNull List<Ticket> getTickets() {
         return this.getTurtles(Ticket.class);
     }
 
+    /**
+     * Returns a single {@link Ticket} specified by its id, or {@code null} if no such object is stored in the
+     * underlying cache.
+     * @param id The unique id of the Ticket.
+     * @return The requested Ticket (may be {@code null}).
+     * @see Ticket#getId()
+     */
     default @Nullable Ticket getTicketById(long id) {
         return this.getTurtleById(id, Ticket.class);
     }
 
+    /**
+     * Returns an immutable List of all cached {@link User} objects.
+     * @return List of cached Users.
+     */
     default @NotNull List<User> getUsers() {
         return this.getTurtles(User.class);
     }
 
+    /**
+     * Returns a single {@link User} specified by its id, or {@code null} if no such object is stored in the underlying
+     * cache.
+     * @param id The unique id of the User.
+     * @return The requested User (may be {@code null}).
+     * @see User#getId()
+     */
     default @Nullable User getUserById(long id) {
         return this.getTurtleById(id, User.class);
     }
 
     // FORM
 
+    /**
+     * Returns an immutable List of all cached {@link CompletedForm} objects.
+     * @return List of cached CompletedForms.
+     */
     default @NotNull List<CompletedForm> getCompletedForms() {
         return this.getTurtles(CompletedForm.class);
     }
 
+    /**
+     * Returns a single {@link CompletedForm} specified by its id, or {@code null} if no such object is stored in the
+     * underlying cache.
+     * @param id The unique id of the Form.
+     * @return The requested Form (may be {@code null}).
+     * @see CompletedForm#getId()
+     */
     default @Nullable CompletedForm getCompletedFormById(long id) {
         return this.getTurtleById(id, CompletedForm.class);
     }
 
+    /**
+     * Returns an immutable List of all cached {@link Element} objects.
+     * @return List of cached Elements.
+     */
     default @NotNull List<Element> getElements() {
         return this.getTurtles(Element.class);
     }
 
+    /**
+     * Returns a single {@link Element} specified by its id, or {@code null} if no such object is stored in the
+     * underlying cache.
+     * @param id The unique id of the Element.
+     * @return The requested Element (may be {@code null}).
+     * @see Element#getId()
+     */
     default @Nullable Element getElementFormById(long id) {
         return this.getTurtleById(id, Element.class);
     }
 
+    /**
+     * Returns an immutable List of all cached {@link QueryElement} objects.
+     * @return List of cached QueryElements.
+     */
     default @NotNull List<QueryElement> getQueryElements() {
         return this.getTurtles(QueryElement.class);
     }
 
+    /**
+     * Returns a single {@link QueryElement} specified by its id, or {@code null} if no such object is stored in the
+     * underlying cache.
+     * @param id The unique id of the Element.
+     * @return The requested Element (may be {@code null}).
+     * @see QueryElement#getId()
+     */
     default @Nullable QueryElement getQueryElementById(long id) {
         return this.getTurtleById(id, QueryElement.class);
     }
 
+    /**
+     * Returns an immutable List of all cached {@link QueryResponse} objects.
+     * @return List of cached QueryResponses.
+     */
     default @NotNull List<QueryResponse> getQueryResponses() {
         return this.getTurtles(QueryResponse.class);
     }
 
+    /**
+     * Returns a single {@link QueryResponse} specified by its id, or {@code null} if no such object is stored in the
+     * underlying cache.
+     * @param id The unique id of the QueryResponse.
+     * @return The requested QueryResponse (may be {@code null}).
+     * @see QueryResponse#getId()
+     */
     default @Nullable QueryResponse getQueryResponseById(long id) {
         return this.getTurtleById(id, QueryResponse.class);
     }
 
+    /**
+     * Returns an immutable List of all cached {@link TemplateForm} objects.
+     * @return List of cached TemplateForms.
+     */
     default @NotNull List<TemplateForm> getTemplateForms() {
         return this.getTurtles(TemplateForm.class);
     }
 
+    /**
+     * Returns a single {@link TemplateForm} specified by its id, or {@code null} if no such object is stored in the
+     * underlying cache.
+     * @param id The unique id of the Form.
+     * @return The requested Form (may be {@code null}).
+     * @see TemplateForm#getId()
+     */
     default @Nullable TemplateForm getTemplateFormById(long id) {
         return this.getTurtleById(id, TemplateForm.class);
     }
 
+    /**
+     * Returns an immutable List of all cached {@link TextElement} objects.
+     * @return List of cached TextElements.
+     */
     default @NotNull List<TextElement> getTextElements() {
         return this.getTurtles(TextElement.class);
     }
 
+    /**
+     * Returns a single {@link TextElement} specified by its id, or {@code null} if no such object is stored in the
+     * underlying cache.
+     * @param id The unique id of the Element.
+     * @return The requested Element (may be {@code null}).
+     * @see TextElement#getId()
+     */
     default @Nullable TextElement getTextElementById(long id) {
         return this.getTurtleById(id, TextElement.class);
     }
 
     // MESSAGES
 
+    /**
+     * Returns an immutable List of all cached {@link DiscordChannel} objects.
+     * @return List of cached DiscordChannels.
+     */
     default @NotNull List<DiscordChannel> getDiscordChannels() {
         return this.getTurtles(DiscordChannel.class);
     }
 
+    /**
+     * Returns a single {@link DiscordChannel} specified by its id, or {@code null} if no such object is stored in the
+     * underlying cache.
+     * @param id The unique id of the Channel.
+     * @return The requested Channel (may be {@code null}).
+     * @see DiscordChannel#getId()
+     */
     default @Nullable DiscordChannel getDiscordChannelById(long id) {
         return this.getTurtleById(id, DiscordChannel.class);
     }
 
+    /**
+     * Returns an immutable List of all cached {@link IChannel} objects.
+     * @return List of cached IChannels.
+     */
     default @NotNull List<IChannel> getIChannels() {
         return this.getTurtles(IChannel.class);
     }
 
+    /**
+     * Returns a single {@link IChannel} specified by its id, or {@code null} if no such object is stored in the
+     * underlying cache.
+     * @param id The unique id of the Channel.
+     * @return The requested Channel (may be {@code null}).
+     * @see IChannel#getId()
+     */
     default @Nullable IChannel getIChannelById(long id) {
         return this.getTurtleById(id, IChannel.class);
     }
 
+    /**
+     * Returns an immutable List of all cached {@link MinecraftChannel} objects.
+     * @return List of cached MinecraftChannels.
+     */
     default @NotNull List<MinecraftChannel> getMinecraftChannels() {
         return this.getTurtles(MinecraftChannel.class);
     }
 
+    /**
+     * Returns a single {@link MinecraftChannel} specified by its id, or {@code null} if no such object is stored in the
+     * underlying cache.
+     * @param id The unique id of the Channel.
+     * @return The requested Channel (may be {@code null}).
+     * @see MinecraftChannel#getId()
+     */
     default @Nullable MinecraftChannel getMinecraftChannelById(long id) {
         return this.getTurtleById(id, MinecraftChannel.class);
     }
 
+    /**
+     * Returns an immutable List of all cached {@link SyncChannel} objects.
+     * @return List of cached SyncChannels.
+     */
     default @NotNull List<SyncChannel> getSyncChannels() {
         return this.getTurtles(SyncChannel.class);
     }
 
+    /**
+     * Returns a single {@link SyncChannel} specified by its id, or {@code null} if no such object is stored in the
+     * underlying cache.
+     * @param id The unique id of the Channel.
+     * @return The requested Channel (may be {@code null}).
+     * @see SyncChannel#getId()
+     */
     default @Nullable SyncChannel getSyncChannelById(long id) {
         return this.getTurtleById(id, SyncChannel.class);
     }
 
+    /**
+     * Returns an immutable List of all cached {@link SyncMessage} objects.
+     * @return List of cached SyncMessages.
+     */
     default @NotNull List<SyncMessage> getSyncMessages() {
         return this.getTurtles(SyncMessage.class);
     }
 
+    /**
+     * Returns a single {@link SyncMessage} specified by its id, or {@code null} if no such object is stored in the
+     * underlying cache.
+     * @param id The unique id of the Message.
+     * @return The requested Message (may be {@code null}).
+     * @see SyncMessage#getId()
+     */
     default @Nullable SyncMessage getSyncMessageById(long id) {
         return this.getTurtleById(id, SyncMessage.class);
     }
@@ -256,114 +432,284 @@ public interface TurtleClient extends TurtleContainer<Turtle> {
      */
     <T extends Turtle> @NotNull Action<T> retrieveTurtle(long id, @NotNull Class<T> type);
 
+    /**
+     * Creates an Action with the Provider request to retrieve all available {@link Group Groups}.
+     * <p> If the operation is successful, the retrieved Groups will also be put into cache, if not already present.
+     * @return Action that provides the List of {@link Group Groups} on completion.
+     * @see TurtleClient#getGroups()
+     */
     default @NotNull Action<List<Group>> retrieveGroups() {
         return this.retrieveTurtles(Group.class);
     }
 
+    /**
+     * Creates an Action with the Provider request to retrieve a {@link Group} specified by its id.
+     * <p> If the operation is successful, the Group will also be put into cache, if not already present.
+     * @return Action that provides the {@link Group} on completion.
+     * @see TurtleClient#getGroupById(long)
+     * @see Group#update()
+     */
     default @NotNull Action<Group> retrieveGroup(long id) {
         return this.retrieveTurtle(id, Group.class);
     }
 
     // no retrieveJsonResources() to discourage users from retrieving ALL JsonResources at once
 
+    /**
+     * Creates an Action with the Provider request to retrieve a {@link JsonResource} specified by its id.
+     * <p> If the operation is successful, the JsonResource will also be put into cache, if not already present.
+     * @return Action that provides the {@link JsonResource} on completion.
+     * @see TurtleClient#getJsonResourceById(long)
+     * @see JsonResource#update()
+     */
     default @NotNull Action<JsonResource> retrieveJsonResource(long id) {
         return this.retrieveTurtle(id, JsonResource.class);
     }
 
+    /**
+     * Creates an Action with the Provider request to retrieve all available {@link Project Projects}.
+     * <p> If the operation is successful, the retrieved Projects will also be put into cache, if not already present.
+     * @return Action that provides the List of {@link Project Projects} on completion.
+     * @see TurtleClient#getProjects()
+     */
     default @NotNull Action<List<Project>> retrieveProjects() {
         return this.retrieveTurtles(Project.class);
     }
 
+    /**
+     * Creates an Action with the Provider request to retrieve a {@link Project} specified by its id.
+     * <p> If the operation is successful, the Project will also be put into cache, if not already present.
+     * @return Action that provides the {@link Project} on completion.
+     * @see TurtleClient#getProjectById(long)
+     * @see Project#update()
+     */
     default @NotNull Action<Project> retrieveProject(long id) {
         return this.retrieveTurtle(id, Project.class);
     }
 
+    /**
+     * Creates an Action with the Provider request to retrieve all available {@link Ticket Tickets}.
+     * <p> If the operation is successful, the retrieved Tickets will also be put into cache, if not already present.
+     * @return Action that provides the List of {@link Ticket Tickets} on completion.
+     * @see TurtleClient#getTickets()
+     */
     default @NotNull Action<List<Ticket>> retrieveTickets() {
         return this.retrieveTurtles(Ticket.class);
     }
 
+    /**
+     * Creates an Action with the Provider request to retrieve a {@link Ticket} specified by its id.
+     * <p> If the operation is successful, the Ticket will also be put into cache, if not already present.
+     * @return Action that provides the {@link Ticket} on completion.
+     * @see TurtleClient#getTicketById(long)
+     * @see Ticket#update()
+     */
     default @NotNull Action<Ticket> retrieveTicket(long id) {
         return this.retrieveTurtle(id, Ticket.class);
     }
 
+    /**
+     * Creates an Action with the Provider request to retrieve all available {@link User Users}.
+     * <p> If the operation is successful, the retrieved Users will also be put into cache, if not already present.
+     * @return Action that provides the List of {@link User Users} on completion.
+     * @see TurtleClient#getUsers()
+     */
     default @NotNull Action<List<User>> retrieveUsers() {
         return this.retrieveTurtles(User.class);
     }
 
+    /**
+     * Creates an Action with the Provider request to retrieve a {@link User} specified by its id.
+     * <p> If the operation is successful, the User will also be put into cache, if not already present.
+     * @return Action that provides the {@link User} on completion.
+     * @see TurtleClient#getUserById(long)
+     * @see User#update()
+     */
     default @NotNull Action<User> retrieveUser(long id) {
         return this.retrieveTurtle(id, User.class);
     }
 
     // FORM
 
+    /**
+     * Creates an Action with the Provider request to retrieve all available {@link CompletedForm CompletedForms}.
+     * <p> If the operation is successful, the retrieved Forms will also be put into cache, if not already present.
+     * @return Action that provides the List of {@link CompletedForm CompletedForms} on completion.
+     * @see TurtleClient#getCompletedForms()
+     */
     default @NotNull Action<List<CompletedForm>> retrieveCompletedForms() {
         return this.retrieveTurtles(CompletedForm.class);
     }
 
+    /**
+     * Creates an Action with the Provider request to retrieve a {@link CompletedForm} specified by its id.
+     * <p> If the operation is successful, the Form will also be put into cache, if not already present.
+     * @return Action that provides the {@link CompletedForm} on completion.
+     * @see TurtleClient#getCompletedFormById(long)
+     * @see CompletedForm#update()
+     */
     default @NotNull Action<CompletedForm> retrieveCompletedForm(long id) {
         return this.retrieveTurtle(id, CompletedForm.class);
     }
 
+    /**
+     * Creates an Action with the Provider request to retrieve all available {@link QueryElement QueryElements}.
+     * <p> If the operation is successful, the retrieved Elements will also be put into cache, if not already present.
+     * @return Action that provides the List of {@link QueryElement QueryElements} on completion.
+     * @see TurtleClient#getQueryElements()
+     */
     default @NotNull Action<List<QueryElement>> retrieveQueryElements() {
         return this.retrieveTurtles(QueryElement.class);
     }
 
+    /**
+     * Creates an Action with the Provider request to retrieve a {@link QueryElement} specified by its id.
+     * <p> If the operation is successful, the Element will also be put into cache, if not already present.
+     * @return Action that provides the {@link QueryElement} on completion.
+     * @see TurtleClient#getQueryElementById(long)
+     * @see QueryElement#update()
+     */
     default @NotNull Action<QueryElement> retrieveQueryElement(long id) {
         return this.retrieveTurtle(id, QueryElement.class);
     }
 
+    /**
+     * Creates an Action with the Provider request to retrieve all available {@link QueryResponse QueryResponses}.
+     * <p> If the operation is successful, the retrieved QueryResponses will also be put into cache, if not already present.
+     * @return Action that provides the List of {@link QueryResponse QueryResponses} on completion.
+     * @see TurtleClient#getQueryResponses()
+     */
     default @NotNull Action<List<QueryResponse>> retrieveQueryResponses() {
         return this.retrieveTurtles(QueryResponse.class);
     }
 
+    /**
+     * Creates an Action with the Provider request to retrieve a {@link QueryResponse} specified by its id.
+     * <p> If the operation is successful, the QueryResponse will also be put into cache, if not already present.
+     * @return Action that provides the {@link QueryResponse} on completion.
+     * @see TurtleClient#getQueryResponseById(long)
+     * @see QueryResponse#update()
+     */
     default @NotNull Action<QueryResponse> retrieveQueryResponse(long id) {
         return this.retrieveTurtle(id, QueryResponse.class);
     }
 
+    /**
+     * Creates an Action with the Provider request to retrieve all available {@link TemplateForm TemplateForms}.
+     * <p> If the operation is successful, the retrieved Forms will also be put into cache, if not already present.
+     * @return Action that provides the List of {@link TemplateForm TemplateForms} on completion.
+     * @see TurtleClient#getTemplateForms()
+     */
     default @NotNull Action<List<TemplateForm>> retrieveTemplateForms() {
         return this.retrieveTurtles(TemplateForm.class);
     }
 
+    /**
+     * Creates an Action with the Provider request to retrieve a {@link TemplateForm} specified by its id.
+     * <p> If the operation is successful, the Form will also be put into cache, if not already present.
+     * @return Action that provides the {@link TemplateForm} on completion.
+     * @see TurtleClient#getTemplateFormById(long)
+     * @see TemplateForm#update()
+     */
     default @NotNull Action<TemplateForm> retrieveTemplateForm(long id) {
         return this.retrieveTurtle(id, TemplateForm.class);
     }
 
+    /**
+     * Creates an Action with the Provider request to retrieve all available {@link TextElement TextElements}.
+     * <p> If the operation is successful, the retrieved Elements will also be put into cache, if not already present.
+     * @return Action that provides the List of {@link TextElement TextElements} on completion.
+     * @see TurtleClient#getTextElements()
+     */
     default @NotNull Action<List<TextElement>> retrieveTextElements() {
         return this.retrieveTurtles(TextElement.class);
     }
 
+    /**
+     * Creates an Action with the Provider request to retrieve a {@link TextElement} specified by its id.
+     * <p> If the operation is successful, the Element will also be put into cache, if not already present.
+     * @return Action that provides the {@link TextElement} on completion.
+     * @see TurtleClient#getTextElementById(long)
+     * @see TextElement#update()
+     */
     default @NotNull Action<TextElement> retrieveTextElement(long id) {
         return this.retrieveTurtle(id, TextElement.class);
     }
 
     // MESSAGE
 
+    /**
+     * Creates an Action with the Provider request to retrieve all available {@link DiscordChannel DiscordChannels}.
+     * <p> If the operation is successful, the retrieved Channels will also be put into cache, if not already present.
+     * @return Action that provides the List of {@link DiscordChannel DiscordChannels} on completion.
+     * @see TurtleClient#getDiscordChannels()
+     */
     default @NotNull Action<List<DiscordChannel>> retrieveDiscordChannels() {
         return this.retrieveTurtles(DiscordChannel.class);
     }
 
+    /**
+     * Creates an Action with the Provider request to retrieve a {@link DiscordChannel} specified by its id.
+     * <p> If the operation is successful, the Channel will also be put into cache, if not already present.
+     * @return Action that provides the {@link DiscordChannel} on completion.
+     * @see TurtleClient#getDiscordChannelById(long)
+     * @see DiscordChannel#update()
+     */
     default @NotNull Action<DiscordChannel> retrieveDiscordChannel(long id) {
         return this.retrieveTurtle(id, DiscordChannel.class);
     }
 
+    /**
+     * Creates an Action with the Provider request to retrieve all available {@link MinecraftChannel MinecraftChannels}.
+     * <p> If the operation is successful, the retrieved Channels will also be put into cache, if not already present.
+     * @return Action that provides the List of {@link MinecraftChannel MinecraftChannels} on completion.
+     * @see TurtleClient#getMinecraftChannels()
+     */
     default @NotNull Action<List<MinecraftChannel>> retrieveMinecraftChannels() {
         return this.retrieveTurtles(MinecraftChannel.class);
     }
 
+    /**
+     * Creates an Action with the Provider request to retrieve a {@link MinecraftChannel} specified by its id.
+     * <p> If the operation is successful, the Channel will also be put into cache, if not already present.
+     * @return Action that provides the {@link MinecraftChannel} on completion.
+     * @see TurtleClient#getMinecraftChannelById(long)
+     * @see MinecraftChannel#update()
+     */
     default @NotNull Action<MinecraftChannel> retrieveMinecraftChannel(long id) {
         return this.retrieveTurtle(id, MinecraftChannel.class);
     }
 
+    /**
+     * Creates an Action with the Provider request to retrieve all available {@link SyncChannel SyncChannels}.
+     * <p> If the operation is successful, the retrieved Channels will also be put into cache, if not already present.
+     * @return Action that provides the List of {@link SyncChannel SyncChannels} on completion.
+     * @see TurtleClient#getSyncChannels()
+     */
     default @NotNull Action<List<SyncChannel>> retrieveSyncChannels() {
         return this.retrieveTurtles(SyncChannel.class);
     }
 
+    /**
+     * Creates an Action with the Provider request to retrieve a {@link SyncChannel} specified by its id.
+     * <p> If the operation is successful, the Channel will also be put into cache, if not already present.
+     * @return Action that provides the {@link SyncChannel} on completion.
+     * @see TurtleClient#getSyncChannelById(long)
+     * @see SyncChannel#update()
+     */
     default @NotNull Action<SyncChannel> retrieveSyncChannel(long id) {
         return this.retrieveTurtle(id, SyncChannel.class);
     }
 
     // no retrieveSyncMessages() to discourage users from retrieving ALL SyncMessages at once
 
+    /**
+     * Creates an Action with the Provider request to retrieve a {@link SyncMessage} specified by its id.
+     * <p> If the operation is successful, the Message will also be put into cache, if not already present.
+     * @return Action that provides the {@link SyncMessage} on completion.
+     * @see TurtleClient#getSyncMessageById(long)
+     * @see SyncMessage#update()
+     */
     default @NotNull Action<SyncMessage> retrieveSyncMessage(long id) {
         return this.retrieveTurtle(id, SyncMessage.class);
     }
@@ -418,14 +764,49 @@ public interface TurtleClient extends TurtleContainer<Turtle> {
 
     // FORM
 
+    /**
+     * Creates an Action with the Provider request to create a new {@link CompletedForm}. The returned
+     * {@link CompletedFormAction} may be used to modify the request and to set each required field. If any required
+     * field is missing the server will reject the request and respond with an error.
+     * <p> If the operation is successful, the created Form will also be put into cache, if not already present.
+     * @return Action that provides the newly crated {@link CompletedForm} on completion.
+     */
     @NotNull CompletedFormAction createCompletedForm();
 
+    /**
+     * Creates an Action with the Provider request to create a new {@link QueryElement}. The returned
+     * {@link QueryElementAction} may be used to modify the request and to set each required field. If any required
+     * field is missing the server will reject the request and respond with an error.
+     * <p> If the operation is successful, the created Element will also be put into cache, if not already present.
+     * @return Action that provides the newly crated {@link User} on completion.
+     */
     @NotNull QueryElementAction createQueryElement();
 
+    /**
+     * Creates an Action with the Provider request to create a new {@link QueryResponse}. The returned
+     * {@link QueryResponseAction} may be used to modify the request and to set each required field. If any required
+     * field is missing the server will reject the request and respond with an error.
+     * <p> If the operation is successful, the created QueryResponse will also be put into cache, if not already present.
+     * @return Action that provides the newly crated {@link QueryResponse} on completion.
+     */
     @NotNull QueryResponseAction createQueryResponse();
 
+    /**
+     * Creates an Action with the Provider request to create a new {@link TemplateForm}. The returned
+     * {@link TemplateFormAction} may be used to modify the request and to set each required field. If any required
+     * field is missing the server will reject the request and respond with an error.
+     * <p> If the operation is successful, the created Form will also be put into cache, if not already present.
+     * @return Action that provides the newly crated {@link TemplateForm} on completion.
+     */
     @NotNull TemplateFormAction createTemplateForm();
 
+    /**
+     * Creates an Action with the Provider request to create a new {@link TextElement}. The returned
+     * {@link TextElementAction} may be used to modify the request and to set each required field. If any required field
+     * is missing the server will reject the request and respond with an error.
+     * <p> If the operation is successful, the created Element will also be put into cache, if not already present.
+     * @return Action that provides the newly crated {@link TextElement} on completion.
+     */
     @NotNull TextElementAction createTextElement();
 
     // MESSAGES
