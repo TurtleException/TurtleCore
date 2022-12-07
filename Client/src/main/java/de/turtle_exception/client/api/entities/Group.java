@@ -1,8 +1,8 @@
 package de.turtle_exception.client.api.entities;
 
-import de.turtle_exception.client.internal.data.annotations.*;
-import de.turtle_exception.client.api.entities.attribute.IUserContainer;
+import de.turtle_exception.client.api.entities.containers.TurtleContainer;
 import de.turtle_exception.client.api.request.Action;
+import de.turtle_exception.client.internal.data.annotations.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -13,10 +13,10 @@ import java.util.List;
  */
 @Resource(path = "groups", builder = "buildGroup")
 @SuppressWarnings("unused")
-public interface Group extends Turtle, IUserContainer {
+public interface Group extends Turtle, TurtleContainer<User> {
     @Override
     default @NotNull Action<Group> update() {
-        return this.getClient().retrieveGroup(this.getId());
+        return this.getClient().retrieveTurtle(this.getId(), Group.class);
     }
 
     /* - NAME - */
@@ -38,17 +38,22 @@ public interface Group extends Turtle, IUserContainer {
 
     /* - USERS - */
 
+    @Override
+    default @NotNull List<User> getTurtles() {
+        return this.getUsers();
+    }
+
     /**
      * Provides a List of all {@link User Users} that are a member of this Group.
      * <p> A Group can have multiple Users; A User can also be part of multiple Groups.
      * @return List of members.
      */
-    @Key(name = Keys.Group.MEMBERS, relation = Relation.MANY_TO_MANY, type = User.class, sqlType = Types.Group.MEMBERS)
-    @Relational(table = "group_members", self = "group", foreign = "user")
+    @Key(name = Keys.Group.MEMBERS, relation = Relation.MANY_TO_MANY, sqlType = Types.Group.MEMBERS)
+    @Relational(table = "group_members", self = "group", foreign = "user", type = User.class)
     @NotNull List<User> getUsers();
 
     /**
-     * Creates an Action with the instruction to add the provided id to the list of group members.
+     * Creates an Action with the instruction to add the provided id to the list of Group members.
      * <p> The provided {@code long} should be a representation of a {@link User} id.
      * @param user Turtle ID of a User.
      * @return Action that provides the modified {@link Group} on completion.
@@ -56,7 +61,7 @@ public interface Group extends Turtle, IUserContainer {
     @NotNull Action<Group> addUser(long user);
 
     /**
-     * Creates an Action with the instruction to add the provided {@link User} to the list of group members.
+     * Creates an Action with the instruction to add the provided {@link User} to the list of Group members.
      * <p> This is a shortcut for {@code Group.addUser(user.getId())}.
      * @param user A User.
      * @return Action that provides the modified {@link Group} on completion.
@@ -66,7 +71,7 @@ public interface Group extends Turtle, IUserContainer {
     }
 
     /**
-     * Creates an Action with the instruction to remove the provided id from the list of group members.
+     * Creates an Action with the instruction to remove the provided id from the list of Group members.
      * <p> The provided {@code long} should be a representation of a {@link User} id.
      * @param user Turtle ID of a User.
      * @return Action that provides the modified {@link Group} on completion.
@@ -74,7 +79,7 @@ public interface Group extends Turtle, IUserContainer {
     @NotNull Action<Group> removeUser(long user);
 
     /**
-     * Creates an Action with the instruction to remove the provided {@link User} from the list of group members.
+     * Creates an Action with the instruction to remove the provided {@link User} from the list of Group members.
      * <p> This is a shortcut for {@code Group.removeUser(user.getId())}.
      * @param user A User.
      * @return Action that provides the modified {@link Group} on completion.

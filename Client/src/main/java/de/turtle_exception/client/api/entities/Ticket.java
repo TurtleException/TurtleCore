@@ -1,10 +1,10 @@
 package de.turtle_exception.client.api.entities;
 
 import de.turtle_exception.client.api.TurtleClient;
-import de.turtle_exception.client.internal.data.annotations.*;
-import de.turtle_exception.client.api.TicketState;
-import de.turtle_exception.client.api.entities.attribute.IUserContainer;
+import de.turtle_exception.client.api.entities.attributes.TicketState;
+import de.turtle_exception.client.api.entities.containers.TurtleContainer;
 import de.turtle_exception.client.api.request.Action;
+import de.turtle_exception.client.internal.data.annotations.*;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import org.jetbrains.annotations.NotNull;
@@ -20,10 +20,10 @@ import java.util.List;
  */
 @Resource(path = "tickets", builder = "buildTicket")
 @SuppressWarnings("unused")
-public interface Ticket extends Turtle, IUserContainer {
+public interface Ticket extends Turtle, TurtleContainer<User> {
     @Override
     default @NotNull Action<Ticket> update() {
-        return this.getClient().retrieveTicket(this.getId());
+        return this.getClient().retrieveTurtle(this.getId(), Ticket.class);
     }
 
     /* - STATE - */
@@ -92,8 +92,8 @@ public interface Ticket extends Turtle, IUserContainer {
      * <p> Tags are custom Strings that can be assigned by the Ticket author(s) or by team, moderation and bots.
      * @return List of Ticket tags.
      */
-    @Key(name = Keys.Ticket.TAGS, relation = Relation.MANY_TO_MANY, type = String.class, sqlType = Types.Ticket.TAGS)
-    @Relational(table = "ticket_tags", self = "ticket", foreign = "tag")
+    @Key(name = Keys.Ticket.TAGS, relation = Relation.MANY_TO_MANY, sqlType = Types.Ticket.TAGS)
+    @Relational(table = "ticket_tags", self = "ticket", foreign = "tag", type = String.class)
     @NotNull List<String> getTags();
 
     /**
@@ -143,14 +143,19 @@ public interface Ticket extends Turtle, IUserContainer {
 
     /* - USERS - */
 
+    @Override
+    default @NotNull List<User> getTurtles() {
+        return this.getUsers();
+    }
+
     /**
      * Provides a List of all {@link User Users} that have access to this Ticket.
      * <p> A Ticket can have multiple Users; A User can also have access to multiple Groups.
      * <p> Team members, moderation and bots are not included in this list unless they have explicitly been added.
      * @return List of Users.
      */
-    @Key(name = Keys.Ticket.USERS, relation = Relation.MANY_TO_MANY, type = User.class, sqlType = Types.Ticket.USERS)
-    @Relational(table = "ticket_users", self = "ticket", foreign = "user")
+    @Key(name = Keys.Ticket.USERS, relation = Relation.MANY_TO_MANY, sqlType = Types.Ticket.USERS)
+    @Relational(table = "ticket_users", self = "ticket", foreign = "user", type = User.class)
     @NotNull List<User> getUsers();
 
     /**

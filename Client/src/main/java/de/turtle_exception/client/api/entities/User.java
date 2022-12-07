@@ -1,6 +1,7 @@
 package de.turtle_exception.client.api.entities;
 
 import de.turtle_exception.client.api.TurtleClient;
+import de.turtle_exception.client.api.entities.form.CompletedForm;
 import de.turtle_exception.client.internal.data.annotations.*;
 import de.turtle_exception.client.api.request.Action;
 import net.dv8tion.jda.api.JDA;
@@ -25,7 +26,7 @@ import java.util.UUID;
 public interface User extends Turtle {
     @Override
     default @NotNull Action<User> update() {
-        return this.getClient().retrieveUser(this.getId());
+        return this.getClient().retrieveTurtle(this.getId(), User.class);
     }
 
     /* - NAME - */
@@ -57,8 +58,8 @@ public interface User extends Turtle {
      */
     default @NotNull List<Group> getGroups() {
         ArrayList<Group> groups = new ArrayList<>();
-        for (Group group : getClient().getGroups())
-            if (group.getUserById(this.getId()) != null)
+        for (Group group : getClient().getTurtles(Group.class))
+            if (group.getTurtleById(this.getId()) != null)
                 groups.add(group);
         return List.copyOf(groups);
     }
@@ -89,8 +90,8 @@ public interface User extends Turtle {
      * Provides a List of snowflake ids that each represent a Discord user this User is linked to (exclusively).
      * @return List of snowflake ids.
      */
-    @Key(name = Keys.User.DISCORD, relation = Relation.ONE_TO_MANY, type = Long.class, sqlType = Types.User.DISCORD)
-    @Relational(table = "user_discord", self = "user", foreign = "discord")
+    @Key(name = Keys.User.DISCORD, relation = Relation.ONE_TO_MANY, sqlType = Types.User.DISCORD)
+    @Relational(table = "user_discord", self = "user", foreign = "discord", type = Long.class)
     @NotNull List<Long> getDiscordIds();
 
     /**
@@ -155,8 +156,8 @@ public interface User extends Turtle {
      * Provides a List of {@link UUID UUIDs} that each represent a Minecraft account this User is linked to (exclusively).
      * @return List of {@link UUID UUIDs}.
      */
-    @Key(name = Keys.User.MINECRAFT, relation = Relation.ONE_TO_MANY, type = UUID.class, sqlType = Types.User.MINECRAFT)
-    @Relational(table = "user_minecraft", self = "user", foreign = "minecraft")
+    @Key(name = Keys.User.MINECRAFT, relation = Relation.ONE_TO_MANY, sqlType = Types.User.MINECRAFT)
+    @Relational(table = "user_minecraft", self = "user", foreign = "minecraft", type = UUID.class)
     @NotNull List<UUID> getMinecraftIds();
 
     /**
@@ -193,5 +194,15 @@ public interface User extends Turtle {
             list.add(server.getOfflinePlayer(minecraftId));
 
         return List.copyOf(list);
+    }
+
+    /**
+     * Provides a List of all {@link CompletedForm CompletedForms} this User is the author of.
+     * @return List of the CompletedForms.
+     */
+    default @NotNull List<CompletedForm> getCompletedForms() {
+        return this.getClient().getTurtles(CompletedForm.class).stream()
+                .filter(form -> form.getAuthor().getId() == this.getId())
+                .toList();
     }
 }

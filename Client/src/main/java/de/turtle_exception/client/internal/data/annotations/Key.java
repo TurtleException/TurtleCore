@@ -16,8 +16,6 @@ public @interface Key {
     /** If this is not {@link Relation#ONE_TO_ONE} the annotation must be combined with a {@link Relational}. */
     @NotNull Relation relation() default Relation.ONE_TO_ONE;
 
-    Class<?> type() default Object.class;
-
     /** String representation of the SQL data type. */
     String sqlType();
 }

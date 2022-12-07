@@ -2,28 +2,34 @@ package de.turtle_exception.client.internal;
 
 import com.google.gson.JsonObject;
 import de.turtle_exception.client.api.TurtleClient;
-import de.turtle_exception.client.api.entities.Group;
-import de.turtle_exception.client.api.entities.Ticket;
-import de.turtle_exception.client.api.entities.Turtle;
-import de.turtle_exception.client.api.entities.User;
+import de.turtle_exception.client.api.entities.*;
+import de.turtle_exception.client.api.entities.attributes.EphemeralType;
+import de.turtle_exception.client.api.entities.form.*;
+import de.turtle_exception.client.api.entities.messages.DiscordChannel;
+import de.turtle_exception.client.api.entities.messages.MinecraftChannel;
+import de.turtle_exception.client.api.entities.messages.SyncChannel;
+import de.turtle_exception.client.api.entities.messages.SyncMessage;
 import de.turtle_exception.client.api.event.EventManager;
 import de.turtle_exception.client.api.request.Action;
-import de.turtle_exception.client.api.request.GroupAction;
-import de.turtle_exception.client.api.request.TicketAction;
-import de.turtle_exception.client.api.request.UserAction;
+import de.turtle_exception.client.api.request.entities.*;
+import de.turtle_exception.client.api.request.entities.form.*;
+import de.turtle_exception.client.api.request.entities.messages.DiscordChannelAction;
+import de.turtle_exception.client.api.request.entities.messages.MinecraftChannelAction;
+import de.turtle_exception.client.api.request.entities.messages.SyncChannelAction;
+import de.turtle_exception.client.api.request.entities.messages.SyncMessageAction;
 import de.turtle_exception.client.internal.data.ResourceBuilder;
 import de.turtle_exception.client.internal.data.annotations.Keys;
-import de.turtle_exception.client.internal.entities.GroupImpl;
-import de.turtle_exception.client.internal.entities.TicketImpl;
 import de.turtle_exception.client.internal.entities.TurtleImpl;
-import de.turtle_exception.client.internal.entities.UserImpl;
 import de.turtle_exception.client.internal.event.UpdateHelper;
 import de.turtle_exception.client.internal.net.NetClient;
 import de.turtle_exception.client.internal.net.NetworkProvider;
-import de.turtle_exception.client.internal.request.actions.GroupActionImpl;
 import de.turtle_exception.client.internal.request.actions.SimpleAction;
-import de.turtle_exception.client.internal.request.actions.TicketActionImpl;
-import de.turtle_exception.client.internal.request.actions.UserActionImpl;
+import de.turtle_exception.client.internal.request.actions.entities.*;
+import de.turtle_exception.client.internal.request.actions.entities.form.*;
+import de.turtle_exception.client.internal.request.actions.entities.messages.DiscordChannelActionImpl;
+import de.turtle_exception.client.internal.request.actions.entities.messages.MinecraftChannelActionImpl;
+import de.turtle_exception.client.internal.request.actions.entities.messages.SyncChannelActionImpl;
+import de.turtle_exception.client.internal.request.actions.entities.messages.SyncMessageActionImpl;
 import de.turtle_exception.client.internal.util.TurtleSet;
 import de.turtle_exception.client.internal.util.version.IllegalVersionException;
 import de.turtle_exception.client.internal.util.version.Version;
@@ -35,7 +41,6 @@ import org.jetbrains.annotations.Range;
 
 import javax.security.auth.login.LoginException;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -67,9 +72,7 @@ public class TurtleClientImpl implements TurtleClient {
     private long defaultTimeoutInbound  = TimeUnit.SECONDS.toMillis( 8);
     private long defaultTimeoutOutbound = TimeUnit.SECONDS.toMillis(16);
 
-    private final TurtleSet<Group> groupCache = new TurtleSet<>();
-    private final TurtleSet<Ticket> ticketCache = new TurtleSet<>();
-    private final TurtleSet<User> userCache = new TurtleSet<>();
+    private final TurtleSet<Turtle> cache = new TurtleSet<>();
 
     /* THIRD PARTY SERVICES */
     private Server spigotServer = null;
@@ -105,16 +108,7 @@ public class TurtleClientImpl implements TurtleClient {
 
         if (autoFillCache) {
             this.logger.log(Level.FINE, "Dispatching initial requests...");
-
-            /*
-            * While entities are normally ordered alphabetically, the initial requests have to be ordered like this because
-            * the existence of User objects is essential to parsing other objects, that reference users, later.
-            */
-            // initial requests
-            this.retrieveUsers().complete();
-            this.retrieveGroups().complete();
-            this.retrieveTickets().complete();
-
+            this.doInvalidateCaches(true);
             this.logger.log(Level.FINE, "OK!");
         }
 
@@ -158,18 +152,33 @@ public class TurtleClientImpl implements TurtleClient {
     @Override
     public @NotNull Action<Void> invalidateCaches(boolean retrieve) {
         return new SimpleAction<>(provider, () -> {
-            this.groupCache.clear();
-            this.ticketCache.clear();
-            this.userCache.clear();
-
-            if (retrieve) {
-                // dependency order
-                this.retrieveUsers().complete();
-                this.retrieveGroups().complete();
-                this.retrieveTickets().complete();
-            }
+            this.doInvalidateCaches(retrieve);
             return null;
         });
+    }
+
+    private synchronized void doInvalidateCaches(boolean retrieve) {
+        this.cache.clear();
+
+        if (retrieve) {
+            /*
+             * While entities are normally ordered alphabetically, these requests have to be ordered like this because
+             * the existence of some objects is essential to parsing other resources that reference them later.
+             */
+            this.retrieveTurtles(            User.class).complete(); // depends on nothing
+            this.retrieveTurtles(    QueryElement.class).complete(); // depends on nothing
+            this.retrieveTurtles(     TextElement.class).complete(); // depends on nothing
+            this.retrieveTurtles(  DiscordChannel.class).complete(); // depends on nothing
+            this.retrieveTurtles(MinecraftChannel.class).complete(); // depends on nothing
+            this.retrieveTurtles(           Group.class).complete(); // depends on User
+            this.retrieveTurtles(          Ticket.class).complete(); // depends on User
+            this.retrieveTurtles(         Project.class).complete(); // depends on User & TemplateForm
+            this.retrieveTurtles(     SyncChannel.class).complete(); // depends on IChannel
+            this.retrieveTurtles(    TemplateForm.class).complete(); // depends on Element
+            this.retrieveTurtles(   QueryResponse.class).complete(); // depends on Element
+            this.retrieveTurtles(   CompletedForm.class).complete(); // depends on User & TemplateForm & QueryResponse
+            this.retrieveTurtles(     SyncMessage.class).complete(); // depends on User & SyncChannel & IChannel
+        }
     }
 
     /**
@@ -180,116 +189,38 @@ public class TurtleClientImpl implements TurtleClient {
         return name;
     }
 
-    public @NotNull TurtleSet<Group> getGroupCache() {
-        return groupCache;
-    }
-
-    public @NotNull TurtleSet<Ticket> getTicketCache() {
-        return ticketCache;
-    }
-
-    public @NotNull TurtleSet<User> getUserCache() {
-        return userCache;
-    }
-
     @Override
     public @NotNull List<Turtle> getTurtles() {
-        ArrayList<Turtle> list = new ArrayList<>();
-        list.addAll(groupCache);
-        list.addAll(userCache);
-        list.addAll(ticketCache);
-        return list;
+        return List.copyOf(this.cache);
     }
 
-    @Override
-    public @NotNull List<Group> getGroups() {
-        return List.copyOf(groupCache);
-    }
-
-    @Override
-    public @NotNull List<Ticket> getTickets() {
-        return List.copyOf(ticketCache);
-    }
-
-    @Override
-    public @NotNull List<User> getUsers() {
-        return List.copyOf(userCache);
-    }
-
-    @SuppressWarnings("RedundantIfStatement")
     @Override
     public @Nullable Turtle getTurtleById(long id) {
-        Group group = groupCache.get(id);
-        if (group != null) return group;
-        User user = userCache.get(id);
-        if (user != null) return user;
-        Ticket ticket = ticketCache.get(id);
-        if (ticket != null) return ticket;
-        return null;
-    }
-
-    @Override
-    public @Nullable Group getGroupById(long id) {
-        return groupCache.get(id);
-    }
-
-    @Override
-    public @Nullable Ticket getTicketById(long id) {
-        return ticketCache.get(id);
-    }
-
-    @Override
-    public @Nullable User getUserById(long id) {
-        return userCache.get(id);
+        return this.cache.get(id);
     }
 
     /* - - - */
 
-    @Override
-    public @NotNull Action<Group> retrieveGroup(long id) {
-        return provider.get(Group.class, id).andThenParse(Group.class).onSuccess(group -> {
-            groupCache.removeById(id);
-            groupCache.add(group);
+    public <T extends Turtle> @NotNull Action<List<T>> retrieveTurtles(@NotNull Class<T> type) {
+        return provider.get(type).andThenParseList(type).onSuccess(l -> {
+            cache.removeAll(type);
+            for (T t : l) {
+                // don't cache ephemeral resources
+                if (t instanceof EphemeralType e && e.isEphemeral()) continue;
+
+                cache.add(t);
+            }
         });
     }
 
-    @Override
-    public @NotNull Action<List<Group>> retrieveGroups() {
-        return provider.get(Group.class).andThenParseList(Group.class).onSuccess(l -> {
-            groupCache.clear();
-            groupCache.addAll(l);
-        });
-    }
+    public <T extends Turtle> @NotNull Action<T> retrieveTurtle(long id, @NotNull Class<T> type) {
+        return provider.get(type, id).andThenParse(type).onSuccess(t -> {
+            cache.removeById(id);
 
-    @Override
-    public @NotNull Action<Ticket> retrieveTicket(long id) {
-        return provider.get(Ticket.class, id).andThenParse(Ticket.class).onSuccess(ticket -> {
-            ticketCache.removeById(id);
-            ticketCache.add(ticket);
-        });
-    }
+            // don't cache ephemeral resources
+            if (t instanceof EphemeralType e && e.isEphemeral()) return;
 
-    @Override
-    public @NotNull Action<List<Ticket>> retrieveTickets() {
-        return provider.get(Ticket.class).andThenParseList(Ticket.class).onSuccess(l -> {
-            ticketCache.clear();
-            ticketCache.addAll(l);
-        });
-    }
-
-    @Override
-    public @NotNull Action<User> retrieveUser(long id) {
-        return provider.get(User.class, id).andThenParse(User.class).onSuccess(user -> {
-            userCache.removeById(id);
-            userCache.add(user);
-        });
-    }
-
-    @Override
-    public @NotNull Action<List<User>> retrieveUsers() {
-        return provider.get(User.class).andThenParseList(User.class).onSuccess(l -> {
-            userCache.clear();
-            userCache.addAll(l);
+            cache.add(t);
         });
     }
 
@@ -301,6 +232,16 @@ public class TurtleClientImpl implements TurtleClient {
     }
 
     @Override
+    public @NotNull JsonResourceAction createJsonResource() {
+        return new JsonResourceActionImpl(this.provider);
+    }
+
+    @Override
+    public @NotNull ProjectAction createProject() {
+        return new ProjectActionImpl(this.provider);
+    }
+
+    @Override
     public @NotNull TicketAction createTicket() {
         return new TicketActionImpl(this.provider);
     }
@@ -308,6 +249,55 @@ public class TurtleClientImpl implements TurtleClient {
     @Override
     public @NotNull UserAction createUser() {
         return new UserActionImpl(this.provider);
+    }
+
+    // FORM
+
+    @Override
+    public @NotNull CompletedFormAction createCompletedForm() {
+        return new CompletedFormActionImpl(this.provider);
+    }
+
+    @Override
+    public @NotNull QueryElementAction createQueryElement() {
+        return new QueryElementActionImpl(this.provider);
+    }
+
+    @Override
+    public @NotNull QueryResponseAction createQueryResponse() {
+        return new QueryResponseActionImpl(this.provider);
+    }
+
+    @Override
+    public @NotNull TemplateFormAction createTemplateForm() {
+        return new TemplateFormActionImpl(this.provider);
+    }
+
+    @Override
+    public @NotNull TextElementAction createTextElement() {
+        return new TextElementActionImpl(this.provider);
+    }
+
+    // MESSAGES
+
+    @Override
+    public @NotNull DiscordChannelAction createDiscordChannel() {
+        return new DiscordChannelActionImpl(this.provider);
+    }
+
+    @Override
+    public @NotNull MinecraftChannelAction createMinecraftChannel() {
+        return new MinecraftChannelActionImpl(this.provider);
+    }
+
+    @Override
+    public @NotNull SyncChannelAction createChannel() {
+        return new SyncChannelActionImpl(this.provider);
+    }
+
+    @Override
+    public @NotNull SyncMessageAction createMessage() {
+        return new SyncMessageActionImpl(this.provider);
     }
 
     /* - - - */
@@ -337,29 +327,20 @@ public class TurtleClientImpl implements TurtleClient {
     }
 
     public void removeTurtle(@NotNull Turtle turtle) {
-        this.removeCache(turtle.getClass(), turtle.getId());
+        this.removeCache(turtle.getId());
         UpdateHelper.ofDeleteTurtle(turtle);
     }
 
     private void updateCache(@NotNull Turtle turtle) throws IllegalArgumentException {
-        if (turtle instanceof GroupImpl group)
-            groupCache.put(group);
-        if (turtle instanceof TicketImpl ticket)
-            ticketCache.put(ticket);
-        if (turtle instanceof UserImpl user)
-            userCache.put(user);
+        // don't cache ephemeral JsonResources
+        if ((turtle instanceof JsonResource j) && j.isEphemeral()) return;
 
+        this.cache.add(turtle);
         this.logger.log(Level.FINER, "Updated cache for turtle " + turtle.getId() + ".");
     }
 
-    public void removeCache(@NotNull Class<? extends Turtle> type, long id) throws IllegalArgumentException, ClassCastException {
-        if (Group.class.isAssignableFrom(type))
-            groupCache.removeById(id);
-        if (Ticket.class.isAssignableFrom(type))
-            ticketCache.removeById(id);
-        if (User.class.isAssignableFrom(type))
-            userCache.removeById(id);
-
+    public void removeCache(long id) {
+        this.cache.removeById(id);
         this.logger.log(Level.FINER, "Removed turtle " + id + " from cache.");
     }
 

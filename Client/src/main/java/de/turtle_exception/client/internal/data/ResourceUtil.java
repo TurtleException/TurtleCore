@@ -82,6 +82,8 @@ public class ResourceUtil {
     public static void addValue(@NotNull JsonArray json, Object object) {
         if (object instanceof JsonElement entryElement) {
             json.add(entryElement);
+        } else if (object instanceof Turtle entryTurtle) {
+            json.add(entryTurtle.getId());
         } else if (object instanceof Boolean entryBoolean) {
             json.add(entryBoolean);
         } else if (object instanceof Character entryCharacter) {
@@ -109,6 +111,8 @@ public class ResourceUtil {
             json.add(key, JsonNull.INSTANCE);
         } else if (object instanceof JsonElement objElement) {
             json.add(key, objElement);
+        } else if (object instanceof  Turtle objTurtle) {
+            json.addProperty(key, objTurtle.getId());
         } else if (object instanceof Boolean objBoolean) {
             json.addProperty(key, objBoolean);
         } else if (object instanceof Character objCharacter) {
@@ -124,7 +128,9 @@ public class ResourceUtil {
         if (element == null || element.isJsonNull() || object == null) return false;
 
         try {
-            if (object instanceof Boolean objBoolean) {
+            if (object instanceof Turtle objTurtle) {
+                return objTurtle.getId() == element.getAsLong();
+            } else if (object instanceof Boolean objBoolean) {
                 return objBoolean.equals(element.getAsBoolean());
             } else if (object instanceof Character objCharacter) {
                 return objCharacter.equals(element.getAsString().charAt(0));

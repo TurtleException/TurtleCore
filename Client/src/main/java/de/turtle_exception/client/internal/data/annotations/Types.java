@@ -9,11 +9,100 @@ public class Types {
         public static final String UUID      = "VARCHAR(36)";
     }
 
+    /* - ATTRIBUTES - */
+
+    public static class Attributes {
+        public static class EphemeralType {
+            public static final String EPHEMERAL = "BOOLEAN";
+        }
+    }
+
+    /* - PACKAGES - */
+
+    public static class Form {
+        public static class CompletedForm {
+            public static final String FORM            = Templates.TURTLE;
+            public static final String AUTHOR          = Templates.TURTLE;
+            public static final String TIME_SUBMISSION = "BIGINT";
+            public static final String QUERY_RESPONSES = Templates.TURTLE;
+        }
+
+        public static class Element {
+            public static final String TITLE = "TEXT";
+        }
+
+        public static class QueryElement {
+            public static final String DESCRIPTION  = "TEXT";
+            public static final String CONTENT_TYPE = "TINYINT";
+            public static final String REQUIRED     = "BOOLEAN";
+        }
+
+        public static class QueryResponse {
+            public static final String QUERY   = Templates.TURTLE;
+            public static final String CONTENT = "TEXT";
+        }
+
+        public static class TemplateForm {
+            public static final String TITLE    = "TEXT";
+            public static final String ELEMENTS = Templates.TURTLE;
+        }
+
+        public static class TextElement {
+            public static final String CONTENT = "TEXT";
+        }
+    }
+
+    public static class Messages {
+        public static class DiscordChannel {
+            public static final String SNOWFLAKE = Templates.SNOWFLAKE;
+        }
+
+        public static class IChannel {
+            public static final String SYNC_CHANNEL = Templates.TURTLE;
+        }
+
+        public static class MinecraftChannel {
+            public static final String TYPE         = "TINYINT";
+            public static final String IDENTIFIER   = "TEXT";
+        }
+
+        public static class SyncChannel {
+            public static final String DISCORD   = Templates.TURTLE;
+            public static final String MINECRAFT = Templates.TURTLE;
+        }
+
+        public static class SyncMessage {
+            public static final String FORMAT    = "TINYINT";
+            public static final String AUTHOR    = Templates.TURTLE;
+            public static final String CONTENT   = "TEXT";
+            public static final String REFERENCE = Turtle.ID;
+            public static final String CHANNEL   = Templates.TURTLE;
+            public static final String SOURCE    = Templates.TURTLE;
+        }
+    }
+
     /* - - - */
 
     public static class Group {
         public static final String NAME    = "TINYTEXT";
         public static final String MEMBERS = Templates.TURTLE;
+    }
+
+    public static class JsonResource {
+        public static final String IDENTIFIER = "TEXT";
+        public static final String CONTENT    = "LONGTEXT";
+    }
+
+    public static class Project {
+        public static final String TITLE        = "TINYTEXT";
+        public static final String CODE         = "TINYTEXT";
+        public static final String STATE        = "TINYINT";
+        public static final String MEMBERS      = Templates.TURTLE;
+        public static final String APP_FORM     = Templates.TURTLE;
+        public static final String TIME_RELEASE = "BIGINT";
+        public static final String TIME_APPLY   = "BIGINT";
+        public static final String TIME_START   = "BIGINT";
+        public static final String TIME_END     = "BIGINT";
     }
 
     public static class Ticket {

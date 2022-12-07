@@ -1,13 +1,40 @@
 package de.turtle_exception.client.internal.event;
 
-import de.turtle_exception.client.api.entities.Group;
-import de.turtle_exception.client.api.entities.Ticket;
-import de.turtle_exception.client.api.entities.Turtle;
-import de.turtle_exception.client.api.entities.User;
+import de.turtle_exception.client.api.entities.*;
+import de.turtle_exception.client.api.entities.attributes.EphemeralType;
+import de.turtle_exception.client.api.entities.form.*;
+import de.turtle_exception.client.api.entities.messages.DiscordChannel;
+import de.turtle_exception.client.api.entities.messages.MinecraftChannel;
+import de.turtle_exception.client.api.entities.messages.SyncChannel;
+import de.turtle_exception.client.api.entities.messages.SyncMessage;
+import de.turtle_exception.client.api.event.entities.EphemeralEntityEvent;
+import de.turtle_exception.client.api.event.entities.form.completed_form.CompletedFormCreateEvent;
+import de.turtle_exception.client.api.event.entities.form.completed_form.CompletedFormDeleteEvent;
+import de.turtle_exception.client.api.event.entities.form.query_element.QueryElementCreateEvent;
+import de.turtle_exception.client.api.event.entities.form.query_element.QueryElementDeleteEvent;
+import de.turtle_exception.client.api.event.entities.form.query_response.QueryResponseCreateEvent;
+import de.turtle_exception.client.api.event.entities.form.query_response.QueryResponseDeleteEvent;
+import de.turtle_exception.client.api.event.entities.form.template_form.TemplateFormCreateEvent;
+import de.turtle_exception.client.api.event.entities.form.template_form.TemplateFormDeleteEvent;
+import de.turtle_exception.client.api.event.entities.form.text_element.TextElementCreateEvent;
+import de.turtle_exception.client.api.event.entities.form.text_element.TextElementDeleteEvent;
 import de.turtle_exception.client.api.event.entities.group.GroupCreateEvent;
 import de.turtle_exception.client.api.event.entities.group.GroupDeleteEvent;
 import de.turtle_exception.client.api.event.entities.group.GroupMemberJoinEvent;
 import de.turtle_exception.client.api.event.entities.group.GroupMemberLeaveEvent;
+import de.turtle_exception.client.api.event.entities.json_resource.JsonResourceCreateEvent;
+import de.turtle_exception.client.api.event.entities.json_resource.JsonResourceDeleteEvent;
+import de.turtle_exception.client.api.event.entities.messages.discord_channel.DiscordChannelCreateEvent;
+import de.turtle_exception.client.api.event.entities.messages.discord_channel.DiscordChannelDeleteEvent;
+import de.turtle_exception.client.api.event.entities.messages.minecraft_channel.MinecraftChannelCreateEvent;
+import de.turtle_exception.client.api.event.entities.messages.minecraft_channel.MinecraftChannelDeleteEvent;
+import de.turtle_exception.client.api.event.entities.messages.sync_channel.*;
+import de.turtle_exception.client.api.event.entities.messages.sync_message.SyncMessageCreateEvent;
+import de.turtle_exception.client.api.event.entities.messages.sync_message.SyncMessageDeleteEvent;
+import de.turtle_exception.client.api.event.entities.project.ProjectCreateEvent;
+import de.turtle_exception.client.api.event.entities.project.ProjectDeleteEvent;
+import de.turtle_exception.client.api.event.entities.project.ProjectMemberJoinEvent;
+import de.turtle_exception.client.api.event.entities.project.ProjectMemberLeaveEvent;
 import de.turtle_exception.client.api.event.entities.ticket.*;
 import de.turtle_exception.client.api.event.entities.user.*;
 import de.turtle_exception.client.internal.util.TurtleSet;
@@ -22,21 +49,78 @@ public class UpdateHelper {
     private UpdateHelper() { }
 
     public static void ofCreateTurtle(@NotNull Turtle turtle) {
+        if (turtle instanceof EphemeralType e && e.isEphemeral()) {
+            turtle.getClient().getEventManager().handleEvent(new EphemeralEntityEvent<>(e));
+            return;
+        }
+
         if (turtle instanceof Group group)
             turtle.getClient().getEventManager().handleEvent(new GroupCreateEvent(group));
+        if (turtle instanceof JsonResource jsonResource)
+            turtle.getClient().getEventManager().handleEvent(new JsonResourceCreateEvent(jsonResource));
+        if (turtle instanceof Project project)
+            turtle.getClient().getEventManager().handleEvent(new ProjectCreateEvent(project));
         if (turtle instanceof Ticket ticket)
             turtle.getClient().getEventManager().handleEvent(new TicketCreateEvent(ticket));
         if (turtle instanceof User user)
             turtle.getClient().getEventManager().handleEvent(new UserCreateEvent(user));
+
+        // FORM
+        if (turtle instanceof CompletedForm form)
+            turtle.getClient().getEventManager().handleEvent(new CompletedFormCreateEvent(form));
+        if (turtle instanceof QueryElement element)
+            turtle.getClient().getEventManager().handleEvent(new QueryElementCreateEvent(element));
+        if (turtle instanceof QueryResponse query)
+            turtle.getClient().getEventManager().handleEvent(new QueryResponseCreateEvent(query));
+        if (turtle instanceof TemplateForm form)
+            turtle.getClient().getEventManager().handleEvent(new TemplateFormCreateEvent(form));
+        if (turtle instanceof TextElement element)
+            turtle.getClient().getEventManager().handleEvent(new TextElementCreateEvent(element));
+
+        // MESSAGES
+        if (turtle instanceof DiscordChannel discordChannel)
+            turtle.getClient().getEventManager().handleEvent(new DiscordChannelCreateEvent(discordChannel));
+        if (turtle instanceof MinecraftChannel minecraftChannel)
+            turtle.getClient().getEventManager().handleEvent(new MinecraftChannelCreateEvent(minecraftChannel));
+        if (turtle instanceof SyncChannel syncChannel)
+            turtle.getClient().getEventManager().handleEvent(new SyncChannelCreateEvent(syncChannel));
+        if (turtle instanceof SyncMessage syncMessage)
+            turtle.getClient().getEventManager().handleEvent(new SyncMessageCreateEvent(syncMessage));
     }
 
     public static void ofDeleteTurtle(@NotNull Turtle turtle) {
         if (turtle instanceof Group group)
             turtle.getClient().getEventManager().handleEvent(new GroupDeleteEvent(group));
+        if (turtle instanceof JsonResource jsonResource)
+            turtle.getClient().getEventManager().handleEvent(new JsonResourceDeleteEvent(jsonResource));
+        if (turtle instanceof Project project)
+            turtle.getClient().getEventManager().handleEvent(new ProjectDeleteEvent(project));
         if (turtle instanceof Ticket ticket)
             turtle.getClient().getEventManager().handleEvent(new TicketDeleteEvent(ticket));
         if (turtle instanceof User user)
             turtle.getClient().getEventManager().handleEvent(new UserDeleteEvent(user));
+
+        // FORM
+        if (turtle instanceof CompletedForm form)
+            turtle.getClient().getEventManager().handleEvent(new CompletedFormDeleteEvent(form));
+        if (turtle instanceof QueryElement element)
+            turtle.getClient().getEventManager().handleEvent(new QueryElementDeleteEvent(element));
+        if (turtle instanceof QueryResponse query)
+            turtle.getClient().getEventManager().handleEvent(new QueryResponseDeleteEvent(query));
+        if (turtle instanceof TemplateForm form)
+            turtle.getClient().getEventManager().handleEvent(new TemplateFormDeleteEvent(form));
+        if (turtle instanceof TextElement element)
+            turtle.getClient().getEventManager().handleEvent(new TextElementDeleteEvent(element));
+
+        // MESSAGES
+        if (turtle instanceof DiscordChannel discordChannel)
+            turtle.getClient().getEventManager().handleEvent(new DiscordChannelDeleteEvent(discordChannel));
+        if (turtle instanceof MinecraftChannel minecraftChannel)
+            turtle.getClient().getEventManager().handleEvent(new MinecraftChannelDeleteEvent(minecraftChannel));
+        if (turtle instanceof SyncChannel syncChannel)
+            turtle.getClient().getEventManager().handleEvent(new SyncChannelDeleteEvent(syncChannel));
+        if (turtle instanceof SyncMessage syncMessage)
+            turtle.getClient().getEventManager().handleEvent(new SyncMessageDeleteEvent(syncMessage));
     }
 
     /* - GROUP - */
@@ -49,6 +133,18 @@ public class UpdateHelper {
             group.getClient().getEventManager().handleEvent(new GroupMemberJoinEvent(group, newUser));
         for (User oldUser : removed)
             group.getClient().getEventManager().handleEvent(new GroupMemberLeaveEvent(group, oldUser));
+    }
+
+    /* - PROJECT - */
+
+    public static void ofProjectMembers(@NotNull Project project, @NotNull TurtleSet<User> oldUsers, @NotNull TurtleSet<User> newUsers) {
+        List<User> added   = newUsers.stream().filter(user -> !oldUsers.containsId(user.getId())).toList();
+        List<User> removed = oldUsers.stream().filter(user -> !newUsers.containsId(user.getId())).toList();
+
+        for (User newUser : added)
+            project.getClient().getEventManager().handleEvent(new ProjectMemberJoinEvent(project, newUser));
+        for (User oldUser : removed)
+            project.getClient().getEventManager().handleEvent(new ProjectMemberLeaveEvent(project, oldUser));
     }
 
     /* - TICKET - */

@@ -3,8 +3,8 @@ package de.turtle_exception.client.internal.entities;
 import com.google.common.collect.Sets;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import de.turtle_exception.client.api.entities.attributes.TicketState;
 import de.turtle_exception.client.internal.data.annotations.Keys;
-import de.turtle_exception.client.api.TicketState;
 import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.api.entities.Ticket;
 import de.turtle_exception.client.api.entities.User;
@@ -77,11 +77,16 @@ public class TicketImpl extends TurtleImpl implements Ticket {
             TurtleSet<User> old = this.users;
             TurtleSet<User> set = new TurtleSet<>();
             for (JsonElement entry : element.getAsJsonArray())
-                set.add(client.getUserById(entry.getAsLong()));
+                set.add(client.getTurtleById(entry.getAsLong(), User.class));
             this.users = set;
             UpdateHelper.ofTicketUsers(this, old, set);
         });
         return this;
+    }
+
+    @Override
+    public @Nullable User getTurtleById(long id) {
+        return this.users.get(id);
     }
 
     /* - STATE - */
@@ -105,7 +110,7 @@ public class TicketImpl extends TurtleImpl implements Ticket {
 
     @Override
     public @NotNull Action<Ticket> modifyTitle(@Nullable String title) {
-        return getClient().getProvider().patch(this, Keys.Ticket.TITLE, String.valueOf(title)).andThenParse(Ticket.class);
+        return getClient().getProvider().patch(this, Keys.Ticket.TITLE, title).andThenParse(Ticket.class);
     }
 
     /* - CATEGORY - */
@@ -154,15 +159,6 @@ public class TicketImpl extends TurtleImpl implements Ticket {
     @Override
     public @NotNull List<User> getUsers() {
         return List.copyOf(users);
-    }
-
-    public @NotNull TurtleSet<User> getUserSet() {
-        return users;
-    }
-
-    @Override
-    public @Nullable User getUserById(long id) {
-        return users.get(id);
     }
 
     @Override
