@@ -70,7 +70,7 @@ public interface GroupAction extends Action<Group> {
     GroupAction addUserId(long user);
 
     /**
-     * Adds the provided {@link User} to the List Users that are members of this Group.
+     * Adds the provided {@link User} to the List of Users that are members of this Group.
      * @param user Some User.
      * @return This GroupAction for chaining convenience.
      */
@@ -86,7 +86,7 @@ public interface GroupAction extends Action<Group> {
     GroupAction removeUseId(long user);
 
     /**
-     * Removes the provided {@link User} from the List Users that are members of this Group.
+     * Removes the provided {@link User} from the List of Users that are members of this Group.
      * @param user Some User.
      * @return This GroupAction for chaining convenience.
      */
