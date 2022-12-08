@@ -8,7 +8,6 @@ import de.turtle_exception.client.api.entities.form.*;
 import de.turtle_exception.client.api.entities.messages.DiscordChannel;
 import de.turtle_exception.client.api.entities.messages.MinecraftChannel;
 import de.turtle_exception.client.api.entities.messages.SyncChannel;
-import de.turtle_exception.client.api.entities.messages.SyncMessage;
 import de.turtle_exception.client.api.event.EventManager;
 import de.turtle_exception.client.api.request.Action;
 import de.turtle_exception.client.api.request.entities.*;
@@ -73,6 +72,15 @@ public class TurtleClientImpl implements TurtleClient {
     private long defaultTimeoutOutbound = TimeUnit.SECONDS.toMillis(16);
 
     private final TurtleSet<Turtle> cache = new TurtleSet<>();
+
+    /** Resource types that should be pulled from the server by default. */
+    private final List<Class<? extends Turtle>> retrievableTypes = List.of(
+            Group.class, Project.class, Ticket.class, User.class,
+            // FORM
+            CompletedForm.class, QueryElement.class, QueryResponse.class, TemplateForm.class, TextElement.class,
+            // MESSAGES
+            DiscordChannel.class, MinecraftChannel.class, SyncChannel.class
+    );
 
     /* THIRD PARTY SERVICES */
     private Server spigotServer = null;
@@ -161,23 +169,9 @@ public class TurtleClientImpl implements TurtleClient {
         this.cache.clear();
 
         if (retrieve) {
-            /*
-             * While entities are normally ordered alphabetically, these requests have to be ordered like this because
-             * the existence of some objects is essential to parsing other resources that reference them later.
-             */
-            this.retrieveTurtles(            User.class).complete(); // depends on nothing
-            this.retrieveTurtles(    QueryElement.class).complete(); // depends on nothing
-            this.retrieveTurtles(     TextElement.class).complete(); // depends on nothing
-            this.retrieveTurtles(  DiscordChannel.class).complete(); // depends on nothing
-            this.retrieveTurtles(MinecraftChannel.class).complete(); // depends on nothing
-            this.retrieveTurtles(           Group.class).complete(); // depends on User
-            this.retrieveTurtles(          Ticket.class).complete(); // depends on User
-            this.retrieveTurtles(         Project.class).complete(); // depends on User & TemplateForm
-            this.retrieveTurtles(     SyncChannel.class).complete(); // depends on IChannel
-            this.retrieveTurtles(    TemplateForm.class).complete(); // depends on Element
-            this.retrieveTurtles(   QueryResponse.class).complete(); // depends on Element
-            this.retrieveTurtles(   CompletedForm.class).complete(); // depends on User & TemplateForm & QueryResponse
-            this.retrieveTurtles(     SyncMessage.class).complete(); // depends on User & SyncChannel & IChannel
+            for (Class<? extends Turtle> type : this.retrievableTypes) {
+                this.retrieveTurtles(type).complete();
+            }
         }
     }
 
