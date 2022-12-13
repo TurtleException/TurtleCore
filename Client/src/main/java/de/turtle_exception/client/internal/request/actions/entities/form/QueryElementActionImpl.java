@@ -7,11 +7,12 @@ import de.turtle_exception.client.api.request.entities.form.QueryElementAction;
 import de.turtle_exception.client.internal.Provider;
 import de.turtle_exception.client.internal.data.annotations.Keys;
 import de.turtle_exception.client.internal.request.actions.EntityAction;
+import de.turtle_exception.fancyformat.FormatText;
 import org.jetbrains.annotations.NotNull;
 
 public class QueryElementActionImpl extends EntityAction<QueryElement> implements QueryElementAction {
     private String title;
-    private String description;
+    private FormatText description;
     private ContentType contentType;
     private Boolean required;
 
@@ -29,7 +30,7 @@ public class QueryElementActionImpl extends EntityAction<QueryElement> implement
     protected void updateContent() {
         this.content = new JsonObject();
         this.content.addProperty(Keys.Form.Element.TITLE, title);
-        this.content.addProperty(Keys.Form.QueryElement.DESCRIPTION, description);
+        this.content.addProperty(Keys.Form.QueryElement.DESCRIPTION, description.toString());
         this.content.addProperty(Keys.Form.QueryElement.CONTENT_TYPE, contentType.getCode());
         this.content.addProperty(Keys.Form.QueryElement.REQUIRED, required);
     }
@@ -43,7 +44,7 @@ public class QueryElementActionImpl extends EntityAction<QueryElement> implement
     }
 
     @Override
-    public QueryElementAction setDescription(String description) {
+    public QueryElementAction setDescription(FormatText description) {
         this.description = description;
         return this;
     }

@@ -5,6 +5,7 @@ import de.turtle_exception.client.internal.data.annotations.Key;
 import de.turtle_exception.client.internal.data.annotations.Keys;
 import de.turtle_exception.client.internal.data.annotations.Resource;
 import de.turtle_exception.client.internal.data.annotations.Types;
+import de.turtle_exception.fancyformat.FormatText;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -30,14 +31,14 @@ public interface QueryElement extends Element {
      * @return The Query description (possibly {@code null}).
      */
     @Key(name = Keys.Form.QueryElement.DESCRIPTION, sqlType = Types.Form.QueryElement.DESCRIPTION)
-    @Nullable String getDescription();
+    @Nullable FormatText getDescription();
 
     /**
-     * Creates an Action with the instruction to modify this QueryElement's description and change it to the provided String.
+     * Creates an Action with the instruction to modify this QueryElement's description and change it to the provided FormatText.
      * @param description New Query description.
      * @return Action that provides the modified {@link QueryElement} on completion.
      */
-    @NotNull Action<QueryElement> modifyDescription(@Nullable String description);
+    @NotNull Action<QueryElement> modifyDescription(@Nullable FormatText description);
 
     /* - CONTENT TYPE - */
 

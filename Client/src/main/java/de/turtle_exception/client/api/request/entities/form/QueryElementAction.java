@@ -4,6 +4,7 @@ import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.api.entities.form.ContentType;
 import de.turtle_exception.client.api.entities.form.QueryElement;
 import de.turtle_exception.client.api.request.Action;
+import de.turtle_exception.fancyformat.FormatText;
 
 import java.util.Collection;
 
@@ -24,11 +25,11 @@ public interface QueryElementAction extends Action<QueryElement> {
     QueryElementAction setTitle(String title);
 
     /**
-     * Sets the description of this QueryElement to the provided String.
+     * Sets the description of this QueryElement to the provided FormatText.
      * @param description Query description.
      * @return This QueryElementAction for chaining convenience.
      */
-    QueryElementAction setDescription(String description);
+    QueryElementAction setDescription(FormatText description);
 
     /**
      * Sets the content type of this QueryElement to the provided ContentType.

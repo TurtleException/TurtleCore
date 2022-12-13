@@ -9,15 +9,17 @@ import de.turtle_exception.client.api.event.entities.form.query_element.QueryEle
 import de.turtle_exception.client.api.event.entities.form.query_element.QueryElementUpdateTitleEvent;
 import de.turtle_exception.client.api.request.Action;
 import de.turtle_exception.client.internal.data.annotations.Keys;
+import de.turtle_exception.fancyformat.Format;
+import de.turtle_exception.fancyformat.FormatText;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class QueryElementImpl extends ElementImpl implements QueryElement {
-    private String description;
+    private FormatText description;
     private final ContentType contentType;
     private boolean required;
 
-    public QueryElementImpl(@NotNull TurtleClient client, long id, String title, String description, ContentType contentType, boolean required) {
+    public QueryElementImpl(@NotNull TurtleClient client, long id, String title, FormatText description, ContentType contentType, boolean required) {
         super(client, id, title);
         this.description = description;
         this.contentType = contentType;
@@ -32,8 +34,8 @@ public class QueryElementImpl extends ElementImpl implements QueryElement {
             this.fireEvent(new QueryElementUpdateTitleEvent(this, old, this.title));
         });
         this.apply(json, Keys.Form.QueryElement.DESCRIPTION, element -> {
-            String old = this.description;
-            this.description = element.getAsString();
+            FormatText old = this.description;
+            this.description = client.getFormatter().newText(element.getAsString(), Format.TURTLE);
             this.fireEvent(new QueryElementUpdateDescriptionEvent(this, old, this.description));
         });
         this.apply(json, Keys.Form.QueryElement.REQUIRED, element -> {
@@ -52,12 +54,12 @@ public class QueryElementImpl extends ElementImpl implements QueryElement {
     }
 
     @Override
-    public @Nullable String getDescription() {
+    public @Nullable FormatText getDescription() {
         return this.description;
     }
 
     @Override
-    public @NotNull Action<QueryElement> modifyDescription(@Nullable String description) {
+    public @NotNull Action<QueryElement> modifyDescription(@Nullable FormatText description) {
         return getClient().getProvider().patch(this, Keys.Form.QueryElement.DESCRIPTION, description).andThenParse(QueryElement.class);
     }
 

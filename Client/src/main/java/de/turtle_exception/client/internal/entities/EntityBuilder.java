@@ -162,7 +162,7 @@ public class EntityBuilder {
 
         long        id          = data.get(Keys.Turtle.ID).getAsLong();
         String      title       = getOptional(() -> data.get(Keys.Form.Element.TITLE).getAsString());
-        String      description = getOptional(() -> data.get(Keys.Form.QueryElement.DESCRIPTION).getAsString());
+        FormatText  description = getOptional(() -> client.getFormatter().newText(data.get(Keys.Form.QueryElement.DESCRIPTION).getAsString(), Format.TURTLE));
         ContentType contentType = ContentType.of(data.get(Keys.Form.QueryElement.CONTENT_TYPE).getAsByte());
         boolean     required    = data.get(Keys.Form.QueryElement.REQUIRED).getAsBoolean();
 
