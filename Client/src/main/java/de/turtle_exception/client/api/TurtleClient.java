@@ -17,6 +17,7 @@ import de.turtle_exception.client.internal.net.NetworkProvider;
 import de.turtle_exception.client.internal.util.logging.NestedLogger;
 import de.turtle_exception.client.internal.util.logging.SimpleFormatter;
 import de.turtle_exception.client.internal.util.version.Version;
+import de.turtle_exception.fancyformat.FancyFormatter;
 import net.dv8tion.jda.api.JDA;
 import org.bukkit.Server;
 import org.jetbrains.annotations.NotNull;
@@ -53,6 +54,13 @@ public interface TurtleClient extends TurtleContainer<Turtle> {
      * @return Application version.
      */
     @NotNull Version getVersion();
+
+    /**
+     * Return the {@link FancyFormatter} of this TurtleClient. This formatter is used globally. Any modifications to it
+     * will impact formatting on every layer of the API.
+     * @return FancyFormatter instance.
+     */
+    @NotNull FancyFormatter getFormatter();
 
     /**
      * Returns the EventManager of this TurtleClient. The EventManager can be used to register {@link EventListener

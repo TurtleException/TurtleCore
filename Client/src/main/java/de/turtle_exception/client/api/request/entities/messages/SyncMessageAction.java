@@ -2,12 +2,13 @@ package de.turtle_exception.client.api.request.entities.messages;
 
 import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.api.entities.User;
-import de.turtle_exception.client.api.entities.attributes.MessageFormat;
 import de.turtle_exception.client.api.entities.messages.Attachment;
 import de.turtle_exception.client.api.entities.messages.IChannel;
 import de.turtle_exception.client.api.entities.messages.SyncChannel;
 import de.turtle_exception.client.api.entities.messages.SyncMessage;
 import de.turtle_exception.client.api.request.Action;
+import de.turtle_exception.fancyformat.Format;
+import de.turtle_exception.fancyformat.FormatText;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
@@ -24,13 +25,6 @@ import java.util.List;
 @SuppressWarnings("unused")
 public interface SyncMessageAction extends Action<SyncMessage> {
     /**
-     * Sets the format of this Message to the provided MessageFormat.
-     * @param format Message format.
-     * @return This SyncMessageAction for chaining convenience.
-     */
-    SyncMessageAction setFormat(MessageFormat format);
-
-    /**
      * Sets the author of this Message to the provided User.
      * @param user Message author.
      * @return This SyncMessageAction for chaining convenience.
@@ -38,11 +32,20 @@ public interface SyncMessageAction extends Action<SyncMessage> {
     SyncMessageAction setAuthor(User user);
 
     /**
-     * Sets the raw content of this Message to the provided String.
-     * @param content Raw Message content.
+     * Sets the content of this Message to the provided FormatText.
+     * @param content Message content.
      * @return This SyncMessageAction for chaining convenience.
      */
-    SyncMessageAction setContent(String content);
+    SyncMessageAction setContent(FormatText content);
+
+    /**
+     * Sets the content of this Message to the provided String & Format.
+     * @param content Message content.
+     * @return This SyncMessageAction for chaining convenience.
+     */
+    default SyncMessageAction setContent(@NotNull String content, @NotNull Format format) {
+        return this.setContent(this.getClient().getFormatter().newText(content, format));
+    }
 
     /**
      * Sets the referenced message (id) of this Message to the provided id.

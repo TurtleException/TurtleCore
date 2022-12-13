@@ -148,7 +148,6 @@ public abstract class EventListener {
     public void onSyncMessageCreate(@NotNull SyncMessageCreateEvent event) { }
     public void onSyncMessageDelete(@NotNull SyncMessageDeleteEvent event) { }
     public void onSyncMessageUpdate(@NotNull SyncMessageUpdateEvent<?> event) { }
-    public void onSyncMessageUpdateFormat(@NotNull SyncMessageUpdateFormatEvent event) { }
     public void onSyncMessageUpdateAuthor(@NotNull SyncMessageUpdateAuthorEvent event) { }
     public void onSyncMessageUpdateContent(@NotNull SyncMessageUpdateContentEvent event) { }
     public void onSyncMessageUpdateReference(@NotNull SyncMessageUpdateReferenceEvent event) { }

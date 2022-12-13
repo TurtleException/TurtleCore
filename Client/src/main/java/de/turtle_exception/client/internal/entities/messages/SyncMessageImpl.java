@@ -3,13 +3,14 @@ package de.turtle_exception.client.internal.entities.messages;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import de.turtle_exception.client.api.TurtleClient;
-import de.turtle_exception.client.api.entities.attributes.MessageFormat;
 import de.turtle_exception.client.api.entities.messages.SyncMessage;
 import de.turtle_exception.client.api.event.entities.messages.sync_message.*;
 import de.turtle_exception.client.api.request.Action;
 import de.turtle_exception.client.internal.data.annotations.Keys;
 import de.turtle_exception.client.internal.entities.TurtleImpl;
 import de.turtle_exception.client.internal.event.UpdateHelper;
+import de.turtle_exception.fancyformat.Format;
+import de.turtle_exception.fancyformat.FormatText;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -17,18 +18,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SyncMessageImpl extends TurtleImpl implements SyncMessage {
-    private MessageFormat format;
     private long author;
-    private String content;
+    private FormatText content;
     private Long reference;
     private long channel;
     private long source;
     private ArrayList<Long> attachments;
 
-    public SyncMessageImpl(@NotNull TurtleClient client, long id, MessageFormat format, long author, String content, Long reference, long channel, long source, ArrayList<Long> attachments) {
+    public SyncMessageImpl(@NotNull TurtleClient client, long id, long author, FormatText content, Long reference, long channel, long source, ArrayList<Long> attachments) {
         super(client, id);
 
-        this.format      = format;
         this.author      = author;
         this.content     = content;
         this.reference   = reference;
@@ -39,19 +38,14 @@ public class SyncMessageImpl extends TurtleImpl implements SyncMessage {
 
     @Override
     public @NotNull TurtleImpl handleUpdate(@NotNull JsonObject json) {
-        this.apply(json, Keys.Messages.SyncMessage.FORMAT, element -> {
-            MessageFormat old = this.format;
-            this.format = MessageFormat.of(json.getAsByte());
-            this.fireEvent(new SyncMessageUpdateFormatEvent(this, old, this.format));
-        });
         this.apply(json, Keys.Messages.SyncMessage.AUTHOR, element -> {
             long old = this.author;
             this.author = element.getAsLong();
             this.fireEvent(new SyncMessageUpdateAuthorEvent(this, old, this.author));
         });
         this.apply(json, Keys.Messages.SyncMessage.CONTENT, element -> {
-            String old = this.content;
-            this.content = element.getAsString();
+            FormatText old = this.content;
+            this.content = getClient().getFormatter().newText(element.getAsString(), Format.TURTLE);
             this.fireEvent(new SyncMessageUpdateContentEvent(this, old, this.content));
         });
         this.apply(json, Keys.Messages.SyncMessage.REFERENCE, element -> {
@@ -80,18 +74,6 @@ public class SyncMessageImpl extends TurtleImpl implements SyncMessage {
         return this;
     }
 
-    /* - FORMAT - */
-
-    @Override
-    public @NotNull MessageFormat getMessageFormat() {
-        return this.format;
-    }
-
-    @Override
-    public @NotNull Action<SyncMessage> modifyMessageFormat(@NotNull MessageFormat format) {
-        return getClient().getProvider().patch(this, Keys.Messages.SyncMessage.FORMAT, format).andThenParse(SyncMessage.class);
-    }
-
     /* - AUTHOR - */
 
     @Override
@@ -107,18 +89,12 @@ public class SyncMessageImpl extends TurtleImpl implements SyncMessage {
     /* - CONTENT - */
 
     @Override
-    public @NotNull String getContent() {
+    public @NotNull FormatText getContent() {
         return this.content;
     }
 
     @Override
-    public @NotNull String getContent(@NotNull MessageFormat format) {
-        // TODO: apply format
-        return this.content;
-    }
-
-    @Override
-    public @NotNull Action<SyncMessage> modifyContent(@NotNull String content) {
+    public @NotNull Action<SyncMessage> modifyContent(@NotNull FormatText content) {
         return getClient().getProvider().patch(this, Keys.Messages.SyncMessage.CONTENT, content).andThenParse(SyncMessage.class);
     }
 

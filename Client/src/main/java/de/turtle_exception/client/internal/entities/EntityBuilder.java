@@ -7,7 +7,6 @@ import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.api.entities.Group;
 import de.turtle_exception.client.api.entities.Ticket;
 import de.turtle_exception.client.api.entities.User;
-import de.turtle_exception.client.api.entities.attributes.MessageFormat;
 import de.turtle_exception.client.api.entities.attributes.ProjectState;
 import de.turtle_exception.client.api.entities.attributes.TicketState;
 import de.turtle_exception.client.api.entities.form.ContentType;
@@ -17,6 +16,8 @@ import de.turtle_exception.client.internal.data.annotations.Keys;
 import de.turtle_exception.client.internal.entities.form.*;
 import de.turtle_exception.client.internal.entities.messages.*;
 import de.turtle_exception.client.internal.util.Checks;
+import de.turtle_exception.fancyformat.Format;
+import de.turtle_exception.fancyformat.FormatText;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -254,20 +255,19 @@ public class EntityBuilder {
     public static @NotNull SyncMessageImpl buildSyncMessage(@NotNull JsonObject data, @NotNull TurtleClient client) throws NullPointerException, IllegalArgumentException, IllegalJsonException {
         Checks.nonNull(data, "JSON");
 
-        long          id        = data.get(Keys.Turtle.ID).getAsLong();
-        MessageFormat format    = MessageFormat.of(data.get(Keys.Messages.SyncMessage.FORMAT).getAsByte());
-        long          author    = data.get(Keys.Messages.SyncMessage.AUTHOR).getAsLong();
-        String        content   = data.get(Keys.Messages.SyncMessage.CONTENT).getAsString();
-        Long          reference = getOptional(() -> data.get(Keys.Messages.SyncMessage.REFERENCE).getAsLong());
-        long          channel   = data.get(Keys.Messages.SyncMessage.CHANNEL).getAsLong();
-        long          source    = data.get(Keys.Messages.SyncMessage.SOURCE).getAsLong();
+        long       id        = data.get(Keys.Turtle.ID).getAsLong();
+        long       author    = data.get(Keys.Messages.SyncMessage.AUTHOR).getAsLong();
+        FormatText content   = client.getFormatter().newText(data.get(Keys.Messages.SyncMessage.CONTENT).getAsString(), Format.TURTLE);
+        Long       reference = getOptional(() -> data.get(Keys.Messages.SyncMessage.REFERENCE).getAsLong());
+        long       channel   = data.get(Keys.Messages.SyncMessage.CHANNEL).getAsLong();
+        long       source    = data.get(Keys.Messages.SyncMessage.SOURCE).getAsLong();
 
         JsonArray attachmentArr = data.getAsJsonArray(Keys.Messages.SyncMessage.ATTACHMENTS);
         ArrayList<Long> attachments = new ArrayList<>();
         for (JsonElement element : attachmentArr)
             attachments.add(element.getAsLong());
 
-        return new SyncMessageImpl(client, id, format, author, content, reference, channel, source, attachments);
+        return new SyncMessageImpl(client, id, author, content, reference, channel, source, attachments);
     }
 
     /* - - - */

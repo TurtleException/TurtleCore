@@ -2,9 +2,9 @@ package de.turtle_exception.client.api.entities.messages;
 
 import de.turtle_exception.client.api.entities.Turtle;
 import de.turtle_exception.client.api.entities.User;
-import de.turtle_exception.client.api.entities.attributes.MessageFormat;
 import de.turtle_exception.client.api.request.Action;
 import de.turtle_exception.client.internal.data.annotations.*;
+import de.turtle_exception.fancyformat.FormatText;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -20,26 +20,6 @@ public interface SyncMessage extends Turtle {
     @Override
     default @NotNull Action<SyncMessage> update() {
         return this.getClient().retrieveTurtle(this.getId(), SyncMessage.class);
-    }
-
-    /* - FORMAT - */
-
-    /**
-     * Provides the MessageFormat of this message.
-     * @return The Message format.
-     */
-    @NotNull MessageFormat getMessageFormat();
-
-    /**
-     * Creates an Action with the instruction to modify this Message's format and change it to the provided MessageFormat.
-     * @param format New Message format.
-     * @return Action that provides the modified {@link SyncMessage} on completion.
-     */
-    @NotNull Action<SyncMessage> modifyMessageFormat(@NotNull MessageFormat format);
-
-    @Key(name = Keys.Messages.SyncMessage.FORMAT, sqlType = Types.Messages.SyncMessage.FORMAT)
-    default byte getMessageFormatCode() {
-        return this.getMessageFormat().getCode();
     }
 
     /* - AUTHOR - */
@@ -74,24 +54,19 @@ public interface SyncMessage extends Turtle {
     /* - CONTENT - */
 
     /**
-     * Provides the raw content of this message.
+     * Provides the content of this message as a {@link FormatText}.
      * @return The Message content.
      */
+    // FormatText#toString() will return the Turtle format
     @Key(name = Keys.Messages.SyncMessage.CONTENT, sqlType = Types.Messages.SyncMessage.CONTENT)
-    @NotNull String getContent();
+    @NotNull FormatText getContent();
 
     /**
-     * Provides the content of this message formatted as specified by the provided {@link MessageFormat}.
-     * @return The formatted Message content.
-     */
-    @NotNull String getContent(@NotNull MessageFormat format);
-
-    /**
-     * Creates an Action with the instruction to modify this Message's content and change it to the provided String.
+     * Creates an Action with the instruction to modify this Message's content and change it to the provided FormatText.
      * @param content New Message content.
      * @return Action that provides the modified {@link SyncMessage} on completion.
      */
-    @NotNull Action<SyncMessage> modifyContent(@NotNull String content);
+    @NotNull Action<SyncMessage> modifyContent(@NotNull FormatText content);
 
     /* - REFERENCE - */
 

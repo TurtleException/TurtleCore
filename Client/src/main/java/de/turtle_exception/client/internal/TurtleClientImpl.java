@@ -26,6 +26,7 @@ import de.turtle_exception.client.internal.request.actions.entities.messages.*;
 import de.turtle_exception.client.internal.util.TurtleSet;
 import de.turtle_exception.client.internal.util.version.IllegalVersionException;
 import de.turtle_exception.client.internal.util.version.Version;
+import de.turtle_exception.fancyformat.FancyFormatter;
 import net.dv8tion.jda.api.JDA;
 import org.bukkit.Server;
 import org.jetbrains.annotations.NotNull;
@@ -56,6 +57,7 @@ public class TurtleClientImpl implements TurtleClient {
     /** Name of this instance. Naming is not required, but it may be helpful when using multiple instances. */
     private final @Nullable String name;
 
+    private final FancyFormatter formatter;
     private final ResourceBuilder resourceBuilder;
     private final EventManager eventManager;
     /** The internal network part of the client */
@@ -84,6 +86,8 @@ public class TurtleClientImpl implements TurtleClient {
         this.name = name;
         this.logger = logger;
         this.logger.log(Level.INFO, "Hello there  (Starting...)");
+
+        this.formatter = new FancyFormatter();
 
         this.logger.log(Level.FINE, "Initializing ResourceBuilder.");
         this.resourceBuilder = new ResourceBuilder(this);
@@ -129,6 +133,11 @@ public class TurtleClientImpl implements TurtleClient {
     @Override
     public @NotNull Version getVersion() {
         return VERSION;
+    }
+
+    @Override
+    public @NotNull FancyFormatter getFormatter() {
+        return this.formatter;
     }
 
     public @NotNull ResourceBuilder getResourceBuilder() {
