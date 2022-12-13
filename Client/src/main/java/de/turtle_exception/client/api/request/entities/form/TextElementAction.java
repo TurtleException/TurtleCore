@@ -3,6 +3,7 @@ package de.turtle_exception.client.api.request.entities.form;
 import de.turtle_exception.client.api.TurtleClient;
 import de.turtle_exception.client.api.entities.form.TextElement;
 import de.turtle_exception.client.api.request.Action;
+import de.turtle_exception.fancyformat.FormatText;
 
 import java.util.Collection;
 
@@ -23,9 +24,9 @@ public interface TextElementAction extends Action<TextElement> {
     TextElementAction setTitle(String title);
 
     /**
-     * Sets the content of this TextElement to the provided String.
+     * Sets the content of this TextElement to the provided FormatText.
      * @param content TextElement content.
      * @return This TextElementAction for chaining convenience.
      */
-    TextElementAction setContent(String content);
+    TextElementAction setContent(FormatText content);
 }

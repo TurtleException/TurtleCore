@@ -7,14 +7,15 @@ import de.turtle_exception.client.api.event.entities.form.text_element.TextEleme
 import de.turtle_exception.client.api.event.entities.form.text_element.TextElementUpdateTitleEvent;
 import de.turtle_exception.client.api.request.Action;
 import de.turtle_exception.client.internal.data.annotations.Keys;
-import de.turtle_exception.client.internal.entities.TurtleImpl;
+import de.turtle_exception.fancyformat.Format;
+import de.turtle_exception.fancyformat.FormatText;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class TextElementImpl extends ElementImpl implements TextElement {
-    private String content;
+    private FormatText content;
 
-    public TextElementImpl(@NotNull TurtleClient client, long id, String title, String content) {
+    public TextElementImpl(@NotNull TurtleClient client, long id, String title, FormatText content) {
         super(client, id, title);
         this.content = content;
     }
@@ -27,8 +28,8 @@ public class TextElementImpl extends ElementImpl implements TextElement {
             this.fireEvent(new TextElementUpdateTitleEvent(this, old, this.title));
         });
         this.apply(json, Keys.Form.TextElement.CONTENT, element -> {
-            String old = this.content;
-            this.content = element.getAsString();
+            FormatText old = this.content;
+            this.content = getClient().getFormatter().newText(element.getAsString(), Format.TURTLE);
             this.fireEvent(new TextElementUpdateContentEvent(this, old, this.content));
         });
         return this;
@@ -42,12 +43,12 @@ public class TextElementImpl extends ElementImpl implements TextElement {
     }
 
     @Override
-    public @NotNull String getContent() {
+    public @NotNull FormatText getContent() {
         return this.content;
     }
 
     @Override
-    public @NotNull Action<TextElement> modifyContent(@NotNull String content) {
+    public @NotNull Action<TextElement> modifyContent(@NotNull FormatText content) {
         return getClient().getProvider().patch(this, Keys.Form.TextElement.CONTENT, content).andThenParse(TextElement.class);
     }
 }

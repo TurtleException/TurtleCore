@@ -196,9 +196,9 @@ public class EntityBuilder {
     public static @NotNull TextElementImpl buildTextElement(@NotNull JsonObject data, @NotNull TurtleClient client) throws NullPointerException, IllegalArgumentException, IllegalJsonException {
         Checks.nonNull(data, "JSON");
 
-        long   id      = data.get(Keys.Turtle.ID).getAsLong();
-        String title   = getOptional(() -> data.get(Keys.Form.Element.TITLE).getAsString());
-        String content = data.get(Keys.Form.TextElement.CONTENT).getAsString();
+        long       id      = data.get(Keys.Turtle.ID).getAsLong();
+        String     title   = getOptional(() -> data.get(Keys.Form.Element.TITLE).getAsString());
+        FormatText content = client.getFormatter().newText(data.get(Keys.Form.TextElement.CONTENT).getAsString(), Format.TURTLE);
 
         return new TextElementImpl(client, id, title, content);
     }

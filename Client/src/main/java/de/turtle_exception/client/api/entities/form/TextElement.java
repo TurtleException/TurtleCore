@@ -5,6 +5,7 @@ import de.turtle_exception.client.internal.data.annotations.Key;
 import de.turtle_exception.client.internal.data.annotations.Keys;
 import de.turtle_exception.client.internal.data.annotations.Resource;
 import de.turtle_exception.client.internal.data.annotations.Types;
+import de.turtle_exception.fancyformat.FormatText;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -29,12 +30,12 @@ public interface TextElement extends Element {
      * @return The TextElement content.
      */
     @Key(name = Keys.Form.TextElement.CONTENT, sqlType = Types.Form.TextElement.CONTENT)
-    @NotNull String getContent();
+    @NotNull FormatText getContent();
 
     /**
-     * Creates an Action with the instruction to modify this TextElement's content and change it to the provided String.
+     * Creates an Action with the instruction to modify this TextElement's content and change it to the provided FormatText.
      * @param content New TextElement content.
      * @return Action that provides the modified {@link TextElement} on completion.
      */
-    @NotNull Action<TextElement> modifyContent(@NotNull String content);
+    @NotNull Action<TextElement> modifyContent(@NotNull FormatText content);
 }

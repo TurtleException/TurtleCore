@@ -6,11 +6,12 @@ import de.turtle_exception.client.api.request.entities.form.TextElementAction;
 import de.turtle_exception.client.internal.Provider;
 import de.turtle_exception.client.internal.data.annotations.Keys;
 import de.turtle_exception.client.internal.request.actions.EntityAction;
+import de.turtle_exception.fancyformat.FormatText;
 import org.jetbrains.annotations.NotNull;
 
 public class TextElementActionImpl extends EntityAction<TextElement> implements TextElementAction {
     private String title;
-    private String textContent;
+    private FormatText textContent;
 
     @SuppressWarnings("CodeBlock2Expr")
     public TextElementActionImpl(@NotNull Provider provider) {
@@ -24,7 +25,7 @@ public class TextElementActionImpl extends EntityAction<TextElement> implements 
     protected void updateContent() {
         this.content = new JsonObject();
         this.content.addProperty(Keys.Form.Element.TITLE, title);
-        this.content.addProperty(Keys.Form.TextElement.CONTENT, textContent);
+        this.content.addProperty(Keys.Form.TextElement.CONTENT, textContent.toString());
     }
 
     /* - - - */
@@ -36,7 +37,7 @@ public class TextElementActionImpl extends EntityAction<TextElement> implements 
     }
 
     @Override
-    public TextElementAction setContent(String content) {
+    public TextElementAction setContent(FormatText content) {
         this.textContent = content;
         return this;
     }
