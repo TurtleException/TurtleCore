@@ -7,6 +7,7 @@ import de.turtle_exception.client.api.request.entities.form.QueryElementAction;
 import de.turtle_exception.client.internal.Provider;
 import de.turtle_exception.client.internal.data.annotations.Keys;
 import de.turtle_exception.client.internal.request.actions.EntityAction;
+import de.turtle_exception.fancyformat.Format;
 import de.turtle_exception.fancyformat.FormatText;
 import org.jetbrains.annotations.NotNull;
 
@@ -30,7 +31,7 @@ public class QueryElementActionImpl extends EntityAction<QueryElement> implement
     protected void updateContent() {
         this.content = new JsonObject();
         this.content.addProperty(Keys.Form.Element.TITLE, title);
-        this.content.addProperty(Keys.Form.QueryElement.DESCRIPTION, description.toString());
+        this.content.addProperty(Keys.Form.QueryElement.DESCRIPTION, description.toString(Format.TURTLE));
         this.content.addProperty(Keys.Form.QueryElement.CONTENT_TYPE, contentType.getCode());
         this.content.addProperty(Keys.Form.QueryElement.REQUIRED, required);
     }
