@@ -354,7 +354,10 @@ public class SQLProvider extends DatabaseProvider {
             if (atKey == null) continue;
             if (atKey.relation() != Relation.ONE_TO_ONE) continue;
 
-            keys.add("`" + atKey.name() +  "` " + atKey.sqlType());
+            NotNull atNotNull = AnnotationUtil.getAnnotation(method, NotNull.class);
+            String nullSuffix = atNotNull != null ? " NOT NULL" : "";
+
+            keys.add("`" + atKey.name() +  "` " + atKey.sqlType() + nullSuffix);
         }
 
         keys.add("PRIMARY KEY (`" + Keys.Turtle.ID + "`)");
@@ -378,8 +381,8 @@ public class SQLProvider extends DatabaseProvider {
         if (foreignType.equalsIgnoreCase("TURTLE"))
             foreignType = Types.Turtle.ID;
 
-        keys.add("`" + relAnnotation.self() + "` " + Types.Turtle.ID);
-        keys.add("`" + relAnnotation.foreign() + "` " + foreignType);
+        keys.add("`" + relAnnotation.self() + "` " + Types.Turtle.ID + " NOT NULL");
+        keys.add("`" + relAnnotation.foreign() + "` " + foreignType + " NOT NULL");
 
         if (key.relation() == Relation.ONE_TO_MANY)
             keys.add("PRIMARY KEY (`" + relAnnotation.foreign() + "`)");
