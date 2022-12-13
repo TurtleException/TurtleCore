@@ -36,7 +36,7 @@ public class JsonResourceImpl extends TurtleImpl implements JsonResource {
             this.content = element;
             this.fireEvent(new JsonResourceUpdateContentEvent(this, old, this.content));
         });
-        this.apply(json, Keys.JsonResource.EPHEMERAL, element -> {
+        this.apply(json, Keys.Attribute.EphemeralType.EPHEMERAL, element -> {
             boolean old = this.ephemeral;
             this.ephemeral = element.getAsBoolean();
             this.fireEvent(new JsonResourceUpdateEphemeralEvent(this, old, this.ephemeral));
@@ -77,6 +77,6 @@ public class JsonResourceImpl extends TurtleImpl implements JsonResource {
 
     @Override
     public @NotNull Action<JsonResource> modifyEphemeral(boolean ephemeral) {
-        return getClient().getProvider().patch(this, Keys.JsonResource.EPHEMERAL, ephemeral).andThenParse(JsonResource.class);
+        return getClient().getProvider().patch(this, Keys.Attribute.EphemeralType.EPHEMERAL, ephemeral).andThenParse(JsonResource.class);
     }
 }

@@ -6,6 +6,6 @@ import org.jetbrains.annotations.NotNull;
 
 public class JsonResourceUpdateEphemeralEvent extends JsonResourceUpdateEvent<Boolean> {
     public JsonResourceUpdateEphemeralEvent(@NotNull JsonResource jsonResource, Boolean oldValue, Boolean newValue) {
-        super(jsonResource, Keys.JsonResource.EPHEMERAL, oldValue, newValue);
+        super(jsonResource, Keys.Attribute.EphemeralType.EPHEMERAL, oldValue, newValue);
     }
 }
