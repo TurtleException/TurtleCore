@@ -1,18 +1,20 @@
 package de.turtle_exception.client.internal.entities.messages;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import de.turtle_exception.client.api.TurtleClient;
-import de.turtle_exception.client.api.entities.User;
 import de.turtle_exception.client.api.entities.attributes.MessageFormat;
-import de.turtle_exception.client.api.entities.messages.IChannel;
-import de.turtle_exception.client.api.entities.messages.SyncChannel;
 import de.turtle_exception.client.api.entities.messages.SyncMessage;
 import de.turtle_exception.client.api.event.entities.messages.sync_message.*;
 import de.turtle_exception.client.api.request.Action;
 import de.turtle_exception.client.internal.data.annotations.Keys;
 import de.turtle_exception.client.internal.entities.TurtleImpl;
+import de.turtle_exception.client.internal.event.UpdateHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class SyncMessageImpl extends TurtleImpl implements SyncMessage {
     private MessageFormat format;
@@ -21,16 +23,18 @@ public class SyncMessageImpl extends TurtleImpl implements SyncMessage {
     private Long reference;
     private long channel;
     private long source;
+    private ArrayList<Long> attachments;
 
-    public SyncMessageImpl(@NotNull TurtleClient client, long id, MessageFormat format, long author, String content, Long reference, long channel, long source) {
+    public SyncMessageImpl(@NotNull TurtleClient client, long id, MessageFormat format, long author, String content, Long reference, long channel, long source, ArrayList<Long> attachments) {
         super(client, id);
 
-        this.format    = format;
-        this.author    = author;
-        this.content   = content;
-        this.reference = reference;
-        this.channel   = channel;
-        this.source    = source;
+        this.format      = format;
+        this.author      = author;
+        this.content     = content;
+        this.reference   = reference;
+        this.channel     = channel;
+        this.source      = source;
+        this.attachments = attachments;
     }
 
     @Override
@@ -64,6 +68,14 @@ public class SyncMessageImpl extends TurtleImpl implements SyncMessage {
             long old = this.source;
             this.source = element.getAsLong();
             this.fireEvent(new SyncMessageUpdateSourceEvent(this, old, this.source));
+        });
+        this.apply(json, Keys.Messages.SyncMessage.ATTACHMENTS, element -> {
+            ArrayList<Long> old  = this.attachments;
+            ArrayList<Long> list = new ArrayList<>();
+            for (JsonElement entry : element.getAsJsonArray())
+                list.add(entry.getAsLong());
+            this.attachments = list;
+            UpdateHelper.ofSyncMessageAttachments(this, old, list);
         });
         return this;
     }
@@ -144,5 +156,22 @@ public class SyncMessageImpl extends TurtleImpl implements SyncMessage {
     @Override
     public @NotNull Action<SyncMessage> modifySource(@NotNull Long source) {
         return getClient().getProvider().patch(this, Keys.Messages.SyncMessage.SOURCE, source).andThenParse(SyncMessage.class);
+    }
+
+    /* - ATTACHMENTS - */
+
+    @Override
+    public @NotNull List<Long> getAttachmentIds() {
+        return this.attachments;
+    }
+
+    @Override
+    public @NotNull Action<SyncMessage> addAttachment(long attachment) {
+        return getClient().getProvider().patchEntryAdd(this, Keys.Messages.SyncMessage.ATTACHMENTS, attachment).andThenParse(SyncMessage.class);
+    }
+
+    @Override
+    public @NotNull Action<SyncMessage> removeAttachment(long attachment) {
+        return getClient().getProvider().patchEntryDel(this, Keys.Messages.SyncMessage.ATTACHMENTS, attachment).andThenParse(SyncMessage.class);
     }
 }

@@ -10,19 +10,13 @@ import de.turtle_exception.client.api.entities.User;
 import de.turtle_exception.client.api.entities.attributes.MessageFormat;
 import de.turtle_exception.client.api.entities.attributes.ProjectState;
 import de.turtle_exception.client.api.entities.attributes.TicketState;
-import de.turtle_exception.client.api.entities.form.*;
-import de.turtle_exception.client.api.entities.messages.IChannel;
+import de.turtle_exception.client.api.entities.form.ContentType;
 import de.turtle_exception.client.api.entities.messages.MinecraftChannel;
-import de.turtle_exception.client.api.entities.messages.SyncChannel;
 import de.turtle_exception.client.internal.data.IllegalJsonException;
 import de.turtle_exception.client.internal.data.annotations.Keys;
 import de.turtle_exception.client.internal.entities.form.*;
-import de.turtle_exception.client.internal.entities.messages.DiscordChannelImpl;
-import de.turtle_exception.client.internal.entities.messages.MinecraftChannelImpl;
-import de.turtle_exception.client.internal.entities.messages.SyncChannelImpl;
-import de.turtle_exception.client.internal.entities.messages.SyncMessageImpl;
+import de.turtle_exception.client.internal.entities.messages.*;
 import de.turtle_exception.client.internal.util.Checks;
-import de.turtle_exception.client.internal.util.TurtleSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -210,6 +204,24 @@ public class EntityBuilder {
 
     /* - MESSAGES - */
 
+    public static @NotNull AttachmentImpl buildAttachment(@NotNull JsonObject data, @NotNull TurtleClient client) throws NullPointerException, IllegalArgumentException, IllegalJsonException {
+        Checks.nonNull(data, "JSON");
+
+        long id            = data.get(Keys.Turtle.ID).getAsLong();
+        long snowflake     = data.get(Keys.Messages.Attachment.SNOWFLAKE).getAsLong();
+        String url         = data.get(Keys.Messages.Attachment.URL).getAsString();
+        String proxyUrl    = data.get(Keys.Messages.Attachment.PROXY_URL).getAsString();
+        String fileName    = data.get(Keys.Messages.Attachment.FILE_NAME).getAsString();
+        String contentType = data.get(Keys.Messages.Attachment.CONTENT_TYPE).getAsString();
+        String description = data.get(Keys.Messages.Attachment.DESCRIPTION).getAsString();
+        long size          = data.get(Keys.Messages.Attachment.SIZE).getAsLong();
+        int height         = data.get(Keys.Messages.Attachment.HEIGHT).getAsInt();
+        int width          = data.get(Keys.Messages.Attachment.WIDTH).getAsInt();
+        boolean ephemeral  = data.get(Keys.Messages.Attachment.EPHEMERAL).getAsBoolean();
+
+        return new AttachmentImpl(id, client, snowflake, url, proxyUrl, fileName, contentType, description, size, height, width, ephemeral);
+    }
+
     public static @NotNull DiscordChannelImpl buildDiscordChannel(@NotNull JsonObject data, @NotNull TurtleClient client) throws NullPointerException, IllegalArgumentException, IllegalJsonException {
         Checks.nonNull(data, "JSON");
 
@@ -250,7 +262,12 @@ public class EntityBuilder {
         long          channel   = data.get(Keys.Messages.SyncMessage.CHANNEL).getAsLong();
         long          source    = data.get(Keys.Messages.SyncMessage.SOURCE).getAsLong();
 
-        return new SyncMessageImpl(client, id, format, author, content, reference, channel, source);
+        JsonArray attachmentArr = data.getAsJsonArray(Keys.Messages.SyncMessage.ATTACHMENTS);
+        ArrayList<Long> attachments = new ArrayList<>();
+        for (JsonElement element : attachmentArr)
+            attachments.add(element.getAsLong());
+
+        return new SyncMessageImpl(client, id, format, author, content, reference, channel, source, attachments);
     }
 
     /* - - - */

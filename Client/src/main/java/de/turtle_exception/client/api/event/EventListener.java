@@ -11,6 +11,8 @@ import de.turtle_exception.client.api.event.entities.form.template_form.Template
 import de.turtle_exception.client.api.event.entities.form.text_element.*;
 import de.turtle_exception.client.api.event.entities.group.*;
 import de.turtle_exception.client.api.event.entities.json_resource.*;
+import de.turtle_exception.client.api.event.entities.messages.attachment.AttachmentCreateEvent;
+import de.turtle_exception.client.api.event.entities.messages.attachment.AttachmentDeleteEvent;
 import de.turtle_exception.client.api.event.entities.messages.discord_channel.*;
 import de.turtle_exception.client.api.event.entities.messages.minecraft_channel.*;
 import de.turtle_exception.client.api.event.entities.messages.sync_channel.*;
@@ -117,6 +119,10 @@ public abstract class EventListener {
     public void onTextElementUpdateContent(@NotNull TextElementUpdateContentEvent event) { }
 
     /* - MESSAGES - */
+
+    // Attachment Events
+    public void onAttachmentCreate(@NotNull AttachmentCreateEvent event) { }
+    public void onAttachmentDelete(@NotNull AttachmentDeleteEvent event) { }
 
     // DiscordChannel Events
     public void onDiscordChannelCreate(@NotNull DiscordChannelCreateEvent event) { }

@@ -4,15 +4,11 @@ import de.turtle_exception.client.api.entities.Turtle;
 import de.turtle_exception.client.api.entities.User;
 import de.turtle_exception.client.api.entities.attributes.MessageFormat;
 import de.turtle_exception.client.api.request.Action;
-import de.turtle_exception.client.internal.Provider;
-import de.turtle_exception.client.internal.data.annotations.Key;
-import de.turtle_exception.client.internal.data.annotations.Keys;
-import de.turtle_exception.client.internal.data.annotations.Resource;
-import de.turtle_exception.client.internal.data.annotations.Types;
+import de.turtle_exception.client.internal.data.annotations.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.concurrent.CompletableFuture;
+import java.util.List;
 
 /**
  * A synchronized message that originates from an {@link IChannel} and will be shared with all other
@@ -190,5 +186,23 @@ public interface SyncMessage extends Turtle {
         return this.modifySource(source.getId());
     }
 
-    // TODO: attachments, recipients
+    @Key(name = Keys.Messages.SyncMessage.ATTACHMENTS, relation = Relation.ONE_TO_MANY, sqlType = Types.Messages.SyncMessage.ATTACHMENTS)
+    @Relational(table = "message_attachments", self = "message", foreign = "attachment", type = Long.class)
+    @NotNull List<Long> getAttachmentIds();
+
+    default @NotNull List<Attachment> getAttachments() {
+        return this.getClient().getTurtles(Attachment.class, this.getAttachmentIds());
+    }
+
+    @NotNull Action<SyncMessage> addAttachment(long attachment);
+
+    default @NotNull Action<SyncMessage> addAttachment(@NotNull Attachment attachment) {
+        return this.addAttachment(attachment.getId());
+    }
+
+    @NotNull Action<SyncMessage> removeAttachment(long attachment);
+
+    default @NotNull Action<SyncMessage> removeAttachment(@NotNull Attachment attachment) {
+        return this.removeAttachment(attachment.getId());
+    }
 }

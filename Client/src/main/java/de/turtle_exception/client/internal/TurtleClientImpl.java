@@ -12,10 +12,7 @@ import de.turtle_exception.client.api.event.EventManager;
 import de.turtle_exception.client.api.request.Action;
 import de.turtle_exception.client.api.request.entities.*;
 import de.turtle_exception.client.api.request.entities.form.*;
-import de.turtle_exception.client.api.request.entities.messages.DiscordChannelAction;
-import de.turtle_exception.client.api.request.entities.messages.MinecraftChannelAction;
-import de.turtle_exception.client.api.request.entities.messages.SyncChannelAction;
-import de.turtle_exception.client.api.request.entities.messages.SyncMessageAction;
+import de.turtle_exception.client.api.request.entities.messages.*;
 import de.turtle_exception.client.internal.data.ResourceBuilder;
 import de.turtle_exception.client.internal.data.annotations.Keys;
 import de.turtle_exception.client.internal.entities.TurtleImpl;
@@ -25,10 +22,7 @@ import de.turtle_exception.client.internal.net.NetworkProvider;
 import de.turtle_exception.client.internal.request.actions.SimpleAction;
 import de.turtle_exception.client.internal.request.actions.entities.*;
 import de.turtle_exception.client.internal.request.actions.entities.form.*;
-import de.turtle_exception.client.internal.request.actions.entities.messages.DiscordChannelActionImpl;
-import de.turtle_exception.client.internal.request.actions.entities.messages.MinecraftChannelActionImpl;
-import de.turtle_exception.client.internal.request.actions.entities.messages.SyncChannelActionImpl;
-import de.turtle_exception.client.internal.request.actions.entities.messages.SyncMessageActionImpl;
+import de.turtle_exception.client.internal.request.actions.entities.messages.*;
 import de.turtle_exception.client.internal.util.TurtleSet;
 import de.turtle_exception.client.internal.util.version.IllegalVersionException;
 import de.turtle_exception.client.internal.util.version.Version;
@@ -273,6 +267,11 @@ public class TurtleClientImpl implements TurtleClient {
     }
 
     // MESSAGES
+
+    @Override
+    public @NotNull AttachmentAction createAttachment() {
+        return new AttachmentActionImpl(this.provider);
+    }
 
     @Override
     public @NotNull DiscordChannelAction createDiscordChannel() {

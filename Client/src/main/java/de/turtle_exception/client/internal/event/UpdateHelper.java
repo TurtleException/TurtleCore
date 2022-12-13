@@ -3,10 +3,7 @@ package de.turtle_exception.client.internal.event;
 import de.turtle_exception.client.api.entities.*;
 import de.turtle_exception.client.api.entities.attributes.EphemeralType;
 import de.turtle_exception.client.api.entities.form.*;
-import de.turtle_exception.client.api.entities.messages.DiscordChannel;
-import de.turtle_exception.client.api.entities.messages.MinecraftChannel;
-import de.turtle_exception.client.api.entities.messages.SyncChannel;
-import de.turtle_exception.client.api.entities.messages.SyncMessage;
+import de.turtle_exception.client.api.entities.messages.*;
 import de.turtle_exception.client.api.event.entities.EphemeralEntityEvent;
 import de.turtle_exception.client.api.event.entities.form.completed_form.CompletedFormCreateEvent;
 import de.turtle_exception.client.api.event.entities.form.completed_form.CompletedFormDeleteEvent;
@@ -24,11 +21,16 @@ import de.turtle_exception.client.api.event.entities.group.GroupMemberJoinEvent;
 import de.turtle_exception.client.api.event.entities.group.GroupMemberLeaveEvent;
 import de.turtle_exception.client.api.event.entities.json_resource.JsonResourceCreateEvent;
 import de.turtle_exception.client.api.event.entities.json_resource.JsonResourceDeleteEvent;
+import de.turtle_exception.client.api.event.entities.messages.attachment.AttachmentCreateEvent;
+import de.turtle_exception.client.api.event.entities.messages.attachment.AttachmentDeleteEvent;
 import de.turtle_exception.client.api.event.entities.messages.discord_channel.DiscordChannelCreateEvent;
 import de.turtle_exception.client.api.event.entities.messages.discord_channel.DiscordChannelDeleteEvent;
 import de.turtle_exception.client.api.event.entities.messages.minecraft_channel.MinecraftChannelCreateEvent;
 import de.turtle_exception.client.api.event.entities.messages.minecraft_channel.MinecraftChannelDeleteEvent;
-import de.turtle_exception.client.api.event.entities.messages.sync_channel.*;
+import de.turtle_exception.client.api.event.entities.messages.sync_channel.SyncChannelCreateEvent;
+import de.turtle_exception.client.api.event.entities.messages.sync_channel.SyncChannelDeleteEvent;
+import de.turtle_exception.client.api.event.entities.messages.sync_message.SyncMessageAttachmentAddEvent;
+import de.turtle_exception.client.api.event.entities.messages.sync_message.SyncMessageAttachmentRemoveEvent;
 import de.turtle_exception.client.api.event.entities.messages.sync_message.SyncMessageCreateEvent;
 import de.turtle_exception.client.api.event.entities.messages.sync_message.SyncMessageDeleteEvent;
 import de.turtle_exception.client.api.event.entities.project.ProjectCreateEvent;
@@ -37,7 +39,6 @@ import de.turtle_exception.client.api.event.entities.project.ProjectMemberJoinEv
 import de.turtle_exception.client.api.event.entities.project.ProjectMemberLeaveEvent;
 import de.turtle_exception.client.api.event.entities.ticket.*;
 import de.turtle_exception.client.api.event.entities.user.*;
-import de.turtle_exception.client.internal.util.TurtleSet;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -79,6 +80,8 @@ public class UpdateHelper {
             turtle.getClient().getEventManager().handleEvent(new TextElementCreateEvent(element));
 
         // MESSAGES
+        if (turtle instanceof Attachment attachment)
+            turtle.getClient().getEventManager().handleEvent(new AttachmentCreateEvent(attachment));
         if (turtle instanceof DiscordChannel discordChannel)
             turtle.getClient().getEventManager().handleEvent(new DiscordChannelCreateEvent(discordChannel));
         if (turtle instanceof MinecraftChannel minecraftChannel)
@@ -114,6 +117,8 @@ public class UpdateHelper {
             turtle.getClient().getEventManager().handleEvent(new TextElementDeleteEvent(element));
 
         // MESSAGES
+        if (turtle instanceof Attachment attachment)
+            turtle.getClient().getEventManager().handleEvent(new AttachmentDeleteEvent(attachment));
         if (turtle instanceof DiscordChannel discordChannel)
             turtle.getClient().getEventManager().handleEvent(new DiscordChannelDeleteEvent(discordChannel));
         if (turtle instanceof MinecraftChannel minecraftChannel)
@@ -190,5 +195,17 @@ public class UpdateHelper {
             user.getClient().getEventManager().handleEvent(new UserMinecraftAddEvent(user, newMinecraft));
         for (UUID oldMinecraft : removed)
             user.getClient().getEventManager().handleEvent(new UserMinecraftRemoveEvent(user, oldMinecraft));
+    }
+
+    /* - SYNC_MESSAGE - */
+
+    public static void ofSyncMessageAttachments(@NotNull SyncMessage message, @NotNull List<Long> oldAttachments, @NotNull List<Long> newAttachments) {
+        List<Long> added   = newAttachments.stream().filter(attachment -> !oldAttachments.contains(attachment)).toList();
+        List<Long> removed = oldAttachments.stream().filter(attachment -> !newAttachments.contains(attachment)).toList();
+
+        for (Long newAttachment : added)
+            message.getClient().getEventManager().handleEvent(new SyncMessageAttachmentAddEvent(message, newAttachment));
+        for (Long oldAttachment : removed)
+            message.getClient().getEventManager().handleEvent(new SyncMessageAttachmentRemoveEvent(message, oldAttachment));
     }
 }

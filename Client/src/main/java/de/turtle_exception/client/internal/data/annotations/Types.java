@@ -52,6 +52,19 @@ public class Types {
     }
 
     public static class Messages {
+        public static class Attachment {
+            public static final String SNOWFLAKE    = Templates.SNOWFLAKE;
+            public static final String URL          = "TEXT";
+            public static final String PROXY_URL    = "TEXT";
+            public static final String FILE_NAME    = "TEXT";
+            public static final String CONTENT_TYPE = "TEXT";
+            public static final String DESCRIPTION  = "TEXT";
+            public static final String SIZE         = "BIGINT";
+            public static final String HEIGHT       = "INT";
+            public static final String WIDTH        = "INT";
+            public static final String EPHEMERAL    = "BOOLEAN";
+        }
+
         public static class DiscordChannel {
             public static final String SNOWFLAKE = Templates.SNOWFLAKE;
         }
@@ -66,12 +79,13 @@ public class Types {
         }
 
         public static class SyncMessage {
-            public static final String FORMAT    = "TINYINT";
-            public static final String AUTHOR    = Turtle.ID;
-            public static final String CONTENT   = "TEXT";
-            public static final String REFERENCE = Turtle.ID;
-            public static final String CHANNEL   = Turtle.ID;
-            public static final String SOURCE    = Turtle.ID;
+            public static final String FORMAT      = "TINYINT";
+            public static final String AUTHOR      = Turtle.ID;
+            public static final String CONTENT     = "TEXT";
+            public static final String REFERENCE   = Turtle.ID;
+            public static final String CHANNEL     = Turtle.ID;
+            public static final String SOURCE      = Turtle.ID;
+            public static final String ATTACHMENTS = Turtle.ID;
         }
     }
 

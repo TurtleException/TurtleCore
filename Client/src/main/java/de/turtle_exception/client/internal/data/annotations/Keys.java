@@ -47,6 +47,19 @@ public class Keys {
     }
 
     public static class Messages {
+        public static class Attachment {
+            public static final String SNOWFLAKE    = "snowflake";
+            public static final String URL          = "url";
+            public static final String PROXY_URL    = "proxy_url";
+            public static final String FILE_NAME    = "file_name";
+            public static final String CONTENT_TYPE = "content_type";
+            public static final String DESCRIPTION  = "description";
+            public static final String SIZE         = "size";
+            public static final String HEIGHT       = "height";
+            public static final String WIDTH        = "width";
+            public static final String EPHEMERAL    = "BOOLEAN";
+        }
+
         public static class DiscordChannel {
             public static final String SNOWFLAKE = "snowflake";
         }
@@ -66,12 +79,13 @@ public class Keys {
         }
 
         public static class SyncMessage {
-            public static final String FORMAT    = "format";
-            public static final String AUTHOR    = "author";
-            public static final String CONTENT   = "content";
-            public static final String REFERENCE = "reference";
-            public static final String CHANNEL   = "channel";
-            public static final String SOURCE    = "source";
+            public static final String FORMAT      = "format";
+            public static final String AUTHOR      = "author";
+            public static final String CONTENT     = "content";
+            public static final String REFERENCE   = "reference";
+            public static final String CHANNEL     = "channel";
+            public static final String SOURCE      = "source";
+            public static final String ATTACHMENTS = "attachments";
         }
     }
 

@@ -9,10 +9,7 @@ import de.turtle_exception.client.api.event.EventManager;
 import de.turtle_exception.client.api.request.Action;
 import de.turtle_exception.client.api.request.entities.*;
 import de.turtle_exception.client.api.request.entities.form.*;
-import de.turtle_exception.client.api.request.entities.messages.DiscordChannelAction;
-import de.turtle_exception.client.api.request.entities.messages.MinecraftChannelAction;
-import de.turtle_exception.client.api.request.entities.messages.SyncChannelAction;
-import de.turtle_exception.client.api.request.entities.messages.SyncMessageAction;
+import de.turtle_exception.client.api.request.entities.messages.*;
 import de.turtle_exception.client.internal.NetworkAdapter;
 import de.turtle_exception.client.internal.Provider;
 import de.turtle_exception.client.internal.net.NetClient;
@@ -319,6 +316,25 @@ public interface TurtleClient extends TurtleContainer<Turtle> {
     }
 
     // MESSAGES
+
+    /**
+     * Returns an immutable List of all cached {@link Attachment} objects.
+     * @return List of cached Attachments.
+     */
+    default @NotNull List<Attachment> getAttachments() {
+        return this.getTurtles(Attachment.class);
+    }
+
+    /**
+     * Returns a single {@link Attachment} specified by its id, or {@code null} if no such object is stored in the
+     * underlying cache.
+     * @param id The unique id of the Attachment.
+     * @return The requested Attachment (may be {@code null}).
+     * @see Attachment#getId()
+     */
+    default @Nullable Attachment getAttachmentById(long id) {
+        return this.getTurtleById(id, Attachment.class);
+    }
 
     /**
      * Returns an immutable List of all cached {@link DiscordChannel} objects.
@@ -639,6 +655,27 @@ public interface TurtleClient extends TurtleContainer<Turtle> {
     // MESSAGE
 
     /**
+     * Creates an Action with the Provider request to retrieve all available {@link Attachment Attachments}.
+     * <p> If the operation is successful, the retrieved Attachments will also be put into cache, if not already present.
+     * @return Action that provides the List of {@link Attachment Attachments} on completion.
+     * @see TurtleClient#getAttachments()
+     */
+    default @NotNull Action<List<Attachment>> retrieveAttachments() {
+        return this.retrieveTurtles(Attachment.class);
+    }
+
+    /**
+     * Creates an Action with the Provider request to retrieve a {@link Attachment} specified by its id.
+     * <p> If the operation is successful, the Attachment will also be put into cache, if not already present.
+     * @return Action that provides the {@link Attachment} on completion.
+     * @see TurtleClient#getAttachmentById(long)
+     * @see Attachment#update()
+     */
+    default @NotNull Action<Attachment> retrieveAttachment(long id) {
+        return this.retrieveTurtle(id, Attachment.class);
+    }
+
+    /**
      * Creates an Action with the Provider request to retrieve all available {@link DiscordChannel DiscordChannels}.
      * <p> If the operation is successful, the retrieved Channels will also be put into cache, if not already present.
      * @return Action that provides the List of {@link DiscordChannel DiscordChannels} on completion.
@@ -810,6 +847,15 @@ public interface TurtleClient extends TurtleContainer<Turtle> {
     @NotNull TextElementAction createTextElement();
 
     // MESSAGES
+
+    /**
+     * Creates an Action with the Provider request to create a new {@link Attachment}. The returned
+     * {@link AttachmentAction} may be used to modify the request and to set each required field. If any required
+     * field is missing the server will reject the request and respond with an error.
+     * <p> If the operation is successful, the created Attachment will also be put into cache, if not already present.
+     * @return Action that provides the newly crated {@link DiscordChannel} on completion.
+     */
+    @NotNull AttachmentAction createAttachment();
 
     /**
      * Creates an Action with the Provider request to create a new {@link DiscordChannel}. The returned
