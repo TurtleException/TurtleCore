@@ -85,7 +85,7 @@ public class NetServer extends NetworkAdapter {
                         throw e;
                     return;
                 }
-                getLogger().log(Level.FINE, "New socket connection: " + client.getInetAddress().toString());
+                getLogger().log(Level.FINE, "New socket connection: " + client.getInetAddress().toString() + ":" + client.getPort());
 
                 try {
                     Handshake handshake  = new ServerHandshake(this);

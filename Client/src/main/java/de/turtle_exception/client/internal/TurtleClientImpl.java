@@ -159,8 +159,6 @@ public class TurtleClientImpl implements TurtleClient {
         return this.provider;
     }
 
-    // TODO: don't
-    // note: this will create a deadlock when using a DatabaseProvider
     @Override
     public @NotNull Action<Void> invalidateCaches(boolean retrieve) {
         return new SimpleAction<>(provider, () -> {
@@ -176,11 +174,15 @@ public class TurtleClientImpl implements TurtleClient {
 
         if (retrieve) {
             for (Class<? extends Turtle> type : this.retrievableTypes) {
-                this.retrieveTurtles(type).complete();
+                try {
+                    this.retrieveTurtles(type).getCallable().call();
+                } catch (Exception e) {
+                    this.logger.log(Level.WARNING, "Encountered an unexpected exception when retrieving turtles of type " + type.getSimpleName() + ".", e);
+                }
             }
         }
 
-        this.logger.log(Level.INFO, "Cached invalidated: Removed " + turtles + " entities, retrieved " + this.cache.size() + " entities. (" + this.retrievableTypes.size() + " resources)");
+        this.logger.log(Level.INFO, "Caches invalidated: Removed " + turtles + " entities, retrieved " + this.cache.size() + " entities. (" + this.retrievableTypes.size() + " resources)");
     }
 
     /**
@@ -203,7 +205,7 @@ public class TurtleClientImpl implements TurtleClient {
 
     /* - - - */
 
-    public <T extends Turtle> @NotNull Action<List<T>> retrieveTurtles(@NotNull Class<T> type) {
+    public <T extends Turtle> @NotNull ActionImpl<List<T>> retrieveTurtles(@NotNull Class<T> type) {
         return provider.get(type).andThenParseList(type).onSuccess(l -> {
             cache.removeAll(type);
             for (T t : l) {
@@ -215,7 +217,7 @@ public class TurtleClientImpl implements TurtleClient {
         });
     }
 
-    public <T extends Turtle> @NotNull Action<T> retrieveTurtle(long id, @NotNull Class<T> type) {
+    public <T extends Turtle> @NotNull ActionImpl<T> retrieveTurtle(long id, @NotNull Class<T> type) {
         return provider.get(type, id).andThenParse(type).onSuccess(t -> {
             cache.removeById(id);
 

@@ -25,13 +25,13 @@ import java.util.logging.Level;
 // TODO: reverse applied changes if an operation fails
 public class SQLProvider extends DatabaseProvider {
     private static final String STMT_DELETE_RESOURCE  = "DELETE FROM `%s` WHERE `" + Keys.Turtle.ID + "` = ?;";
-    private static final String STMT_DELETE_REFERENCE = "DELETE FROM `%s` WHERE ? = ?;";
+    private static final String STMT_DELETE_REFERENCE = "DELETE FROM `%s` WHERE `%s` = ?;";
     private static final String STMT_GET_RESOURCE  = "SELECT * FROM `%s` WHERE `" + Keys.Turtle.ID + "` = ?;";
-    private static final String STMT_GET_REFERENCE = "SELECT * FROM `%s` WHERE ? = ?;";
+    private static final String STMT_GET_REFERENCE = "SELECT * FROM `%s` WHERE `%s` = ?;";
     private static final String STMT_GET_ALL = "SELECT `" + Keys.Turtle.ID + "` FROM %s;";
     private static final String TEMPLATE_INSERT = "INSERT INTO `{0}` ({1}) VALUES ({2});";
     private static final String TEMPLATE_UPDATE = "UPDATE `{0}` SET `{1}` WHERE `" + Keys.Turtle.ID + "` = ?;";
-    private static final String STMT_DELETE_ENTRY = "DELETE FROM `%s` WHERE ? = ? AND ? = ?;";
+    private static final String STMT_DELETE_ENTRY = "DELETE FROM `%s` WHERE `%s` = ? AND `%s` = ?;";
 
     private final String host;
     private final int    port;
@@ -95,9 +95,8 @@ public class SQLProvider extends DatabaseProvider {
             String rTable = relAnnotation.table();
             String rName1 = relAnnotation.self();
 
-            try (PreparedStatement statement = connection.prepareStatement(STMT_DELETE_REFERENCE.formatted(rTable))) {
-                statement.setString(1, rName1);
-                statement.setLong(2, id);
+            try (PreparedStatement statement = connection.prepareStatement(STMT_DELETE_REFERENCE.formatted(rTable, rName1))) {
+                statement.setLong(1, id);
                 statement.executeUpdate();
             }
         }
@@ -152,9 +151,8 @@ public class SQLProvider extends DatabaseProvider {
             String rName1 = relAnnotation.self();
             String rName2 = relAnnotation.foreign();
 
-            try (PreparedStatement statement = connection.prepareStatement(STMT_GET_REFERENCE.formatted(rTable))) {
-                statement.setString(1, rName1);
-                statement.setLong(2, id);
+            try (PreparedStatement statement = connection.prepareStatement(STMT_GET_REFERENCE.formatted(rTable, rName1))) {
+                statement.setLong(1, id);
 
                 ResultSet result = statement.executeQuery();
 
@@ -242,10 +240,10 @@ public class SQLProvider extends DatabaseProvider {
                 try (PreparedStatement statement = connection.prepareStatement(refStmt)) {
                     statement.executeUpdate();
                 } catch (SQLException e) {
-                    if (e.getErrorCode() == 0) {
-                        // TODO: delete entity?
-                        throw new IllegalArgumentException(/* TODO */);
-                    }
+                    switch (e.getErrorCode()) {
+                        case 1062, 1586 -> logger.log(Level.WARNING, "Duplicate key '" + refKey.name() + "' on resource '" + type.getSimpleName() + "' for entry: " + entry);
+                        default -> throw e;
+                    };
                 }
             }
         }
@@ -311,11 +309,9 @@ public class SQLProvider extends DatabaseProvider {
     }
 
     private void doPatchEntryDelete(Relational annotation, long id, Object val) throws SQLException {
-        try (PreparedStatement statement = connection.prepareStatement(STMT_DELETE_ENTRY.formatted(annotation.table()))) {
-            statement.setString(1, annotation.self());
-            statement.setLong(2, id);
-            statement.setString(3, annotation.foreign());
-            statement.setObject(4, val);
+        try (PreparedStatement statement = connection.prepareStatement(STMT_DELETE_ENTRY.formatted(annotation.table(), annotation.self(), annotation.foreign()))) {
+            statement.setLong(1, id);
+            statement.setObject(2, val);
 
             statement.executeUpdate();
         }

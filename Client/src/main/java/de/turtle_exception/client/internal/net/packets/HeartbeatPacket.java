@@ -38,7 +38,7 @@ public class HeartbeatPacket extends Packet {
         this.time3 = MathUtil.bytesToLong(receivedBytes, 16);
         this.time4 = MathUtil.bytesToLong(receivedBytes, 22);
 
-        this.stage = getState(time1, time2, time3, time4);
+        this.stage = getState(time1, time2, time3);
 
         // update timings
         if (stage == Stage.SEND)
@@ -58,7 +58,7 @@ public class HeartbeatPacket extends Packet {
         this.time3 = time3;
         this.time4 = 0;
 
-        this.stage = getState(time1, time2, time3, 0);
+        this.stage = getState(time1, time2, time3);
     }
 
     @Override
@@ -71,17 +71,14 @@ public class HeartbeatPacket extends Packet {
         return bytes;
     }
 
-    private static @NotNull Stage getState(long time1, long time2, long time3, long time4) throws IllegalStateException {
+    private static @NotNull Stage getState(long time1, long time2, long time3) throws IllegalStateException {
         if (time1 == 0)
             return Stage.SEND;
         else if (time2 == 0)
             return Stage.ACK_CLIENT;
         else if (time3 == 0)
             return Stage.ACK_SERVER;
-        else if (time4 == 0)
-            return Stage.RECEIVE;
-        else
-            throw new IllegalStateException("Heartbeat may not go past state RECEIVE");
+        return Stage.RECEIVE;
     }
 
     public @NotNull Stage getStage() {
@@ -106,8 +103,8 @@ public class HeartbeatPacket extends Packet {
     }
 
     public @NotNull HeartbeatPacket buildResponse() throws IllegalStateException {
-        if (stage != Stage.SEND && stage != Stage.ACK_CLIENT)
-            throw new IllegalStateException("Unable to respond to a heartbeat that is not in stage SEND or ACK_CLIENT");
+        if (stage == Stage.RECEIVE)
+            throw new IllegalStateException("Unable to respond to a heartbeat that is in stage RECEIVE");
 
         // keep the deadline from the initial packet
         return new HeartbeatPacket(deadline, connection, responseCode, time1, time2, time3);

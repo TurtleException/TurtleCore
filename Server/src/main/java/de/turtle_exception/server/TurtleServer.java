@@ -130,6 +130,8 @@ public class TurtleServer {
 
         logger.log(Level.INFO, "Shutting down...");
 
+        // TODO: write to db (?)
+
         logger.log(Level.INFO, "Stopping TurtleClient...");
         this.turtleClient.shutdown();
 

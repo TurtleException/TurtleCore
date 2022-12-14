@@ -49,7 +49,7 @@ public class Connection {
         this.status = Status.INIT;
 
         this.adapter = adapter;
-        this.logger = new NestedLogger("CON#" + socket.getInetAddress() + ":" + socket.getPort(), adapter.getLogger());
+        this.logger = new NestedLogger("CON" + socket.getInetAddress() + ":" + socket.getPort(), adapter.getLogger());
 
         this.requestCallbacks = new RequestCallbackPool(adapter.getClient().getTimeoutOutbound(), logger);
 

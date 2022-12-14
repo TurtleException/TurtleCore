@@ -39,7 +39,7 @@ public class TurtleClientBuilder {
 
     private @Nullable Logger logger;
 
-    private boolean autoFillCache;
+    private boolean autoFillCache = true;
 
     /* THIRD PARTY SERVICES */
     private @Nullable Server spigot;
