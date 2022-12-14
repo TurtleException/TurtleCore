@@ -90,7 +90,7 @@ public interface User extends Turtle {
      * Provides a List of snowflake ids that each represent a Discord user this User is linked to (exclusively).
      * @return List of snowflake ids.
      */
-    @Key(name = Keys.User.DISCORD, relation = Relation.ONE_TO_MANY, sqlType = Types.User.DISCORD)
+    @Key(name = Keys.User.DISCORD, relation = Relation.ONE_TO_MANY, sqlType = Types.User.DISCORD, unique = true)
     @Relational(table = "user_discord", self = "user", foreign = "discord", type = Long.class)
     @NotNull List<Long> getDiscordIds();
 
@@ -156,7 +156,7 @@ public interface User extends Turtle {
      * Provides a List of {@link UUID UUIDs} that each represent a Minecraft account this User is linked to (exclusively).
      * @return List of {@link UUID UUIDs}.
      */
-    @Key(name = Keys.User.MINECRAFT, relation = Relation.ONE_TO_MANY, sqlType = Types.User.MINECRAFT)
+    @Key(name = Keys.User.MINECRAFT, relation = Relation.ONE_TO_MANY, sqlType = Types.User.MINECRAFT, unique = true)
     @Relational(table = "user_minecraft", self = "user", foreign = "minecraft", type = UUID.class)
     @NotNull List<UUID> getMinecraftIds();
 

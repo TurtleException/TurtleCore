@@ -117,7 +117,7 @@ public class Types {
         public static final String STATE           = "TINYINT(4)";
         public static final String TITLE           = "TINYTEXT";
         public static final String CATEGORY        = "TINYTEXT";
-        public static final String TAGS            = "TINYTEXT";
+        public static final String TAGS            = "VARCHAR(64)";
         public static final String DISCORD_CHANNEL = Templates.SNOWFLAKE;
         public static final String USERS           = Turtle.ID;
     }

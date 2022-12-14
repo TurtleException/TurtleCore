@@ -28,4 +28,6 @@ public @interface Key {
 
     /** String representation of the SQL data type. */
     String sqlType();
+
+    boolean unique() default false;
 }

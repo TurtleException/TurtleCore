@@ -80,8 +80,9 @@ public class ServerCLI {
                     out.println("Too few arguments! Append [true|false] to indicate refill.");
                     return;
                 }
-                server.getClient().invalidateCaches(Boolean.parseBoolean(args[0]));
-                out.println("Caches invalidated!");
+                server.getClient().invalidateCaches(Boolean.parseBoolean(args[0])).queue(v -> {
+                    out.println("Caches invalidated!");
+                });
             });
         else if (StringUtil.startsWith(low, "adduser", "addlogin"))
             this.execute(input, args -> {

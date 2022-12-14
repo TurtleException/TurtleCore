@@ -53,7 +53,7 @@ public interface Action<T> {
      * @param success Consumer that accepts successful result.
      */
     default void queue(@Nullable Consumer<T> success) {
-        this.queue(null, null);
+        this.queue(success, null);
     }
 
     /**

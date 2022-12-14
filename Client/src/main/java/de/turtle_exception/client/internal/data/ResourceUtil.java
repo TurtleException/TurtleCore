@@ -66,8 +66,8 @@ public class ResourceUtil {
         }
     }
 
-    public static Object getValue(@NotNull JsonPrimitive json) {
-        if (json.isJsonNull()) {
+    public static Object getValue(JsonPrimitive json) {
+        if (json == null || json.isJsonNull()) {
             return null;
         } else if (json.isBoolean()) {
             return json.getAsBoolean();

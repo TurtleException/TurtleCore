@@ -27,7 +27,7 @@ public class SimpleFormatter extends Formatter {
                 .append("\n");
 
         if (record.getThrown() != null) {
-            str.append(" ".repeat(time.length() + 2)).append(record.getLevel().getName()).append("   ").append(record.getThrown().toString()).append("\n");
+            str.append(" ".repeat(time.length() + 2)).append(level).append("   ").append(record.getThrown().toString()).append("\n");
 
             StackTraceElement[] stackTrace = record.getThrown().getStackTrace();
             for (StackTraceElement stackTraceElement : stackTrace) {

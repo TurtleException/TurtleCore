@@ -159,6 +159,7 @@ public class TurtleClientImpl implements TurtleClient {
         return this.provider;
     }
 
+    // TODO: don't
     // note: this will create a deadlock when using a DatabaseProvider
     @Override
     public @NotNull Action<Void> invalidateCaches(boolean retrieve) {
@@ -169,6 +170,8 @@ public class TurtleClientImpl implements TurtleClient {
     }
 
     private synchronized void doInvalidateCaches(boolean retrieve) {
+        int turtles = this.cache.size();
+
         this.cache.clear();
 
         if (retrieve) {
@@ -176,6 +179,8 @@ public class TurtleClientImpl implements TurtleClient {
                 this.retrieveTurtles(type).complete();
             }
         }
+
+        this.logger.log(Level.INFO, "Cached invalidated: Removed " + turtles + " entities, retrieved " + this.cache.size() + " entities. (" + this.retrievableTypes.size() + " resources)");
     }
 
     /**

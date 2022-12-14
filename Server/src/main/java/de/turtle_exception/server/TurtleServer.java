@@ -76,11 +76,28 @@ public class TurtleServer {
     public void run() throws Exception {
         statusView.set(StatusView.INIT);
 
-        logger.log(Level.INFO, "Initializing TurtleClient...");
+        logger.log(Level.INFO, "Preparing initialization...");
+
+        SQLProvider sqlProvider;
+        try {
+            sqlProvider = new SQLProvider(config);
+        } catch (NullPointerException e) {
+            logger.log(Level.SEVERE, "Missing at least one SQL attribute!");
+            logger.log(Level.SEVERE, "Please make sure you have sql.host, sql.port, sql.database, sql.user and sql.pass set to non-null values!");
+            System.exit(1);
+            return;
+        } catch (NumberFormatException e) {
+            logger.log(Level.SEVERE, "Illegal SQL port: " + config.getProperty("sql.port"), e);
+            System.exit(1);
+            return;
+        }
+
         NetServer netServer = new NetServer(this, getPort());
+
+        logger.log(Level.INFO, "Initializing TurtleClient...");
         this.turtleClient = new TurtleClientBuilder()
                 .setNetworkAdapter(netServer)
-                .setProvider(new SQLProvider(config))
+                .setProvider(sqlProvider)
                 .setLogger(new NestedLogger("TurtleClient", logger))
                 .addListeners(new EntityUpdateListener(netServer))
                 .setAutoFillCache(true)

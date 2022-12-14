@@ -94,7 +94,7 @@ public class FilesystemProvider extends DatabaseProvider {
     protected @Nullable JsonObject doPut(@NotNull Class<? extends Turtle> type, @NotNull JsonObject data) throws AnnotationFormatError {
         Resource annotation = ResourceUtil.getResourceAnnotation(type);
 
-        long id = TurtleUtil.newId(TurtleType.ofResource(type));
+        long id = TurtleUtil.newId(TurtleType.RESOURCE);
         data.addProperty(Keys.Turtle.ID, id);
 
         File file = getFile(annotation, id);

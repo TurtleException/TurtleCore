@@ -221,11 +221,13 @@ public class NetServer extends NetworkAdapter {
 
         getLogger().log(Level.FINER, "PUT request for turtle of type " + type.getSimpleName());
 
-        Turtle turtle = getClientImpl().updateTurtle(type, content);
+        getClient().getProvider().put(type, content).queue(json -> {
+            Turtle turtle = getClientImpl().updateTurtle(type, json);
 
-        // TODO: check for used discord / minecraft / ...
-
-        notifyClients(packet, Data.buildUpdate(type, getClientImpl().getResourceBuilder().buildJson(turtle)));
+            notifyClients(packet, Data.buildUpdate(type, getClientImpl().getResourceBuilder().buildJson(turtle)));
+        }, throwable -> {
+            respond(packet, "Could not create entity: " + throwable.getMessage(), throwable);
+        });
     }
 
     private void handlePatch(@NotNull DataPacket packet) {

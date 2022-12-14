@@ -1,5 +1,6 @@
 package de.turtle_exception.server.data;
 
+import com.google.common.collect.Lists;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -10,6 +11,8 @@ import de.turtle_exception.client.internal.data.annotations.*;
 import de.turtle_exception.client.internal.data.annotations.Types;
 import de.turtle_exception.client.internal.util.AnnotationUtil;
 import de.turtle_exception.client.internal.util.StringUtil;
+import de.turtle_exception.client.internal.util.time.TurtleType;
+import de.turtle_exception.client.internal.util.time.TurtleUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Method;
@@ -21,14 +24,14 @@ import java.util.logging.Level;
 // TODO: simplify (reduce duplicate code)
 // TODO: reverse applied changes if an operation fails
 public class SQLProvider extends DatabaseProvider {
-    private static final String STMT_DELETE_RESOURCE  = "DELETE FROM `?` WHERE `?` = '?';";
-    private static final String STMT_DELETE_REFERENCE = "DELETE FROM `?` WHERE `" + Keys.Turtle.ID + "` = '?';";
-    private static final String STMT_GET_RESOURCE  = "SELECT * FROM `?` WHERE `" + Keys.Turtle.ID + "` = '?';";
-    private static final String STMT_GET_REFERENCE = "SELECT * FROM `?` WHERE `?` = '?';";
-    private static final String STMT_GET_ALL = "SELECT `" + Keys.Turtle.ID + "` FROM `?`;";
-    private static final String TEMPLATE_INSERT = "INSERT INTO `?` ({0}) VALUES ({1});";
-    private static final String TEMPLATE_UPDATE = "UPDATE `?` SET {0} WHERE `" + Keys.Turtle.ID + "` = '?';";
-    private static final String STMT_DELETE_ENTRY = "DELETE FROM `?` WHERE `?` = '?' AND `?` = '?';";
+    private static final String STMT_DELETE_RESOURCE  = "DELETE FROM `%s` WHERE `" + Keys.Turtle.ID + "` = ?;";
+    private static final String STMT_DELETE_REFERENCE = "DELETE FROM `%s` WHERE ? = ?;";
+    private static final String STMT_GET_RESOURCE  = "SELECT * FROM `%s` WHERE `" + Keys.Turtle.ID + "` = ?;";
+    private static final String STMT_GET_REFERENCE = "SELECT * FROM `%s` WHERE ? = ?;";
+    private static final String STMT_GET_ALL = "SELECT `" + Keys.Turtle.ID + "` FROM %s;";
+    private static final String TEMPLATE_INSERT = "INSERT INTO `{0}` ({1}) VALUES ({2});";
+    private static final String TEMPLATE_UPDATE = "UPDATE `{0}` SET `{1}` WHERE `" + Keys.Turtle.ID + "` = ?;";
+    private static final String STMT_DELETE_ENTRY = "DELETE FROM `%s` WHERE ? = ? AND ? = ?;";
 
     private final String host;
     private final int    port;
@@ -49,7 +52,7 @@ public class SQLProvider extends DatabaseProvider {
         this.pass = pass;
     }
 
-    public SQLProvider(@NotNull Properties properties) {
+    public SQLProvider(@NotNull Properties properties) throws NullPointerException, NumberFormatException {
         this(
                 properties.getProperty("sql.host"),
                 Integer.parseInt(properties.getProperty("sql.port")),
@@ -82,27 +85,25 @@ public class SQLProvider extends DatabaseProvider {
 
         // handle references
         for (Key key : keys) {
-            if (key.relation() == Relation.ONE_TO_ONE) continue;
+            if (!key.relation().isExt()) continue;
 
             Relational relAnnotation = ResourceUtil.getRelationalAnnotation(type, key.name());
 
             if (relAnnotation == null)
-                throw new IllegalArgumentException("Illegal key: " + key);
+                throw new IllegalArgumentException("Illegal key for resource " + type.getSimpleName() + ": " + key);
 
             String rTable = relAnnotation.table();
             String rName1 = relAnnotation.self();
 
-            try (PreparedStatement statement = connection.prepareStatement(STMT_DELETE_REFERENCE)) {
-                statement.setString(1, rTable);
-                statement.setString(2, rName1);
-                statement.setLong(3, id);
+            try (PreparedStatement statement = connection.prepareStatement(STMT_DELETE_REFERENCE.formatted(rTable))) {
+                statement.setString(1, rName1);
+                statement.setLong(2, id);
                 statement.executeUpdate();
             }
         }
 
-        try (PreparedStatement statement = connection.prepareStatement(STMT_DELETE_RESOURCE)) {
-            statement.setString(1, table);
-            statement.setLong(2, id);
+        try (PreparedStatement statement = connection.prepareStatement(STMT_DELETE_RESOURCE.formatted(table))) {
+            statement.setLong(1, id);
             statement.executeUpdate();
         }
 
@@ -120,9 +121,8 @@ public class SQLProvider extends DatabaseProvider {
 
         JsonObject json = new JsonObject();
 
-        try (PreparedStatement statement = connection.prepareStatement(STMT_GET_RESOURCE)) {
-            statement.setString(1, table);
-            statement.setLong(2, id);
+        try (PreparedStatement statement = connection.prepareStatement(STMT_GET_RESOURCE.formatted(table))) {
+            statement.setLong(1, id);
 
             ResultSet result = statement.executeQuery();
 
@@ -130,7 +130,7 @@ public class SQLProvider extends DatabaseProvider {
                 throw new NullPointerException("Entry does not exist!");
 
             for (Key key : keys) {
-                if (key.relation() != Relation.ONE_TO_ONE) continue;
+                if (key.relation().isExt()) continue;
 
                 Object val = result.getObject(key.name());
                 ResourceUtil.addValue(json, key.name(), val);
@@ -139,12 +139,12 @@ public class SQLProvider extends DatabaseProvider {
 
         // handle references
         for (Key key : keys) {
-            if (key.relation() == Relation.ONE_TO_ONE) continue;
+            if (!key.relation().isExt()) continue;
 
             Relational relAnnotation = ResourceUtil.getRelationalAnnotation(type, key.name());
 
             if (relAnnotation == null)
-                throw new IllegalArgumentException("Illegal key: " + key);
+                throw new IllegalArgumentException("Illegal key for resource " + type.getSimpleName() + ": " + key);
 
             JsonArray arr = new JsonArray();
 
@@ -152,10 +152,9 @@ public class SQLProvider extends DatabaseProvider {
             String rName1 = relAnnotation.self();
             String rName2 = relAnnotation.foreign();
 
-            try (PreparedStatement statement = connection.prepareStatement(STMT_GET_REFERENCE)) {
-                statement.setString(1, rTable);
-                statement.setString(2, rName1);
-                statement.setLong(3, id);
+            try (PreparedStatement statement = connection.prepareStatement(STMT_GET_REFERENCE.formatted(rTable))) {
+                statement.setString(1, rName1);
+                statement.setLong(2, id);
 
                 ResultSet result = statement.executeQuery();
 
@@ -178,9 +177,7 @@ public class SQLProvider extends DatabaseProvider {
 
         JsonArray arr = new JsonArray();
 
-        try (PreparedStatement statement = connection.prepareStatement(STMT_GET_ALL)) {
-            statement.setString(1, table);
-
+        try (PreparedStatement statement = connection.prepareStatement(STMT_GET_ALL.formatted(table))) {
             ResultSet result = statement.executeQuery();
 
             while (result.next())
@@ -197,51 +194,58 @@ public class SQLProvider extends DatabaseProvider {
         Resource resourceAnnotation = ResourceUtil.getResourceAnnotation(type);
         String table = resourceAnnotation.path();
 
-        long id = content.get(Keys.Turtle.ID).getAsLong();
+        long id = TurtleUtil.newId(TurtleType.RESOURCE);
 
         List<Key> keys = ResourceUtil.getKeyAnnotations(type);
 
         List<String> keyStrings = keys.stream()
-                .filter(key -> key.relation() == Relation.ONE_TO_ONE)
-                .map(key1 -> "`" + key1.name() + "`")
+                .filter(key -> !key.relation().isExt())
+                .map(Key::name)
                 .toList();
         List<Object> valStrings = new ArrayList<>();
 
-        for (String keyString : keyStrings)
-            valStrings.add("'" + ResourceUtil.getValue((JsonPrimitive) content.get(keyString)) + "'");
+        for (String keyString : keyStrings) {
+            if (keyString.equals(Keys.Turtle.ID))
+                valStrings.add(id);
+            else
+                valStrings.add(ResourceUtil.getValue((JsonPrimitive) content.get(keyString)));
+        }
 
-        String sqlKeys = StringUtil.join(", ", keyStrings);
-        String sqlVals = StringUtil.join(", ", valStrings);
+        String sqlKeys = StringUtil.join(", ", keyStrings.stream().map(s -> "`" + s + "`").toList());
+        String sqlVals = StringUtil.join(", ", valStrings.stream().map(s -> "'" + s + "'").toList());
 
-        String stmt = MessageFormat.format(TEMPLATE_INSERT, sqlKeys, sqlVals);
+        String stmt = MessageFormat.format(TEMPLATE_INSERT, table, sqlKeys, sqlVals);
 
         try (PreparedStatement statement = connection.prepareStatement(stmt)) {
-            statement.setString(1, table);
             statement.executeUpdate();
         }
 
 
-        List<Key> refKeys = keys.stream().filter(key -> key.relation() != Relation.ONE_TO_ONE).toList();
+        List<Key> refKeys = keys.stream().filter(key -> key.relation().isExt()).toList();
 
         for (Key refKey : refKeys) {
             Relational relAnnotation = ResourceUtil.getRelationalAnnotation(type, refKey.name());
 
             if (relAnnotation == null)
-                throw new IllegalArgumentException("Illegal key: " + refKey);
+                throw new IllegalArgumentException("Illegal key for resource " + type.getSimpleName() + ": " + refKey);
 
             JsonArray arr = content.getAsJsonArray(refKey.name());
 
             for (JsonElement entry : arr) {
                 Object entryObj = ResourceUtil.getValue((JsonPrimitive) entry);
 
-                String refSqlKeys = relAnnotation.self() + "`, `" + relAnnotation.foreign();
-                String refSqlVals = id + "', '" + entryObj;
+                String refSqlKeys = "`" + relAnnotation.self() + "`, `" + relAnnotation.foreign() + "`";
+                String refSqlVals = "'" + id + "', '" + entryObj + "'";
 
-                String refStmt = MessageFormat.format(TEMPLATE_INSERT, refSqlKeys, refSqlVals);
+                String refStmt = MessageFormat.format(TEMPLATE_INSERT, relAnnotation.table(), refSqlKeys, refSqlVals);
 
                 try (PreparedStatement statement = connection.prepareStatement(refStmt)) {
-                    statement.setString(1, relAnnotation.table());
                     statement.executeUpdate();
+                } catch (SQLException e) {
+                    if (e.getErrorCode() == 0) {
+                        // TODO: delete entity?
+                        throw new IllegalArgumentException(/* TODO */);
+                    }
                 }
             }
         }
@@ -259,11 +263,9 @@ public class SQLProvider extends DatabaseProvider {
         // note: this will only work with ONE_TO_ONE relations
 
         Set<String> keys = content.keySet();
-        String stmt = MessageFormat.format(TEMPLATE_UPDATE, StringUtil.repeat("`?` = '?'", ", ", keys.size()));
+        String stmt = MessageFormat.format(TEMPLATE_UPDATE, table, StringUtil.repeat("? = ?", ", ", keys.size()));
 
         try (PreparedStatement statement = connection.prepareStatement(stmt)) {
-            statement.setString(1, table);
-
             int i = 2;
             for (String key : keys) {
                 Object val = ResourceUtil.getValue((JsonPrimitive) content.get(key));
@@ -286,7 +288,7 @@ public class SQLProvider extends DatabaseProvider {
         Relational relAnnotation = ResourceUtil.getRelationalAnnotation(type, key);
 
         if (relAnnotation == null)
-            throw new IllegalArgumentException("Illegal key: " + key);
+            throw new IllegalArgumentException("Illegal key for resource " + type.getSimpleName() + ": " + key);
 
         if (add)
             this.doPatchEntryInsert(relAnnotation, id, obj);
@@ -298,24 +300,22 @@ public class SQLProvider extends DatabaseProvider {
 
     private void doPatchEntryInsert(Relational annotation, long id, Object val) throws SQLException {
         String keys = "`" + annotation.self() + ", `" + annotation.foreign() + "`";
-        String stmt = MessageFormat.format(TEMPLATE_INSERT, keys, "`?`, `?`");
+        String stmt = MessageFormat.format(TEMPLATE_INSERT, annotation.table(), keys, "?, ?");
 
         try (PreparedStatement statement = connection.prepareStatement(stmt)) {
-            statement.setString(1, annotation.table());
-            statement.setLong(2, id);
-            statement.setObject(3, val);
+            statement.setLong(1, id);
+            statement.setObject(2, val);
 
             statement.executeUpdate();
         }
     }
 
     private void doPatchEntryDelete(Relational annotation, long id, Object val) throws SQLException {
-        try (PreparedStatement statement = connection.prepareStatement(STMT_DELETE_ENTRY)) {
-            statement.setString(1, annotation.table());
-            statement.setString(2, annotation.self());
-            statement.setLong(3, id);
-            statement.setString(4, annotation.foreign());
-            statement.setObject(5, val);
+        try (PreparedStatement statement = connection.prepareStatement(STMT_DELETE_ENTRY.formatted(annotation.table()))) {
+            statement.setString(1, annotation.self());
+            statement.setLong(2, id);
+            statement.setString(3, annotation.foreign());
+            statement.setObject(4, val);
 
             statement.executeUpdate();
         }
@@ -334,7 +334,7 @@ public class SQLProvider extends DatabaseProvider {
 
         List<Key> keys = ResourceUtil.getKeyAnnotations(type);
         for (Key key : keys) {
-            if (key.relation() != Relation.ONE_TO_ONE) continue;
+            if (!key.relation().isExt()) continue;
             this.createReferenceTable(type, key);
         }
 
@@ -352,7 +352,10 @@ public class SQLProvider extends DatabaseProvider {
 
             // value should be ignored
             if (atKey == null) continue;
-            if (atKey.relation() != Relation.ONE_TO_ONE) continue;
+            if (atKey.relation().isExt()) continue;
+
+            if (atKey.unique())
+                keys.add("UNIQUE (`" + atKey.name() + "`)");
 
             NotNull atNotNull = AnnotationUtil.getAnnotation(method, NotNull.class);
             String nullSuffix = atNotNull != null ? " NOT NULL" : "";
@@ -360,6 +363,7 @@ public class SQLProvider extends DatabaseProvider {
             keys.add("`" + atKey.name() +  "` " + atKey.sqlType() + nullSuffix);
         }
 
+        keys = Lists.reverse(keys);
         keys.add("PRIMARY KEY (`" + Keys.Turtle.ID + "`)");
 
         try (Statement statement = connection.createStatement()) {
@@ -371,7 +375,7 @@ public class SQLProvider extends DatabaseProvider {
         Relational relAnnotation = ResourceUtil.getRelationalAnnotation(resource, key.name());
 
         if (relAnnotation == null)
-            throw new IllegalArgumentException("Illegal key: " + key);
+            throw new IllegalArgumentException("Illegal key for resource " + resource.getSimpleName() + ": " + key);
 
         String table = relAnnotation.table();
         List<String> keys = new ArrayList<>();
